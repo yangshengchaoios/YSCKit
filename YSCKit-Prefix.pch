@@ -1,0 +1,213 @@
+//
+//  Prefix header
+//
+//  The contents of this file are implicitly included at the beginning of every source file.
+//  FORMATED!
+//
+
+#import <Availability.h>
+
+#ifndef __IPHONE_7_0
+#warning "This project uses features only available in iOS SDK 3.0 and later."
+#endif
+
+#ifdef __OBJC__
+    #import <UIKit/UIKit.h>
+    #import <Foundation/Foundation.h>
+    #import <BlocksKit/BlocksKit.h>
+    #import <BlocksKit+UIKit.h>
+    #import <BlocksKit+MessageUI.h>
+    #import <MBProgressHUD/MBProgressHUD.h>
+
+    //定义固定常量和公用枚举
+    #import "UrlConstants.h"
+    #import "UMengConstants.h"
+    #import "EnumType.h"
+
+    //系统类扩展
+    #import "NSObject+Addition.h"
+    #import "UITextField+Additions.h"
+    #import "UIView+Addition.h"
+    #import "NSDate+Additions.h"
+    #import "NSTimer+Addition.h"
+    #import "UIColor+Expanded.h"
+    #import "NSString+Addition.h"
+    #import "UIImageView+Additions.h"
+
+    //Utils
+    #import "FileUtils.h"
+    #import "ImageUtils.h"  //TODO:
+
+    //Manager
+    #import "PlayAudioManager.h"
+    #import "ReachabilityManager.h"
+    #import "AppConfigManager.h"
+    #import "StorageManager.h"
+    #import "LogManager.h"
+    #import "AFNManager.h"
+    #import "SNSShareManager.h"
+
+    //自定义view(对于全局需要使用的自定义view放这里)
+
+    //业务逻辑相关
+    #import "DataModel.h"
+    #import "Login.h"
+    #import "BaseViewController.h"
+#endif
+
+
+#define WeakSelfType __weak __typeof(&*self)
+
+/**
+ *  重新定义NSLog
+ */
+//控制调试信息的输出
+#define DEBUGMODEL      [[NSUserDefaults standardUserDefaults] boolForKey:@"DEBUG"]
+#define TGO_DEBUG_LOG   1  //只有在 非DEBUG 模式下起作用  0-关闭调试输出和日志记录功能  1-打开控制台输出和日志文件记录功能
+#define TGO_APPSTORE    0  //0-用企业证书打包版本  1-appstore审核版本
+
+#define __NSLog(s, ...) do { \
+NSString *logString = [NSString stringWithFormat:@"[%@(%d)] %@",[[NSString stringWithUTF8String:__FILE__] lastPathComponent],__LINE__,[NSString stringWithFormat:(s), ##__VA_ARGS__]]; \
+if ( DEBUGMODEL ) { \
+NSLog(@"%@", logString);\
+[LogManager saveLog:logString];\
+} \
+else { \
+if (TGO_DEBUG_LOG) { \
+[LogManager saveLog:logString]; \
+NSLog(@"%@", logString); \
+} \
+} \
+} while (0)
+
+#define NSLog(...) __NSLog(__VA_ARGS__)
+
+
+/**
+ *  判断设备的相关参数
+ */
+#pragma mark - Device
+
+#define IOS7                    ([[[UIDevice currentDevice] systemVersion] floatValue] >= 7.0) //是否是IOS7
+#define SCREEN_WIDTH            ([UIScreen mainScreen].bounds.size.width) //屏幕的宽度
+#define SCREEN_HEIGHT           ([UIScreen mainScreen].bounds.size.height)//屏幕的高度
+#define STATUSBAR_HEIGHT        20.0f
+#define NAVIGATIONBAR_HEIGHT    44.0f
+#define TITLEBAR_HEIGHT         64.0f       //等于STATUSBAR_HEIGHT + NAVIGATIONBAR_HEIGHT
+#define TABBAR_HEIGHT           49.0f
+
+/**
+ *  定义单例
+ */
+#pragma mark - Singleton
+
+#define DEFINE_SHARED_INSTANCE_USING_BLOCK(block) \
+static dispatch_once_t pred = 0; \
+__strong static id _sharedObject = nil; \
+dispatch_once(&pred, ^{ \
+_sharedObject = block(); \
+}); \
+return _sharedObject;
+
+
+/**
+ *  代码段简写
+ *
+ */
+#pragma mark - special methods
+
+#define USERID                          [[Login sharedInstance] userId]
+#define RGB(r, g, b)                    [UIColor colorWithRed:r / 255.0f green:g / 255.0f blue:b / 255.0f alpha:1.0f]
+#define RGBA(r, g, b, a)                [UIColor colorWithRed:r / 255.0f green:g / 255.0f blue:b / 255.0f alpha:a]
+#define RGBHEX(hex)                     [UIColor colorWithRed:((float)((hex & 0xFF0000) >> 16))/255.0 green:((float)((hex & 0xFF00) >> 8))/255.0 blue:((float)(hex & 0xFF))/255.0 alpha:1.0]
+#define ViewInXib(_xibName, _index)     [[[NSBundle mainBundle] loadNibNamed:_xibName owner:nil options:nil] objectAtIndex:_index]
+#define NavigationViewController(x)     [[UINavigationController alloc]initWithRootViewController:[[NSClassFromString(x) alloc] initWithNibName:nil bundle:nil]]
+#define ViewController(x)               [[NSClassFromString(x) alloc] initWithNibName:nil bundle:nil]
+#define AppVersion                      [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"]
+#define BundleVersion                   [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"]
+#define Welcome                         [NSString stringWithFormat:@"Welcome_V%@", AppVersion]
+#define SkipVersion                     [NSString stringWithFormat:@"SkipVersion_V%@", AppVersion]
+#define KeyWindow                       [UIApplication sharedApplication].keyWindow
+#define FileDefaultManager              [NSFileManager defaultManager]
+#define AppProgramPath(x)               [[FileUtils DirectoryPathOfBundle] stringByAppendingPathComponent:x]
+#define ReturnWhenObjectIsEmpty(object)             if ([NSObject isEmpty:object]) { return ;    }
+#define ReturnNilWhenObjectIsEmpty(object)          if ([NSObject isEmpty:object]) { return nil; }
+#define ReturnEmptyWhenObjectIsEmpty(object)        if ([NSObject isEmpty:object]) { return @""; }
+#define ReturnYESWhenObjectIsEmpty(object)          if ([NSObject isEmpty:object]) { return YES; }
+#define ReturnNOWhenObjectIsEmpty(object)           if ([NSObject isEmpty:object]) { return NO;  }
+
+
+/**
+ *  颜色及相关默认值定义
+ */
+#pragma mark - Color defines
+
+#define kDefaultViewColor               RGB(236, 236, 236)      //self.view的默认背景颜色
+#define kDefaultTitleBarColor           RGB(234, 106, 84)       //导航栏的默认颜色
+#define kDefaultStatusBarColor          RGB(234, 106, 84)       //状态栏默认颜色
+#define kDefaultNaviBarColor            RGBA(39, 155, 211, 1)   //设置navigationBar默认颜色(包括了StatusBar)
+#define kDefaultTextColor               RGB(126, 127, 140)      //设置文字默认颜色
+#define kDefaultTextColor1              RGB(122, 122, 122)
+#define kDefaultEmptyTextColor          RGB(122, 122, 122)      //列表为空时的提醒文字颜色
+
+
+
+/**
+ *  字体及相关默认值定义
+ */
+#pragma mark - Font defines
+
+#define kDefaultTextFont13              [UIFont systemFontOfSize:13]
+#define kDefaultTextFont14              [UIFont systemFontOfSize:14]        //设置默认字体大小
+#define kDefaultTextFont15              [UIFont systemFontOfSize:15]        //设置默认字体大小
+#define kDefaultTextFont16              [UIFont systemFontOfSize:16]        //设置默认字体大小
+#define kDefaultBoldTextFont14          [UIFont boldSystemFontOfSize:14]    //设置默认的粗体字体大小
+#define kDefaultBoldTextFont15          [UIFont boldSystemFontOfSize:15]
+#define kDefaultBoldTextFont16          [UIFont boldSystemFontOfSize:16]
+
+
+/**
+ *  定义常量
+ */
+#pragma mark - define constants
+
+#define kDefaultAppType                 @"TGO8-IOS"
+#define kDefaultPageSize                @"20"
+#define kDefaultAnimationDuration01     0.1f
+#define kDefaultAnimationDuration02     0.2f
+#define kDefaultAnimationDuration03     0.3f
+#define kDefaultAnimationDuration04     0.4f
+#define kDefaultAnimationDuration05     0.5f
+#define kDefaultAnimationDuration10     1.0f
+#define kAppScheme                      @"TGO8"
+#define kCellIdentifier                 @"cell"
+#define kFooterIdentifier               @"footer"
+#define kHeaderIdentifier               @"header"
+#define kItemCellIdentifier             @"itemCell"     //UICollectionView要用的
+#define kAppChannelAppStore             @"AppStore"     //定义渠道为AppStore
+#define kAppChannelTgogoDotNet          @"TgogoDotNet"  //定义渠道为官网
+#define kAppChannelDebug                @"Debug"        //定义渠道为测试环境
+
+
+
+/**
+ *  注册通知与发送通知
+ */
+#pragma mark - Notification
+
+#define addNObserver(_selector,_name)               ([[NSNotificationCenter defaultCenter] addObserver:self selector:_selector name:_name object:nil])
+#define addNObserverWithObj(_selector,_name,_obj)   ([[NSNotificationCenter defaultCenter] addObserver:self selector:_selector name:_name object:_obj])
+#define removeNObserver(_name)                      ([[NSNotificationCenter defaultCenter] removeObserver:self name:_name object:nil])
+#define removeAllObservers(_self)                   ([[NSNotificationCenter defaultCenter] removeObserver:_self])
+#define postN(_name)                                ([[NSNotificationCenter defaultCenter] postNotificationName:_name object:nil userInfo:nil])
+#define postNWithObj(_name,_obj)                    ([[NSNotificationCenter defaultCenter] postNotificationName:_name object:_obj userInfo:nil])
+#define postNWithInfo(_name,_info)                  ([[NSNotificationCenter defaultCenter] postNotificationName:_name object:nil userInfo:_info])
+
+
+
+/**
+ *  定义通知
+ */
+#pragma mark - Notification Name
+
+

@@ -1,0 +1,50 @@
+//
+//  UIImageView+Additions.h
+//  TGO
+//
+//  Created by  YangShengchao on 14-7-28.
+//  Copyright (c) 2014年 YSHCH_TEAM. All rights reserved.
+//  FORMATED!
+//
+
+#import <UIKit/UIKit.h>
+
+@interface UIImageView (Additions)
+
+@end
+
+
+/**
+ *  网络图片缓存处理
+ */
+@interface UIImageView (Cache)
+
+/**
+ *  加载网络图片
+ *
+ *  @param urlString 图片的完整url地址
+ */
+- (void)setImageWithURLString:(NSString *)urlString;
+- (void)setImageWithURLString:(NSString *)urlString placeholderImageName:(NSString *)placeholderImageName;
+- (void)setImageWithURLString:(NSString *)urlString withFadeIn:(BOOL)fadeIn;
+- (void)setImageWithURLString:(NSString *)urlString withThumbnail:(BOOL)thumbnail  DEPRECATED_ATTRIBUTE;
+- (void)setImageWithURLString:(NSString *)urlString placeholderImage:(UIImage *)holderImage;
+- (void)setImageWithURLString:(NSString *)urlString placeholderImage:(UIImage *)holderImage withFadeIn:(BOOL)fadeIn;
+- (void)setImageWithURLString:(NSString *)urlString placeholderImage:(UIImage *)holderImage withThumbnail:(BOOL)thumbnail DEPRECATED_ATTRIBUTE;
+
+/**
+ *  处理部分图形模糊
+ */
+
+@end
+
+
+/**
+ *  缩放Image
+ */
+@interface UIImage (Scale)
+
+-(UIImage*)getSubImage:(CGRect)rect;
+-(UIImage*)scaleToSize:(CGSize)size;
+
+@end
