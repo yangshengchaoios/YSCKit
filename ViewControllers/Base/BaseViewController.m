@@ -94,10 +94,10 @@
     }
     self.view.backgroundColor = kDefaultViewColor; //设置默认背景颜色
     
-    //单击隐藏键盘
-    [self.view bk_whenTapped:^{
-        [blockSelf performSelector:@selector(hideKeyboard) withObject:nil afterDelay:0.1f];
-    }];
+    //单击隐藏键盘(这里会和tableviewcell的单击事件相冲突)
+//    [self.view bk_whenTapped:^{
+//        [blockSelf performSelector:@selector(hideKeyboard) withObject:nil afterDelay:0.1f];
+//    }];
     
     //在输入框聚焦的情况下按键盘的return键要隐藏键盘
     [self setDelegateOfAllTextFields:self.view];
