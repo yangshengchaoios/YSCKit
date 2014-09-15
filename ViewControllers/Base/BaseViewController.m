@@ -622,6 +622,19 @@
 	}
 }
 
+/**
+ *  加载本地缓存数据
+ *  同时初始化为NSMutableArray
+ */
+- (NSMutableArray *)commonLoadCaches:(NSString *)cacheKey {
+    NSMutableArray *cacheArray = [NSMutableArray array];
+    NSArray *tempArray = [self cachedObjectForKey:cacheKey];
+    if ([tempArray isKindOfClass:[NSArray class]] && [NSArray isNotEmpty:tempArray]) {
+        [cacheArray addObjectsFromArray:tempArray];
+    }
+    return cacheArray;
+}
+
 #pragma mark - Overridden methods 业务相关
 
 /**

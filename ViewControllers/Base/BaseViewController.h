@@ -90,6 +90,7 @@
 - (id)cachedObjectForKey:(NSString *)cachedKey withSuffix:(NSString *)suffix;
 - (void)saveObject:(id)object forKey:(NSString *)cachedKey;
 - (void)saveObject:(id)object forKey:(NSString *)cachedKey withSuffix:(NSString *)suffix;
+- (NSMutableArray *)commonLoadCaches:(NSString *)cacheKey;
 
 
 #pragma mark - Overridden methods 业务相关
