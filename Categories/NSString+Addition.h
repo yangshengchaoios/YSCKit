@@ -47,6 +47,7 @@
 
 + (BOOL)isUrl:(NSString *)string;
 - (BOOL)isUrl;
++ (BOOL)isNotUrl:(NSString *)string;
 
 #pragma mark - 字符串比较
 /**
@@ -155,4 +156,21 @@
 - (NSString *)UTF8DecodedString;
 
 @end
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//  针对NSString扩展——带emoji表情的富文本显示
+//  Created by Joey on 14-9-17.
+//  Copyright (c) 2014年 JoeytatEmojiText. All rights reserved.
+///////////////////////////////////////////////////////////////////////////////////////////////////
+@interface NSString (EmojiAttributedString)
+
++ (NSAttributedString *)emojiAttributedString:(NSString *)string withFont:(UIFont *)font;
++ (CGFloat)HeightOfEmojiString:(NSString *)string maxWidth:(CGFloat)width withFont:(UIFont *)font;
++ (CGFloat)WidthOfEmojiString:(NSString *)string maxHeight:(CGFloat)height withFont:(UIFont *)font;
+
+@end
+
+
 

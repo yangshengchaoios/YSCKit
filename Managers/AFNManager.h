@@ -107,4 +107,8 @@ typedef NS_ENUM (NSInteger, RequestType) {
     requestSuccessed:(RequestSuccessed)requestSuccessed
       requestFailure:(RequestFailure)requestFailure;
 
+
+//TODO:测试参数加密字符串
++ (NSString *)signatureWithParam:(NSDictionary *)param;
+
 @end

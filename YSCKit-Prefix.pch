@@ -173,7 +173,8 @@ return _sharedObject;
 #pragma mark - define constants
 
 #define kDefaultAppType                 @"TGO8-IOS"
-#define kDefaultPageSize                @"20"
+#define kDefaultPageStartIndex          0
+#define kDefaultPageSize                20
 #define kDefaultAnimationDuration01     0.1f
 #define kDefaultAnimationDuration02     0.2f
 #define kDefaultAnimationDuration03     0.3f
@@ -188,6 +189,7 @@ return _sharedObject;
 #define kAppChannelAppStore             @"AppStore"     //定义渠道为AppStore
 #define kAppChannelTgogoDotNet          @"TgogoDotNet"  //定义渠道为官网
 #define kAppChannelDebug                @"Debug"        //定义渠道为测试环境
+#define kAppParamSecret                 @"TGOGOBA20141008"
 
 
 

@@ -566,6 +566,10 @@
 	return retStr;
 }
 
++ (NSString *)StringFromTimeStamp:(NSString *)timeStamp withFormat:(NSString *)format {
+    return [[self dateFromTimeStamp:timeStamp] stringWithFormat:format];
+}
+
 #pragma mark - private methods
 
 @end

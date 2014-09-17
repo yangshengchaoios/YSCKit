@@ -12,6 +12,8 @@
 #import <Foundation/Foundation.h>
 
 #define DateFormat1 @"yyyy-MM-dd hh:mm:ss"
+#define DateFormat2 @"yyyy.MM.dd hh:mm"
+#define DateFormat3 @"yyyy-MM-dd"
 
 #define D_MINUTE    60
 #define D_HOUR      3600
@@ -87,5 +89,6 @@
 - (NSString *)stringWithFormat:(NSString *)format;
 - (NSString *)chineseMonth; //汉语月份
 - (NSString *)constellation;//星座
++ (NSString *)StringFromTimeStamp:(NSString *)timeStamp withFormat:(NSString *)format;
 
 @end

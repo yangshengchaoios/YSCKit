@@ -32,7 +32,7 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.currentPageIndex = 1;                  //分页从1开始
+    self.currentPageIndex = kDefaultPageStartIndex;
     if (self.dataArray == nil) {
         self.dataArray = [NSMutableArray array];
     }
@@ -107,7 +107,7 @@
 	         requestSuccessed: ^(id responseObject) {
                  [blockSelf.contentScrollView headerEndRefreshing];
                  [blockSelf hideHUDLoading];
-                 blockSelf.currentPageIndex = 1;
+                 blockSelf.currentPageIndex = kDefaultPageStartIndex;
                  
                  //1. 获取结果数组
                  NSArray *dataArray = nil;

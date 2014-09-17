@@ -64,23 +64,21 @@
              placeholderImage:(UIImage *)placeholderImage
                 autoThumbnail:(BOOL)thumbnail
                    withFadeIn:(BOOL)withAnimate {
-    
     //设置基本参数
     self.image = nil;
     self.clipsToBounds = YES;
     self.contentMode = UIViewContentModeCenter;
     self.backgroundColor = DefaultBackgroundColor;
-    ReturnWhenObjectIsEmpty(urlString)
     NSString *newUrlString = [urlString copy];
     
     //处理相对路径
-    if (![NSString isUrl:urlString]) {
+    if ([NSString isNotUrl:urlString]) {
         newUrlString = [kResPathAppResUrl stringByAppendingFormat:@"%@%@",
                         ([kResPathAppResUrl hasSuffix:@"/"] ? @"" : @"/"),//确保kResPathAppResUrl后面有1个字符'/'
                         ([urlString hasPrefix:@"/"] ? [urlString substringFromIndex:1] : urlString)];//确保urlString前面没有字符'/'
     }
     
-    if (![NSString isUrl:newUrlString]) {//处理相对路径后仍然不是合法的url，则返回默认图片
+    if ([NSString isNotUrl:newUrlString]) {//处理相对路径后仍然不是合法的url，则返回默认图片
         self.image = DefaultPlaceholderImage;
         return;
     }

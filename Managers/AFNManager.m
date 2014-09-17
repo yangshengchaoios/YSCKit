@@ -221,7 +221,14 @@
 		[newUrlString appendFormat:@"%@",param];
 	}
     
-	//5. 发起网络请求
+    //5. 对提交的dict添加一个加密的参数'signature'
+    NSMutableDictionary *newDictParam = [NSMutableDictionary dictionaryWithDictionary:dictParam];
+    NSString *signature = [self signatureWithParam:dictParam];
+    if ([NSString isNotEmpty:signature]) {//当加密字符串不为空的时候就新增一个参数'signature'
+        [newDictParam setValue:signature forKey:kParamSignature];
+    }
+    
+	//6. 发起网络请求
     AFHTTPRequestOperationManager *manager = [AFHTTPRequestOperationManager manager];   //create new AFHTTPRequestOperationManager
     manager.requestSerializer.cachePolicy = NSURLRequestReloadIgnoringLocalCacheData;
     manager.requestSerializer.timeoutInterval = 15.0f;//设置POST和GET的超时时间
@@ -260,7 +267,7 @@
         NSLog(@"post failure! operation = %@\r\nerror = %@", operation, error);
         
         if (200 != operation.response.statusCode) {
-            [LogManager saveLog:[NSString stringWithFormat:@"请求参数%@", dictParam]];
+            [LogManager saveLog:[NSString stringWithFormat:@"请求参数%@", newDictParam]];
             [LogManager saveLog:error.localizedDescription];
             if (401 == operation.response.statusCode) {
                 requestFailure(1003, @"您还未登录呢！");
@@ -284,18 +291,18 @@
     //        return [mutablePairs componentsJoinedByString:@"&"];
     //    }];
     
-	NSLog(@"requestType = %d, dictParam = %@", requestType, dictParam);
+	NSLog(@"requestType = %d, newDictParam = %@", requestType, newDictParam);
 	if (RequestTypeGET == requestType) {
 		NSLog(@"getting data...");
 		[manager   GET:newUrlString
-		    parameters:dictParam
+		    parameters:newDictParam
 		       success:requestSuccessed1
 		       failure:requestFailure1];
 	}
 	else if (RequestTypePOST == requestType) {
 		NSLog(@"posting data...");
 		[manager  POST:newUrlString
-		    parameters:dictParam
+		    parameters:newDictParam
 		       success:requestSuccessed1
 		       failure:requestFailure1];
 	}
@@ -303,7 +310,7 @@
 		NSLog(@"uploading data...");
         
 		[manager       POST:newUrlString
-                 parameters:dictParam
+                 parameters:newDictParam
   constructingBodyWithBlock: ^(id < AFMultipartFormData > formData) {
       [formData appendPartWithFileData:imageData name:@"file" fileName:@"avatar.png" mimeType:@"application/octet-stream"];
   }
@@ -318,4 +325,38 @@
         [manager.operationQueue addOperation:operation];
     }
 }
+
+/**
+ *  对参数进行签名
+ *
+ *  @param param oldDict
+ *
+ *  @return signature
+ */
++ (NSString *)signatureWithParam:(NSDictionary *)param {
+    NSArray *keys = [[param allKeys] sortedArrayUsingSelector:@selector(compare:)];
+    //1. 判空
+    if ([NSArray isEmpty:keys]) {//如果key为空就返回空字符串
+        return @"";
+    }
+    //2. 按照字典顺序拼接url字符串
+    NSLog(@"param = %@", param);
+    NSMutableString *joinedString = [NSMutableString string];
+    for (NSString *key in keys) {
+        if ([kParamSignature isEqualToString:key]) {//不对signature进行加密
+            continue;
+        }
+        //去掉key和value的前后空格字符
+        NSString *newKey = [NSString trimString:key];
+        NSString *newValue = [NSString trimString:param[key]];
+        //对value进行UTF8编码
+        [joinedString appendFormat:@"%@=%@", newKey, [NSString UTF8Encoded:newValue]];
+    }
+    
+    //3. 对参数进行md5加密
+    NSString *newString = [NSString stringWithFormat:@"%@%@", joinedString, kAppParamSecret];
+    NSLog(@"newString = %@", newString);
+    return [[NSString MD5Encrypt:newString] lowercaseString];
+}
+
 @end
