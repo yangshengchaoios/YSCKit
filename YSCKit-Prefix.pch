@@ -135,6 +135,7 @@ return _sharedObject;
 #define ReturnEmptyWhenObjectIsEmpty(object)        if ([NSObject isEmpty:object]) { return @""; }
 #define ReturnYESWhenObjectIsEmpty(object)          if ([NSObject isEmpty:object]) { return YES; }
 #define ReturnNOWhenObjectIsEmpty(object)           if ([NSObject isEmpty:object]) { return NO;  }
+#define StretchImageOfTopicReply        [ImageUtils stretchImage:[UIImage imageNamed:@"bg_balloon_white"] withPoint:CGPointMake(20, 20)]
 
 
 /**

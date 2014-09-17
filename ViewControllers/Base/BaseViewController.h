@@ -17,7 +17,7 @@
 //第三方库
 #import "UIViewController+ScrollingNavbar.h"
 #import "UIViewController+ADTransitionController.h"
-
+#import "UINavigationController+CustomAnimations.h"
 
 
 @interface BaseViewController : UIViewController <UITextFieldDelegate>

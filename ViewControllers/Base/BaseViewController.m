@@ -283,7 +283,7 @@
     
 	//第二步：检测是否有class文件 同时兼容xib布局的情况
 	if (!pushedViewController) {
-		pushedViewController = [[NSClassFromString(className) alloc] initWithNibName:nil bundle:nil];
+		pushedViewController = [[NSClassFromString(className) alloc] initWithNibName:className bundle:nil];
 	}
 	NSAssert(pushedViewController, @"class[%@] is not exists in this project!", className);
     pushedViewController.hidesBottomBarWhenPushed = YES;

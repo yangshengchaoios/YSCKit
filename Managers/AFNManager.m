@@ -91,9 +91,9 @@
      requestFailure:(RequestFailure)requestFailure {
     long long timestamp = [[NSDate date] timeIntervalSince1970] * 1000;
     NSString *picturePath = [NSTemporaryDirectory() stringByAppendingPathComponent:[NSString stringWithFormat:@"%lld.jpg", timestamp]];
-    UIImage *scaledImage1 = [ImageUtils adjustImage:image toQuality:quality];
+    UIImage *scaledImage1 = [ImageUtils adjustImage:image withQuality:quality];
     UIImage *scaledImage = [scaledImage1 resizedImage:CGSizeMake(76, 76) interpolationQuality:kCGInterpolationDefault];
-    
+    //TODO:resize
     [self requestByUrl:url withAPI:apiName andArrayParam:arrayParam andDictParam:dictParam andBodyParam:nil imageData:UIImagePNGRepresentation(scaledImage)
            requestType:RequestTypeUploadFile
       requestSuccessed:^(id responseObject) {
