@@ -122,7 +122,7 @@ return _sharedObject;
 #define RGBHEX(hex)                     [UIColor colorWithRed:((float)((hex & 0xFF0000) >> 16))/255.0 green:((float)((hex & 0xFF00) >> 8))/255.0 blue:((float)(hex & 0xFF))/255.0 alpha:1.0]
 #define ViewInXib(_xibName, _index)     [[[NSBundle mainBundle] loadNibNamed:_xibName owner:nil options:nil] objectAtIndex:_index]
 #define NavigationViewController(x)     [[UINavigationController alloc]initWithRootViewController:[[NSClassFromString(x) alloc] initWithNibName:nil bundle:nil]]
-#define ViewController(x)               [[NSClassFromString(x) alloc] initWithNibName:nil bundle:nil]
+#define ViewController(x)               [[NSClassFromString(x) alloc] initWithNibName:x bundle:nil]
 #define AppVersion                      [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"]
 #define BundleVersion                   [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"]
 #define Welcome                         [NSString stringWithFormat:@"Welcome_V%@", AppVersion]
@@ -172,7 +172,6 @@ return _sharedObject;
  */
 #pragma mark - define constants
 
-#define kDefaultAppType                 @"TGO8-IOS"
 #define kDefaultPageStartIndex          0
 #define kDefaultPageSize                20
 #define kDefaultAnimationDuration01     0.1f
@@ -181,16 +180,16 @@ return _sharedObject;
 #define kDefaultAnimationDuration04     0.4f
 #define kDefaultAnimationDuration05     0.5f
 #define kDefaultAnimationDuration10     1.0f
+#define kDefaultInterfaceVersion        @"1.0"          //设置默认接口版本号
+#define kDefaultClientType              @"TGO8-IOS"     //设置终端设备类型(ios android)
 #define kAppScheme                      @"TGO8"
-#define kCellIdentifier                 @"cell"
-#define kFooterIdentifier               @"footer"
-#define kHeaderIdentifier               @"header"
-#define kItemCellIdentifier             @"itemCell"     //UICollectionView要用的
+#define kCellIdentifier                 @"Cell"
+#define kFooterIdentifier               @"Footer"
+#define kHeaderIdentifier               @"Header"
+#define kItemCellIdentifier             @"ItemCell"     //UICollectionView要用的
 #define kAppChannelAppStore             @"AppStore"     //定义渠道为AppStore
 #define kAppChannelTgogoDotNet          @"TgogoDotNet"  //定义渠道为官网
 #define kAppChannelDebug                @"Debug"        //定义渠道为测试环境
-#define kAppParamSecret                 @"TGOGOBA20141008"
-
 
 
 /**

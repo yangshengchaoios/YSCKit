@@ -223,7 +223,7 @@
     
     //5. 对提交的dict添加一个加密的参数'signature'
     NSMutableDictionary *newDictParam = [NSMutableDictionary dictionaryWithDictionary:dictParam];
-    NSString *signature = [self signatureWithParam:dictParam];
+    NSString *signature = [self signatureWithParam:newDictParam];
     if ([NSString isNotEmpty:signature]) {//当加密字符串不为空的时候就新增一个参数'signature'
         [newDictParam setValue:signature forKey:kParamSignature];
     }
@@ -232,7 +232,7 @@
     AFHTTPRequestOperationManager *manager = [AFHTTPRequestOperationManager manager];   //create new AFHTTPRequestOperationManager
     manager.requestSerializer.cachePolicy = NSURLRequestReloadIgnoringLocalCacheData;
     manager.requestSerializer.timeoutInterval = 15.0f;//设置POST和GET的超时时间
-    [manager.requestSerializer setValue:kDefaultAppType forHTTPHeaderField:@"User-Agent"];
+    [manager.requestSerializer setValue:kDefaultClientType forHTTPHeaderField:@"User-Agent"];
     [manager.requestSerializer setValue:[[Login sharedInstance] authorization] forHTTPHeaderField:@"Authorization"];
     //解决返回的Content-Type始终是application/xml问题！
     [manager.requestSerializer setValue:@"application/json" forHTTPHeaderField:@"Accept"];
@@ -333,12 +333,13 @@
  *
  *  @return signature
  */
-+ (NSString *)signatureWithParam:(NSDictionary *)param {
-    NSArray *keys = [[param allKeys] sortedArrayUsingSelector:@selector(compare:)];
-    //1. 判空
-    if ([NSArray isEmpty:keys]) {//如果key为空就返回空字符串
-        return @"";
++ (NSString *)signatureWithParam:(NSMutableDictionary *)param {
+    //1. 添加默认'version'参数
+    if ([NSString isEmpty:param[kParamVersion]]) {
+        [param setValue:kDefaultInterfaceVersion forKey:kParamVersion];//如果有了就不加
     }
+    NSArray *keys = [[param allKeys] sortedArrayUsingSelector:@selector(compare:)];
+    
     //2. 按照字典顺序拼接url字符串
     NSLog(@"param = %@", param);
     NSMutableString *joinedString = [NSMutableString string];
@@ -354,7 +355,7 @@
     }
     
     //3. 对参数进行md5加密
-    NSString *newString = [NSString stringWithFormat:@"%@%@", joinedString, kAppParamSecret];
+    NSString *newString = [NSString stringWithFormat:@"%@%@", joinedString, kParamSecretKey];
     NSLog(@"newString = %@", newString);
     return [[NSString MD5Encrypt:newString] lowercaseString];
 }
