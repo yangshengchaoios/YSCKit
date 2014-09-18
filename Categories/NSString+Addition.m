@@ -172,6 +172,9 @@
 #pragma mark - 字符串简单变换
 + (NSString *)trimString:(NSString *)string {
     ReturnEmptyWhenObjectIsEmpty(string)
+    if ( ! [string isKindOfClass:[NSString class]]) {
+        return string;
+    }
     return [string trimString];
 }
 
@@ -615,6 +618,8 @@
 @implementation NSString (EmojiAttributedString)
 
 + (NSAttributedString *)emojiAttributedString:(NSString *)string withFont:(UIFont *)font {
+    ReturnNilWhenObjectIsEmpty(string)
+    ReturnNilWhenObjectIsEmpty(font);
     NSMutableAttributedString *parsedOutput = [[NSMutableAttributedString alloc]initWithString:string
                                                                                     attributes:@{NSFontAttributeName : font}];
     // 1. 获取本地表情 Dictionary
@@ -643,7 +648,6 @@
         UIImage *emojiImage = [UIImage imageNamed:emojiPlistDic[[parsedOutput.string substringWithRange:captureRange]]];
         // 6. 将图片 Size 修改为符合字体的大小
         textAttachment.image = [ImageUtils resizeImage:emojiImage toSize:CGSizeMake(emojiSize,emojiSize)];
-        
         // 7. 将之前 match 到的图片代码替换为含有 Emoji 表情的 NSAttributeString
         NSAttributedString *rep = [NSAttributedString attributedStringWithAttachment:textAttachment];
         [parsedOutput replaceCharactersInRange:matchRange withAttributedString:rep];
@@ -653,12 +657,16 @@
 }
 
 + (CGFloat)HeightOfEmojiString:(NSString *)string maxWidth:(CGFloat)width withFont:(UIFont *)font {
+    ReturnZeroWhenObjectIsEmpty(string)
+    ReturnZeroWhenObjectIsEmpty(font)
     UITextView *textView = [[UITextView alloc] initWithFrame:CGRectZero];
     [textView.textStorage setAttributedString:[self emojiAttributedString:string withFont:font]];
     return [textView sizeThatFits:CGSizeMake(width, CGFLOAT_MAX)].height;
 }
 
 + (CGFloat)WidthOfEmojiString:(NSString *)string maxHeight:(CGFloat)height withFont:(UIFont *)font {
+    ReturnZeroWhenObjectIsEmpty(string)
+    ReturnZeroWhenObjectIsEmpty(font)
     UITextView *textView = [[UITextView alloc] initWithFrame:CGRectZero];
     [textView.textStorage setAttributedString:[self emojiAttributedString:string withFont:font]];
     return [textView sizeThatFits:CGSizeMake(CGFLOAT_MAX, height)].width;

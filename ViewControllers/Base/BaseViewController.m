@@ -161,7 +161,7 @@
 				self.backButton.autoresizingMask = UIViewAutoresizingFlexibleBottomMargin;
 				self.backButton.backgroundColor = [UIColor clearColor];
 				[self.backButton setTitle:nil forState:UIControlStateNormal];
-				[self.backButton setImage:[UIImage imageNamed:@"button_back"] forState:UIControlStateNormal];
+				[self.backButton setImage:[UIImage imageNamed:@"button_arrow_left"] forState:UIControlStateNormal];
 			}
 			[self.backButton addTarget:self action:@selector(popButtonClicked:) forControlEvents:UIControlEventTouchUpInside];
 			[self.titleBarView addSubview:self.backButton];
@@ -199,7 +199,7 @@
         UIButton *dismissButton = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, 44, 40)];
         [dismissButton addTarget:self action:@selector(dismissOnPresentingViewController) forControlEvents:UIControlEventTouchUpInside];
         [dismissButton setImageEdgeInsets:UIEdgeInsetsMake(4, -4, 4, 16)];
-        [dismissButton setImage:[UIImage imageNamed:@"button_dismiss"] forState:UIControlStateNormal];
+        [dismissButton setImage:[UIImage imageNamed:@"button_arrow_left"] forState:UIControlStateNormal];
         dismissButton.tintColor = [UIColor blackColor];
         self.navigationItem.leftBarButtonItems = [self customBarButtonOnNavigationBar:dismissButton withFixedSpaceWidth:-10];
     }
@@ -375,14 +375,13 @@
 - (UIViewController *)presentViewController:(NSString *)className withParams:(NSDictionary *)paramDict {
     [self hideKeyboard];
     UIViewController *viewController = [self createBaseViewController:className];
-    NSMutableDictionary *mutableParamDict = [paramDict mutableCopy];
+    NSMutableDictionary *mutableParamDict = [NSMutableDictionary dictionaryWithDictionary:paramDict];
     [mutableParamDict setValue:@(BackTypeDismiss) forKey:kParamBackType];   //这里设置的返回按钮由即将presented出来的viewController负责创建
 	if ([viewController isKindOfClass:[BaseViewController class]]) {
 		[(BaseViewController *)viewController setParams:[NSDictionary dictionaryWithDictionary:mutableParamDict]];
 	}
     
 	UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:viewController];
-	navigationController.navigationBar.tintColor = [UIColor blackColor];
 	[self presentViewController:navigationController animated:YES completion:nil];
 	return navigationController;
 }
@@ -421,7 +420,7 @@
     }
     [self hideKeyboard];
 	UIViewController *pushedViewController = [self createBaseViewController:className];
-    NSMutableDictionary *mutableParamDict = [paramDict mutableCopy];
+    NSMutableDictionary *mutableParamDict = [NSMutableDictionary dictionaryWithDictionary:paramDict];
 	if ([pushedViewController isKindOfClass:[BaseViewController class]]) {
 		[(BaseViewController *)pushedViewController setParams:mutableParamDict];
 	}

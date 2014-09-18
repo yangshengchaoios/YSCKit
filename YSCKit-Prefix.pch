@@ -135,7 +135,13 @@ return _sharedObject;
 #define ReturnEmptyWhenObjectIsEmpty(object)        if ([NSObject isEmpty:object]) { return @""; }
 #define ReturnYESWhenObjectIsEmpty(object)          if ([NSObject isEmpty:object]) { return YES; }
 #define ReturnNOWhenObjectIsEmpty(object)           if ([NSObject isEmpty:object]) { return NO;  }
+#define ReturnZeroWhenObjectIsEmpty(object)         if ([NSObject isEmpty:object]) { return 0;  }
 #define StretchImageOfTopicReply        [ImageUtils stretchImage:[UIImage imageNamed:@"bg_balloon_white"] withPoint:CGPointMake(20, 20)]
+#define DefaultAvatarImage              [UIImage imageNamed:@"default_avatar"]
+#define DefaultProductImage             [UIImage imageNamed:@"default_product"]
+#define DefaultImage                    [UIImage imageNamed:@"default_image"]
+#define GenderMaleImage                 [UIImage imageNamed:@"icon_gender_male"]
+#define GenderFemaleImage               [UIImage imageNamed:@"icon_gender_female"]
 
 
 /**

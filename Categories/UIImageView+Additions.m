@@ -10,7 +10,7 @@
 #import <SDWebImage/UIImageView+WebCache.h>
 
 #define DefaultBackgroundColor          [UIColor colorWithWhite:0.97f alpha:1.0f]       //UIImageView默认背景颜色
-#define DefaultPlaceholderImageName     @"image_placeholder"
+#define DefaultPlaceholderImageName     @"default_image"
 #define DefaultPlaceholderImage         [UIImage imageNamed:DefaultPlaceholderImageName]       //本项目的默认图片
 
 
