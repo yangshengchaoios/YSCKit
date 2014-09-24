@@ -23,4 +23,9 @@
 + (UIImage *)stretchImage:(UIImage *)image withPoint:(CGPoint)point;
 + (UIImage *)stretchImage:(UIImage *)image withEdgeInset:(UIEdgeInsets)edgeInset;
 
+//模糊图片1
++ (UIImage *)blurryImage:(UIImage *)image withBlurLevel:(CGFloat)blur;
+
+//模糊图片2 0.0 to 1.0
++ (UIImage*)blurryImage1:(UIImage *)image withBlurLevel:(CGFloat)blurAmount;
 @end

@@ -25,31 +25,35 @@
 @implementation UIImageView (Cache)
 
 - (void)setImageWithURLString:(NSString *)urlString {
-    [self setImageWithURLString:urlString placeholderImage:DefaultPlaceholderImage];
+    [self setImageWithURLString:urlString placeholderImage:DefaultPlaceholderImage autoThumbnail:NO withFadeIn:NO completed:nil];
+}
+
+- (void)setImageWithURLString:(NSString *)urlString completed:(SetImageCompletionBlock)complete {
+    [self setImageWithURLString:urlString placeholderImage:DefaultPlaceholderImage autoThumbnail:NO withFadeIn:NO completed:complete];
 }
 
 - (void)setImageWithURLString:(NSString *)urlString placeholderImageName:(NSString *)placeholderImageName {
-    [self setImageWithURLString:urlString placeholderImage:[UIImage imageNamed:placeholderImageName]];
+    [self setImageWithURLString:urlString placeholderImage:[UIImage imageNamed:placeholderImageName] autoThumbnail:NO withFadeIn:NO completed:nil];
+}
+
+- (void)setImageWithURLString:(NSString *)urlString placeholderImageName:(NSString *)placeholderImageName completed:(SetImageCompletionBlock)complete {
+    [self setImageWithURLString:urlString placeholderImage:[UIImage imageNamed:placeholderImageName] autoThumbnail:NO withFadeIn:NO completed:complete];
 }
 
 - (void)setImageWithURLString:(NSString *)urlString withFadeIn:(BOOL)fadeIn {
-    [self setImageWithURLString:urlString placeholderImage:DefaultPlaceholderImage withFadeIn:fadeIn];
-}
-
-- (void)setImageWithURLString:(NSString *)urlString withThumbnail:(BOOL)thumbnail {
-    [self setImageWithURLString:urlString placeholderImage:DefaultPlaceholderImage withThumbnail:thumbnail];
+    [self setImageWithURLString:urlString placeholderImage:DefaultPlaceholderImage autoThumbnail:NO withFadeIn:fadeIn completed:nil];
 }
 
 - (void)setImageWithURLString:(NSString *)urlString placeholderImage:(UIImage *)holderImage {
-    [self setImageWithURLString:urlString placeholderImage:holderImage autoThumbnail:NO withFadeIn:NO];
+    [self setImageWithURLString:urlString placeholderImage:holderImage autoThumbnail:NO withFadeIn:NO completed:nil];
+}
+
+- (void)setImageWithURLString:(NSString *)urlString placeholderImage:(UIImage *)holderImage completed:(SetImageCompletionBlock)complete {
+    [self setImageWithURLString:urlString placeholderImage:holderImage autoThumbnail:NO withFadeIn:NO completed:complete];
 }
 
 - (void)setImageWithURLString:(NSString *)urlString placeholderImage:(UIImage *)holderImage withFadeIn:(BOOL)fadeIn {
-    [self setImageWithURLString:urlString placeholderImage:holderImage autoThumbnail:NO withFadeIn:fadeIn];
-}
-
-- (void)setImageWithURLString:(NSString *)urlString placeholderImage:(UIImage *)holderImage withThumbnail:(BOOL)thumbnail {
-    [self setImageWithURLString:urlString placeholderImage:holderImage autoThumbnail:thumbnail withFadeIn:NO];
+    [self setImageWithURLString:urlString placeholderImage:holderImage autoThumbnail:NO withFadeIn:fadeIn completed:nil];
 }
 
 /**
@@ -63,11 +67,11 @@
 - (void)setImageWithURLString:(NSString *)urlString
              placeholderImage:(UIImage *)placeholderImage
                 autoThumbnail:(BOOL)thumbnail
-                   withFadeIn:(BOOL)withAnimate {
+                   withFadeIn:(BOOL)withAnimate
+                    completed:(SetImageCompletionBlock)complete {
     //设置基本参数
     self.image = nil;
     self.clipsToBounds = YES;
-    self.contentMode = UIViewContentModeCenter;
     self.backgroundColor = DefaultBackgroundColor;
     NSString *newUrlString = [urlString copy];
     
@@ -114,6 +118,10 @@
                                                     
                                                 }];
                            }
+                       }
+                       //设置回调
+                       if (complete) {
+                           complete(image, error);
                        }
                    }];
 }

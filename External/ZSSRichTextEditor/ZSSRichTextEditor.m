@@ -79,7 +79,6 @@ static Class hackishFixClass = Nil;
 @interface ZSSRichTextEditor ()
 @property (nonatomic, strong) UIScrollView *toolBarScroll;
 @property (nonatomic, strong) UIToolbar *toolbar;
-@property (nonatomic, strong) UIView *toolbarHolder;
 @property (nonatomic, strong) NSString *htmlString;
 @property (nonatomic, strong) UIWebView *editorView;
 @property (nonatomic, strong) ZSSTextView *sourceView;
@@ -93,6 +92,9 @@ static Class hackishFixClass = Nil;
 @property (nonatomic, strong) NSString *selectedImageAlt;
 @property (nonatomic, strong) UIBarButtonItem *keyboardItem;
 @property (nonatomic, strong) NSMutableArray *customBarButtonItems;
+@property (nonatomic, strong) NSMutableArray *customZSSBarButtonItems;
+@property (nonatomic, strong) NSString *internalHTML;
+@property (nonatomic) BOOL editorLoaded;
 - (NSString *)removeQuotesFromHTML:(NSString *)html;
 - (NSString *)tidyHTML:(NSString *)html;
 - (void)enableToolbarItems:(BOOL)enable;
@@ -104,12 +106,14 @@ static Class hackishFixClass = Nil;
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    // Defaults
+    self.editorLoaded = NO;
     self.shouldShowKeyboard = YES;
     self.formatHTML = YES;
     
+    
+    // FIXME: 修改布局以及样式
     // Source View
-    CGRect frame = CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height);
+    CGRect frame = CGRectMake(12, 0, self.view.frame.size.width-24, self.view.frame.size.height);
     self.sourceView = [[ZSSTextView alloc] initWithFrame:frame];
     self.sourceView.hidden = YES;
     self.sourceView.autocapitalizationType = UITextAutocapitalizationTypeNone;
@@ -131,6 +135,9 @@ static Class hackishFixClass = Nil;
     self.editorView.scrollView.bounces = NO;
     self.editorView.backgroundColor = [UIColor whiteColor];
     [self.view addSubview:self.editorView];
+    
+    self.editorView.layer.cornerRadius = 5.0f;
+    self.editorView.layer.masksToBounds = YES;
     
     // Scrolling View
     self.toolBarScroll = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, [self isIpad] ? self.view.frame.size.width : self.view.frame.size.width - 44, 44)];
@@ -179,7 +186,18 @@ static Class hackishFixClass = Nil;
     
     // Build the toolbar
     [self buildToolbar];
-
+    
+    if (!self.resourcesLoaded) {
+        NSString *filePath = [[NSBundle mainBundle] pathForResource:@"editor" ofType:@"html"];
+        NSData *htmlData = [NSData dataWithContentsOfFile:filePath];
+        NSString *htmlString = [[NSString alloc] initWithData:htmlData encoding:NSUTF8StringEncoding];
+        NSString *source = [[NSBundle mainBundle] pathForResource:@"ZSSRichTextEditor" ofType:@"js"];
+        NSString *jsString = [[NSString alloc] initWithData:[NSData dataWithContentsOfFile:source] encoding:NSUTF8StringEncoding];
+        htmlString = [htmlString stringByReplacingOccurrencesOfString:@"<!--editor-->" withString:jsString];
+        
+        [self.editorView loadHTMLString:htmlString baseURL:self.baseURL];
+        self.resourcesLoaded = YES;
+    }
 }
 
 
@@ -208,6 +226,26 @@ static Class hackishFixClass = Nil;
     
     _toolbarItemSelectedTintColor = toolbarItemSelectedTintColor;
     
+}
+
+
+- (void)setPlaceholderText {
+    
+    NSString *js = [NSString stringWithFormat:@"zss_editor.setPlaceholder(\"%@\");", self.placeholder];
+    [self.editorView stringByEvaluatingJavaScriptFromString:js];
+    
+}
+
+- (void)setFooterHeight:(float)footerHeight {
+
+    NSString *js = [NSString stringWithFormat:@"zss_editor.setFooterHeight(\"%f\");", footerHeight];
+    [self.editorView stringByEvaluatingJavaScriptFromString:js];
+}
+
+- (void)setContentHeight:(float)contentHeight {
+    
+    NSString *js = [NSString stringWithFormat:@"zss_editor.contentHeight = %f;", contentHeight];
+    [self.editorView stringByEvaluatingJavaScriptFromString:js];
 }
 
 
@@ -460,6 +498,10 @@ static Class hackishFixClass = Nil;
         items = [self itemsForToolbar];
     }
     
+    if (self.customZSSBarButtonItems != nil) {
+        items = [items arrayByAddingObjectsFromArray:self.customZSSBarButtonItems];
+    }
+    
     // get the width before we add custom buttons
     CGFloat toolbarWidth = items.count == 0 ? 0.0f : (CGFloat)(items.count * 39) - 10;
     
@@ -477,7 +519,10 @@ static Class hackishFixClass = Nil;
         item.tintColor = [self barButtonItemDefaultColor];
     }
     
-    self.toolbar.frame = CGRectMake(0, 0, toolbarWidth, 44);
+    //FIXME:修改 ToolBar 样式
+    self.toolbar.barTintColor = RGB(54, 54, 54);
+    self.toolbar.translucent = NO;
+    self.toolbar.frame = CGRectMake(0, 0, self.view.width, 44);
     self.toolBarScroll.contentSize = CGSizeMake(self.toolbar.frame.size.width, 44);
 }
 
@@ -503,36 +548,32 @@ static Class hackishFixClass = Nil;
     // Dispose of any resources that can be recreated.
 }
 
-- (void)focusTextEditor
-{
+#pragma mark - Editor Interaction
+
+- (void)focusTextEditor {
     self.editorView.keyboardDisplayRequiresUserAction = NO;
     NSString *js = [NSString stringWithFormat:@"zss_editor.focusEditor();"];
     [self.editorView stringByEvaluatingJavaScriptFromString:js];
 }
 
-- (void)blurTextEditor
-{
+- (void)blurTextEditor {
     NSString *js = [NSString stringWithFormat:@"zss_editor.blurEditor();"];
     [self.editorView stringByEvaluatingJavaScriptFromString:js];
 }
 
-#pragma mark - Editor Interaction
-
 - (void)setHTML:(NSString *)html {
     
-    if (!self.resourcesLoaded) {
-        NSString *filePath = [[NSBundle mainBundle] pathForResource:@"editor" ofType:@"html"];
-        NSData *htmlData = [NSData dataWithContentsOfFile:filePath];
-        NSString *htmlString = [[NSString alloc] initWithData:htmlData encoding:NSUTF8StringEncoding];
-        NSString *source = [[NSBundle mainBundle] pathForResource:@"ZSSRichTextEditor" ofType:@"js"];
-        NSString *jsString = [[NSString alloc] initWithData:[NSData dataWithContentsOfFile:source] encoding:NSUTF8StringEncoding];
-        htmlString = [htmlString stringByReplacingOccurrencesOfString:@"<!--editor-->" withString:jsString];
-        htmlString = [htmlString stringByReplacingOccurrencesOfString:@"<!--content-->" withString:html];
-        
-        [self.editorView loadHTMLString:htmlString baseURL:self.baseURL];
-        self.resourcesLoaded = YES;
+    self.internalHTML = html;
+    
+    if (self.editorLoaded) {
+        [self updateHTML];
     }
     
+}
+
+- (void)updateHTML {
+    
+    NSString *html = self.internalHTML;
     self.sourceView.text = html;
     NSString *cleanedHTML = [self removeQuotesFromHTML:self.sourceView.text];
 	NSString *trigger = [NSString stringWithFormat:@"zss_editor.setHTML(\"%@\");", cleanedHTML];
@@ -552,6 +593,10 @@ static Class hackishFixClass = Nil;
     NSString *cleanedHTML = [self removeQuotesFromHTML:html];
 	NSString *trigger = [NSString stringWithFormat:@"zss_editor.insertHTML(\"%@\");", cleanedHTML];
     [self.editorView stringByEvaluatingJavaScriptFromString:trigger];
+}
+
+- (NSString *)getText {
+    return [self.editorView stringByEvaluatingJavaScriptFromString:@"zss_editor.getText();"];
 }
 
 - (void)dismissKeyboard {
@@ -813,10 +858,23 @@ static Class hackishFixClass = Nil;
     [button setTitleColor:[self barButtonItemSelectedDefaultColor] forState:UIControlStateHighlighted];
     
     ZSSBarButtonItem *barButtonItem = [[ZSSBarButtonItem alloc] initWithCustomView:button];
+    
     [self.customBarButtonItems addObject:barButtonItem];
     
     [self buildToolbar];
 }
+
+- (void)addCustomToolbarItem:(ZSSBarButtonItem *)item {
+    
+    if(self.customZSSBarButtonItems == nil)
+    {
+        self.customZSSBarButtonItems = [NSMutableArray array];
+    }
+    [self.customZSSBarButtonItems addObject:item];
+    
+    [self buildToolbar];
+}
+
 
 - (void)removeLink {
     [self.editorView stringByEvaluatingJavaScriptFromString:@"zss_editor.unlink();"];
@@ -913,7 +971,7 @@ static Class hackishFixClass = Nil;
         [itemsModified addObject:updatedItem];
     }
     itemNames = [NSArray arrayWithArray:itemsModified];
-    NSLog(@"%@", itemNames);
+   
     self.editorItemsEnabled = itemNames;
     
     // Highlight items
@@ -960,6 +1018,18 @@ static Class hackishFixClass = Nil;
         NSString *className = [urlString stringByReplacingOccurrencesOfString:@"callback://" withString:@""];
         [self updateToolBarWithButtonName:className];
         
+    } else if ([urlString rangeOfString:@"debug://"].location != NSNotFound) {
+        
+        // We recieved the callback
+        NSString *debug = [urlString stringByReplacingOccurrencesOfString:@"debug://" withString:@""];
+        debug = [debug stringByReplacingPercentEscapesUsingEncoding:NSStringEncodingConversionAllowLossy];
+        NSLog(@"%@", debug);
+        
+    } else if ([urlString rangeOfString:@"scroll://"].location != NSNotFound) {
+        
+        NSInteger position = [[urlString stringByReplacingOccurrencesOfString:@"scroll://" withString:@""] integerValue];
+        [self editorDidScrollWithPosition:position];
+        
     }
     
     return YES;
@@ -968,11 +1038,26 @@ static Class hackishFixClass = Nil;
 
 
 - (void)webViewDidFinishLoad:(UIWebView *)webView {
+    self.editorLoaded = YES;
+    //[self setPlaceholderText];
+    if (!self.internalHTML) {
+        self.internalHTML = @"";
+    }
+    [self updateHTML];
     if (self.shouldShowKeyboard) {
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
             [self focusTextEditor];
         });
     }
+}
+
+
+#pragma mark - Callbacks
+
+// Blank implementation
+- (void)editorDidScrollWithPosition:(NSInteger)position {
+    
+    
 }
 
 
@@ -1067,8 +1152,10 @@ static Class hackishFixClass = Nil;
             self.toolbarHolder.frame = frame;
             
             // Editor View
+            const int extraHeight = 10;
+
             CGRect editorFrame = self.editorView.frame;
-            editorFrame.size.height = (self.view.frame.size.height - keyboardHeight) - sizeOfToolbar;
+            editorFrame.size.height = (self.view.frame.size.height - keyboardHeight) - sizeOfToolbar - extraHeight;
             self.editorView.frame = editorFrame;
             self.editorViewFrame = self.editorView.frame;
             self.editorView.scrollView.contentInset = UIEdgeInsetsZero;
@@ -1076,8 +1163,12 @@ static Class hackishFixClass = Nil;
             
             // Source View
             CGRect sourceFrame = self.sourceView.frame;
-            sourceFrame.size.height = (self.view.frame.size.height - keyboardHeight) - sizeOfToolbar;
+            sourceFrame.size.height = (self.view.frame.size.height - keyboardHeight) - sizeOfToolbar - extraHeight;
             self.sourceView.frame = sourceFrame;
+            
+            // Provide editor with keyboard hegiht and aditor view height
+            [self setFooterHeight:(keyboardHeight - 8)];
+            [self setContentHeight: self.editorViewFrame.size.height];
             
         } completion:nil];
         
@@ -1152,7 +1243,8 @@ static Class hackishFixClass = Nil;
 
 
 - (BOOL)isIpad {
-	return (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad);
+    //FIXME: 暂时不需要关闭键盘按钮
+	return !(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad);
 }//end
 
 

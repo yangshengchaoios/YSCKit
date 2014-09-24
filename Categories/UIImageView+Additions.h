@@ -9,6 +9,8 @@
 
 #import <UIKit/UIKit.h>
 
+typedef void(^SetImageCompletionBlock)(UIImage *image, NSError *error);
+
 @interface UIImageView (Additions)
 
 @end
@@ -25,12 +27,13 @@
  *  @param urlString 图片的完整url地址
  */
 - (void)setImageWithURLString:(NSString *)urlString;
+- (void)setImageWithURLString:(NSString *)urlString completed:(SetImageCompletionBlock)complete;
 - (void)setImageWithURLString:(NSString *)urlString placeholderImageName:(NSString *)placeholderImageName;
+- (void)setImageWithURLString:(NSString *)urlString placeholderImageName:(NSString *)placeholderImageName completed:(SetImageCompletionBlock)complete;
 - (void)setImageWithURLString:(NSString *)urlString withFadeIn:(BOOL)fadeIn;
-- (void)setImageWithURLString:(NSString *)urlString withThumbnail:(BOOL)thumbnail  DEPRECATED_ATTRIBUTE;
 - (void)setImageWithURLString:(NSString *)urlString placeholderImage:(UIImage *)holderImage;
+- (void)setImageWithURLString:(NSString *)urlString placeholderImage:(UIImage *)holderImage completed:(SetImageCompletionBlock)complete;
 - (void)setImageWithURLString:(NSString *)urlString placeholderImage:(UIImage *)holderImage withFadeIn:(BOOL)fadeIn;
-- (void)setImageWithURLString:(NSString *)urlString placeholderImage:(UIImage *)holderImage withThumbnail:(BOOL)thumbnail DEPRECATED_ATTRIBUTE;
 
 /**
  *  处理部分图形模糊

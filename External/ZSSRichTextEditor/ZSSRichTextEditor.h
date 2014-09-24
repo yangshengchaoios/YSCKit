@@ -55,7 +55,7 @@ typedef NS_ENUM(NSInteger, ZSSRichTextEditorToolbar) {
  *  The viewController used with ZSSRichTextEditor
  */
 @interface ZSSRichTextEditor : UIViewController <UIWebViewDelegate, HRColorPickerViewControllerDelegate, UITextViewDelegate>
-
+@property (nonatomic, strong) UIView *toolbarHolder;
 
 /**
  *  The base URL to use for the webView
@@ -71,6 +71,11 @@ typedef NS_ENUM(NSInteger, ZSSRichTextEditorToolbar) {
  *  If the keyboard should be shown when the editor loads
  */
 @property (nonatomic) BOOL shouldShowKeyboard;
+
+/**
+ *  The placeholder text to use if there is no editor content
+ */
+@property (nonatomic, strong) NSString *placeholder;
 
 /**
  *  Toolbar items to include
@@ -100,6 +105,12 @@ typedef NS_ENUM(NSInteger, ZSSRichTextEditorToolbar) {
  *
  */
 - (NSString *)getHTML;
+
+/**
+ *  Returns the plain text from the Rich Text Editor
+ *
+ */
+- (NSString *)getText;
 
 /**
  *  Inserts HTML at the caret position
@@ -171,8 +182,18 @@ typedef NS_ENUM(NSInteger, ZSSRichTextEditorToolbar) {
 - (void)dismissAlertView;
 
 /**
- *  Add a custom UIBarButtonItem
+ *  Add a custom UIBarButtonItem by using a UIButton
  */
 - (void)addCustomToolbarItemWithButton:(UIButton*)button;
+
+/**
+ *  Add a custom ZSSBarButtonItem
+ */
+- (void)addCustomToolbarItem:(ZSSBarButtonItem *)item;
+
+/**
+ *  Scroll event callback with position
+ */
+- (void)editorDidScrollWithPosition:(NSInteger)position;
 
 @end

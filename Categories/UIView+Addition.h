@@ -8,6 +8,7 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "ZYQAssetPickerController.h"
 
 @interface UIView (Addition)
 
@@ -32,9 +33,11 @@
 
 #pragma mark - 图片选择器
 + (UIActionSheet *)showImagePickerActionSheetWithDelegate:(id<UINavigationControllerDelegate,
-                                                           UIImagePickerControllerDelegate>)delegate
+                                                           UIImagePickerControllerDelegate,
+                                                           ZYQAssetPickerControllerDelegate>)delegate
                                             allowsEditing:(BOOL)allowsEditing
                                               singleImage:(BOOL)singleImage
+                                        numberOfSelection:(NSInteger)numberOfSelection
                                          onViewController:(UIViewController *)viewController;
 
 

@@ -10,7 +10,6 @@
 
 @interface BasePullToRefreshViewController ()
 
-@property (nonatomic, assign) NSInteger currentPageIndex;   //分页的页码指针
 @property (nonatomic, assign) BOOL isTipsViewHidden;        //设置没有数据的提示view是否隐藏
 
 @end
@@ -69,7 +68,7 @@
 
 - (void)addRefreshFooterView {
 	WeakSelfType blockSelf = self;
-    [self.contentScrollView addHeaderWithCallback:^{
+    [self.contentScrollView addFooterWithCallback:^{
         [blockSelf loadMoreWithSuccessed:blockSelf.successBlock failed:blockSelf.failedBlock];
     }];
 }
@@ -82,12 +81,14 @@
 - (void)setIsTipsViewHidden:(BOOL)isTipsViewHidden {
     _isTipsViewHidden = isTipsViewHidden;
     
-    if (self.tipsView == nil) {
-        self.tipsView = [TipsView showTips:[self hintStringWhenNoData]
-                                       inView:[self contentScrollView]];
-    }
-    if (self.tipsView.hidden != isTipsViewHidden) {
-        self.tipsView.hidden = isTipsViewHidden;
+    if ([self tipsViewEnable]) {
+        if (self.tipsView == nil) {
+            self.tipsView = [TipsView showTips:[self hintStringWhenNoData]
+                                        inView:[self contentScrollView]];
+        }
+        if (self.tipsView.hidden != isTipsViewHidden) {
+            self.tipsView.hidden = isTipsViewHidden;
+        }
     }
 }
 
@@ -98,54 +99,72 @@
  *  @param failed    
  */
 - (void)refreshWithSuccessed:(PullToRefreshSuccessed)successed failed:(PullToRefreshFailed)failed {
-	WeakSelfType blockSelf = self;
-	[AFNManager getDataFromUrl:[self prefixOfUrl]
-                      withAPI:[self methodWithPath]
-	            andArrayParam:[self arrayParamWithPage:1]
-	             andDictParam:[self dictParamWithPage:1]
-	                dataModel:[self modelNameOfData]
-	         requestSuccessed: ^(id responseObject) {
-                 [blockSelf.contentScrollView headerEndRefreshing];
-                 [blockSelf hideHUDLoading];
-                 blockSelf.currentPageIndex = kDefaultPageStartIndex;
-                 
-                 //1. 获取结果数组
-                 NSArray *dataArray = nil;
-                 if ([responseObject isKindOfClass:[NSArray class]]) {
-                     dataArray = (NSArray *)responseObject;
-                 }
-                 //------------
-                 
-                 //2. 根据组装后的数组刷新列表
-                 NSArray *newDataArray = nil;
-                 if ([dataArray count] > 0) {
-                     newDataArray = [blockSelf preProcessData:dataArray];
-                 }
-                 blockSelf.isTipsViewHidden = ([newDataArray count] > 0);
-                 if ([newDataArray count] > 0) {
-                     [blockSelf reloadByReplacing:newDataArray];
-                 }
-                 else {
-                     //清空已有的数据
-                     [blockSelf.dataArray removeAllObjects];
-                 }
-                 //------------
-                 
-                 if (successed) {
-                     successed();
-                 }
-                 [blockSelf reloadData];
-             }
-     
-	           requestFailure: ^(NSInteger errorCode, NSString *errorMessage) {
-                   [blockSelf.contentScrollView headerEndRefreshing];
-                   [blockSelf showAlertVieWithMessage:errorMessage];
-                   blockSelf.isTipsViewHidden = ([blockSelf.dataArray count] > 0);//判断总的数组是否为空
-                   
-                   if (failed) {
-                       failed();
-                   }
-               }];
+    [self refreshWithSuccessed:successed failed:failed withRequestType:RequestTypeGET];
+}
+
+- (void)refreshWithSuccessed:(PullToRefreshSuccessed)successed failed:(PullToRefreshFailed)failed withRequestType:(RequestType)requestType
+{
+    WeakSelfType blockSelf = self;
+    RequestSuccessed requestSuccessedBlock = ^(id responseObject){
+        [blockSelf.contentScrollView headerEndRefreshing];
+        [blockSelf hideHUDLoading];
+        blockSelf.currentPageIndex = kDefaultPageStartIndex;
+        
+        //1. 获取结果数组
+        NSArray *dataArray = nil;
+        if ([responseObject isKindOfClass:[NSArray class]]) {
+            dataArray = (NSArray *)responseObject;
+        }
+        else if([responseObject isKindOfClass:[BaseDataModel class]]){
+            dataArray = @[responseObject];
+        }
+        //------------
+        
+        //2. 根据组装后的数组刷新列表
+        NSArray *newDataArray = nil;
+        if ([dataArray count] > 0) {
+            newDataArray = [blockSelf preProcessData:dataArray];
+        }
+        blockSelf.isTipsViewHidden = ([newDataArray count] > 0);
+        if ([newDataArray count] > 0) {
+            [blockSelf reloadByReplacing:newDataArray];
+        }
+        else {
+            //清空已有的数据
+            [blockSelf.dataArray removeAllObjects];
+        }
+        //------------
+        
+        if (successed) {
+            successed();
+        }
+        [blockSelf reloadData];
+    };
+    
+    RequestFailure requestFailureBlock = ^(NSInteger errorCode, NSString *errorMessage){
+        [blockSelf.contentScrollView headerEndRefreshing];
+        [blockSelf showAlertVieWithMessage:errorMessage];
+        blockSelf.isTipsViewHidden = ([blockSelf.dataArray count] > 0);//判断总的数组是否为空
+//
+//        if (failed) {
+//            failed();
+//        }
+    };
+    if(requestType == RequestTypeGET){
+        [AFNManager getDataFromUrl:[self prefixOfUrl]
+                           withAPI:[self methodWithPath]
+                           andArrayParam:[self arrayParamWithPage:kDefaultPageStartIndex]
+                           andDictParam:[self dictParamWithPage:kDefaultPageStartIndex]
+                           dataModel:[self modelNameOfData]
+                           requestSuccessed:requestSuccessedBlock requestFailure:requestFailureBlock];
+    }else if(requestType == RequestTypePOST){
+        [AFNManager postDataToUrl:[self prefixOfUrl]
+                           withAPI:[self methodWithPath]
+                     andArrayParam:[self arrayParamWithPage:kDefaultPageStartIndex]
+                      andDictParam:[self dictParamWithPage:kDefaultPageStartIndex]
+                         dataModel:[self modelNameOfData]
+                  requestSuccessed:requestSuccessedBlock requestFailure:requestFailureBlock];
+    }
 }
 
 - (void)reloadByReplacing:(NSArray *)anArray {
@@ -165,54 +184,78 @@
  *  @param failed
  */
 - (void)loadMoreWithSuccessed:(PullToRefreshSuccessed)successed failed:(PullToRefreshFailed)failed {
-	WeakSelfType blockSelf = self;
-	[AFNManager getDataFromUrl:[self prefixOfUrl]
-                      withAPI:[self methodWithPath]
-	            andArrayParam:[self arrayParamWithPage:self.currentPageIndex + 1]
-	             andDictParam:[self dictParamWithPage:self.currentPageIndex + 1]
-	                dataModel:[self modelNameOfData]
-	         requestSuccessed: ^(id responseObject) {
-                 [blockSelf.contentScrollView footerEndRefreshing];
-                 [blockSelf hideHUDLoading];
-                 
-                 //1. 获取结果数组
-                 NSArray *dataArray = nil;
-                 if ([responseObject isKindOfClass:[NSArray class]]) {
-                     dataArray = (NSArray *)responseObject;
-                 }
-                 //------------
-                 
-                 //2. 根据组装后的数组刷新列表
-                 NSArray *newDataArray = nil;
-                 if ([dataArray count] > 0) {
-                     blockSelf.currentPageIndex++;//只要返回有数据就自增
-                     newDataArray = [blockSelf preProcessData:dataArray];
-                 }
-                 if ([newDataArray count] > 0) {
-                     blockSelf.isTipsViewHidden = YES;
-                     [blockSelf reloadByAdding:newDataArray];
-                 }
-                 else {
-                     if ([blockSelf.dataArray count] == 0) {//判断总的数组是否为空
-                         blockSelf.isTipsViewHidden = NO;
-                     }
-                     [blockSelf showResultThenHide:@"没有更多了"];
-                 }
-                 //------------
-                 
-                 if (successed) {
-                     successed();
-                 }
-             }
-	           requestFailure: ^(NSInteger errorCode,NSString *errorMessage) {
-                   [blockSelf.contentScrollView footerEndRefreshing];
-                   [blockSelf showResultThenHide:errorMessage];
-                   blockSelf.isTipsViewHidden = ([blockSelf.dataArray count] > 0);//判断总的数组是否为空
-                   
-                   if (failed) {
-                       failed();
-                   }
-               }];
+	[self loadMoreWithSuccessed:successed failed:failed withRequestType:RequestTypeGET];
+}
+
+- (void)loadMoreWithSuccessed:(PullToRefreshSuccessed)successed failed:(PullToRefreshFailed)failed withRequestType:(RequestType)requestType{
+
+    WeakSelfType blockSelf = self;
+    
+    RequestSuccessed requestSuccessedBlock = ^(id responseObject){
+        [blockSelf.contentScrollView footerEndRefreshing];
+        [blockSelf hideHUDLoading];
+        
+        //1. 获取结果数组
+        NSArray *dataArray = nil;
+        if ([responseObject isKindOfClass:[NSArray class]]) {
+            dataArray = (NSArray *)responseObject;
+        }
+        else if([responseObject isKindOfClass:[BaseDataModel class]]){
+            dataArray = @[responseObject];
+        }
+        //------------
+        
+        //2. 根据组装后的数组刷新列表
+        NSArray *newDataArray = nil;
+        if ([dataArray count] > 0) {
+            blockSelf.currentPageIndex++;//只要返回有数据就自增
+            newDataArray = [blockSelf preProcessData:dataArray];
+        }
+        if ([newDataArray count] > 0) {
+            blockSelf.isTipsViewHidden = YES;
+            [blockSelf reloadByAdding:newDataArray];
+        }
+        else {
+            if ([blockSelf.dataArray count] == 0) {//判断总的数组是否为空
+                blockSelf.isTipsViewHidden = NO;
+            }
+            [blockSelf showResultThenHide:@"没有更多了"];
+        }
+        //------------
+        
+        if (successed) {
+            successed();
+        }
+
+    };
+    
+    
+    RequestFailure requestFailureBlock = ^(NSInteger errorCode, NSString *errorMessage){
+        [blockSelf.contentScrollView footerEndRefreshing];
+        [blockSelf showAlertVieWithMessage:errorMessage];
+        blockSelf.isTipsViewHidden = ([blockSelf.dataArray count] > 0);//判断总的数组是否为空
+        
+        if (failed) {
+            failed();
+        }
+    };
+    
+    
+	if(requestType == RequestTypeGET){
+        [AFNManager getDataFromUrl:[self prefixOfUrl]
+                           withAPI:[self methodWithPath]
+                     andArrayParam:[self arrayParamWithPage:self.currentPageIndex + 1]
+                      andDictParam:[self dictParamWithPage:self.currentPageIndex + 1]
+                         dataModel:[self modelNameOfData]
+                  requestSuccessed:requestSuccessedBlock requestFailure:requestFailureBlock];
+    }else if(requestType == RequestTypePOST){
+        [AFNManager postDataToUrl:[self prefixOfUrl]
+                          withAPI:[self methodWithPath]
+                    andArrayParam:[self arrayParamWithPage:self.currentPageIndex + 1]
+                     andDictParam:[self dictParamWithPage:self.currentPageIndex + 1]
+                        dataModel:[self modelNameOfData]
+                 requestSuccessed:requestSuccessedBlock requestFailure:requestFailureBlock];
+    }
 }
 
 - (void)reloadByAdding:(NSArray *)anArray {
@@ -261,6 +304,10 @@
 
 - (NSString *)hintStringWhenNoData {
     return @"暂时没有内容";
+}
+
+- (BOOL)tipsViewEnable {
+    return YES;
 }
 
 #pragma mark - 必须重写的方法

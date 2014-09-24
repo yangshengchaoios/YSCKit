@@ -16,8 +16,8 @@
 
 //第三方库
 #import "UIViewController+ScrollingNavbar.h"
-#import "UIViewController+ADTransitionController.h"
-#import "UINavigationController+CustomAnimations.h"
+//#import "UIViewController+ADTransitionController.h" //TODO:为什么在ios下一直没起作用？
+//#import "UINavigationController+CustomAnimations.h" //系统自带的几种常用切换动画
 
 
 @interface BaseViewController : UIViewController <UITextFieldDelegate>
@@ -54,9 +54,7 @@
 - (UIView *)scrollableView;
 
 #pragma mark - push & pop with animation
-- (UIViewController *)pushViewController:(NSString *)className withParams:(NSDictionary *)paramDict withAnimation:(ADTransition *)transition;
-- (UIViewController *)popViewControllerWithAnimation;
-
+//- (UIViewController *)pushViewController:(NSString *)className withParams:(NSDictionary *)paramDict withAnimation:(ADTransition *)transition;
 
 #pragma mark -  show & hide HUD
 - (MBProgressHUD *)showHUDLoading:(NSString *)hintString;

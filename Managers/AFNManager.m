@@ -89,23 +89,22 @@
        imageQuality:(ImageQuality)quality
    requestSuccessed:(RequestSuccessed)requestSuccessed
      requestFailure:(RequestFailure)requestFailure {
-    long long timestamp = [[NSDate date] timeIntervalSince1970] * 1000;
-    NSString *picturePath = [NSTemporaryDirectory() stringByAppendingPathComponent:[NSString stringWithFormat:@"%lld.jpg", timestamp]];
-    UIImage *scaledImage1 = [ImageUtils adjustImage:image withQuality:quality];
-    UIImage *scaledImage = [scaledImage1 resizedImage:CGSizeMake(76, 76) interpolationQuality:kCGInterpolationDefault];
     //TODO:resize
-    [self requestByUrl:url withAPI:apiName andArrayParam:arrayParam andDictParam:dictParam andBodyParam:nil imageData:UIImagePNGRepresentation(scaledImage)
+    [self requestByUrl:url withAPI:apiName
+         andArrayParam:arrayParam
+          andDictParam:dictParam
+          andBodyParam:nil
+             imageData:UIImagePNGRepresentation(image)
            requestType:RequestTypeUploadFile
       requestSuccessed:^(id responseObject) {
-          [[NSFileManager defaultManager] removeItemAtPath:picturePath error:NULL];
           BaseModel *baseModel = (BaseModel *)responseObject;
           if ([baseModel isKindOfClass:NSClassFromString(modelName)]) {
-              if (1 == baseModel.State) {  //接口访问成功
-                  NSLog(@"success message = %@", baseModel.Message);
+              if (1 == baseModel.state) {  //接口访问成功
+                  NSLog(@"success message = %@", baseModel.message);
                   requestSuccessed(baseModel);
               }
               else {
-                  requestFailure(1101, baseModel.Message);
+                  requestFailure(1101, baseModel.message);
               }
           }
           else {
@@ -113,7 +112,6 @@
           }
           
       } requestFailure:^(NSInteger errorCode, NSString *errorMessage) {
-          [[NSFileManager defaultManager] removeItemAtPath:picturePath error:NULL];
           requestFailure(1103, errorMessage);
       }];
 }
@@ -144,16 +142,16 @@
     [self   requestByUrl:url withAPI:apiName andArrayParam:arrayParam andDictParam:dictParam andBodyParam:bodyParam imageData:nil requestType:requestType
 	    requestSuccessed: ^(id responseObject) {
             BaseModel *baseModel = (BaseModel *)responseObject;
-            if (1 == baseModel.State) {  //接口访问成功
-                NSObject *dataModel = baseModel.Data;
+            if (1 == baseModel.state) {  //接口访问成功
+                NSObject *dataModel = baseModel.data;
                 JSONModelError *initError = nil;
                 if ([dataModel isKindOfClass:[NSArray class]]) {
-                    if ( [modelName length] > 0 && [NSClassFromString(modelName) isSubclassOfClass:[BaseDataModel class]]) {
+                    if ( [NSString isNotEmpty:modelName] && [NSClassFromString(modelName) isSubclassOfClass:[BaseDataModel class]]) {
                         dataModel = [NSClassFromString(modelName) arrayOfModelsFromDictionaries:(NSArray *)dataModel error:&initError];
                     }
                 }
                 else if ([dataModel isKindOfClass:[NSDictionary class]]) {
-                    if ( [modelName length] > 0 && [NSClassFromString(modelName) isSubclassOfClass:[BaseDataModel class]]) {
+                    if ( [NSString isNotEmpty:modelName] && [NSClassFromString(modelName) isSubclassOfClass:[BaseDataModel class]]) {
                         dataModel = [[NSClassFromString(modelName) alloc] initWithDictionary:(NSDictionary *)dataModel error:&initError];
                     }
                 }
@@ -170,7 +168,8 @@
 //            
 //            }
             else {
-                requestFailure(1103, baseModel.Message);
+                NSLog(@"message=%@", baseModel.message);
+                requestFailure(1103, baseModel.message);
             }
         } requestFailure:requestFailure];
 }
@@ -233,14 +232,12 @@
     manager.requestSerializer.cachePolicy = NSURLRequestReloadIgnoringLocalCacheData;
     manager.requestSerializer.timeoutInterval = 15.0f;//设置POST和GET的超时时间
     [manager.requestSerializer setValue:kDefaultClientType forHTTPHeaderField:@"User-Agent"];
-    [manager.requestSerializer setValue:[[Login sharedInstance] authorization] forHTTPHeaderField:@"Authorization"];
     //解决返回的Content-Type始终是application/xml问题！
     [manager.requestSerializer setValue:@"application/json" forHTTPHeaderField:@"Accept"];
     
     //   定义返回成功的block
     void (^requestSuccessed1)(AFHTTPRequestOperation *operation, id responseObject) = ^(AFHTTPRequestOperation *operation, id responseObject) {
-        NSLog(@"get success! operation = %@\r\nresponseObject = %@", operation, responseObject);
-        
+        NSLog(@"request success! \r\noperation=%@\r\nresponseObject=%@", operation, responseObject);
         JSONModelError *initError;
         BaseModel *baseModel = nil;
         if ([responseObject isKindOfClass:[NSDictionary class]]) {
@@ -264,8 +261,7 @@
     };
     //   定义返回失败的block
     void (^requestFailure1)(AFHTTPRequestOperation *operation, id responseObject) = ^(AFHTTPRequestOperation *operation, NSError *error) {
-        NSLog(@"post failure! operation = %@\r\nerror = %@", operation, error);
-        
+        NSLog(@"request failed! \r\noperation=%@\r\nerror=%@", operation, error);
         if (200 != operation.response.statusCode) {
             [LogManager saveLog:[NSString stringWithFormat:@"请求参数%@", newDictParam]];
             [LogManager saveLog:error.localizedDescription];
@@ -344,14 +340,17 @@
     NSLog(@"param = %@", param);
     NSMutableString *joinedString = [NSMutableString string];
     for (NSString *key in keys) {
+        NSObject *value = param[key];
         if ([kParamSignature isEqualToString:key]) {//不对signature进行加密
             continue;
         }
         //去掉key和value的前后空格字符
         NSString *newKey = [NSString trimString:key];
-        NSString *newValue = [NSString trimString:param[key]];
+        NSString *newValue = [NSString stringWithFormat:@"%@", [NSObject isEmpty:value] ? @"" : value];
+        NSString *newUTF8Value = [NSString UTF8Encoded:[NSString trimString:newValue]];
         //对value进行UTF8编码
-        [joinedString appendFormat:@"%@=%@", newKey, [NSString UTF8Encoded:newValue]];
+        [joinedString appendFormat:@"%@=%@", newKey, newUTF8Value];
+//        [param setValue:newUTF8Value forKey:newKey];
     }
     
     //3. 对参数进行md5加密

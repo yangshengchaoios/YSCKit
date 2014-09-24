@@ -11,9 +11,9 @@
 
 @interface BaseModel : JSONModel
 
-@property (assign, nonatomic) NSInteger State;
-@property (strong, nonatomic) NSString *Message;
-@property (strong, nonatomic) NSObject<ConvertOnDemand> *Data;
+@property (assign, nonatomic) NSInteger state;
+@property (strong, nonatomic) NSString *message;
+@property (strong, nonatomic) NSObject<ConvertOnDemand> *data;
 
 @end
 

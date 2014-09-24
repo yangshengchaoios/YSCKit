@@ -32,6 +32,9 @@
     else if (ShareTypeWechatFavorite == shareType) {
         platformName = UMShareToWechatFavorite;
     }
+    else if (ShareTypeMobileQQ == shareType) {
+        platformName = UMShareToQQ;
+    }
     
     return platformName;
 }

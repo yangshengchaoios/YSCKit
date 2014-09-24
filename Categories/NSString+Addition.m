@@ -172,9 +172,6 @@
 #pragma mark - 字符串简单变换
 + (NSString *)trimString:(NSString *)string {
     ReturnEmptyWhenObjectIsEmpty(string)
-    if ( ! [string isKindOfClass:[NSString class]]) {
-        return string;
-    }
     return [string trimString];
 }
 
@@ -626,7 +623,7 @@
     NSDictionary *emojiPlistDic = [[NSDictionary alloc]initWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"Emoji" ofType:@"plist"]];
     
     // 2. 正则匹配获取 parsedOutput 中符合表情代码的 range，图片代码暂时使用 ![图片名称]
-    NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@"\\!\\[[A-Za-z1-9]*\\]" options:0 error:nil];
+    NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@"\\!\\[[A-Za-z0-9]*\\]" options:0 error:nil];
     NSArray* matches = [regex matchesInString:[parsedOutput string]
                                       options:NSMatchingWithoutAnchoringBounds
                                         range:NSMakeRange(0, parsedOutput.length)];

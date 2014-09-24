@@ -24,7 +24,7 @@ typedef UIView *(^PageViewAtIndex)(NSInteger pageIndex);
  *
  *  @param pageIndex
  */
-typedef void(^TapPageAtIndex)(NSInteger pageIndex);
+typedef void(^TapPageAtIndex)(NSInteger pageIndex, UIView *contentView);
 /**
  *  当页面切换到pageIndex时执行操作
  *

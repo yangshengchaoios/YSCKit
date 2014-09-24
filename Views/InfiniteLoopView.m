@@ -212,7 +212,7 @@
     UIView *contentView = tap.view;
     NSInteger tapIndex = contentView.tag - TagOfContentViewStart;
 	if (self.tapPageAtIndex) {
-		self.tapPageAtIndex(tapIndex);
+		self.tapPageAtIndex(tapIndex, contentView);
 	}
 }
 

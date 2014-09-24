@@ -116,9 +116,11 @@
 
 #pragma mark - 图片选择器
 + (UIActionSheet *)showImagePickerActionSheetWithDelegate:(id<UINavigationControllerDelegate,
-                                                           UIImagePickerControllerDelegate>)delegate
+                                                           UIImagePickerControllerDelegate,
+                                                           ZYQAssetPickerControllerDelegate>)delegate
                                             allowsEditing:(BOOL)allowsEditing
                                               singleImage:(BOOL)singleImage
+                                        numberOfSelection:(NSInteger)numberOfSelection
                                          onViewController:(UIViewController *)viewController {
     UIActionSheet *actionSheet = [UIActionSheet bk_actionSheetWithTitle:nil];
     [actionSheet bk_addButtonWithTitle:@"拍摄照片"
@@ -154,8 +156,21 @@
                                            imagePickerController.sourceType = sourceType;
                                            [viewController presentViewController:imagePickerController animated:YES completion:nil];
                                        }
-                                       else {
-                                           //多张图片
+                                       else {//多张图片
+                                           ZYQAssetPickerController *picker = [[ZYQAssetPickerController alloc] init];
+                                           picker.delegate = delegate;
+                                           picker.maximumNumberOfSelection = numberOfSelection;
+                                           picker.assetsFilter = [ALAssetsFilter allPhotos];
+                                           picker.showEmptyGroups = NO;
+                                           picker.selectionFilter = [NSPredicate predicateWithBlock:^BOOL(id evaluatedObject, NSDictionary *bindings) {
+                                               if ([[(ALAsset*)evaluatedObject valueForProperty:ALAssetPropertyType] isEqual:ALAssetTypeVideo]) {
+                                                   NSTimeInterval duration = [[(ALAsset*)evaluatedObject valueForProperty:ALAssetPropertyDuration] doubleValue];
+                                                   return duration >= 5;
+                                               } else {
+                                                   return YES;
+                                               }
+                                           }];
+                                           [viewController presentViewController:picker animated:YES completion:NULL];
                                        }
                                    }
                                }];

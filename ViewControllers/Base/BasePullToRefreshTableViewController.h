@@ -11,7 +11,7 @@
 
 @interface BasePullToRefreshTableViewController : BasePullToRefreshViewController <UITableViewDataSource, UITableViewDelegate>
 
-@property (nonatomic, weak) IBOutlet UITableView *tableView;
+@property (nonatomic, weak) IBOutlet UITableView * tableView;
 
 #pragma mark - UITableView特有的方法
 

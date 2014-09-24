@@ -7,6 +7,7 @@
 //
 
 #import "BaseViewController.h"
+#import "MLNavigationController.h"
 
 #define kHudIntervalShort 0.5f
 #define kHudIntervalNormal 1.0f
@@ -41,15 +42,20 @@
 
 - (void)viewWillAppear:(BOOL)animated {
 	[super viewWillAppear:animated];
-	self.isAppeared = YES;
 
 	if ([self showCustomTitleBarView]) {
 		if (self.navigationController) {
-			[self.navigationController setNavigationBarHidden:YES];
-			[self.navigationController setToolbarHidden:YES];
+			[self.navigationController setNavigationBarHidden:YES animated:animated];
+			[self.navigationController setToolbarHidden:YES animated:animated];
 		}
 		[self.view bringSubviewToFront:self.titleBarView];
 	}
+    else {
+        if ( ! self.isAppeared) {//这里解决push出来的vc要隐藏navibar的情况
+            [self.navigationController setNavigationBarHidden:NO animated:animated];//IMPORTANT!
+        }
+    }
+    self.isAppeared = YES;
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -167,9 +173,11 @@
 			[self.titleBarView addSubview:self.backButton];
 		}
 		else {
+            //------去掉返回按钮的文字------
 			UIBarButtonItem *temporaryBarButtonItem = [[UIBarButtonItem alloc] init];
 			temporaryBarButtonItem.title = @"";
 			self.navigationItem.backBarButtonItem = temporaryBarButtonItem;
+            //-------------END-----------
 		}
 	}
     else if (self.backType == BackTypeSliding) { //设置侧边栏按钮
@@ -247,7 +255,9 @@
 	[self willLayoutForKeyboardHeight:0];
 	WeakSelfType blockSelf = self;
 	[UIView animateWithDuration:animationDuration
-	                 animations: ^{ [blockSelf layoutForKeyboardHeight:0]; }
+	                 animations: ^{
+                         [blockSelf layoutForKeyboardHeight:0];
+                     }
 	                 completion: ^(BOOL finished) {
                          [blockSelf didLayoutForKeyboardHeight:0];
                      }];
@@ -304,6 +314,14 @@
 	if ([pushedViewController isKindOfClass:[BaseViewController class]]) {
 		[(BaseViewController *)pushedViewController setParams:mutableParamDict];
 	}
+    
+    //---统一设置NavigationBar的返回按钮图片
+    WeakSelfType blockSelf = self;
+    pushedViewController.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] bk_initWithImage:[UIImage imageNamed:@"button_arrow_left"] style:UIBarButtonItemStylePlain handler:^(id sender) {
+        [blockSelf popViewController];
+    }];
+    //--------------END-----------------
+    
 	[self.navigationController pushViewController:pushedViewController animated:YES];
 	return pushedViewController;
 }
@@ -381,7 +399,7 @@
 		[(BaseViewController *)viewController setParams:[NSDictionary dictionaryWithDictionary:mutableParamDict]];
 	}
     
-	UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:viewController];
+	MLNavigationController *navigationController = [[MLNavigationController alloc] initWithRootViewController:viewController];
 	[self presentViewController:navigationController animated:YES completion:nil];
 	return navigationController;
 }
@@ -414,29 +432,19 @@
 
 
 #pragma mark - push & pop with animation
-- (UIViewController *)pushViewController:(NSString *)className withParams:(NSDictionary *)paramDict withAnimation:(ADTransition *)transition {
-    if (!self.transitionController) {
-        return nil;
-    }
-    [self hideKeyboard];
-	UIViewController *pushedViewController = [self createBaseViewController:className];
-    NSMutableDictionary *mutableParamDict = [NSMutableDictionary dictionaryWithDictionary:paramDict];
-	if ([pushedViewController isKindOfClass:[BaseViewController class]]) {
-		[(BaseViewController *)pushedViewController setParams:mutableParamDict];
-	}
-	[self.transitionController pushViewController:pushedViewController withTransition:transition];
-	return pushedViewController;
-}
 
-- (UIViewController *)popViewControllerWithAnimation {
-    if (!self.transitionController) {
-        return nil;
-    }
-    NSInteger index = [self.transitionController.viewControllers indexOfObject:self];
-    UIViewController *previousViewController = [self.transitionController.viewControllers objectAtIndex:MAX(index - 1, 0)];
-    [self.transitionController popViewController]; //这里会自动采用与push对应的pop动画！
-    return previousViewController;
-}
+//FIXME:该动画不起作用为什么？
+//- (UIViewController *)pushViewController:(NSString *)className withParams:(NSDictionary *)paramDict withAnimation:(ADTransition *)transition {
+//    [self hideKeyboard];
+//	UIViewController *pushedViewController = [self createBaseViewController:className];
+//    NSMutableDictionary *mutableParamDict = [NSMutableDictionary dictionaryWithDictionary:paramDict];
+//	if ([pushedViewController isKindOfClass:[BaseViewController class]]) {
+//		[(BaseViewController *)pushedViewController setParams:mutableParamDict];
+//        ((ADTransitioningViewController *)pushedViewController).transition = transition;
+//	}
+//	[self.navigationController pushViewController:pushedViewController animated:YES];
+//	return pushedViewController;
+//}
 
 
 #pragma mark -  show & hide HUD

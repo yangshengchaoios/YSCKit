@@ -18,6 +18,7 @@
     #import <BlocksKit+UIKit.h>
     #import <BlocksKit+MessageUI.h>
     #import <MBProgressHUD/MBProgressHUD.h>
+    #import <POP/POP.h>
 
     //定义固定常量和公用枚举
     #import "UrlConstants.h"
@@ -46,6 +47,7 @@
     #import "LogManager.h"
     #import "AFNManager.h"
     #import "SNSShareManager.h"
+    #import "ShowPhotosManager.h"
 
     //自定义view(对于全局需要使用的自定义view放这里)
 
@@ -95,6 +97,7 @@ NSLog(@"%@", logString); \
 #define NAVIGATIONBAR_HEIGHT    44.0f
 #define TITLEBAR_HEIGHT         64.0f       //等于STATUSBAR_HEIGHT + NAVIGATIONBAR_HEIGHT
 #define TABBAR_HEIGHT           49.0f
+#define KEYBOARD_HEIGHT         216.0f      //默认键盘高度
 
 /**
  *  定义单例
@@ -117,9 +120,12 @@ return _sharedObject;
 #pragma mark - special methods
 
 #define USERID                          [[Login sharedInstance] userId]
+#define TOKEN                           ([Login sharedInstance].token == nil ? @"" : [Login sharedInstance].token)
+#define ISLOGGED                        [[Login sharedInstance] isLogged]
+#define USER                            [Login sharedInstance].user
 #define RGB(r, g, b)                    [UIColor colorWithRed:r / 255.0f green:g / 255.0f blue:b / 255.0f alpha:1.0f]
 #define RGBA(r, g, b, a)                [UIColor colorWithRed:r / 255.0f green:g / 255.0f blue:b / 255.0f alpha:a]
-#define RGBHEX(hex)                     [UIColor colorWithRed:((float)((hex & 0xFF0000) >> 16))/255.0 green:((float)((hex & 0xFF00) >> 8))/255.0 blue:((float)(hex & 0xFF))/255.0 alpha:1.0]
+#define RGBHEX(hexstring)               [UIColor colorWithHexString:[NSString replaceString:hexstring byRegex:@"[#]" to:@""]]
 #define ViewInXib(_xibName, _index)     [[[NSBundle mainBundle] loadNibNamed:_xibName owner:nil options:nil] objectAtIndex:_index]
 #define NavigationViewController(x)     [[UINavigationController alloc]initWithRootViewController:[[NSClassFromString(x) alloc] initWithNibName:nil bundle:nil]]
 #define ViewController(x)               [[NSClassFromString(x) alloc] initWithNibName:x bundle:nil]
@@ -142,6 +148,7 @@ return _sharedObject;
 #define DefaultImage                    [UIImage imageNamed:@"default_image"]
 #define GenderMaleImage                 [UIImage imageNamed:@"icon_gender_male"]
 #define GenderFemaleImage               [UIImage imageNamed:@"icon_gender_female"]
+#define Trim(x)                         [NSString trimString:x]
 
 
 /**
@@ -164,6 +171,9 @@ return _sharedObject;
  */
 #pragma mark - Font defines
 
+#define kDefaultTextFont10              [UIFont systemFontOfSize:10]
+#define kDefaultTextFont11              [UIFont systemFontOfSize:11]
+#define kDefaultTextFont12              [UIFont systemFontOfSize:12]
 #define kDefaultTextFont13              [UIFont systemFontOfSize:13]
 #define kDefaultTextFont14              [UIFont systemFontOfSize:14]        //设置默认字体大小
 #define kDefaultTextFont15              [UIFont systemFontOfSize:15]        //设置默认字体大小
@@ -171,21 +181,27 @@ return _sharedObject;
 #define kDefaultBoldTextFont14          [UIFont boldSystemFontOfSize:14]    //设置默认的粗体字体大小
 #define kDefaultBoldTextFont15          [UIFont boldSystemFontOfSize:15]
 #define kDefaultBoldTextFont16          [UIFont boldSystemFontOfSize:16]
-
+#define kDefaultBoldTextFont17          [UIFont boldSystemFontOfSize:17]
 
 /**
  *  定义常量
  */
 #pragma mark - define constants
 
-#define kDefaultPageStartIndex          0
+#define kDefaultPageStartIndex          1
 #define kDefaultPageSize                20
 #define kDefaultAnimationDuration01     0.1f
 #define kDefaultAnimationDuration02     0.2f
 #define kDefaultAnimationDuration03     0.3f
 #define kDefaultAnimationDuration04     0.4f
 #define kDefaultAnimationDuration05     0.5f
+#define kDefaultAnimationDuration06     0.6f
+#define kDefaultAnimationDuration07     0.7f
+#define kDefaultAnimationDuration08     0.8f
+#define kDefaultAnimationDuration09     0.9f
 #define kDefaultAnimationDuration10     1.0f
+#define kDefaultAnimationDuration15     1.5f
+#define kDefaultAnimationDuration20     2.0f
 #define kDefaultInterfaceVersion        @"1.0"          //设置默认接口版本号
 #define kDefaultClientType              @"TGO8-IOS"     //设置终端设备类型(ios android)
 #define kAppScheme                      @"TGO8"
@@ -212,10 +228,15 @@ return _sharedObject;
 #define postNWithInfo(_name,_info)                  ([[NSNotificationCenter defaultCenter] postNotificationName:_name object:nil userInfo:_info])
 
 
+#pragma mark - 地址页面(涉及)
+#define postNotificationName(name)    [[NSNotificationCenter defaultCenter] postNotificationName:name object:nil]
+
 
 /**
  *  定义通知
  */
 #pragma mark - Notification Name
 
-
+#define kNotificationRefreshHome        @"kNotificationRefreshHome"
+#define kNotificationRefreshMicroBar    @"kNotificationRefreshMicroBar"
+#define kNotificationRefreshUserCenter  @"kNotificationRefreshUserCenter"
