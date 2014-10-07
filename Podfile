@@ -1,8 +1,10 @@
-platform :ios, "7.0"
+platform :ios, '7.0'
 
 pod 'AFNetworking', :head
 
 pod 'ADTransitionController', :head
+
+pod 'Canvas', :head
 
 pod 'FMDB', :head
 
@@ -37,3 +39,13 @@ pod 'pop', :head
 pod 'UIImage-Resize', :head
 
 pod 'UIImage-Categories', :head
+
+pod 'SVPullToRefresh', :head
+#等效于MJRefresh
+
+pod 'PopoverView', :head
+
+pod 'ZYQAssetPickerController',  '~> 1.0.0'
+#等效于pod 'ELCImagePickerController', :head
+
+pod 'HPGrowingTextView',  '~>1.1'
