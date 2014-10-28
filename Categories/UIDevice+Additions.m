@@ -35,34 +35,49 @@
  函数描述 : 获取当前分辨率
  ******************************************************************************/
 - (DeviceType) currentDeviceType {
-    if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone){//判断为iphone设备
+    if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone){//iphone设备
         if ([[UIScreen mainScreen] respondsToSelector: @selector(scale)]) {
             CGSize size = CGSizeMake([[UIScreen mainScreen] bounds].size.width  * [UIScreen mainScreen].scale,
                                      [[UIScreen mainScreen] bounds].size.height * [UIScreen mainScreen].scale);
-            if (size.height <= 480.0f) {
-                return DeviceTypeiPhoneStandard;
+            if (480 == size.height) {
+                return DeviceTypeiPhone320x480;
+            }
+            else if (960 == size.height) {
+                return DeviceTypeiPhone640x960;
+            }
+            else if (1136 == size.height) {
+                return DeviceTypeiPhone640x1136;
+            }
+            else if (750 == size.height) {
+                return DeviceTypeiPhone1334x750;
+            }
+            else if (1080 == size.height) {
+                return DeviceTypeiPhone1920x1080;
             }
             else {
-                return (size.height > 960 ? DeviceTypeiPhoneTallerHigh : DeviceTypeiPhoneHigh);
+                return DeviceTypeUnknown;
             }
         }
         else {
-            return DeviceTypeiPhoneStandard;
+            return DeviceTypeiPhone320x480;
         }
     }
-    else{
+    else {//iPad设备
         if ([[UIScreen mainScreen] respondsToSelector: @selector(scale)]) {
             CGSize size = CGSizeMake([[UIScreen mainScreen] bounds].size.width  * [UIScreen mainScreen].scale,
                                      [[UIScreen mainScreen] bounds].size.height * [UIScreen mainScreen].scale);
-            if (size.height <= 1024) {
-                return DeviceTypeiPadStandard;
+            if (768 == size.height) {
+                return DeviceTypeiPad1024x768;
+            }
+            else if (1536 == size.height) {
+                return DeviceTypeiPhone1920x1080;
             }
             else {
-                return DeviceTypeiPadHigh;
+                return DeviceTypeUnknown;
             }
         }
         else {
-            return DeviceTypeiPadStandard;
+            return DeviceTypeiPad1024x768;
         }
     }
 }
@@ -77,14 +92,6 @@
 #else
     return NO;
 #endif
-}
-
-/******************************************************************************
- 函数名称 : - (BOOL)isLongScreen
- 函数描述 : 判断是否运行在长屏幕的iphone上
- ******************************************************************************/
-- (BOOL)isLongScreen {
-    return (self.currentDeviceType == DeviceTypeiPhoneTallerHigh);
 }
 
 
