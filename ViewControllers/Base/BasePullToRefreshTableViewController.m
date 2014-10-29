@@ -44,7 +44,7 @@
     [super reloadByAdding:anArray];
     NSInteger displayedSectionIndex = [self.dataArray count];
     NSMutableArray *insertedIndexPaths = [NSMutableArray array];
-    for (int insertedIndex = 0, insertedCount = [anArray count]; insertedIndex < insertedCount; insertedIndex ++) {
+    for (NSUInteger insertedIndex = 0, insertedCount = [anArray count]; insertedIndex < insertedCount; insertedIndex ++) {
         [insertedIndexPaths addObject:[NSIndexPath indexPathForRow:displayedSectionIndex + insertedIndex inSection:0]];
     }
     NSIndexSet *insertedIndexSet = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(displayedSectionIndex, [anArray count])];

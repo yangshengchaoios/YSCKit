@@ -49,10 +49,10 @@
                 return DeviceTypeiPhone640x1136;
             }
             else if (750 == size.height) {
-                return DeviceTypeiPhone1334x750;
+                return DeviceTypeiPhone750x1334;
             }
             else if (1080 == size.height) {
-                return DeviceTypeiPhone1920x1080;
+                return DeviceTypeiPhone1080x1920;
             }
             else {
                 return DeviceTypeUnknown;
@@ -70,7 +70,7 @@
                 return DeviceTypeiPad1024x768;
             }
             else if (1536 == size.height) {
-                return DeviceTypeiPhone1920x1080;
+                return DeviceTypeiPhone1080x1920;
             }
             else {
                 return DeviceTypeUnknown;

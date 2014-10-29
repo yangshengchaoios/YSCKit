@@ -47,9 +47,9 @@
     WeakSelfType blockSelf = self;
     [UIView setAnimationsEnabled:NO];
     [self.collectionView performBatchUpdates:^{
-        int resultsSize = [anArray count];
+        NSUInteger resultsSize = [anArray count];
         NSMutableArray *insertedIndexPaths = [NSMutableArray array];
-        for (int i = resultsSize; i < resultsSize + anArray.count; i++) {
+        for (NSUInteger i = resultsSize; i < resultsSize + anArray.count; i++) {
             [insertedIndexPaths addObject:[NSIndexPath indexPathForRow:i inSection:0]];
         }
         [blockSelf.collectionView insertItemsAtIndexPaths:insertedIndexPaths];

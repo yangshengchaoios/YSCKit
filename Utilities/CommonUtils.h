@@ -17,5 +17,5 @@
 + (void)checkNewVersion;
 + (void)configUmeng;
 + (void)initAppDefaultUI;
-
++ (UIView *)createSearchBar:(NSInteger)textFieldTag;
 @end

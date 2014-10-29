@@ -125,4 +125,37 @@
     [[UINavigationBar appearance] setBarStyle:UIBarStyleBlackTranslucent];
 }
 
+/**
+ *  创建搜索栏
+ *
+ *  @return
+ */
++ (UIView *)createSearchBar:(NSInteger)textFieldTag {
+    UIView *searchBoxContainerView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 205, 28)];
+    //1. 设置搜索框背景图片
+    UIImageView *searchBoxImageView = [[UIImageView alloc] initWithFrame:searchBoxContainerView.bounds];
+    searchBoxImageView.image = [UIImage imageNamed:@"bg_search"];
+    searchBoxImageView.center = searchBoxContainerView.center;
+    [searchBoxContainerView addSubview:searchBoxImageView];
+    //2. 设置搜索图标icon
+    UIImageView *searchIconImageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"icon_search"]];
+    searchIconImageView.left = 10;
+    searchIconImageView.centerY = searchBoxContainerView.height / 2;
+    [searchBoxContainerView addSubview:searchIconImageView];
+    //3. 设置关键词输入框
+    UITextField *searchTextField = [[UITextField alloc] initWithFrame:CGRectZero];
+    searchTextField.placeholder = @"搜索商品与店铺";
+    searchTextField.font = kDefaultTextFont14;
+    searchTextField.textColor = [UIColor whiteColor];
+    [searchTextField setValue:[UIColor whiteColor] forKeyPath:@"_placeholderLabel.textColor"];
+    searchTextField.tag = textFieldTag;
+    searchTextField.height = 24;
+    searchTextField.centerY = searchIconImageView.centerY;
+    searchTextField.left = CGRectGetMaxX(searchIconImageView.frame) + 10;
+    searchTextField.width = searchBoxContainerView.width - searchTextField.left - 10;
+    [searchBoxContainerView addSubview:searchTextField];
+    
+    return searchBoxContainerView;
+}
+
 @end

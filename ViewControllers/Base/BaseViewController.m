@@ -212,7 +212,7 @@
         self.navigationItem.leftBarButtonItems = [self customBarButtonOnNavigationBar:dismissButton withFixedSpaceWidth:-10];
     }
 	else {
-		NSAssert(YES, @"self.backType = [%d] 不支持该类型！", self.backType);
+		NSAssert(YES, @"self.backType = [%lu] 不支持该类型！", self.backType);
 	}
 }
 
@@ -728,7 +728,7 @@
 #pragma mark - UITextFieldDelegate
 
 - (BOOL)textFieldShouldReturn:(UITextField *)textField {
-	[self hideKeyboard];
+	[self hideKeyboard];//TODO:在ios8中失效！
 	return YES;
 }
 
