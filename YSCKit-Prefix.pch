@@ -37,7 +37,8 @@
 
     //Utils
     #import "FileUtils.h"
-    #import "ImageUtils.h"  //TODO:
+    #import "ImageUtils.h"
+    #import "CommonUtils.h"
 
     //Manager
     #import "PlayAudioManager.h"
