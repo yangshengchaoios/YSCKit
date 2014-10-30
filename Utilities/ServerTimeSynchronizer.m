@@ -71,9 +71,8 @@
 	WeakSelfType blockSelf = self;
     NSDate *date = [NSDate date];
     [AFNManager getDataWithAPI:kResPathAppGetServerTime
-                 andArrayParam:nil
                   andDictParam:nil
-                     dataModel:nil
+                     modelName:nil
               requestSuccessed:^(id responseObject) {
                   NSTimeInterval httpWaste = [[NSDate date] timeIntervalSinceDate:date];//计算接口调用的执行时间
                   NSString *oldServerTime = [NSString stringWithFormat:@"%@", responseObject];

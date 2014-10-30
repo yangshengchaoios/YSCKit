@@ -150,6 +150,7 @@ return _sharedObject;
 #define GenderMaleImage                 [UIImage imageNamed:@"icon_gender_male"]
 #define GenderFemaleImage               [UIImage imageNamed:@"icon_gender_female"]
 #define Trim(x)                         [NSString trimString:x]
+#define Class(x)                        [x class]
 
 
 /**
@@ -157,7 +158,7 @@ return _sharedObject;
  */
 #pragma mark - Color defines
 
-#define kDefaultViewColor               RGB(236, 236, 236)      //self.view的默认背景颜色
+#define kDefaultViewColor               RGB(229, 229, 229)      //self.view的默认背景颜色
 #define kDefaultTitleBarColor           RGB(234, 106, 84)       //导航栏的默认颜色
 #define kDefaultStatusBarColor          RGB(234, 106, 84)       //状态栏默认颜色
 #define kDefaultNaviBarColor            RGBA(39, 155, 211, 1)   //设置navigationBar默认颜色(包括了StatusBar)

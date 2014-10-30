@@ -68,7 +68,7 @@ typedef void(^PullToRefreshFailed)(void);
 - (NSString *)nibNameOfCell;                        //自定义的cell布局文件
 - (NSArray *)arrayParamWithPage:(NSInteger)page;        //请求key-value参数封装
 - (NSDictionary *)dictParamWithPage:(NSInteger)page;    //请求URL参数封装
-- (NSString *)modelNameOfData;                      //BasePageModel
+- (Class)modelNameOfData;                      //BasePageModel
 - (UIView *)layoutCellWithData:(id)object atIndexPath:(NSIndexPath *)indexPath;     //根据数据来布局界面
 - (void)clickedCell:(id)object atIndexPath:(NSIndexPath *)indexPath;
 

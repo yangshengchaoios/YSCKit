@@ -202,7 +202,7 @@
         NSLog(@"Error by creating Regex: %@",[error description]);
         return @"";
     }
-    return [expression stringByReplacingMatchesInString:self options:0 range:NSMakeRange(0, [self length]) withTemplate:toString];
+    return [[expression stringByReplacingMatchesInString:self options:0 range:NSMakeRange(0, [self length]) withTemplate:toString] trimString];
 }
 
 

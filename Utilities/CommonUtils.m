@@ -18,9 +18,8 @@
     //TODO:远程开关
     
     [AFNManager getDataWithAPI:kResPathAppUpdateNewVersion
-                 andArrayParam:nil
                   andDictParam:nil
-                     dataModel:@"NewVersionModel"
+                     modelName:Class(NewVersionModel)
               requestSuccessed: ^(id responseObject) {
                   NewVersionModel * versionModel = (NewVersionModel *)responseObject;
                   if ([NSObject isNotEmpty:versionModel]) {

@@ -27,22 +27,19 @@ typedef NS_ENUM (NSInteger, RequestType) {
 #pragma mark - 最常用的GET和POST
 
 + (void)getDataWithAPI:(NSString *)apiName
-         andArrayParam:(NSArray *)arrayParam
           andDictParam:(NSDictionary *)dictParam
-             dataModel:(NSString *)modelName
+             modelName:(Class)modelName
       requestSuccessed:(RequestSuccessed)requestSuccessed
         requestFailure:(RequestFailure)requestFailure;
 + (void)postDataWithAPI:(NSString *)apiName
-          andArrayParam:(NSArray *)arrayParam
            andDictParam:(NSDictionary *)dictParam
-              dataModel:(NSString *)modelName
+              modelName:(Class)modelName
        requestSuccessed:(RequestSuccessed)requestSuccessed
          requestFailure:(RequestFailure)requestFailure;
 + (void)postBodyDataWithAPI:(NSString *)apiName
-              andArrayParam:(NSArray *)arrayParam
                andDictParam:(NSDictionary *)dictParam
                andBodyParam:(NSString *)bodyParam
-                  dataModel:(NSString *)modelName
+                  modelName:(Class)modelName
            requestSuccessed:(RequestSuccessed)requestSuccessed
              requestFailure:(RequestFailure)requestFailure;
 
@@ -50,38 +47,24 @@ typedef NS_ENUM (NSInteger, RequestType) {
 
 + (void)getDataFromUrl:(NSString *)url
                withAPI:(NSString *)apiName
-         andArrayParam:(NSArray *)arrayParam
           andDictParam:(NSDictionary *)dictParam
-             dataModel:(NSString *)modelName
+             modelName:(Class)modelName
       requestSuccessed:(RequestSuccessed)requestSuccessed
         requestFailure:(RequestFailure)requestFailure;
 + (void)postDataToUrl:(NSString *)url
               withAPI:(NSString *)apiName
-        andArrayParam:(NSArray *)arrayParam
          andDictParam:(NSDictionary *)dictParam
-            dataModel:(NSString *)modelName
+            modelName:(Class)modelName
      requestSuccessed:(RequestSuccessed)requestSuccessed
        requestFailure:(RequestFailure)requestFailure;
 + (void)postBodyDataToUrl:(NSString *)url
                   withAPI:(NSString *)apiName
-            andArrayParam:(NSArray *)arrayParam
              andDictParam:(NSDictionary *)dictParam
              andBodyParam:(NSString *)bodyParam
-                dataModel:(NSString *)modelName
+                modelName:(Class)modelName
          requestSuccessed:(RequestSuccessed)requestSuccessed
            requestFailure:(RequestFailure)requestFailure;
 
-#pragma mark - 上传文件
-
-+ (void)uploadImage:(UIImage *)image
-              toUrl:(NSString *)url
-            withApi:(NSString *)apiName
-      andArrayParam:(NSArray *)arrayParam
-       andDictParam:(NSDictionary *)dictParam
-          dataModel:(NSString *)modelName
-       imageQuality:(ImageQuality)quality
-   requestSuccessed:(RequestSuccessed)requestSuccessed
-     requestFailure:(RequestFailure)requestFailure;
 
 #pragma mark - 通用的GET和POST（只返回BaseModel的Data内容）
 
@@ -90,10 +73,20 @@ typedef NS_ENUM (NSInteger, RequestType) {
        andArrayParam:(NSArray *)arrayParam
         andDictParam:(NSDictionary *)dictParam
         andBodyParam:(NSString *)bodyParam
-           dataModel:(NSString *)modelName
+           modelName:(Class)modelName
          requestType:(RequestType)requestType
     requestSuccessed:(RequestSuccessed)requestSuccessed
       requestFailure:(RequestFailure)requestFailure;
+
+#pragma mark - 上传文件
+
++ (void)uploadImage:(UIImage *)image
+              toUrl:(NSString *)url
+            withApi:(NSString *)apiName
+       andDictParam:(NSDictionary *)dictParam
+       imageQuality:(ImageQuality)quality
+   requestSuccessed:(RequestSuccessed)requestSuccessed
+     requestFailure:(RequestFailure)requestFailure;
 
 #pragma mark - 通用的GET、POST和上传图片（返回BaseModel的所有内容）
 

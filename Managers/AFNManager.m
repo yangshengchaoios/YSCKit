@@ -15,105 +15,61 @@
 #pragma mark - 最常用的GET和POST
 
 + (void)getDataWithAPI:(NSString *)apiName
-         andArrayParam:(NSArray *)arrayParam
           andDictParam:(NSDictionary *)dictParam
-             dataModel:(NSString *)modelName
+             modelName:(Class)modelName
       requestSuccessed:(RequestSuccessed)requestSuccessed
         requestFailure:(RequestFailure)requestFailure {
 	NSString *url = kResPathAppBaseUrl;
-    [self requestByUrl:url withAPI:apiName andArrayParam:arrayParam andDictParam:dictParam andBodyParam:nil dataModel:modelName requestType:RequestTypeGET requestSuccessed:requestSuccessed requestFailure:requestFailure];
+    [self requestByUrl:url withAPI:apiName andArrayParam:nil andDictParam:dictParam andBodyParam:nil modelName:modelName requestType:RequestTypeGET requestSuccessed:requestSuccessed requestFailure:requestFailure];
 }
 
 + (void)postDataWithAPI:(NSString *)apiName
-          andArrayParam:(NSArray *)arrayParam
            andDictParam:(NSDictionary *)dictParam
-              dataModel:(NSString *)modelName
+              modelName:(Class)modelName
        requestSuccessed:(RequestSuccessed)requestSuccessed
          requestFailure:(RequestFailure)requestFailure {
 	NSString *url = kResPathAppBaseUrl;
-    [self requestByUrl:url withAPI:apiName andArrayParam:arrayParam andDictParam:dictParam andBodyParam:nil dataModel:modelName requestType:RequestTypePOST requestSuccessed:requestSuccessed requestFailure:requestFailure];
+    [self requestByUrl:url withAPI:apiName andArrayParam:nil andDictParam:dictParam andBodyParam:nil modelName:modelName requestType:RequestTypePOST requestSuccessed:requestSuccessed requestFailure:requestFailure];
 }
 
 + (void)postBodyDataWithAPI:(NSString *)apiName
-              andArrayParam:(NSArray *)arrayParam
                andDictParam:(NSDictionary *)dictParam
                andBodyParam:(NSString *)bodyParam
-                  dataModel:(NSString *)modelName
+                  modelName:(Class)modelName
            requestSuccessed:(RequestSuccessed)requestSuccessed
              requestFailure:(RequestFailure)requestFailure {
 	NSString *url = kResPathAppBaseUrl;
-    [self requestByUrl:url withAPI:apiName andArrayParam:arrayParam andDictParam:dictParam andBodyParam:bodyParam dataModel:modelName requestType:RequestTypePostBodyData requestSuccessed:requestSuccessed requestFailure:requestFailure];
+    [self requestByUrl:url withAPI:apiName andArrayParam:nil andDictParam:dictParam andBodyParam:bodyParam modelName:modelName requestType:RequestTypePostBodyData requestSuccessed:requestSuccessed requestFailure:requestFailure];
 }
 
 #pragma mark - 自定义url前缀的GET和POST
 
 + (void)getDataFromUrl:(NSString *)url
                withAPI:(NSString *)apiName
-         andArrayParam:(NSArray *)arrayParam
           andDictParam:(NSDictionary *)dictParam
-             dataModel:(NSString *)modelName
+             modelName:(Class)modelName
       requestSuccessed:(RequestSuccessed)requestSuccessed
         requestFailure:(RequestFailure)requestFailure {
-	[self requestByUrl:url withAPI:apiName andArrayParam:arrayParam andDictParam:dictParam andBodyParam:nil dataModel:modelName requestType:RequestTypeGET requestSuccessed:requestSuccessed requestFailure:requestFailure];
+	[self requestByUrl:url withAPI:apiName andArrayParam:nil andDictParam:dictParam andBodyParam:nil modelName:modelName requestType:RequestTypeGET requestSuccessed:requestSuccessed requestFailure:requestFailure];
 }
 
 + (void)postDataToUrl:(NSString *)url
               withAPI:(NSString *)apiName
-        andArrayParam:(NSArray *)arrayParam
          andDictParam:(NSDictionary *)dictParam
-            dataModel:(NSString *)modelName
+            modelName:(Class)modelName
      requestSuccessed:(RequestSuccessed)requestSuccessed
        requestFailure:(RequestFailure)requestFailure {
-    [self requestByUrl:url withAPI:apiName andArrayParam:arrayParam andDictParam:dictParam andBodyParam:nil dataModel:modelName requestType:RequestTypePOST requestSuccessed:requestSuccessed requestFailure:requestFailure];
+    [self requestByUrl:url withAPI:apiName andArrayParam:nil andDictParam:dictParam andBodyParam:nil modelName:modelName requestType:RequestTypePOST requestSuccessed:requestSuccessed requestFailure:requestFailure];
 }
 
 + (void)postBodyDataToUrl:(NSString *)url
                   withAPI:(NSString *)apiName
-            andArrayParam:(NSArray *)arrayParam
              andDictParam:(NSDictionary *)dictParam
              andBodyParam:(NSString *)bodyParam
-                dataModel:(NSString *)modelName
+                modelName:(Class)modelName
          requestSuccessed:(RequestSuccessed)requestSuccessed
            requestFailure:(RequestFailure)requestFailure {
-    [self requestByUrl:url withAPI:apiName andArrayParam:arrayParam andDictParam:dictParam andBodyParam:bodyParam dataModel:modelName requestType:RequestTypePostBodyData requestSuccessed:requestSuccessed requestFailure:requestFailure];
-}
-
-#pragma mark - 上传文件
-
-+ (void)uploadImage:(UIImage *)image
-              toUrl:(NSString *)url
-            withApi:(NSString *)apiName
-      andArrayParam:(NSArray *)arrayParam
-       andDictParam:(NSDictionary *)dictParam
-          dataModel:(NSString *)modelName
-       imageQuality:(ImageQuality)quality
-   requestSuccessed:(RequestSuccessed)requestSuccessed
-     requestFailure:(RequestFailure)requestFailure {
-    //TODO:resize
-    [self requestByUrl:url withAPI:apiName
-         andArrayParam:arrayParam
-          andDictParam:dictParam
-          andBodyParam:nil
-             imageData:UIImagePNGRepresentation(image)
-           requestType:RequestTypeUploadFile
-      requestSuccessed:^(id responseObject) {
-          BaseModel *baseModel = (BaseModel *)responseObject;
-          if ([baseModel isKindOfClass:NSClassFromString(modelName)]) {
-              if (1 == baseModel.state) {  //接口访问成功
-                  NSLog(@"success message = %@", baseModel.message);
-                  requestSuccessed(baseModel);
-              }
-              else {
-                  requestFailure(1101, baseModel.message);
-              }
-          }
-          else {
-              requestFailure(1102, @"本地数据映射错误！");
-          }
-          
-      } requestFailure:^(NSInteger errorCode, NSString *errorMessage) {
-          requestFailure(1103, errorMessage);
-      }];
+    [self requestByUrl:url withAPI:apiName andArrayParam:nil andDictParam:dictParam andBodyParam:bodyParam modelName:modelName requestType:RequestTypePostBodyData requestSuccessed:requestSuccessed requestFailure:requestFailure];
 }
 
 #pragma mark - 通用的GET和POST（只返回BaseModel的Data内容）
@@ -135,7 +91,7 @@
        andArrayParam:(NSArray *)arrayParam
         andDictParam:(NSDictionary *)dictParam
         andBodyParam:(NSString *)bodyParam
-           dataModel:(NSString *)modelName
+           modelName:(Class)modelName
          requestType:(RequestType)requestType
     requestSuccessed:(RequestSuccessed)requestSuccessed
       requestFailure:(RequestFailure)requestFailure {
@@ -146,13 +102,13 @@
                 NSObject *dataModel = baseModel.data;
                 JSONModelError *initError = nil;
                 if ([dataModel isKindOfClass:[NSArray class]]) {
-                    if ( [NSString isNotEmpty:modelName] && [NSClassFromString(modelName) isSubclassOfClass:[BaseDataModel class]]) {
-                        dataModel = [NSClassFromString(modelName) arrayOfModelsFromDictionaries:(NSArray *)dataModel error:&initError];
+                    if ([NSString isNotEmpty:modelName] && [modelName isSubclassOfClass:[BaseDataModel class]]) {
+                        dataModel = [modelName arrayOfModelsFromDictionaries:(NSArray *)dataModel error:&initError];
                     }
                 }
                 else if ([dataModel isKindOfClass:[NSDictionary class]]) {
-                    if ( [NSString isNotEmpty:modelName] && [NSClassFromString(modelName) isSubclassOfClass:[BaseDataModel class]]) {
-                        dataModel = [[NSClassFromString(modelName) alloc] initWithDictionary:(NSDictionary *)dataModel error:&initError];
+                    if ( [NSString isNotEmpty:modelName] && [modelName isSubclassOfClass:[BaseDataModel class]]) {
+                        dataModel = [[modelName alloc] initWithDictionary:(NSDictionary *)dataModel error:&initError];
                     }
                 }
                 
@@ -161,10 +117,10 @@
                     requestFailure(1101, initError.localizedDescription);
                 }
                 else {
-                    requestSuccessed(dataModel);//这里dataModel可能为nil
+                    requestSuccessed(dataModel);//注意：这里dataModel为nil也让它返回
                 }
             }
-//            else if (2 == baseModel.State) {//保存扩展
+//            else if (2 == baseModel.State) {//扩展
 //            
 //            }
             else {
@@ -174,6 +130,43 @@
         } requestFailure:requestFailure];
 }
 
+
+#pragma mark - 上传文件
+
++ (void)uploadImage:(UIImage *)image
+              toUrl:(NSString *)url
+            withApi:(NSString *)apiName
+       andDictParam:(NSDictionary *)dictParam
+       imageQuality:(ImageQuality)quality
+   requestSuccessed:(RequestSuccessed)requestSuccessed
+     requestFailure:(RequestFailure)requestFailure {
+    //TODO:resize
+    [self requestByUrl:url
+               withAPI:apiName
+         andArrayParam:nil
+          andDictParam:dictParam
+          andBodyParam:nil
+             imageData:UIImagePNGRepresentation(image)
+           requestType:RequestTypeUploadFile
+      requestSuccessed:^(id responseObject) {
+          BaseModel *baseModel = (BaseModel *)responseObject;
+          if ([baseModel isKindOfClass:[BaseModel class]]) {
+              if (1 == baseModel.state) {  //接口访问成功
+                  NSLog(@"success message = %@", baseModel.message);
+                  requestSuccessed(baseModel);
+              }
+              else {
+                  requestFailure(1101, baseModel.message);
+              }
+          }
+          else {
+              requestFailure(1102, @"本地数据映射错误！");
+          }
+          
+      } requestFailure:^(NSInteger errorCode, NSString *errorMessage) {
+          requestFailure(1103, errorMessage);
+      }];
+}
 
 #pragma mark - 通用的GET和POST（返回BaseModel的所有内容）
 
@@ -204,30 +197,26 @@
 		return;
 	}
     
-	//2. apiName简单判断
-    apiName = [NSString trimString:apiName];
+	//2. 组装完整的url地址
+    NSString *urlString = [url stringByAppendingFormat:@"%@/%@",
+                           [NSString replaceString:url byRegex:@"/+$" to:@""],//去掉url最后的'/'字符
+                           [NSString replaceString:apiName byRegex:@"^/+" to:@""]];//去掉apiName前面的'/'字符                                                     //组装后的完整url地址
     
-	//3. 组装完整的url地址
-	NSString *urlString = [url stringByAppendingFormat:@"%@%@",
-	                       ([url hasSuffix:@"/"] ? @"" : @"/"),
-	                       ([apiName hasPrefix:@"/"] ? [apiName substringFromIndex:1] : apiName)
-                           ];                                                         //组装后的完整url地址
-    
-	//4. 组装数组参数
+	//3. 组装数组参数
 	NSMutableString *newUrlString = [NSMutableString stringWithString:urlString];
 	for (NSObject *param in arrayParam) {
 		[newUrlString appendString:@"/"];
 		[newUrlString appendFormat:@"%@",param];
 	}
     
-    //5. 对提交的dict添加一个加密的参数'signature'
+    //4. 对提交的dict添加一个加密的参数'signature'
     NSMutableDictionary *newDictParam = [NSMutableDictionary dictionaryWithDictionary:dictParam];
     NSString *signature = [self signatureWithParam:newDictParam];
     if ([NSString isNotEmpty:signature]) {//当加密字符串不为空的时候就新增一个参数'signature'
         [newDictParam setValue:signature forKey:kParamSignature];
     }
     
-	//6. 发起网络请求
+	//5. 发起网络请求
     AFHTTPRequestOperationManager *manager = [AFHTTPRequestOperationManager manager];   //create new AFHTTPRequestOperationManager
     manager.requestSerializer.cachePolicy = NSURLRequestReloadIgnoringLocalCacheData;
     manager.requestSerializer.timeoutInterval = 15.0f;//设置POST和GET的超时时间

@@ -153,17 +153,15 @@
     if(requestType == RequestTypeGET){
         [AFNManager getDataFromUrl:[self prefixOfUrl]
                            withAPI:[self methodWithPath]
-                           andArrayParam:[self arrayParamWithPage:kDefaultPageStartIndex]
-                           andDictParam:[self dictParamWithPage:kDefaultPageStartIndex]
-                           dataModel:[self modelNameOfData]
-                           requestSuccessed:requestSuccessedBlock requestFailure:requestFailureBlock];
+                      andDictParam:[self dictParamWithPage:kDefaultPageStartIndex]
+                         modelName:[self modelNameOfData]
+                  requestSuccessed:requestSuccessedBlock requestFailure:requestFailureBlock];
     }else if(requestType == RequestTypePOST){
         [AFNManager postDataToUrl:[self prefixOfUrl]
-                           withAPI:[self methodWithPath]
-                     andArrayParam:[self arrayParamWithPage:kDefaultPageStartIndex]
-                      andDictParam:[self dictParamWithPage:kDefaultPageStartIndex]
-                         dataModel:[self modelNameOfData]
-                  requestSuccessed:requestSuccessedBlock requestFailure:requestFailureBlock];
+                          withAPI:[self methodWithPath]
+                     andDictParam:[self dictParamWithPage:kDefaultPageStartIndex]
+                        modelName:[self modelNameOfData]
+                 requestSuccessed:requestSuccessedBlock requestFailure:requestFailureBlock];
     }
 }
 
@@ -244,16 +242,14 @@
 	if(requestType == RequestTypeGET){
         [AFNManager getDataFromUrl:[self prefixOfUrl]
                            withAPI:[self methodWithPath]
-                     andArrayParam:[self arrayParamWithPage:self.currentPageIndex + 1]
                       andDictParam:[self dictParamWithPage:self.currentPageIndex + 1]
-                         dataModel:[self modelNameOfData]
+                         modelName:[self modelNameOfData]
                   requestSuccessed:requestSuccessedBlock requestFailure:requestFailureBlock];
     }else if(requestType == RequestTypePOST){
         [AFNManager postDataToUrl:[self prefixOfUrl]
                           withAPI:[self methodWithPath]
-                    andArrayParam:[self arrayParamWithPage:self.currentPageIndex + 1]
                      andDictParam:[self dictParamWithPage:self.currentPageIndex + 1]
-                        dataModel:[self modelNameOfData]
+                        modelName:[self modelNameOfData]
                  requestSuccessed:requestSuccessedBlock requestFailure:requestFailureBlock];
     }
 }
@@ -328,8 +324,8 @@
 	return @{};
 }
 
-- (NSString *)modelNameOfData {
-	return @"CommonBaseModel";
+- (Class)modelNameOfData {
+	return NSClassFromString(@"CommonBaseModel");
 }
 
 - (UIView *)layoutCellWithData:(id)object atIndexPath:(NSIndexPath *)indexPath {
