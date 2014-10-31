@@ -61,6 +61,12 @@
 - (void)viewDidAppear:(BOOL)animated {
 	[super viewDidAppear:animated];
     [MobClick beginLogPageView:NSStringFromClass([self class])];
+    
+    //控制只执行一次的方法
+    if (!self.isRunViewDidLoadExtension) {
+        [self viewDidiLoadExtension];
+        self.isRunViewDidLoadExtension = YES;
+    }
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
@@ -83,6 +89,17 @@
     }
 	[[Login sharedInstance] unregisterLoginObserver:self];
 	[[NSNotificationCenter defaultCenter] removeObserver:self]; //等同于宏定义  removeAllObservers(self);
+}
+
+- (void)updateViewConstraints {
+    // Check a flag didSetupConstraints before creating constraints, because this method may be called multiple times, and we
+    // only want to create these constraints once. Without this check, the same constraints could be added multiple times,
+    // which can hurt performance and cause other issues. See Demo 7 (Animation) for an example of code that runs every time.
+    if (!self.isSetupConstraints) {
+        [self setupConstraints];
+        self.isSetupConstraints = YES;
+    }
+    [super updateViewConstraints];
 }
 
 /**
@@ -299,6 +316,17 @@
     pushedViewController.hidesBottomBarWhenPushed = YES;
     NSLog(@"进入页面:%@", className);
     return pushedViewController;
+}
+
+
+#pragma mark - 这里可以获取相对布局的view大小
+- (void)viewDidiLoadExtension {
+
+}
+
+#pragma mark - constraints
+- (void)setupConstraints {
+    
 }
 
 #pragma mark - push & pop & dismiss view controller

@@ -220,7 +220,6 @@
     AFHTTPRequestOperationManager *manager = [AFHTTPRequestOperationManager manager];   //create new AFHTTPRequestOperationManager
     manager.requestSerializer.cachePolicy = NSURLRequestReloadIgnoringLocalCacheData;
     manager.requestSerializer.timeoutInterval = 15.0f;//设置POST和GET的超时时间
-    [manager.requestSerializer setValue:kDefaultClientType forHTTPHeaderField:@"User-Agent"];
     //解决返回的Content-Type始终是application/xml问题！
     [manager.requestSerializer setValue:@"application/json" forHTTPHeaderField:@"Accept"];
     
@@ -319,10 +318,17 @@
  *  @return signature
  */
 + (NSString *)signatureWithParam:(NSMutableDictionary *)param {
-    //1. 添加默认'version'参数
+    //1. 默认参数:version, udid, from
     if ([NSString isEmpty:param[kParamVersion]]) {
-        [param setValue:kDefaultInterfaceVersion forKey:kParamVersion];//如果有了就不加
+        [param setValue:kParamVersionValue forKey:kParamVersion];
     }
+    if ([NSString isEmpty:param[kParamUdid]]) {
+        [param setValue:@"default udid of ios" forKey:kParamUdid];//TODO:获取设备唯一编号
+    }
+    if ([NSString isEmpty:param[kParamFrom]]) {
+        [param setValue:kParamFromValue forKey:kParamFrom];
+    }
+    
     NSArray *keys = [[param allKeys] sortedArrayUsingSelector:@selector(compare:)];
     
     //2. 按照字典顺序拼接url字符串

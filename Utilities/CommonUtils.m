@@ -14,7 +14,7 @@
  *  检查是否有新版本需要更新
  */
 + (void)checkNewVersion {
-    return;
+//    return;
     //TODO:远程开关
     
     [AFNManager getDataWithAPI:kResPathAppUpdateNewVersion

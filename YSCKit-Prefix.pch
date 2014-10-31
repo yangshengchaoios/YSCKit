@@ -12,6 +12,7 @@
 #endif
 
 #ifdef __OBJC__
+    //常用第三方库
     #import <UIKit/UIKit.h>
     #import <Foundation/Foundation.h>
     #import <BlocksKit/BlocksKit.h>
@@ -19,6 +20,7 @@
     #import <BlocksKit+MessageUI.h>
     #import <MBProgressHUD/MBProgressHUD.h>
     #import <POP/POP.h>
+    #import "PureLayout.h"
 
     //定义固定常量和公用枚举
     #import "UrlConstants.h"
@@ -205,8 +207,6 @@ return _sharedObject;
 #define kDefaultAnimationDuration10     1.0f
 #define kDefaultAnimationDuration15     1.5f
 #define kDefaultAnimationDuration20     2.0f
-#define kDefaultInterfaceVersion        @"1.0"          //设置默认接口版本号
-#define kDefaultClientType              @"TGO8-IOS"     //设置终端设备类型(ios android)
 #define kAppScheme                      @"TGO8"
 #define kCellIdentifier                 @"Cell"
 #define kFooterIdentifier               @"Footer"
