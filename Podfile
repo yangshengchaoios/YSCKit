@@ -34,7 +34,7 @@ pod 'DRDynamicSlideShow', :head
 
 pod 'JSONModel', :head
 
-pod 'pop', :head
+pod 'pop',  '~>1.0.7'
 
 pod 'UIImage-Resize', :head
 
@@ -49,3 +49,6 @@ pod 'ZYQAssetPickerController',  '~> 1.0.0'
 #等效于pod 'ELCImagePickerController', :head
 
 pod 'HPGrowingTextView',  '~>1.1'
+
+pod 'PureLayout', :head
+#UIView+AutoLayout has been deprecated in favor of PureLayout
