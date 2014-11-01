@@ -1,5 +1,5 @@
 //
-//  BasePullToRefreshContentViewController.h
+//  BasePullToRefreshCollectionViewController.h
 //  TGO2
 //
 //  Created by  YangShengchao on 14-3-27.
@@ -9,7 +9,7 @@
 
 #import "BasePullToRefreshViewController.h"
 
-@interface BasePullToRefreshContentViewController : BasePullToRefreshViewController <UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout>
+@interface BasePullToRefreshCollectionViewController : BasePullToRefreshViewController <UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout>
 
 @property (nonatomic, weak) IBOutlet UICollectionView * collectionView;
 

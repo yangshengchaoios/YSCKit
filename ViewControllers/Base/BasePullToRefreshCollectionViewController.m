@@ -1,18 +1,18 @@
 //
-//  BasePullToRefreshContentViewController.m
+//  BasePullToRefreshCollectionViewController.m
 //  TGO2
 //
 //  Created by  YangShengchao on 14-3-27.
 //  Copyright (c) 2014年 SCSD_TGO_TEAM. All rights reserved.
 //
 
-#import "BasePullToRefreshContentViewController.h"
+#import "BasePullToRefreshCollectionViewController.h"
 
-@interface BasePullToRefreshContentViewController ()
+@interface BasePullToRefreshCollectionViewController ()
 
 @end
 
-@implementation BasePullToRefreshContentViewController
+@implementation BasePullToRefreshCollectionViewController
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
 	self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];

@@ -58,6 +58,7 @@
     #import "DataModel.h"
     #import "Login.h"
     #import "BaseViewController.h"
+    #import "BaseTableViewCell.h"
 #endif
 
 
