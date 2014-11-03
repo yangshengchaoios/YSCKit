@@ -20,8 +20,8 @@
     // Configure the view for the selected state
 }
 
-+ (CGFloat)HeightOfCell {
-    return 44.0f;
++ (CGFloat)HeightOfCell:(CGSize)size {
+    return size.height / size.width * SCREEN_WIDTH;
 }
 
 - (void)layoutDataModel:(BaseDataModel *)dataModel {

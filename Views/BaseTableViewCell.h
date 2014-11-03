@@ -10,7 +10,7 @@
 
 @interface BaseTableViewCell : UITableViewCell
 
-+ (CGFloat)HeightOfCell;
++ (CGFloat)HeightOfCell:(CGSize)size;
 - (void)layoutDataModel:(BaseDataModel *)dataModel;
 - (void)layoutDataModels:(NSArray *)dataModelArray;
 
