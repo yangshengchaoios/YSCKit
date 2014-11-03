@@ -166,9 +166,10 @@ return _sharedObject;
 #define kDefaultTitleBarColor           RGB(234, 106, 84)       //导航栏的默认颜色
 #define kDefaultStatusBarColor          RGB(234, 106, 84)       //状态栏默认颜色
 #define kDefaultNaviBarColor            RGBA(39, 155, 211, 1)   //设置navigationBar默认颜色(包括了StatusBar)
-#define kDefaultTextColor               RGB(100, 100, 100)      //设置文字默认颜色为灰
+#define kDefaultTextColor               RGB(100, 100, 100)      //设置文字默认颜色
 #define kDefaultTextColor1              RGB(122, 122, 122)
 #define kDefaultEmptyTextColor          RGB(122, 122, 122)      //列表为空时的提醒文字颜色
+#define kDefaultSeperatorLineColor      RGB(176, 176, 176)      //设置间隔线的默认颜色
 
 
 
