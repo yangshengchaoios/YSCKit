@@ -1,16 +1,16 @@
 //
-//  BaseTableViewCell.h
+//  BaseCollectionViewCell.h
 //  KQ
 //
-//  Created by yangshengchao on 14-11-1.
+//  Created by yangshengchao on 14-11-4.
 //  Copyright (c) 2014年 yangshengchao. All rights reserved.
 //
 
 #import <UIKit/UIKit.h>
 
-@interface BaseTableViewCell : UITableViewCell
+@interface BaseCollectionViewCell : UICollectionViewCell
 
-+ (CGFloat)HeightOfCell;
++ (CGSize)SizeOfCell;
 - (void)layoutDataModel:(BaseDataModel *)dataModel;
 - (void)layoutDataModels:(NSArray *)dataModelArray;
 

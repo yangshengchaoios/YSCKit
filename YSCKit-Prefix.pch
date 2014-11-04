@@ -59,6 +59,7 @@
     #import "Login.h"
     #import "BaseViewController.h"
     #import "BaseTableViewCell.h"
+    #import "BaseCollectionViewCell.h"
 #endif
 
 
@@ -96,13 +97,14 @@ NSLog(@"%@", logString); \
 
 #define IOS7                    __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_7_0
 #define IOS8                    __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_8_0
-#define SCREEN_WIDTH            ([UIScreen mainScreen].bounds.size.width) //屏幕的宽度
-#define SCREEN_HEIGHT           ([UIScreen mainScreen].bounds.size.height)//屏幕的高度
+#define SCREEN_WIDTH            ([UIScreen mainScreen].bounds.size.width) //屏幕的宽度(point)
+#define SCREEN_HEIGHT           ([UIScreen mainScreen].bounds.size.height)//屏幕的高度(point)
 #define STATUSBAR_HEIGHT        20.0f
 #define NAVIGATIONBAR_HEIGHT    44.0f
 #define TITLEBAR_HEIGHT         64.0f       //等于STATUSBAR_HEIGHT + NAVIGATIONBAR_HEIGHT
 #define TABBAR_HEIGHT           49.0f
 #define KEYBOARD_HEIGHT         216.0f      //默认键盘高度
+#define XIB_WIDTH               640.0f      //xib布局时的宽度(主要用于计算缩放比例)
 
 /**
  *  定义单例
@@ -155,6 +157,9 @@ return _sharedObject;
 #define GenderFemaleImage               [UIImage imageNamed:@"icon_gender_female"]
 #define Trim(x)                         [NSString trimString:x]
 #define Class(x)                        [x class]
+#define AUTOLAYOUT_WIDTH(size)          ((size.width / XIB_WIDTH) * SCREEN_WIDTH)             //计算自动布局后的宽度
+#define AUTOLAYOUT_HEIGHT(size)         ((AUTOLAYOUT_WIDTH(size) / size.width) * size.height) //计算自动布局后的高度
+#define AUTOLAYOUT_SIZE(size)           CGSizeMake(AUTOLAYOUT_WIDTH(size), AUTOLAYOUT_HEIGHT(size))//计算自动布局后的size
 
 
 /**
@@ -195,7 +200,7 @@ return _sharedObject;
  */
 #pragma mark - define constants
 
-#define kDefaultPageStartIndex          1
+#define kDefaultPageStartIndex          0
 #define kDefaultPageSize                20
 #define kDefaultAnimationDuration01     0.1f
 #define kDefaultAnimationDuration02     0.2f

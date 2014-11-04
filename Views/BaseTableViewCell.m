@@ -20,8 +20,11 @@
     // Configure the view for the selected state
 }
 
-+ (CGFloat)HeightOfCell:(CGSize)size {
-    return size.height / size.width * SCREEN_WIDTH;
++ (CGFloat)HeightOfCell {
+    return AUTOLAYOUT_HEIGHT([self SizeOfCellInXib]);
+}
++ (CGSize)SizeOfCellInXib {
+    return CGSizeMake(290, 290);
 }
 
 - (void)layoutDataModel:(BaseDataModel *)dataModel {
