@@ -158,9 +158,13 @@ return _sharedObject;
 #define Trim(x)                         [NSString trimString:x]
 #define Class(x)                        [x class]
 #define AUTOLAYOUT_WIDTH(size)          ((size.width / XIB_WIDTH) * SCREEN_WIDTH)             //计算自动布局后的宽度
-#define AUTOLAYOUT_HEIGHT(size)         ((AUTOLAYOUT_WIDTH(size) / size.width) * size.height) //计算自动布局后的高度
-#define AUTOLAYOUT_SIZE(size)           CGSizeMake(AUTOLAYOUT_WIDTH(size), AUTOLAYOUT_HEIGHT(size))//计算自动布局后的size
+#define AUTOLAYOUT_WIDTH_W(w)           ((w / XIB_WIDTH) * SCREEN_WIDTH)
 
+#define AUTOLAYOUT_HEIGHT(size)         ((AUTOLAYOUT_WIDTH(size) / size.width) * size.height) //计算自动布局后的高度
+#define AUTOLAYOUT_HEIGHT_WH(w,h)       ((AUTOLAYOUT_WIDTH_W(w) / w) * h)
+
+#define AUTOLAYOUT_SIZE(size)           CGSizeMake(AUTOLAYOUT_WIDTH(size), AUTOLAYOUT_HEIGHT(size))//计算自动布局后的size
+#define AUTOLAYOUT_SIZE_WH(w,h)         CGSizeMake(AUTOLAYOUT_WIDTH_W(w), AUTOLAYOUT_HEIGHT_WH(w,h))
 
 /**
  *  颜色及相关默认值定义

@@ -63,6 +63,9 @@
 - (UIImage *)screenshotOfView;
 
 
+#pragma mark - 递归遍历所有子view
++ (void)clearBackgroundColorOfAllSpaceLabels:(UIView *)view;
+
 
 /**
  *  这里的HUD和AlertView主要用于非BaseViewController的情况下调用

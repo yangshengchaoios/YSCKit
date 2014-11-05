@@ -239,6 +239,27 @@
 
 
 
+
+#pragma mark - 递归遍历所有子view
+//设置调整布局相关的view背景颜色为空
++ (void)clearBackgroundColorOfAllSpaceLabels:(UIView *)view {
+    if ( ! [view isMemberOfClass:[UIView class]]) {
+        return;
+    }
+    
+    for (UIView *subview in view.subviews) {
+        if ([subview isKindOfClass:[UILabel class]] &&
+            subview.tag >= 1000) {
+                subview.backgroundColor = [UIColor clearColor];
+        }
+        else if ([subview isKindOfClass:[UIView class]]) {
+            [self clearBackgroundColorOfAllSpaceLabels:subview];
+        }
+    }
+}
+
+
+
 #pragma mark -  show & hide HUD
 + (MBProgressHUD *)showHUDLoadingOnWindow:(NSString *)hintString {
     UIView *view = [UIApplication sharedApplication].keyWindow;

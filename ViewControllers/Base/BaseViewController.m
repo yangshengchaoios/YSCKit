@@ -160,6 +160,9 @@
     if ([self scrollableView]) {
         [self followScrollView:[self scrollableView]];
     }
+    
+    //清空所有布局使用的子Label背景颜色
+    [UIView clearBackgroundColorOfAllSpaceLabels:self.view];
 }
 
 
@@ -287,8 +290,8 @@
 			((UITextField *)subview).delegate = self;
             addNObserverWithObj(@selector(textFieldChanged:), UITextFieldTextDidChangeNotification, (UITextField *)subview);
 		}
-		else {
-			[self setDelegateOfAllTextFields:subview];
+		else if ([subview isKindOfClass:[UIView class]]) {
+                [self setDelegateOfAllTextFields:subview];
 		}
 	}
 }
