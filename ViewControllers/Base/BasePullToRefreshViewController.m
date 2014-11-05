@@ -154,13 +154,13 @@
         [AFNManager getDataFromUrl:[self prefixOfUrl]
                            withAPI:[self methodWithPath]
                       andDictParam:[self dictParamWithPage:kDefaultPageStartIndex]
-                         modelName:[self modelNameOfData]
+                         modelName:[self modelClassOfData]
                   requestSuccessed:requestSuccessedBlock requestFailure:requestFailureBlock];
     }else if(requestType == RequestTypePOST){
         [AFNManager postDataToUrl:[self prefixOfUrl]
                           withAPI:[self methodWithPath]
                      andDictParam:[self dictParamWithPage:kDefaultPageStartIndex]
-                        modelName:[self modelNameOfData]
+                        modelName:[self modelClassOfData]
                  requestSuccessed:requestSuccessedBlock requestFailure:requestFailureBlock];
     }
 }
@@ -243,13 +243,13 @@
         [AFNManager getDataFromUrl:[self prefixOfUrl]
                            withAPI:[self methodWithPath]
                       andDictParam:[self dictParamWithPage:self.currentPageIndex + 1]
-                         modelName:[self modelNameOfData]
+                         modelName:[self modelClassOfData]
                   requestSuccessed:requestSuccessedBlock requestFailure:requestFailureBlock];
     }else if(requestType == RequestTypePOST){
         [AFNManager postDataToUrl:[self prefixOfUrl]
                           withAPI:[self methodWithPath]
                      andDictParam:[self dictParamWithPage:self.currentPageIndex + 1]
-                        modelName:[self modelNameOfData]
+                        modelName:[self modelClassOfData]
                  requestSuccessed:requestSuccessedBlock requestFailure:requestFailureBlock];
     }
 }
@@ -316,16 +316,12 @@
 	return @"";
 }
 
-- (NSArray *)arrayParamWithPage:(NSInteger)page {
-	return @[];
-}
-
 - (NSDictionary *)dictParamWithPage:(NSInteger)page {
 	return @{};
 }
 
-- (Class)modelNameOfData {
-	return NSClassFromString(@"CommonBaseModel");
+- (Class)modelClassOfData {
+    return [BaseDataModel class];
 }
 
 - (UIView *)layoutCellWithData:(id)object atIndexPath:(NSIndexPath *)indexPath {
