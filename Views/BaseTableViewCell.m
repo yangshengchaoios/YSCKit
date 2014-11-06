@@ -11,7 +11,10 @@
 @implementation BaseTableViewCell
 
 - (void)awakeFromNib {
-    // Initialization code
+    [super awakeFromNib];
+    
+    self.containerView.backgroundColor = [UIColor clearColor];
+    [UIView clearBackgroundColorOfAllSpaceLabels:self.containerView];
 }
 
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated {

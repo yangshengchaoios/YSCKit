@@ -10,6 +10,8 @@
 
 @interface BaseTableViewCell : UITableViewCell
 
+@property (weak, nonatomic) IBOutlet UIView *containerView;
+
 + (CGFloat)HeightOfCell;
 - (void)layoutDataModel:(BaseDataModel *)dataModel;
 - (void)layoutDataModels:(NSArray *)dataModelArray;

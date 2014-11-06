@@ -169,6 +169,7 @@ return _sharedObject;
 #define AUTOLAYOUT_HEIGHT(h)            (h * AUTOLAYOUT_SCALE)              //计算自动布局后的高度
 #define AUTOLAYOUT_SIZE_WH(w,h)         CGSizeMake(AUTOLAYOUT_WIDTH(w), AUTOLAYOUT_HEIGHT(h))
 #define AUTOLAYOUT_SIZE(size)           CGSizeMake(AUTOLAYOUT_WIDTH(size.width), AUTOLAYOUT_HEIGHT(size.height))//计算自动布局后的size
+#define AUTOLAYOUT_FONT(f)              ([UIFont systemFontOfSize:(f * AUTOLAYOUT_SCALE)])
 
 
 /**

@@ -213,12 +213,33 @@
 }
 - (void)animateHorizontalSwipeWithSubType:(NSString *)subtype {
     CATransition *animation = [CATransition animation];
-    animation.duration = kDefaultAnimationDuration03;
+    animation.duration = kDefaultAnimationDuration02;
     animation.timingFunction = UIViewAnimationCurveEaseInOut;
     animation.fillMode = kCAFillModeForwards;
     animation.type = kCATransitionPush;
     animation.subtype = subtype;
     [self.layer addAnimation:animation forKey:@"animation"];
+}
++ (void)add1fingerHorizontalSwipe:(UIView *)view
+                     swipeToRight:(void (^)(UIGestureRecognizer *sender, UIGestureRecognizerState state, CGPoint location))toRightBlock
+                      swipeToLeft:(void (^)(UIGestureRecognizer *sender, UIGestureRecognizerState state, CGPoint location))toLeftBlock {
+    UISwipeGestureRecognizer *swipeRight = [UISwipeGestureRecognizer bk_recognizerWithHandler:^(UIGestureRecognizer *sender, UIGestureRecognizerState state, CGPoint location) {
+        NSLog(@"向右滑动，看前面一页");
+        if (toRightBlock) {
+            toRightBlock(sender, state, location);
+        }
+    }];
+    swipeRight.direction = UISwipeGestureRecognizerDirectionRight;
+    [view addGestureRecognizer:swipeRight];
+    
+    UISwipeGestureRecognizer *swipeLeft = [[UISwipeGestureRecognizer alloc] bk_initWithHandler:^(UIGestureRecognizer *sender, UIGestureRecognizerState state, CGPoint location) {
+        NSLog(@"向左滑动，看后面一页");
+        if (toLeftBlock) {
+            toLeftBlock(sender, state, location);
+        }
+    }];
+    swipeLeft.direction = UISwipeGestureRecognizerDirectionLeft;
+    [view addGestureRecognizer:swipeLeft];
 }
 
 

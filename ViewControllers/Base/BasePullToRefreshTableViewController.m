@@ -30,7 +30,9 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    [self.tableView registerNib:[UINib nibWithNibName:[self nibNameOfCell] bundle:nil] forCellReuseIdentifier:kCellIdentifier];
+    if ([NSString isNotEmpty:[self nibNameOfCell]]) {
+        [self.tableView registerNib:[UINib nibWithNibName:[self nibNameOfCell] bundle:nil] forCellReuseIdentifier:kCellIdentifier];
+    }
     self.tableView.tableHeaderView = [[UIView alloc] initWithFrame:CGRectZero];
     self.tableView.tableFooterView = [[UIView alloc] initWithFrame:CGRectZero];
     self.tableView.dataSource = self;
@@ -66,6 +68,7 @@
 
 - (UIView *)layoutCellWithData:(id)object atIndexPath:(NSIndexPath *)indexPath {
 	UITableViewCell *cell = [self.tableView dequeueReusableCellWithIdentifier:kCellIdentifier];
+    cell.selectionStyle = UITableViewCellSelectionStyleNone;
 	return cell;
 }
 

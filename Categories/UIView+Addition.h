@@ -57,6 +57,10 @@
  */
 + (void)animateHorizontalSwipe:(UIView *)view withSubType:(NSString *)subtype;
 - (void)animateHorizontalSwipeWithSubType:(NSString *)subtype;
++ (void)add1fingerHorizontalSwipe:(UIView *)view
+                     swipeToRight:(void (^)(UIGestureRecognizer *sender, UIGestureRecognizerState state, CGPoint location))toRightBlock
+                      swipeToLeft:(void (^)(UIGestureRecognizer *sender, UIGestureRecognizerState state, CGPoint location))toLeftBlock;
+
 
 #pragma mark - 截图
 + (UIImage *)screenshotOfView:(UIView *) view;

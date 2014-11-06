@@ -29,7 +29,9 @@
 - (void)viewDidLoad {
 	[super viewDidLoad];
 
-	[self.collectionView registerNib:[UINib nibWithNibName:[self nibNameOfCell] bundle:nil] forCellWithReuseIdentifier:kItemCellIdentifier];
+    if ([NSString isNotEmpty:[self nibNameOfCell]]) {
+        [self.collectionView registerNib:[UINib nibWithNibName:[self nibNameOfCell] bundle:nil] forCellWithReuseIdentifier:kItemCellIdentifier];
+    }
 	self.collectionView.showsHorizontalScrollIndicator = NO;        //TODO:以后这里可以扩展
 	self.collectionView.showsVerticalScrollIndicator = YES;
 	self.collectionView.delegate = self;
