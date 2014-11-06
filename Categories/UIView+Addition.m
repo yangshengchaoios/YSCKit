@@ -274,6 +274,9 @@
                 subview.backgroundColor = [UIColor clearColor];
         }
         else if ([subview isKindOfClass:[UIView class]]) {
+            if (subview.tag >= 1000) {//兼容view的背景颜色也要清空
+                subview.backgroundColor = [UIColor clearColor];
+            }
             [self clearBackgroundColorOfAllSpaceLabels:subview];
         }
     }
