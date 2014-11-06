@@ -67,6 +67,9 @@
 + (void)clearBackgroundColorOfAllSpaceLabels:(UIView *)view;
 
 
+#pragma mark - 计算自动布局的size
+- (void)autoLayoutSize;
+
 /**
  *  这里的HUD和AlertView主要用于非BaseViewController的情况下调用
  *

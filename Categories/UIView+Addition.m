@@ -259,6 +259,13 @@
 }
 
 
+#pragma mark - 计算自动布局的size
+- (void)autoLayoutSize {
+    CGSize size = AUTOLAYOUT_SIZE(self.frame.size);
+    self.width = size.width;
+    self.height = size.height;
+}
+
 
 #pragma mark -  show & hide HUD
 + (MBProgressHUD *)showHUDLoadingOnWindow:(NSString *)hintString {

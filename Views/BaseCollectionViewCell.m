@@ -11,10 +11,7 @@
 @implementation BaseCollectionViewCell
 
 + (CGSize)SizeOfCell {
-    return AUTOLAYOUT_SIZE([self SizeOfCellInXib]);
-}
-+ (CGSize)SizeOfCellInXib {
-    return CGSizeMake(290, 290);
+    return AUTOLAYOUT_SIZE(CGSizeMake(290, 290));
 }
 - (void)layoutDataModel:(BaseDataModel *)dataModel {
 

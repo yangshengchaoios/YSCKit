@@ -21,10 +21,7 @@
 }
 
 + (CGFloat)HeightOfCell {
-    return AUTOLAYOUT_HEIGHT([self SizeOfCellInXib]);
-}
-+ (CGSize)SizeOfCellInXib {
-    return CGSizeMake(290, 290);
+    return AUTOLAYOUT_HEIGHT(290);
 }
 
 - (void)layoutDataModel:(BaseDataModel *)dataModel {

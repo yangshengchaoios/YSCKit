@@ -104,7 +104,7 @@ NSLog(@"%@", logString); \
 #define TITLEBAR_HEIGHT         64.0f       //等于STATUSBAR_HEIGHT + NAVIGATIONBAR_HEIGHT
 #define TABBAR_HEIGHT           49.0f
 #define KEYBOARD_HEIGHT         216.0f      //默认键盘高度
-#define XIB_WIDTH               640.0f      //xib布局时的宽度(主要用于计算缩放比例)
+#define XIB_WIDTH               640.0f      //xib布局时的宽度(point)，主要用于计算缩放比例
 
 /**
  *  定义单例
@@ -157,14 +157,19 @@ return _sharedObject;
 #define GenderFemaleImage               [UIImage imageNamed:@"icon_gender_female"]
 #define Trim(x)                         [NSString trimString:x]
 #define Class(x)                        [x class]
-#define AUTOLAYOUT_WIDTH(size)          ((size.width / XIB_WIDTH) * SCREEN_WIDTH)             //计算自动布局后的宽度
-#define AUTOLAYOUT_WIDTH_W(w)           ((w / XIB_WIDTH) * SCREEN_WIDTH)
 
-#define AUTOLAYOUT_HEIGHT(size)         ((AUTOLAYOUT_WIDTH(size) / size.width) * size.height) //计算自动布局后的高度
-#define AUTOLAYOUT_HEIGHT_WH(w,h)       ((AUTOLAYOUT_WIDTH_W(w) / w) * h)
 
-#define AUTOLAYOUT_SIZE(size)           CGSizeMake(AUTOLAYOUT_WIDTH(size), AUTOLAYOUT_HEIGHT(size))//计算自动布局后的size
-#define AUTOLAYOUT_SIZE_WH(w,h)         CGSizeMake(AUTOLAYOUT_WIDTH_W(w), AUTOLAYOUT_HEIGHT_WH(w,h))
+
+/**
+ *  自动布局相关代码段简写
+ *
+ */
+#define AUTOLAYOUT_SCALE                (SCREEN_WIDTH / XIB_WIDTH)          //缩放比例 (当前屏幕的真实宽度 / xib布局的宽度)
+#define AUTOLAYOUT_WIDTH(w)             (w * AUTOLAYOUT_SCALE)              //计算自动布局后的宽度
+#define AUTOLAYOUT_HEIGHT(h)            (h * AUTOLAYOUT_SCALE)              //计算自动布局后的高度
+#define AUTOLAYOUT_SIZE_WH(w,h)         CGSizeMake(AUTOLAYOUT_WIDTH(w), AUTOLAYOUT_HEIGHT(h))
+#define AUTOLAYOUT_SIZE(size)           CGSizeMake(AUTOLAYOUT_WIDTH(size.width), AUTOLAYOUT_HEIGHT(size.height))//计算自动布局后的size
+
 
 /**
  *  颜色及相关默认值定义
