@@ -22,7 +22,7 @@ pod 'CXPhotoBrowser', :head
 
 pod 'JSCustomBadge', :head
 
-pod 'HMSegmentedControl', :head
+pod 'HMSegmentedControl', :git => 'https://github.com/yangshengchaoios/HMSegmentedControl.git'
 
 pod 'MarqueeLabel', :head
 
