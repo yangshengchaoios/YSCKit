@@ -157,6 +157,7 @@ return _sharedObject;
 #define GenderFemaleImage               [UIImage imageNamed:@"icon_gender_female"]
 #define Trim(x)                         [NSString trimString:x]
 #define Class(x)                        [x class]
+#define FormatPrice(x)                  ([NSString stringWithFormat:@"￥%.2f", x])
 
 
 

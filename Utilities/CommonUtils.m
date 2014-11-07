@@ -157,4 +157,78 @@
     return searchBoxContainerView;
 }
 
+
+#pragma mark 格式化金额
+
+/**
+ *  常用的价格字符串格式化方法（默认：显示￥、显示小数点）
+ *
+ *  @param price 价格参数
+ *
+ *  @return
+ */
++ (NSString *)formatPrice:(NSNumber *)price {
+    return [self formatPrice:price showMoneyTag:YES showDecimalPoint:YES useUnit:NO];
+}
+
+/**
+ *  常用的价格字符串格式化方法（默认：显示￥、显示小数点、显示元）
+ *
+ *  @param price
+ *
+ *  @return
+ */
++ (NSString *)formatPriceWithUnit:(NSNumber *)price {
+    return [self formatPrice:price showMoneyTag:YES showDecimalPoint:YES useUnit:YES];
+}
+
+/**
+ *  格式化价格字符串输出
+ *
+ *  @param price     价格
+ *  @param useTag    是否显示￥
+ *  @param isDecimal 是否显示小数点
+ *
+ *  @return 组装好的字符串
+ */
++ (NSString *)formatPrice:(NSNumber *)price showMoneyTag:(BOOL)isTagUsed showDecimalPoint:(BOOL) isDecimal useUnit:(BOOL)isUnitUsed {
+    NSString *formatedPrice = @"";
+    //是否保留2位小数
+    if (isDecimal) {
+        formatedPrice = [NSString stringWithFormat:@"%0.2f", [price doubleValue]];
+    }
+    else {
+        formatedPrice = [NSString stringWithFormat:@"%ld", [price integerValue]];
+    }
+    
+    //是否添加前缀 ￥
+    if (isTagUsed) {
+        formatedPrice = [NSString stringWithFormat:@"￥%@", formatedPrice];
+    }
+    
+    //是否添加后缀 元
+    if(isUnitUsed) {
+        formatedPrice = [NSString stringWithFormat:@"%@元", formatedPrice];
+    }
+    
+    return formatedPrice;
+}
+
+
+#pragma mark 打电话
+
++ (void)makeCall:(NSString *)phoneNumber {
+    if ([self isEmpty:phoneNumber]) {
+        return;
+    }
+    phoneNumber = [phoneNumber stringByReplacingOccurrencesOfString:@"-" withString:@""];//去掉-
+    NSURL *phoneURL = [NSURL URLWithString:[NSString stringWithFormat:@"tel://%@",[NSString trimString:phoneNumber]]];
+    UIAlertView *alertView = [UIAlertView bk_alertViewWithTitle:@"提示"
+                                                        message:[NSString stringWithFormat:@"确定要拨打电话：%@？", phoneNumber]];
+    [alertView bk_addButtonWithTitle:@"确定" handler:^{
+        [[UIApplication sharedApplication] openURL:phoneURL];
+    }];
+    [alertView bk_setCancelButtonWithTitle:@"取消" handler:nil];
+    [alertView show];
+}
 @end

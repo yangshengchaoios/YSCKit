@@ -68,7 +68,7 @@
 
 
 #pragma mark - 递归遍历所有子view
-+ (void)clearBackgroundColorOfAllSpaceLabels:(UIView *)view;
++ (void)clearBackgroundColorOfView:(UIView *)view;
 
 
 #pragma mark - 计算自动布局的size

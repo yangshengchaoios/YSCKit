@@ -162,7 +162,7 @@
     }
     
     //清空所有布局使用的子Label背景颜色
-    [UIView clearBackgroundColorOfAllSpaceLabels:self.view];
+    [UIView clearBackgroundColorOfView:self.view];
 }
 
 

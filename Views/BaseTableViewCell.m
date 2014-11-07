@@ -14,7 +14,7 @@
     [super awakeFromNib];
     
     self.containerView.backgroundColor = [UIColor clearColor];
-    [UIView clearBackgroundColorOfAllSpaceLabels:self.containerView];
+    [UIView clearBackgroundColorOfView:self.containerView];
 }
 
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated {

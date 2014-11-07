@@ -263,7 +263,7 @@
 
 #pragma mark - 递归遍历所有子view
 //设置调整布局相关的view背景颜色为空
-+ (void)clearBackgroundColorOfAllSpaceLabels:(UIView *)view {
++ (void)clearBackgroundColorOfView:(UIView *)view {
     if ( ! [view isMemberOfClass:[UIView class]]) {
         return;
     }
@@ -277,7 +277,7 @@
             if (subview.tag >= 1000) {//兼容view的背景颜色也要清空
                 subview.backgroundColor = [UIColor clearColor];
             }
-            [self clearBackgroundColorOfAllSpaceLabels:subview];
+            [self clearBackgroundColorOfView:subview];
         }
     }
 }
