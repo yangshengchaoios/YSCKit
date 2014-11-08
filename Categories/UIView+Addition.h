@@ -69,6 +69,7 @@
 
 #pragma mark - 递归遍历所有子view
 + (void)clearBackgroundColorOfView:(UIView *)view;
++ (void)resetFontSizeOfView:(UIView *)view;
 
 
 #pragma mark - 计算自动布局的size

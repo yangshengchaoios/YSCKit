@@ -264,24 +264,28 @@
 #pragma mark - 递归遍历所有子view
 //设置调整布局相关的view背景颜色为空
 + (void)clearBackgroundColorOfView:(UIView *)view {
-    if ( ! [view isMemberOfClass:[UIView class]]) {
-        return;
-    }
-    
     for (UIView *subview in view.subviews) {
-        if ([subview isKindOfClass:[UILabel class]] &&
-            subview.tag >= 1000) {
-                subview.backgroundColor = [UIColor clearColor];
+        if (subview.tag >= 1000) {
+            subview.backgroundColor = [UIColor clearColor];
         }
-        else if ([subview isKindOfClass:[UIView class]]) {
-            if (subview.tag >= 1000) {//兼容view的背景颜色也要清空
-                subview.backgroundColor = [UIColor clearColor];
-            }
-            [self clearBackgroundColorOfView:subview];
-        }
+        [self clearBackgroundColorOfView:subview];
     }
 }
 
+//重新调整UILabel和UIButton的font
++ (void)resetFontSizeOfView:(UIView *)view {
+    for (UIView *subview in view.subviews) {
+        if ([subview isMemberOfClass:[UILabel class]]) {
+            UILabel *label = (UILabel *)subview;
+            label.font = AUTOLAYOUT_FONT(label.font.pointSize);
+        }
+        else if ([subview isMemberOfClass:[UIButton class]]) {
+            UIButton *button = (UIButton *)subview;
+            button.titleLabel.font = AUTOLAYOUT_FONT(button.titleLabel.font.pointSize);
+        }
+        [self resetFontSizeOfView:subview];
+    }
+}
 
 #pragma mark - 计算自动布局的size
 - (void)autoLayoutSize {
