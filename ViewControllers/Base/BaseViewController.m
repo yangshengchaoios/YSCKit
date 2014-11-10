@@ -110,6 +110,9 @@
     WeakSelfType blockSelf = self;
     
     //view基本参数设置
+    if ([NSString isEmpty:self.navigationItem.title]) {//已经有标题的就不再设置了
+        self.navigationItem.title = self.params[kParamTitle];
+    }
     self.view.clipsToBounds = YES;
 	self.view.layer.masksToBounds = YES;//解决自定义导航条在移出时的延迟问题
     if ([self respondsToSelector:@selector(setEdgesForExtendedLayout:)]) {//ios6不支持该属性
@@ -161,7 +164,7 @@
         [self followScrollView:[self scrollableView]];
     }
     
-    //清空所有布局使用的子Label背景颜色
+    //清空所有布局的背景颜色
     [UIView clearBackgroundColorOfView:self.view];
 }
 
@@ -176,10 +179,10 @@
 		self.backType = [self.params[kParamBackType] integerValue];
 	}
 	else {
-		self.backType = BackTypeBack;
+		self.backType = BackTypeDefault;
 	}
     
-    if (self.backType == BackTypeBack) { //设置返回按钮(默认)
+    if (BackTypeDefault == self.backType) { //设置返回按钮(默认)
 		if ([self showCustomTitleBarView]) {//显示自定义TitleBarView
 			if (!self.backButton) {
 				self.backButton = [[UIButton alloc] initWithFrame:CGRectMake(2, 22, 44, 40)];
@@ -192,15 +195,21 @@
 			[self.backButton addTarget:self action:@selector(popButtonClicked:) forControlEvents:UIControlEventTouchUpInside];
 			[self.titleBarView addSubview:self.backButton];
 		}
-		else {
+		else {//显示系统默认返回按钮(向左的箭头带)
             //------去掉返回按钮的文字------
-			UIBarButtonItem *temporaryBarButtonItem = [[UIBarButtonItem alloc] init];
-			temporaryBarButtonItem.title = @"";
-			self.navigationItem.backBarButtonItem = temporaryBarButtonItem;
+            UIBarButtonItem *temporaryBarButtonItem = [[UIBarButtonItem alloc] init];
+            temporaryBarButtonItem.title = @"";
+            self.navigationItem.backBarButtonItem = temporaryBarButtonItem;
             //-------------END-----------
 		}
 	}
-    else if (self.backType == BackTypeSliding) { //设置侧边栏按钮
+    else if (BackTypeImage == self.backType) {//自定义返回按钮的图片(包括push和present的)
+        WeakSelfType blockSelf = self;
+        self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] bk_initWithImage:[UIImage imageNamed:@"arrow_right"] style:UIBarButtonItemStylePlain handler:^(id sender) {
+            [blockSelf backViewController];
+        }];
+    }
+    else if (BackTypeSliding == self.backType) { //设置侧边栏按钮
         if ([self showCustomTitleBarView]) {
             if (!self.backButton) {
                 self.backButton = [[UIButton alloc] initWithFrame:CGRectMake(5, 0, 50, 44)];
@@ -222,14 +231,6 @@
             self.navigationItem.hidesBackButton = YES;
             self.navigationItem.leftBarButtonItems = [self customBarButtonOnNavigationBar:slideButton withFixedSpaceWidth:-10];
         }
-    }
-    else if (self.backType == BackTypeDismiss) {//设置dismiss按钮
-        UIButton *dismissButton = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, 44, 40)];
-        [dismissButton addTarget:self action:@selector(dismissOnPresentingViewController) forControlEvents:UIControlEventTouchUpInside];
-        [dismissButton setImageEdgeInsets:UIEdgeInsetsMake(4, -4, 4, 16)];
-        [dismissButton setImage:[UIImage imageNamed:@"button_arrow_left"] forState:UIControlStateNormal];
-        dismissButton.tintColor = [UIColor blackColor];
-        self.navigationItem.leftBarButtonItems = [self customBarButtonOnNavigationBar:dismissButton withFixedSpaceWidth:-10];
     }
 	else {
 		NSAssert(YES, @"self.backType = [%lu] 不支持该类型！", self.backType);
@@ -324,7 +325,7 @@
 
 #pragma mark - 这里可以获取相对布局的view大小
 - (void)viewDidiLoadExtension {
-
+    
 }
 
 #pragma mark - constraints
@@ -341,17 +342,15 @@
 - (UIViewController *)pushViewController:(NSString *)className withParams:(NSDictionary *)paramDict {
     [self hideKeyboard];
 	UIViewController *pushedViewController = [self createBaseViewController:className];
-    NSMutableDictionary *mutableParamDict = [paramDict mutableCopy];
+    NSMutableDictionary *mutableParamDict = [NSMutableDictionary dictionaryWithDictionary:paramDict];
+    if ( ! mutableParamDict[kParamBackType]) {
+        [mutableParamDict setValue:@(BackTypeDefault) forKey:kParamBackType];   //这里设置的返回按钮由即将push出来的viewController负责处理
+    }
 	if ([pushedViewController isKindOfClass:[BaseViewController class]]) {
 		[(BaseViewController *)pushedViewController setParams:mutableParamDict];
 	}
     
-    //---统一设置NavigationBar的返回按钮图片
-    WeakSelfType blockSelf = self;
-    pushedViewController.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] bk_initWithImage:[UIImage imageNamed:@"button_arrow_left"] style:UIBarButtonItemStylePlain handler:^(id sender) {
-        [blockSelf popViewController];
-    }];
-    //--------------END-----------------
+    //NOTE:这里设置backBarButtonItem没有用！
     
 	[self.navigationController pushViewController:pushedViewController animated:YES];
 	return pushedViewController;
@@ -425,9 +424,11 @@
     [self hideKeyboard];
     UIViewController *viewController = [self createBaseViewController:className];
     NSMutableDictionary *mutableParamDict = [NSMutableDictionary dictionaryWithDictionary:paramDict];
-    [mutableParamDict setValue:@(BackTypeDismiss) forKey:kParamBackType];   //这里设置的返回按钮由即将presented出来的viewController负责创建
+    if ( ! mutableParamDict[kParamBackType]) {
+        [mutableParamDict setValue:@(BackTypeImage) forKey:kParamBackType];//这里设置的返回按钮由即将presented出来的viewController负责处理
+    }
 	if ([viewController isKindOfClass:[BaseViewController class]]) {
-		[(BaseViewController *)viewController setParams:[NSDictionary dictionaryWithDictionary:mutableParamDict]];
+		[(BaseViewController *)viewController setParams:mutableParamDict];
 	}
     
 	MLNavigationController *navigationController = [[MLNavigationController alloc] initWithRootViewController:viewController];

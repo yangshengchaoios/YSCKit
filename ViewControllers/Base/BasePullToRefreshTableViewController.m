@@ -75,7 +75,14 @@
 #pragma mark - UITableView特有的方法
 
 - (CGFloat)tableViewCellHeightForData:(id)object atIndexPath:(NSIndexPath *)indexPath {
-    return [BaseTableViewCell HeightOfCell];
+    NSString *nibName = [self nibNameOfCell];
+    if ([NSString isNotEmpty:nibName] &&
+        [NSClassFromString(nibName) isSubclassOfClass:[BaseTableViewCell class]]) {
+        return [NSClassFromString(nibName) HeightOfCell];
+    }
+    else {
+        return 44.0f;
+    }
 }
 
 #pragma mark - UITableViewDataSource

@@ -80,7 +80,14 @@
 #pragma mark - UICollectionView特有的方法
 
 - (CGSize)itemSize {
-	return CGSizeMake(130, 140);
+    NSString *nibName = [self nibNameOfCell];
+    if ([NSString isNotEmpty:nibName] &&
+        [NSClassFromString(nibName) isSubclassOfClass:[BaseCollectionViewCell class]]) {
+        return [NSClassFromString(nibName) SizeOfCell];
+    }
+    else {
+        return CGSizeMake(290, 290);
+    }
 }
 
 - (UIEdgeInsets)itemEdgeInsets {
