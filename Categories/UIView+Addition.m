@@ -291,6 +291,10 @@
             UIButton *button = (UIButton *)subview;
             button.titleLabel.font = AUTOLAYOUT_FONT(button.titleLabel.font.pointSize);
         }
+        else if ([subview isMemberOfClass:[UITextField class]]) {
+            UITextField *textField = (UITextField *)subview;
+            textField.font = AUTOLAYOUT_FONT(textField.font.pointSize);
+        }
         [subview resetFontSizeOfView];
     }
 }

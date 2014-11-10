@@ -205,7 +205,7 @@
 	}
     else if (BackTypeImage == self.backType) {//自定义返回按钮的图片(包括push和present的)
         WeakSelfType blockSelf = self;
-        self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] bk_initWithImage:[UIImage imageNamed:@"arrow_right"] style:UIBarButtonItemStylePlain handler:^(id sender) {
+        self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] bk_initWithImage:[UIImage imageNamed:@"arrow_left_white"] style:UIBarButtonItemStylePlain handler:^(id sender) {
             [blockSelf backViewController];
         }];
     }
@@ -344,7 +344,7 @@
 	UIViewController *pushedViewController = [self createBaseViewController:className];
     NSMutableDictionary *mutableParamDict = [NSMutableDictionary dictionaryWithDictionary:paramDict];
     if ( ! mutableParamDict[kParamBackType]) {
-        [mutableParamDict setValue:@(BackTypeDefault) forKey:kParamBackType];   //这里设置的返回按钮由即将push出来的viewController负责处理
+        [mutableParamDict setValue:@(BackTypeImage) forKey:kParamBackType];   //这里设置的返回按钮由即将push出来的viewController负责处理
     }
 	if ([pushedViewController isKindOfClass:[BaseViewController class]]) {
 		[(BaseViewController *)pushedViewController setParams:mutableParamDict];
