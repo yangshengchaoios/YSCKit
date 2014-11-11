@@ -56,6 +56,7 @@
 
     //业务逻辑相关
     #import "DataModel.h"
+    #import "RegionModel.h"
     #import "Login.h"
     #import "BaseViewController.h"
     #import "BaseTableViewCell.h"

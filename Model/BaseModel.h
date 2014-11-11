@@ -9,6 +9,8 @@
 
 #import <JSONModel/JSONModel.h>
 
+#define RegionDbPath       AppProgramPath(@"region.sqlite")
+
 @interface BaseModel : JSONModel
 
 @property (assign, nonatomic) NSInteger state;

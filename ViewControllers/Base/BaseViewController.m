@@ -432,6 +432,7 @@
 	}
     
 	MLNavigationController *navigationController = [[MLNavigationController alloc] initWithRootViewController:viewController];
+    navigationController.navigationController.navigationBar.translucent = YES;
 	[self presentViewController:navigationController animated:YES completion:nil];
 	return navigationController;
 }
