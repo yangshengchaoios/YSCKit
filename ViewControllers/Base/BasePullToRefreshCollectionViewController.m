@@ -73,8 +73,11 @@
 #pragma mark - 子类必须重写的方法
 
 - (UIView *)layoutCellWithData:(id)object atIndexPath:(NSIndexPath *)indexPath {
-	UICollectionViewCell *cell = [self.collectionView dequeueReusableCellWithReuseIdentifier:kItemCellIdentifier forIndexPath:indexPath];
-	return cell;
+    BaseCollectionViewCell *cell = [self.collectionView dequeueReusableCellWithReuseIdentifier:kItemCellIdentifier forIndexPath:indexPath];
+    if ([cell isKindOfClass:[BaseCollectionViewCell class]]) {
+        [cell layoutDataModel:object];//简单设置cell显示内容，如果需要处理cell的特殊点击事件就必须重写该方法
+    }
+    return cell;
 }
 
 #pragma mark - UICollectionView特有的方法

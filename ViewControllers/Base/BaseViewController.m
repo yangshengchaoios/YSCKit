@@ -204,10 +204,10 @@
 		}
 	}
     else if (BackTypeImage == self.backType) {//自定义返回按钮的图片(包括push和present的)
-        WeakSelfType blockSelf = self;
-        self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] bk_initWithImage:[UIImage imageNamed:@"arrow_left_white"] style:UIBarButtonItemStylePlain handler:^(id sender) {
-            [blockSelf backViewController];
-        }];
+        self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"arrow_left_white"]
+                                                                                 style:UIBarButtonItemStylePlain
+                                                                                target:self
+                                                                                action:@selector(backButtonClicked:)];
     }
     else if (BackTypeSliding == self.backType) { //设置侧边栏按钮
         if ([self showCustomTitleBarView]) {

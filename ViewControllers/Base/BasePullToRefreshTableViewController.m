@@ -67,9 +67,9 @@
 #pragma mark - 子类必须重写的方法
 
 - (UIView *)layoutCellWithData:(id)object atIndexPath:(NSIndexPath *)indexPath {
-	UITableViewCell *cell = [self.tableView dequeueReusableCellWithIdentifier:kCellIdentifier];
+	BaseTableViewCell *cell = [self.tableView dequeueReusableCellWithIdentifier:kCellIdentifier];
     if ([cell isKindOfClass:[BaseTableViewCell class]]) {
-        [(BaseTableViewCell *)cell layoutDataModel:object];//简单设置cell显示内容，如果需要处理cell的特殊点击事件就必须重写
+        [(BaseTableViewCell *)cell layoutDataModel:object];//简单设置cell显示内容，如果需要处理cell的特殊点击事件就必须重写该方法
     }
     
     cell.selectionStyle = UITableViewCellSelectionStyleNone;
