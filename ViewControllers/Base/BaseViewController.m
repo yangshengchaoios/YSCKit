@@ -432,7 +432,12 @@
 	}
     
 	MLNavigationController *navigationController = [[MLNavigationController alloc] initWithRootViewController:viewController];
-    navigationController.navigationController.navigationBar.translucent = YES;
+    navigationController.navigationController.navigationBar.translucent = NO;
+    //--------自定义present出来的navigationbar背景图片--------
+//    [navigationController.navigationBar setBarStyle:UIBarStyleBlack];
+//    [navigationController.navigationBar setBackgroundImage:[UIImage imageNamed:@"bg_navigationbar_gray"]
+//                                             forBarMetrics:UIBarMetricsDefault];
+    //---------------------------END-----------------------
 	[self presentViewController:navigationController animated:YES completion:nil];
 	return navigationController;
 }

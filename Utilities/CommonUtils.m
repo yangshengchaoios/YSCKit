@@ -114,7 +114,7 @@
     
     //改变Navibar的颜色和背景图片
     //	[[UINavigationBar appearance] setBarTintColor:kDefaultNaviBarColor];
-    [[UINavigationBar appearance] setBackgroundImage:[UIImage imageNamed:@"bg_navigationbar"]
+    [[UINavigationBar appearance] setBackgroundImage:[UIImage imageNamed:@"bg_navigationbar_red"]
                                        forBarMetrics:UIBarMetricsDefault];
     //设置字体为白色
     [[UINavigationBar appearance] setTintColor:[UIColor whiteColor]];
