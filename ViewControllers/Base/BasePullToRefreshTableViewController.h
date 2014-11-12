@@ -13,7 +13,7 @@
 
 @property (nonatomic, weak) IBOutlet UITableView * tableView;
 
-#pragma mark - UITableView特有的方法
+#pragma mark - UITableView特有的方法 (如果cell的高度与object无关的话，可以不用重写该方法了)
 
 - (CGFloat)tableViewCellHeightForData:(id)object atIndexPath:(NSIndexPath *)indexPath;
 
