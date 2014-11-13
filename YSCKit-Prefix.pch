@@ -98,6 +98,7 @@ NSLog(@"%@", logString); \
 
 #define IOS7                    __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_7_0
 #define IOS8                    __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_8_0
+#define IOSVERSION              ([[[UIDevice currentDevice] systemVersion] floatValue])
 #define SCREEN_WIDTH            ([UIScreen mainScreen].bounds.size.width) //屏幕的宽度(point)
 #define SCREEN_HEIGHT           ([UIScreen mainScreen].bounds.size.height)//屏幕的高度(point)
 #define STATUSBAR_HEIGHT        20.0f
@@ -159,6 +160,7 @@ return _sharedObject;
 #define Trim(x)                         [NSString trimString:x]
 #define Class(x)                        [x class]
 #define FormatPrice(x)                  ([NSString stringWithFormat:@"￥%.2f", x])
+#define RandomInt(from,to)           ((int)((from) + arc4random() % ((to)-(from) + 1)))  //随机数 [from,to] 之间
 
 
 
@@ -169,6 +171,7 @@ return _sharedObject;
 #define AUTOLAYOUT_SCALE                (SCREEN_WIDTH / XIB_WIDTH)          //缩放比例 (当前屏幕的真实宽度 / xib布局的宽度)
 #define AUTOLAYOUT_WIDTH(w)             (w * AUTOLAYOUT_SCALE)              //计算自动布局后的宽度
 #define AUTOLAYOUT_HEIGHT(h)            (h * AUTOLAYOUT_SCALE)              //计算自动布局后的高度
+#define AUTOLAYOUT_LENGTH(x)            (x * AUTOLAYOUT_SCALE)              //缩放后的大小
 #define AUTOLAYOUT_SIZE_WH(w,h)         CGSizeMake(AUTOLAYOUT_WIDTH(w), AUTOLAYOUT_HEIGHT(h))
 #define AUTOLAYOUT_SIZE(size)           CGSizeMake(AUTOLAYOUT_WIDTH(size.width), AUTOLAYOUT_HEIGHT(size.height))//计算自动布局后的size
 #define AUTOLAYOUT_FONT(f)              ([UIFont systemFontOfSize:(f * AUTOLAYOUT_SCALE)])

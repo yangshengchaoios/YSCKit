@@ -669,6 +669,35 @@
     return [textView sizeThatFits:CGSizeMake(CGFLOAT_MAX, height)].width;
 }
 
+
++ (CGFloat)HeightOfNormalString:(NSString*)string maxWidth:(CGFloat)width withFont:(UIFont*)font {
+    CGSize size;
+    #if IOS7
+            size = [string boundingRectWithSize:CGSizeMake(width, CGFLOAT_MAX)
+                                      options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading
+                                   attributes:@{NSFontAttributeName : font}
+                                      context:nil].size;
+    #else
+            size = [string sizeWithFont:font constrainedToSize:CGSizeMake(width, CGFLOAT_MAX) lineBreakMode:NSLineBreakByWordWrapping];
+    #endif
+    NSLog(@"%@: W: %.f, H: %.f", self, size.width, size.height);
+    return size.height;
+}
+
++ (CGFloat)WidthOfNormalString:(NSString*)string maxHeight:(CGFloat)height withFont:(UIFont*)font {
+    CGSize size;
+#if IOS7
+    size = [string boundingRectWithSize:CGSizeMake(CGFLOAT_MAX,height)
+                                options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading
+                             attributes:@{NSFontAttributeName : font}
+                                context:nil].size;
+#else
+    size = [string sizeWithFont:font constrainedToSize:CGSizeMake(CGFLOAT_MAX, height) lineBreakMode:NSLineBreakByWordWrapping];
+#endif
+    NSLog(@"%@: W: %.f, H: %.f", self, size.width, size.height);
+    return size.width;
+}
+
 @end
 
 
