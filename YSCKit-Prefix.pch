@@ -168,12 +168,10 @@ return _sharedObject;
  *  自动布局相关代码段简写
  *
  */
-#define AUTOLAYOUT_SCALE                (SCREEN_WIDTH / XIB_WIDTH)          //缩放比例 (当前屏幕的真实宽度 / xib布局的宽度)
-#define AUTOLAYOUT_WIDTH(w)             (w * AUTOLAYOUT_SCALE)              //计算自动布局后的宽度
-#define AUTOLAYOUT_HEIGHT(h)            (h * AUTOLAYOUT_SCALE)              //计算自动布局后的高度
-#define AUTOLAYOUT_LENGTH(x)            (x * AUTOLAYOUT_SCALE)              //缩放后的大小
-#define AUTOLAYOUT_SIZE_WH(w,h)         CGSizeMake(AUTOLAYOUT_WIDTH(w), AUTOLAYOUT_HEIGHT(h))
-#define AUTOLAYOUT_SIZE(size)           CGSizeMake(AUTOLAYOUT_WIDTH(size.width), AUTOLAYOUT_HEIGHT(size.height))//计算自动布局后的size
+#define AUTOLAYOUT_SCALE                (SCREEN_WIDTH / XIB_WIDTH)          //缩放比例 (当前屏幕的真实宽度point / xib布局的宽度point)
+#define AUTOLAYOUT_LENGTH(x)            (x * AUTOLAYOUT_SCALE)              //计算缩放后的大小
+#define AUTOLAYOUT_SIZE_WH(w,h)         CGSizeMake(AUTOLAYOUT_LENGTH(w), AUTOLAYOUT_LENGTH(h))
+#define AUTOLAYOUT_SIZE(size)           CGSizeMake(AUTOLAYOUT_LENGTH(size.width), AUTOLAYOUT_LENGTH(size.height))//计算自动布局后的size
 #define AUTOLAYOUT_FONT(f)              ([UIFont systemFontOfSize:(f * AUTOLAYOUT_SCALE)])
 
 

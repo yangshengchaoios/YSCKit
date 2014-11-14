@@ -18,7 +18,7 @@
 }
 
 + (CGSize)SizeOfCell {
-    return AUTOLAYOUT_SIZE(CGSizeMake(290, 290));
+    return AUTOLAYOUT_SIZE_WH(290, 290);
 }
 - (void)layoutDataModel:(BaseDataModel *)dataModel {
 

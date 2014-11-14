@@ -130,7 +130,7 @@
  *  @return
  */
 + (UIView *)createSearchBar:(NSInteger)textFieldTag {
-    UIView *searchBoxContainerView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, AUTOLAYOUT_WIDTH(412), AUTOLAYOUT_HEIGHT(56))];
+    UIView *searchBoxContainerView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, AUTOLAYOUT_LENGTH(412), AUTOLAYOUT_LENGTH(56))];
     //1. 设置搜索框背景图片
     UIImageView *searchBoxImageView = [[UIImageView alloc] initWithFrame:searchBoxContainerView.bounds];
     searchBoxImageView.image = [UIImage imageNamed:@"bg_search"];

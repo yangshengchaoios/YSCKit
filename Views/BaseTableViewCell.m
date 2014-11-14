@@ -25,7 +25,7 @@
 }
 
 + (CGFloat)HeightOfCell {
-    return AUTOLAYOUT_HEIGHT(290);
+    return AUTOLAYOUT_LENGTH(290);
 }
 
 - (void)layoutDataModel:(BaseDataModel *)dataModel {
