@@ -672,7 +672,7 @@
 
 + (CGFloat)HeightOfNormalString:(NSString*)string maxWidth:(CGFloat)width withFont:(UIFont*)font {
     CGSize size;
-    #if IOS7
+    #if IOS7_OR_LATER
             size = [string boundingRectWithSize:CGSizeMake(width, CGFLOAT_MAX)
                                       options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading
                                    attributes:@{NSFontAttributeName : font}
@@ -686,7 +686,7 @@
 
 + (CGFloat)WidthOfNormalString:(NSString*)string maxHeight:(CGFloat)height withFont:(UIFont*)font {
     CGSize size;
-#if IOS7
+#if IOS7_OR_LATER
     size = [string boundingRectWithSize:CGSizeMake(CGFLOAT_MAX,height)
                                 options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading
                              attributes:@{NSFontAttributeName : font}

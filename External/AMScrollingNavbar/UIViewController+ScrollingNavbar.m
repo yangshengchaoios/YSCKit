@@ -9,7 +9,9 @@
 #import "UIViewController+ScrollingNavbar.h"
 #import <objc/runtime.h>
 
-#define IOS7_OR_LATER ([[[UIDevice currentDevice] systemVersion] floatValue] >= 7.0)
+#ifndef IOS7_OR_LATER
+    #define IOS7_OR_LATER ([[[UIDevice currentDevice] systemVersion] floatValue] >= 7.0)
+#endif
 
 @implementation UIViewController (ScrollingNavbar)
 
