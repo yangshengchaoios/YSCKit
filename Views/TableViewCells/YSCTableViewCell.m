@@ -55,6 +55,11 @@
         self.stateSwitch.hidden = NO;
         self.arrowImageView.hidden = YES;
         self.subtitleLabel.hidden = YES;
+        
+        if (YSCTableViewCellStyleSubtitle == (YSCTableViewCellStyleSubtitle & style)) {
+            self.subtitleLabel.hidden = NO;
+            self.subtitleTrailing.constant = AUTOLAYOUT_LENGTH(80);
+        }
     }
     else {
         self.stateSwitch.hidden = YES;
