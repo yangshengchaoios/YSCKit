@@ -61,6 +61,7 @@
     #import "BaseViewController.h"
     #import "BaseTableViewCell.h"
     #import "BaseCollectionViewCell.h"
+    #import "BaseTableViewHeaderFooterView.h"
 #endif
 
 
@@ -169,7 +170,8 @@ return _sharedObject;
  *
  */
 #define AUTOLAYOUT_SCALE                (SCREEN_WIDTH / XIB_WIDTH)          //缩放比例 (当前屏幕的真实宽度point / xib布局的宽度point)
-#define AUTOLAYOUT_LENGTH(x)            ((x) * AUTOLAYOUT_SCALE)              //计算缩放后的大小
+#define AUTOLAYOUT_LENGTH(x)            ((x) * AUTOLAYOUT_SCALE)            //计算缩放后的大小
+#define AUTOLAYOUT_LENGTH_W(x,w)        ((x) * (SCREEN_WIDTH / (w)))        //计算任意布局的真实大小
 #define AUTOLAYOUT_SIZE_WH(w,h)         CGSizeMake(AUTOLAYOUT_LENGTH(w), AUTOLAYOUT_LENGTH(h))
 #define AUTOLAYOUT_SIZE(size)           CGSizeMake(AUTOLAYOUT_LENGTH(size.width), AUTOLAYOUT_LENGTH(size.height))//计算自动布局后的size
 #define AUTOLAYOUT_FONT(f)              ([UIFont systemFontOfSize:(f * AUTOLAYOUT_SCALE)])
