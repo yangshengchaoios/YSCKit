@@ -56,7 +56,7 @@
                                 <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="arrow_right2.png" translatesAutoresizingMaskIntoConstraints="NO" id="Yvs-8y-vUL" userLabel="arrow">
+                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="arrow_right_14x24.png" translatesAutoresizingMaskIntoConstraints="NO" id="Yvs-8y-vUL" userLabel="arrow">
                                 <rect key="frame" x="606" y="23" width="14" height="24"/>
                                 <constraints>
                                     <constraint firstAttribute="width" secondItem="Yvs-8y-vUL" secondAttribute="height" multiplier="7:12" id="ugR-B2-Sqe"/>
@@ -122,6 +122,6 @@
         </tableViewCell>
     </objects>
     <resources>
-        <image name="arrow_right2.png" width="14" height="24"/>
+        <image name="arrow_right_14x24.png" width="14" height="24"/>
     </resources>
 </document>
