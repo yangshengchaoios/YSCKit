@@ -295,6 +295,10 @@
             UITextField *textField = (UITextField *)subview;
             textField.font = AUTOLAYOUT_FONT(textField.font.pointSize);
         }
+        else if ([subview isMemberOfClass:[UITextView class]]) {
+            UITextView *textView = (UITextView *)subview;
+            textView.font = AUTOLAYOUT_FONT(textView.font.pointSize);
+        }
         [subview resetFontSizeOfView];
     }
 }
