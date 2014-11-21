@@ -233,7 +233,8 @@ return _sharedObject;
 #define kCellIdentifier                 @"Cell"
 #define kFooterIdentifier               @"Footer"
 #define kHeaderIdentifier               @"Header"
-#define kItemCellIdentifier             @"ItemCell"     //UICollectionView要用的
+#define kItemCellIdentifier             @"ItemCell"             //UICollectionView要用的
+#define kProductCollectionHeaderView    @"CollectionHeaderView" //UICollectionView要用的
 #define kAppChannelAppStore             @"AppStore"     //定义渠道为AppStore
 #define kAppChannelTgogoDotNet          @"TgogoDotNet"  //定义渠道为官网
 #define kAppChannelDebug                @"Debug"        //定义渠道为测试环境
