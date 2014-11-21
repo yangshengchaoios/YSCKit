@@ -434,9 +434,14 @@
 	MLNavigationController *navigationController = [[MLNavigationController alloc] initWithRootViewController:viewController];
     navigationController.navigationController.navigationBar.translucent = NO;
     //--------自定义present出来的navigationbar背景图片--------
-//    [navigationController.navigationBar setBarStyle:UIBarStyleBlack];
-//    [navigationController.navigationBar setBackgroundImage:[UIImage imageNamed:@"bg_navigationbar_gray"]
-//                                             forBarMetrics:UIBarMetricsDefault];
+    [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleDefault];
+    [navigationController.navigationBar setTintColor:[UIColor blackColor]];//这个控制返回箭头按钮的颜色
+    //设置Title为白色,Title大小为18
+    [navigationController.navigationBar setTitleTextAttributes:@{ NSForegroundColorAttributeName : [UIColor blackColor],
+                                                                  NSFontAttributeName : [UIFont boldSystemFontOfSize:18] }];
+    [navigationController.navigationBar setBarStyle:UIBarStyleDefault];
+    [navigationController.navigationBar setBackgroundImage:[UIImage imageNamed:@"bg_navigationbar_gray1"]
+                                             forBarMetrics:UIBarMetricsDefault];
     //---------------------------END-----------------------
 	[self presentViewController:navigationController animated:YES completion:nil];
 	return navigationController;
