@@ -13,6 +13,7 @@
 @property (weak, nonatomic) IBOutlet UIView *containerView;
 
 + (CGFloat)HeightOfCell;
++ (UINib *)NibNameOfCell;
 - (void)layoutDataModel:(BaseDataModel *)dataModel;
 - (void)layoutDataModels:(NSArray *)dataModelArray;
 

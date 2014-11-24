@@ -20,6 +20,10 @@
 + (CGSize)SizeOfCell {
     return AUTOLAYOUT_SIZE_WH(290, 290);
 }
++ (UINib *)NibNameOfCell {
+    return [UINib nibWithNibName:NSStringFromClass(self.class) bundle:nil];
+}
+
 - (void)layoutDataModel:(BaseDataModel *)dataModel {
 
 }

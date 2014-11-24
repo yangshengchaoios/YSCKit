@@ -1,14 +1,14 @@
 //
-//  BaseTableViewHeaderFooterView.m
+//  BaseCollectionHeaderFooterView.m
 //  KQ
 //
-//  Created by yangshengchao on 14/11/20.
+//  Created by yangshengchao on 14/11/24.
 //  Copyright (c) 2014年 yangshengchao. All rights reserved.
 //
 
-#import "BaseTableViewHeaderFooterView.h"
+#import "BaseCollectionHeaderFooterView.h"
 
-@implementation BaseTableViewHeaderFooterView
+@implementation BaseCollectionHeaderFooterView
 
 - (void)awakeFromNib {
     [super awakeFromNib];
@@ -18,9 +18,10 @@
     [UIView resetFontSizeOfView:self];              //递归缩放label和button的字体大小
 }
 
-+ (CGFloat)HeightOfView {
-    return AUTOLAYOUT_LENGTH(100);
++ (CGSize)SizeOfView {
+    return AUTOLAYOUT_SIZE(CGSizeMake(640, 200));
 }
+
 + (UINib *)NibNameOfView {
     return [UINib nibWithNibName:NSStringFromClass(self.class) bundle:nil];
 }
