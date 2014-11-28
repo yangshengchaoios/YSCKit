@@ -108,13 +108,13 @@
 /**
  *  初始化App默认样式
  */
-+ (void)initAppDefaultUI {
++ (void)initAppDefaultUI:(NSString *)navibarImageName {
     //将状态栏字体改为白色（前提是要设置[View controller-based status bar appearance]为NO）
     [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent];
     
     //改变Navibar的颜色和背景图片
     //	[[UINavigationBar appearance] setBarTintColor:kDefaultNaviBarColor];
-    [[UINavigationBar appearance] setBackgroundImage:[UIImage imageNamed:@"bg_navigationbar_red"]
+    [[UINavigationBar appearance] setBackgroundImage:[UIImage imageNamed:navibarImageName]
                                        forBarMetrics:UIBarMetricsDefault];
     //设置字体为白色
     [[UINavigationBar appearance] setTintColor:[UIColor whiteColor]];

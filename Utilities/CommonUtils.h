@@ -16,7 +16,7 @@
 
 + (void)checkNewVersion;
 + (void)configUmeng;
-+ (void)initAppDefaultUI;
++ (void)initAppDefaultUI:(NSString *)navibarImageName;
 + (UIView *)createSearchBar:(NSInteger)textFieldTag;
 
 #pragma mark 格式化金额
