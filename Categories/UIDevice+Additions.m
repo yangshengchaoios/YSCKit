@@ -34,7 +34,7 @@
  函数名称 : - (DeviceType) currentDeviceType
  函数描述 : 获取当前分辨率
  ******************************************************************************/
-- (DeviceType) currentDeviceType {
++ (DeviceType) currentDeviceType {
     if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone){//iphone设备
         if ([[UIScreen mainScreen] respondsToSelector: @selector(scale)]) {
             CGSize size = CGSizeMake([[UIScreen mainScreen] bounds].size.width  * [UIScreen mainScreen].scale,
@@ -86,7 +86,7 @@
  函数名称 : - (BOOL)isRunningOnSimulator
  函数描述 : 判断是否运行在模拟器上
  ******************************************************************************/
-- (BOOL)isRunningOnSimulator{
++ (BOOL)isRunningOnSimulator{
 #if defined(TARGET_IPHONE_SIMULATOR) && TARGET_IPHONE_SIMULATOR
     return YES;
 #else
@@ -99,7 +99,7 @@
  函数名称 : - (NSString *) platformString
  函数描述 : 返回平台名称
  ******************************************************************************/
-- (NSString *) platformString {
++ (NSString *) platformString {
     size_t size;
     sysctlbyname("hw.machine", NULL, &size, NULL, 0);
     char *machine = malloc(size);

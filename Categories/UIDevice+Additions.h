@@ -29,7 +29,7 @@ enum {
  */
 @property(readonly) double availableMemory;
 
-- (DeviceType) currentDeviceType;
-- (BOOL)isRunningOnSimulator;
-- (NSString *) platformString;
++ (DeviceType) currentDeviceType;
++ (BOOL)isRunningOnSimulator;
++ (NSString *) platformString;
 @end
