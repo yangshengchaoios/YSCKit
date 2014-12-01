@@ -7,13 +7,17 @@
 //
 
 #import "InfiniteLoopView.h"
+#import "SMPageControl.h"
 
 #define TagOfContentViewStart   56214
+#define HeightOfPageControl     20
 
 @interface InfiniteLoopView () <UIScrollViewDelegate>
 
 @property (nonatomic, strong) UIScrollView *scrollView;
 @property (nonatomic, strong) NSTimer *timer;
+@property (nonatomic, strong) SMPageControl *pageControl;
+@property (nonatomic, copy) PageDidChangedAtIndex pageDidChangedAtIndex;
 
 @end
 
@@ -40,19 +44,50 @@
 }
 
 - (void)initSubviews {
-    _currentPageIndex = 0;
-	self.animationDuration = 5;
-    
-	self.autoresizesSubviews = YES;
-	self.scrollView = [[UIScrollView alloc] initWithFrame:self.bounds];
+    //1. 添加scrollview
+	self.scrollView = [[UIScrollView alloc] init];
     self.scrollView.decelerationRate = UIScrollViewDecelerationRateFast;
 	self.scrollView.autoresizingMask = 0xFF;
 	self.scrollView.contentMode = UIViewContentModeCenter;
 	self.scrollView.delegate = self;
 	self.scrollView.showsHorizontalScrollIndicator = NO;
-	self.scrollView.contentOffset = CGPointMake(CGRectGetWidth(self.scrollView.frame), 0);
+	self.scrollView.contentOffset = CGPointMake(0, 0);
 	self.scrollView.pagingEnabled = YES;
 	[self addSubview:self.scrollView];
+    [self.scrollView autoPinEdgeToSuperviewEdge:ALEdgeTop withInset:0];
+    [self.scrollView autoPinEdgeToSuperviewEdge:ALEdgeLeft withInset:0];
+    [self.scrollView autoPinEdgeToSuperviewEdge:ALEdgeBottom withInset:0];
+    [self.scrollView autoPinEdgeToSuperviewEdge:ALEdgeRight withInset:0];
+    
+    //2. 创建pagecontrol
+    self.pageControl = [[SMPageControl alloc] init];
+    self.pageControl.pageIndicatorImage = [ImageUtils resizeImage:[UIImage imageNamed:@"circle_pagecontrol_normal"]
+                                                           toSize:AUTOLAYOUT_SIZE_WH(HeightOfPageControl, HeightOfPageControl)];
+    self.pageControl.currentPageIndicatorImage = [ImageUtils resizeImage:[UIImage imageNamed:@"circle_pagecontrol_selected"]
+                                                                  toSize:AUTOLAYOUT_SIZE_WH(HeightOfPageControl, HeightOfPageControl)];
+    self.pageControl.userInteractionEnabled = NO;
+    [self addSubview:self.pageControl];
+    [self.pageControl autoPinEdgeToSuperviewEdge:ALEdgeLeft withInset:0];
+    [self.pageControl autoPinEdgeToSuperviewEdge:ALEdgeBottom withInset:AUTOLAYOUT_LENGTH(8)];
+    [self.pageControl autoPinEdgeToSuperviewEdge:ALEdgeRight withInset:0];
+    [self.pageControl autoMatchDimension:ALDimensionHeight
+                             toDimension:ALDimensionWidth
+                                  ofView:self.pageControl
+                          withMultiplier:(HeightOfPageControl / self.width)];
+    
+    //3. 添加pagecontrol与currentpage同步
+    WeakSelfType blockSelf = self;
+    self.pageDidChangedAtIndex = ^void(NSInteger pageIndex) {
+        blockSelf.pageControl.currentPage = pageIndex;
+        if (blockSelf.pageDidChanged) {
+            blockSelf.pageDidChanged(pageIndex);
+        }
+    };
+    
+    //4. 初始化参数设置
+    _currentPageIndex = 0;
+    self.animationDuration = 5;
+    self.autoresizesSubviews = YES;
 }
 
 #pragma mark - 设置属性
@@ -90,6 +125,7 @@
         return;
     }
     _totalPageCount = totalPageCount;
+    _pageControl.numberOfPages = totalPageCount;
 }
 
 - (void)reloadData {

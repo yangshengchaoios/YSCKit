@@ -45,7 +45,7 @@ typedef void(^PageDidChangedAtIndex)(NSInteger pageIndex);
 @property (nonatomic, assign) NSInteger totalPageCount;
 @property (nonatomic, copy) PageViewAtIndex pageViewAtIndex;
 @property (nonatomic, copy) TapPageAtIndex tapPageAtIndex;
-@property (nonatomic, copy) PageDidChangedAtIndex pageDidChangedAtIndex;
+@property (nonatomic, copy) PageDidChangedAtIndex pageDidChanged;           //如果外边需要处理页面切换事件的话，就用该回调即可
 
 - (void)reloadData;
 
