@@ -29,7 +29,11 @@
 /**
  *  移除view上所有的手势操作
  */
-- (void)removeGestureRecognizers;
+- (void)removeAllGestureRecognizers;
+/**
+ *  移除view上所有的子view
+ */
+- (void)removeAllSubviews;
 
 #pragma mark - 图片选择器
 + (UIActionSheet *)showImagePickerActionSheetWithDelegate:(id<UINavigationControllerDelegate,

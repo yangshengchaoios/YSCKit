@@ -108,10 +108,16 @@
 }
 
 
-- (void)removeGestureRecognizers {
+- (void)removeAllGestureRecognizers {
     for (UIGestureRecognizer *gesture in self.gestureRecognizers) {
         [self removeGestureRecognizer:gesture];
     }    
+}
+
+- (void)removeAllSubviews {
+    for (UIView *subView in self.subviews) {
+        [subView removeFromSuperview];
+    }
 }
 
 #pragma mark - 图片选择器
