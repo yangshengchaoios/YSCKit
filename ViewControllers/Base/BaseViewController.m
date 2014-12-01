@@ -163,9 +163,6 @@
     if ([self scrollableView]) {
         [self followScrollView:[self scrollableView]];
     }
-    
-    //清空所有布局的背景颜色
-    [UIView clearBackgroundColorOfView:self.view];
 }
 
 
