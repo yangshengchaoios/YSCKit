@@ -366,8 +366,6 @@
 + (UIViewController *)currentViewController {
     UIViewController *viewController = KeyWindow.rootViewController;
     return [UIView getVisibleViewControllerFrom:viewController];
-    NSLog(@"current viewcontroller : %@", viewController);
-    return viewController;
 }
 
 + (UIViewController *)getVisibleViewControllerFrom:(UIViewController *)viewController {
