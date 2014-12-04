@@ -51,9 +51,15 @@
 		[self.view bringSubviewToFront:self.titleBarView];
 	}
     else {
-        if ( ! self.isAppeared) {//这里解决push出来的vc要隐藏navibar的情况
+        if ( ! self.isAppeared) {//这里默认是要显示navibar的!
             [self.navigationController setNavigationBarHidden:NO animated:animated];//IMPORTANT!
         }
+        //NOTE:只有当前VC需要隐藏navibar的时候才这样写
+        /*- (void)viewWillAppear:(BOOL)animated {
+            self.isAppeared = YES;
+            [super viewWillAppear:animated];
+            [self.navigationController setNavigationBarHidden:YES animated:animated];
+         }*/
     }
     self.isAppeared = YES;
 }
@@ -333,24 +339,28 @@
 #pragma mark - push & pop & dismiss view controller
 
 - (UIViewController *)pushViewController:(NSString *)className {
-	return [self pushViewController:className withParams:nil];
+	return [self pushViewController:className withParams:nil animated:YES];
 }
 
 - (UIViewController *)pushViewController:(NSString *)className withParams:(NSDictionary *)paramDict {
+    return [self pushViewController:className withParams:paramDict animated:YES];
+}
+
+- (UIViewController *)pushViewController:(NSString *)className withParams:(NSDictionary *)paramDict animated:(BOOL)animated {
     [self hideKeyboard];
-	UIViewController *pushedViewController = [self createBaseViewController:className];
+    UIViewController *pushedViewController = [self createBaseViewController:className];
     NSMutableDictionary *mutableParamDict = [NSMutableDictionary dictionaryWithDictionary:paramDict];
     if ( ! mutableParamDict[kParamBackType]) {
         [mutableParamDict setValue:@(BackTypeImage) forKey:kParamBackType];   //这里设置的返回按钮由即将push出来的viewController负责处理
     }
-	if ([pushedViewController isKindOfClass:[BaseViewController class]]) {
-		[(BaseViewController *)pushedViewController setParams:mutableParamDict];
-	}
+    if ([pushedViewController isKindOfClass:[BaseViewController class]]) {
+        [(BaseViewController *)pushedViewController setParams:mutableParamDict];
+    }
     
     //NOTE:这里设置backBarButtonItem没有用！
     
-	[self.navigationController pushViewController:pushedViewController animated:YES];
-	return pushedViewController;
+    [self.navigationController pushViewController:pushedViewController animated:animated];
+    return pushedViewController;
 }
 
 /*

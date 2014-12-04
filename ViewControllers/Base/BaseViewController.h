@@ -41,6 +41,7 @@
 #pragma mark - push & pop & dismiss view controller
 - (UIViewController *)pushViewController:(NSString *)className;
 - (UIViewController *)pushViewController:(NSString *)className withParams:(NSDictionary *)paramDict;
+- (UIViewController *)pushViewController:(NSString *)className withParams:(NSDictionary *)paramDict animated:(BOOL)animated;
 //返回上一级，最多到根
 - (UIViewController *)popViewController;
 //返回上一级，直到dismiss
