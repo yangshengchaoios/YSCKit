@@ -32,7 +32,7 @@ typedef void (^StateChanged)(BOOL state);
 @property (weak, nonatomic) IBOutlet UIImageView *arrowImageView;
 @property (weak, nonatomic) IBOutlet UISwitch *stateSwitch;
 @property (assign, nonatomic) YSCTableViewCellStyle style;
-@property (assign, nonatomic) StateChanged stateChanged;
+@property (copy, nonatomic) StateChanged stateChanged;
 
 //icon
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *iconLeading;
@@ -41,12 +41,6 @@ typedef void (^StateChanged)(BOOL state);
 //title
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *titleLeading;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *titleCenterY;
-
-//subtitle
-@property (weak, nonatomic) IBOutlet NSLayoutConstraint *subTitleLeading;
-@property (weak, nonatomic) IBOutlet NSLayoutConstraint *subTitleLeading1;      //leading to superview
-@property (weak, nonatomic) IBOutlet NSLayoutConstraint *subTitleTrailing;      //leading to titleLabel
-@property (weak, nonatomic) IBOutlet NSLayoutConstraint *subTitleCenterY;
 
 //seperator
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *seperatorTopHeight;

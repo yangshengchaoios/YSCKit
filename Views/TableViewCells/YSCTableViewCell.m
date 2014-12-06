@@ -19,11 +19,6 @@
     self.titleLeading.constant = AUTOLAYOUT_LENGTH(88);
     self.titleCenterY.constant = AUTOLAYOUT_LENGTH(0);
     
-    self.subTitleLeading.constant = AUTOLAYOUT_LENGTH(347);
-    self.subTitleLeading1.constant = AUTOLAYOUT_LENGTH(547);
-    self.subTitleTrailing.constant = AUTOLAYOUT_LENGTH(40);
-    self.subTitleCenterY.constant = AUTOLAYOUT_LENGTH(0);
-    
     self.seperatorTopHeight.constant = AUTOLAYOUT_LENGTH(1);
     self.seperatorBottomLeading.constant = AUTOLAYOUT_LENGTH(88);
     self.seperatorBottomHeight.constant = AUTOLAYOUT_LENGTH(1);
@@ -42,6 +37,8 @@
  *  左边只支持以下几种显示格式：
  *  1. 只有title
  *  2. title + icon
+ *  3. title + subtitle
+ *  4. title + subtitle + icon
  *  右边只支持以下几种显示格式：
  *  1. 无
  *  2. 只有switch
@@ -61,11 +58,12 @@
     else {
         self.iconImageView.hidden = YES;
         self.titleLeading.constant = AUTOLAYOUT_LENGTH(20);
+        self.seperatorBottomLeading.constant = AUTOLAYOUT_LENGTH(20);
     }
     
     //控制seperator top是否显示
     if (YSCTableViewCellStyleSeperatorTop == (YSCTableViewCellStyleSeperatorTop & style)) {
-        self.seperatorTopLabel.hidden = NO;
+        self.seperatorTopLabel.hidden = YES;
     }
     else {
         self.seperatorTopLabel.hidden = YES;
@@ -86,6 +84,7 @@
     }
     else {
         self.stateSwitch.hidden = YES;
+        self.subtitleLabel.hidden = NO;
         self.stateChanged = nil;
         
         //控制arrow是否显示
@@ -96,51 +95,34 @@
             self.arrowImageView.hidden = YES;
         }
         
-        self.subTitleLeading.priority = UILayoutPriorityDefaultLow;
-        self.subTitleLeading1.priority = UILayoutPriorityDefaultLow;
-        self.subTitleTrailing.priority = UILayoutPriorityDefaultLow;
-        
         //控制subtitle的显示位置
+        [self.subtitleLabel autoRemoveConstraintsAffectingView];
         if (YSCTableViewCellStyleSubtitleRight == (YSCTableViewCellStyleSubtitleRight & style)) {
-            self.subtitleLabel.hidden = NO;
-            self.subTitleTrailing.priority = UILayoutPriorityRequired;
-            self.subTitleLeading1.constant = 0;
+            [self.subtitleLabel autoAlignAxis:ALAxisHorizontal toSameAxisOfView:self.containerView withOffset:0];
             if (YSCTableViewCellStyleArrow == (YSCTableViewCellStyleArrow & style)) {
-                self.subTitleTrailing.constant = AUTOLAYOUT_LENGTH(40);
+                [self.subtitleLabel autoPinEdge:ALEdgeRight toEdge:ALEdgeLeft ofView:self.arrowImageView withOffset:AUTOLAYOUT_LENGTH(20)];
             }
             else {
-                self.subTitleTrailing.constant = AUTOLAYOUT_LENGTH(20);
+                [self.subtitleLabel autoPinEdge:ALEdgeRight toEdge:ALEdgeRight ofView:self.containerView withOffset:AUTOLAYOUT_LENGTH(-20)];
             }
         }
         else if (YSCTableViewCellStyleSubtitleLeft == (YSCTableViewCellStyleSubtitleLeft & style)) {
-            self.subtitleLabel.hidden = NO;
-            self.subTitleLeading.priority = UILayoutPriorityRequired;
-            self.subTitleLeading.constant = AUTOLAYOUT_LENGTH(10);
+            [self.subtitleLabel autoAlignAxis:ALAxisHorizontal toSameAxisOfView:self.containerView withOffset:0];
+            [self.subtitleLabel autoPinEdge:ALEdgeLeft toEdge:ALEdgeRight ofView:self.titleLabel withOffset:AUTOLAYOUT_LENGTH(20)];
         }
         else if (YSCTableViewCellStyleSubtitleBottom == (YSCTableViewCellStyleSubtitleBottom & style)) {
-            self.subtitleLabel.hidden = NO;
-            self.subTitleLeading1.priority = UILayoutPriorityRequired;
-            self.subTitleCenterY.constant = -10;
-            self.titleCenterY.constant = 10;
-            
-            if (YSCTableViewCellStyleIcon == (YSCTableViewCellStyleIcon & style)) {
-                self.subTitleLeading1.constant = AUTOLAYOUT_LENGTH(88);
-            }
-            else {
-                self.subTitleLeading1.constant = AUTOLAYOUT_LENGTH(20);
-            }
+            self.titleCenterY.constant = AUTOLAYOUT_LENGTH(15);
+            [self.subtitleLabel autoAlignAxis:ALAxisHorizontal toSameAxisOfView:self.containerView withOffset:AUTOLAYOUT_LENGTH(15)];
+            [self.subtitleLabel autoPinEdge:ALEdgeLeft toEdge:ALEdgeLeft ofView:self.titleLabel withOffset:0];
         }
         else {
             self.subtitleLabel.hidden = YES;
-            self.subTitleLeading.priority = UILayoutPriorityRequired;
-            self.subTitleLeading.constant = 0;
         }
     }
 }
 
 - (IBAction)stateChanged:(id)sender {
-    if (YSCTableViewCellStyleSwitch == (YSCTableViewCellStyleSwitch & self.style) &&
-        self.stateChanged) {
+    if (YSCTableViewCellStyleSwitch == (YSCTableViewCellStyleSwitch & self.style) && self.stateChanged) {
         self.stateChanged(self.stateSwitch.on);
     }
 }
