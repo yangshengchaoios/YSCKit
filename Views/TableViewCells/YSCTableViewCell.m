@@ -63,7 +63,7 @@
     
     //控制seperator top是否显示
     if (YSCTableViewCellStyleSeperatorTop == (YSCTableViewCellStyleSeperatorTop & style)) {
-        self.seperatorTopLabel.hidden = YES;
+        self.seperatorTopLabel.hidden = NO;
     }
     else {
         self.seperatorTopLabel.hidden = YES;
