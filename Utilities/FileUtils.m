@@ -1,6 +1,6 @@
 //
 //  FileUtils.m
-//  TGO2
+//  KQ
 //
 //  Created by  YangShengchao on 14-2-14.
 //  Copyright (c) 2014年  YangShengchao. All rights reserved.

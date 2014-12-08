@@ -74,21 +74,21 @@
  */
 //控制调试信息的输出
 #define DEBUGMODEL      [[NSUserDefaults standardUserDefaults] boolForKey:@"DEBUG"]
-#define TGO_DEBUG_LOG   1  //只有在 非DEBUG 模式下起作用  0-关闭调试输出和日志记录功能  1-打开控制台输出和日志文件记录功能
-#define TGO_APPSTORE    0  //0-用企业证书打包版本  1-appstore审核版本
+#define DEBUG_LOG       1  //只有在非DEBUG模式下起作用（0-关闭调试输出和日志记录功能  1-打开控制台输出和日志文件记录功能）
+#define APPSTORE        0  //0-用企业证书打包版本  1-appstore审核版本
 
 #define __NSLog(s, ...) do { \
 NSString *logString = [NSString stringWithFormat:@"[%@(%d)] %@",[[NSString stringWithUTF8String:__FILE__] lastPathComponent],__LINE__,[NSString stringWithFormat:(s), ##__VA_ARGS__]]; \
-if ( DEBUGMODEL ) { \
-NSLog(@"%@", logString);\
-[LogManager saveLog:logString];\
-} \
-else { \
-if (TGO_DEBUG_LOG) { \
-[LogManager saveLog:logString]; \
-NSLog(@"%@", logString); \
-} \
-} \
+    if ( DEBUGMODEL ) { \
+        NSLog(@"%@", logString);\
+        [LogManager saveLog:logString];\
+    } \
+    else { \
+        if (DEBUG_LOG) { \
+            [LogManager saveLog:logString]; \
+            NSLog(@"%@", logString); \
+        } \
+    } \
 } while (0)
 
 #define NSLog(...) __NSLog(__VA_ARGS__)
@@ -99,7 +99,7 @@ NSLog(@"%@", logString); \
  */
 #pragma mark - Device
 
-#define IOS_VERSION              ([[[UIDevice currentDevice] systemVersion] floatValue])
+#define IOS_VERSION             ([[[UIDevice currentDevice] systemVersion] floatValue])
 #define IOS7_OR_LATER           __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_7_0
 #define IOS8_OR_LATER           __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_8_0
 #define SCREEN_WIDTH            ([UIScreen mainScreen].bounds.size.width) //屏幕的宽度(point)
@@ -180,67 +180,19 @@ return _sharedObject;
 
 
 /**
- *  颜色及相关默认值定义
- */
-#pragma mark - Color defines
-
-#define kDefaultViewColor               RGB(235, 235, 235)      //self.view的默认背景颜色
-#define kDefaultTitleBarColor           RGB(234, 106, 84)       //导航栏的默认颜色
-#define kDefaultStatusBarColor          RGB(234, 106, 84)       //状态栏默认颜色
-#define kDefaultNaviBarColor            RGBA(236, 236, 236, 1)   //设置navigationBar默认颜色(包括了StatusBar)
-#define kDefaultTextColor               RGB(100, 100, 100)      //设置文字默认颜色
-#define kDefaultTextColor1              RGB(122, 122, 122)
-#define kDefaultEmptyTextColor          RGB(122, 122, 122)      //列表为空时的提醒文字颜色
-#define kDefaultSeperatorLineColor      RGB(215, 215, 215)      //设置间隔线的默认颜色
-
-
-
-/**
- *  字体及相关默认值定义
- */
-#pragma mark - Font defines
-
-#define kDefaultTextFont10              [UIFont systemFontOfSize:10]
-#define kDefaultTextFont11              [UIFont systemFontOfSize:11]
-#define kDefaultTextFont12              [UIFont systemFontOfSize:12]
-#define kDefaultTextFont13              [UIFont systemFontOfSize:13]
-#define kDefaultTextFont14              [UIFont systemFontOfSize:14]        //设置默认字体大小
-#define kDefaultTextFont15              [UIFont systemFontOfSize:15]        //设置默认字体大小
-#define kDefaultTextFont16              [UIFont systemFontOfSize:16]        //设置默认字体大小
-#define kDefaultBoldTextFont14          [UIFont boldSystemFontOfSize:14]    //设置默认的粗体字体大小
-#define kDefaultBoldTextFont15          [UIFont boldSystemFontOfSize:15]
-#define kDefaultBoldTextFont16          [UIFont boldSystemFontOfSize:16]
-#define kDefaultBoldTextFont17          [UIFont boldSystemFontOfSize:17]
-
-/**
  *  定义常量
  */
 #pragma mark - define constants
 
-#define kDefaultPageStartIndex          0
-#define kDefaultPageSize                20
-#define kDefaultAnimationDuration01     0.1f
-#define kDefaultAnimationDuration02     0.2f
-#define kDefaultAnimationDuration03     0.3f
-#define kDefaultAnimationDuration04     0.4f
-#define kDefaultAnimationDuration05     0.5f
-#define kDefaultAnimationDuration06     0.6f
-#define kDefaultAnimationDuration07     0.7f
-#define kDefaultAnimationDuration08     0.8f
-#define kDefaultAnimationDuration09     0.9f
-#define kDefaultAnimationDuration10     1.0f
-#define kDefaultAnimationDuration15     1.5f
-#define kDefaultAnimationDuration20     2.0f
-#define kAppScheme                      @"TGO8"
 #define kCellIdentifier                 @"Cell"
 #define kFooterIdentifier               @"Footer"
 #define kHeaderIdentifier               @"Header"
 #define kItemCellIdentifier             @"ItemCell"             //UICollectionView要用的
 #define kProductCollectionHeaderView    @"CollectionHeaderView" //UICollectionView要用的
 #define kProductCollectionFooterView    @"CollectionFooterView" //UICollectionView要用的
-#define kAppChannelAppStore             @"AppStore"     //定义渠道为AppStore
-#define kAppChannelTgogoDotNet          @"TgogoDotNet"  //定义渠道为官网
-#define kAppChannelDebug                @"Debug"        //定义渠道为测试环境
+#define kAppChannelAppStore             @"AppStore"             //定义渠道为AppStore
+#define kAppChannelOfficialWebsite      @"OfficialWebsite"      //定义渠道为官网
+#define kAppChannelDebug                @"Debug"                //定义渠道为测试环境
 
 
 /**

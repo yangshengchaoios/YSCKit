@@ -1,9 +1,9 @@
 //
 //  AppConfigManager.m
-//  TGO2
+//  KQ
 //
 //  Created by  YangShengchao on 14-6-9.
-//  Copyright (c) 2014年 SCSD_TGO_TEAM. All rights reserved.
+//  Copyright (c) 2014年 yangshengchao. All rights reserved.
 //
 
 #import "AppConfigManager.h"

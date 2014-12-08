@@ -1,6 +1,6 @@
 //
 //  TipsView.m
-//  TGO
+//  KQ
 //
 //  Created by  YangShengchao on 14-7-24.
 //  Copyright (c) 2014年 YSHCH_TEAM. All rights reserved.
@@ -70,7 +70,7 @@
     tipsView.tipsLabel = [[UILabel alloc] init];
     tipsView.tipsLabel.backgroundColor = [UIColor clearColor];
     tipsView.tipsLabel.textColor = kDefaultEmptyTextColor;
-    tipsView.tipsLabel.font = kDefaultTextFont15;
+    tipsView.tipsLabel.font = AUTOLAYOUT_FONT(16);
     tipsView.tipsLabel.textAlignment = NSTextAlignmentCenter;
     tipsView.tipsLabel.lineBreakMode = NSLineBreakByCharWrapping;
     tipsView.tipsLabel.numberOfLines = 0;
@@ -152,7 +152,7 @@
         
     }
     [tipsView.tipsButton setTitle:buttonTitle forState:UIControlStateNormal];
-    tipsView.tipsButton.titleLabel.font = kDefaultTextFont16;
+    tipsView.tipsButton.titleLabel.font = AUTOLAYOUT_FONT(16);
     tipsView.tipsButton.titleLabel.textColor = [UIColor whiteColor];
     tipsView.tipsButton.width = 100.0f;
     tipsView.tipsButton.height = 32.0f;

@@ -1,9 +1,9 @@
 //
 //  UIView+Addition.m
-//  TGO3
+//  KQ
 //
 //  Created by  YangShengchao on 14-7-1.
-//  Copyright (c) 2014年 SCSD_TGO_TEAM. All rights reserved.
+//  Copyright (c) 2014年 yangshengchao. All rights reserved.
 //
 
 #import "UIView+Addition.h"
@@ -219,7 +219,7 @@
 }
 - (void)animateHorizontalSwipeWithSubType:(NSString *)subtype {
     CATransition *animation = [CATransition animation];
-    animation.duration = kDefaultAnimationDuration02;
+    animation.duration = 0.2;
     animation.timingFunction = UIViewAnimationCurveEaseInOut;
     animation.fillMode = kCAFillModeForwards;
     animation.type = kCATransitionPush;

@@ -60,7 +60,7 @@
     NSLog(@"DEBUGMODEL = %d, kUMAppKey = %@", DEBUGMODEL, kUMAppKey);
 #pragma mark - 设置UMeng应用的key
     [MobClick setAppVersion:AppVersion];
-    if (TGO_APPSTORE) {
+    if (APPSTORE) {
         [MobClick startWithAppkey:kUMAppKey reportPolicy:REALTIME channelId:kAppChannelAppStore];
     }
     else {
@@ -68,7 +68,7 @@
             [MobClick startWithAppkey:kUMAppKey reportPolicy:REALTIME channelId:kAppChannelDebug];
         }
         else {
-            [MobClick startWithAppkey:kUMAppKey reportPolicy:REALTIME channelId:kAppChannelTgogoDotNet];
+            [MobClick startWithAppkey:kUMAppKey reportPolicy:REALTIME channelId:kAppChannelOfficialWebsite];
         }
     }
     
@@ -144,7 +144,7 @@
     //3. 设置关键词输入框
     UITextField *searchTextField = [[UITextField alloc] initWithFrame:CGRectZero];
     searchTextField.placeholder = @"搜索商品与店铺";
-    searchTextField.font = kDefaultTextFont14;
+    searchTextField.font = AUTOLAYOUT_FONT(18);
     searchTextField.textColor = [UIColor whiteColor];
     [searchTextField setValue:[UIColor whiteColor] forKeyPath:@"_placeholderLabel.textColor"];
     searchTextField.tag = textFieldTag;

@@ -1,6 +1,6 @@
 //
 //  UIResponder+Additions.m
-//  TGO
+//  KQ
 //
 //  Created by  YangShengchao on 14-7-24.
 //  Copyright (c) 2014年 YSHCH_TEAM. All rights reserved.

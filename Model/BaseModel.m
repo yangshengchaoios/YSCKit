@@ -3,7 +3,7 @@
 //  SCSDTGO
 //
 //  Created by  YangHangbin on 14-3-3.
-//  Copyright (c) 2014年 SCSD_TGO_TEAM. All rights reserved.
+//  Copyright (c) 2014年 yangshengchao. All rights reserved.
 //
 
 #import "BaseModel.h"
