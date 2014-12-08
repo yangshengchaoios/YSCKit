@@ -1,6 +1,6 @@
 //
 //  ServerTimeSynchronizer.h
-//  KQ
+//  YSCKit
 //
 //  Created by  YangShengchao on 14-9-19.
 //  Copyright (c) 2014年 YSHCH_TEAM. All rights reserved.

@@ -1,6 +1,6 @@
 //
 //  AppConfigManager.m
-//  KQ
+//  YSCKit
 //
 //  Created by  YangShengchao on 14-6-9.
 //  Copyright (c) 2014年 yangshengchao. All rights reserved.

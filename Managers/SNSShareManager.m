@@ -1,6 +1,6 @@
 //
 //  ShareManager.m
-//  KQ
+//  YSCKit
 //
 //  Created by  YangShengchao on 14-8-29.
 //  Copyright (c) 2014年 YSHCH_TEAM. All rights reserved.
@@ -50,20 +50,11 @@
                    image:(UIImage *)image
                 platform:(ShareType)shareType
                   result:(UMSocialDataServiceCompletion)result {
-    
-    if (ShareTypeTGO8 == shareType) {
-        //TODO:分享到TGO8平台
-        
-        
+    NSString *platformName = [self PlatformTypeOfUMeng:shareType];
+    //调用UMeng的社会化分享控件
+    if (platformName) {
+        [[UMSocialDataService defaultDataService] postSNSWithTypes:@[platformName] content:content image:image location:nil urlResource:nil presentedController:nil completion:result];
     }
-    else {
-        NSString *platformName = [self PlatformTypeOfUMeng:shareType];
-        //调用UMeng的社会化分享控件
-        if (platformName) {
-            [[UMSocialDataService defaultDataService] postSNSWithTypes:@[platformName] content:content image:image location:nil urlResource:nil presentedController:nil completion:result];
-        }
-    }
- 
 }
 
 @end

@@ -1,6 +1,6 @@
 //
 //  UIView+Addition.h
-//  KQ
+//  YSCKit
 //
 //  Created by  YangShengchao on 14-7-1.
 //  Copyright (c) 2014年 yangshengchao. All rights reserved.

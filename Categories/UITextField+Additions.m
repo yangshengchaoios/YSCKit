@@ -1,6 +1,6 @@
 //
 //  UITextField+Additions.m
-//  KQ
+//  YSCKit
 //
 //  Created by  YangShengchao on 14-4-11.
 //  Copyright (c) 2014年 yangshengchao. All rights reserved.

@@ -1,6 +1,6 @@
 //
 //  BaseModel.h
-//  SCSDTGO
+//  YSCKit
 //
 //  Created by  YangHangbin on 14-3-3.
 //  Copyright (c) 2014年 yangshengchao. All rights reserved.

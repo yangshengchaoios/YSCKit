@@ -1,6 +1,6 @@
 //
 //  AFNManager.m
-//  KQ
+//  YSCKit
 //
 //  Created by  YangShengchao on 14-5-4.
 //  Copyright (c) 2014年 yangshengchao. All rights reserved.

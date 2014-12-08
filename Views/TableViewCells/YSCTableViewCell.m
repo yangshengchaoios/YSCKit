@@ -1,6 +1,6 @@
 //
 //  YSCTableViewCell.m
-//  KQ
+//  YSCKit
 //
 //  Created by yangshengchao on 14/11/17.
 //  Copyright (c) 2014年 yangshengchao. All rights reserved.

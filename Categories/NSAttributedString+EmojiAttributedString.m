@@ -7,7 +7,7 @@
 //
 
 #import "NSAttributedString+EmojiAttributedString.h"
-#import "UIImage+Resizable.h"
+#import "UIImage+Additions.h"
 @implementation NSAttributedString (EmojiAttributedString)
 - (NSAttributedString *)emojiAttributedString
 {
@@ -37,7 +37,7 @@
         // 5. 通过图片代码找到图片
         UIImage *emojiImage = [UIImage imageNamed:emojiPlistDic[[parsedOutput.string substringWithRange:captureRange]]];
         // 6. 将图片 Size 修改为符合字体的大小
-        textAttachment.image = [emojiImage imageScaledToSize:CGSizeMake(emojiSize,emojiSize)];
+        textAttachment.image = [UIImage resizeImage:emojiImage toSize:CGSizeMake(emojiSize,emojiSize)];
         
         // 7. 将之前 match 到的图片代码替换为含有 Emoji 表情的 NSAttributeString
         NSAttributedString *rep = [NSAttributedString attributedStringWithAttachment:textAttachment];

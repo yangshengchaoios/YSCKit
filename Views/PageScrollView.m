@@ -1,6 +1,6 @@
 //
 //  PageScrollView.m
-//  House
+//  YSCKit
 //
 //  Created by 杨胜超 on 13-7-22.
 //  Copyright (c) 2013年 杨胜超. All rights reserved.

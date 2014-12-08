@@ -1,6 +1,6 @@
 //
 //  BaseViewController.h
-//  SCSDEnterprise
+//  YSCKit
 //
 //  Created by  YangShengchao on 14-2-13.
 //  Copyright (c) 2014年  YangShengchao. All rights reserved.

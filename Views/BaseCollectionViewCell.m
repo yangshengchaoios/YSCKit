@@ -1,6 +1,6 @@
 //
 //  BaseCollectionViewCell.m
-//  KQ
+//  YSCKit
 //
 //  Created by yangshengchao on 14-11-4.
 //  Copyright (c) 2014年 yangshengchao. All rights reserved.

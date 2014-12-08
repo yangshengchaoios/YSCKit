@@ -1,6 +1,6 @@
 //
 //  UIImage+Additions.m
-//  KQ
+//  YSCKit
 //
 //  Created by  YangShengchao on 14-7-28.
 //  Copyright (c) 2014年 YSHCH_TEAM. All rights reserved.
@@ -30,8 +30,6 @@
     
     ImageQuality imageQuality = quality;
     if (imageQuality == ImageQualityLow || imageQuality == ImageQualityNormal) {
-        UIImage *scaledImage = image;
-        
         /**
          * 1、先判断宽度是否在区间内。
          * 2、如果宽度小于最小值，使用原图

@@ -1,6 +1,6 @@
 //
 //  MultiplePullToRefreshView.m
-//  KQ
+//  YSCKit
 //
 //  Created by yangshengchao on 14/12/3.
 //  Copyright (c) 2014年 yangshengchao. All rights reserved.

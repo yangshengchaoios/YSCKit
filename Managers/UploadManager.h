@@ -1,6 +1,6 @@
 //
 //  UploadManager.h
-//  KQ
+//  YSCKit
 //
 //  Created by  YangShengchao on 14-3-13.
 //  Copyright (c) 2014年 yangshengchao. All rights reserved.

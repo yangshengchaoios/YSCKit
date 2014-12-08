@@ -1,6 +1,6 @@
 //
 //  BasePullToRefreshViewController.h
-//  KQ
+//  YSCKit
 //
 //  Created by  YangShengchao on 14-4-18.
 //  Copyright (c) 2014年 yangshengchao. All rights reserved.
