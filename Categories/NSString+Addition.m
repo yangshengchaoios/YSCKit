@@ -11,7 +11,7 @@
 #import <CommonCrypto/CommonCryptor.h>
 
 #define RegexEmail          @"^\\w+([-+.]\\w+)*@\\w+([-.]\\w+)*\\.\\w+([-.]\\w+)*$"
-#define RegexMobilePhone    @"(^(01|1)[3-9])\\d{9}$"
+#define RegexMobilePhone    @"(^(01|1)[0-9])\\d{9}$"
 #define RegexUserName       @"^[A-Za-z0-9]{6,20}+$"
 #define RegexPassword       @"^[a-zA-Z0-9]{6,20}+$"
 #define RegexNickName       @"^[\u4e00-\u9fa5]{4,8}$"

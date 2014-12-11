@@ -197,10 +197,9 @@
 		return;
 	}
     
-	//2. 组装完整的url地址
-    NSString *urlString = [url stringByAppendingFormat:@"%@/%@",
-                          [NSString replaceString:url byRegex:@"/+$" to:@""],//去掉url最后的'/'字符
-                          [NSString replaceString:apiName byRegex:@"^/+" to:@""]];//去掉apiName前面的'/'字符
+    //2. 组装完整的url地址(去掉url最后的'/'字符,去掉apiName前面的'/'字符     )
+    NSString *urlString = [[NSString replaceString:url byRegex:@"/+$" to:@""] stringByAppendingFormat:@"/%@",
+                           [NSString replaceString:apiName byRegex:@"^/+" to:@""]];
     
 	//3. 组装数组参数
 	NSMutableString *newUrlString = [NSMutableString stringWithString:urlString];
@@ -211,17 +210,19 @@
     
     //4. 对提交的dict添加一个加密的参数'signature'
     NSMutableDictionary *newDictParam = [NSMutableDictionary dictionaryWithDictionary:dictParam];
-    NSString *signature = [self signatureWithParam:newDictParam];
-    if ([NSString isNotEmpty:signature]) {//当加密字符串不为空的时候就新增一个参数'signature'
-        [newDictParam setValue:signature forKey:kParamSignature];
-    }
+//    NSString *signature = [self signatureWithParam:newDictParam];
+//    if ([NSString isNotEmpty:signature]) {//当加密字符串不为空的时候就新增一个参数'signature'
+//        [newDictParam setValue:signature forKey:kParamSignature];
+//    }
     
 	//5. 发起网络请求
     AFHTTPRequestOperationManager *manager = [AFHTTPRequestOperationManager manager];   //create new AFHTTPRequestOperationManager
+    manager.responseSerializer = [AFHTTPResponseSerializer serializer];
     manager.requestSerializer.cachePolicy = NSURLRequestReloadIgnoringLocalCacheData;
     manager.requestSerializer.timeoutInterval = 15.0f;//设置POST和GET的超时时间
     //解决返回的Content-Type始终是application/xml问题！
-    [manager.requestSerializer setValue:@"application/json" forHTTPHeaderField:@"Accept"];
+//    [manager.requestSerializer setValue:@"application/json" forHTTPHeaderField:@"Accept"];
+     manager.responseSerializer.acceptableContentTypes = [manager.responseSerializer.acceptableContentTypes setByAddingObject:@"text/html"];
     
     //   定义返回成功的block
     void (^requestSuccessed1)(AFHTTPRequestOperation *operation, id responseObject) = ^(AFHTTPRequestOperation *operation, id responseObject) {
@@ -233,6 +234,9 @@
         }
         else if ([responseObject isKindOfClass:[NSString class]]) {
             baseModel = [[BaseModel alloc] initWithString:responseObject error:&initError];
+        }
+        else {
+            baseModel = [[BaseModel alloc] initWithData:responseObject error:&initError];
         }
         
         if ([NSObject isNotEmpty:baseModel]) {

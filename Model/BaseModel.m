@@ -15,12 +15,56 @@
     return YES;
 }
 
++(JSONKeyMapper*)keyMapper { //将大写首字母转换为小写
+    JSONModelKeyMapBlock toModel = ^ NSString* (NSString* keyName) {
+        if ([keyName length] > 0) {
+            return [[[keyName substringToIndex:1] lowercaseString] stringByAppendingString:[keyName substringFromIndex:1]];
+        }
+        else {
+            return keyName;
+        }
+    };
+    JSONModelKeyMapBlock toJSON = ^ NSString* (NSString* keyName) {
+        if ([keyName length] > 0) {
+            return [[[keyName substringToIndex:1] uppercaseString] stringByAppendingString:[keyName substringFromIndex:1]];
+        }
+        else {
+            return keyName;
+        }
+    };
+    
+    return [[self alloc] initWithJSONToModelBlock:toModel
+                                 modelToJSONBlock:toJSON];
+}
+
 @end
 
 @implementation BaseDataModel
 
 + (BOOL)propertyIsOptional:(NSString *)propertyName {
     return YES;
+}
+
++(JSONKeyMapper*)keyMapper { //将大写首字母转换为小写
+    JSONModelKeyMapBlock toModel = ^ NSString* (NSString* keyName) {
+        if ([keyName length] > 0) {
+            return [[[keyName substringToIndex:1] lowercaseString] stringByAppendingString:[keyName substringFromIndex:1]];
+        }
+        else {
+            return keyName;
+        }
+    };
+    JSONModelKeyMapBlock toJSON = ^ NSString* (NSString* keyName) {
+        if ([keyName length] > 0) {
+            return [[[keyName substringToIndex:1] uppercaseString] stringByAppendingString:[keyName substringFromIndex:1]];
+        }
+        else {
+            return keyName;
+        }
+    };
+    
+    return [[self alloc] initWithJSONToModelBlock:toModel
+                                 modelToJSONBlock:toJSON];
 }
 
 /**
