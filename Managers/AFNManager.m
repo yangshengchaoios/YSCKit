@@ -101,14 +101,15 @@
             if (1 == baseModel.state) {  //接口访问成功
                 NSObject *dataModel = baseModel.data;
                 JSONModelError *initError = nil;
-                if ([dataModel isKindOfClass:[NSArray class]]) {
-                    if ([NSString isNotEmpty:modelName] && [modelName isSubclassOfClass:[BaseDataModel class]]) {
+                if ( [NSString isNotEmpty:modelName] && [modelName isSubclassOfClass:[BaseDataModel class]]) {
+                    if ([dataModel isKindOfClass:[NSArray class]]) {
                         dataModel = [modelName arrayOfModelsFromDictionaries:(NSArray *)dataModel error:&initError];
                     }
-                }
-                else if ([dataModel isKindOfClass:[NSDictionary class]]) {
-                    if ( [NSString isNotEmpty:modelName] && [modelName isSubclassOfClass:[BaseDataModel class]]) {
+                    else if ([dataModel isKindOfClass:[NSDictionary class]]) {
                         dataModel = [[modelName alloc] initWithDictionary:(NSDictionary *)dataModel error:&initError];
+                    }
+                    else if ([responseObject isKindOfClass:[NSData class]]) {
+                        dataModel = [[modelName alloc] initWithData:(NSData *)responseObject error:&initError];
                     }
                 }
                 
@@ -210,19 +211,20 @@
     
     //4. 对提交的dict添加一个加密的参数'signature'
     NSMutableDictionary *newDictParam = [NSMutableDictionary dictionaryWithDictionary:dictParam];
-//    NSString *signature = [self signatureWithParam:newDictParam];
-//    if ([NSString isNotEmpty:signature]) {//当加密字符串不为空的时候就新增一个参数'signature'
-//        [newDictParam setValue:signature forKey:kParamSignature];
-//    }
+#if IsNeedSignParams
+    NSString *signature = [self signatureWithParam:newDictParam];
+    if ([NSString isNotEmpty:signature]) {//当加密字符串不为空的时候就新增一个参数'signature'
+        [newDictParam setValue:signature forKey:kParamSignature];
+    }
+#endif
     
 	//5. 发起网络请求
     AFHTTPRequestOperationManager *manager = [AFHTTPRequestOperationManager manager];   //create new AFHTTPRequestOperationManager
-    manager.responseSerializer = [AFHTTPResponseSerializer serializer];
+    manager.responseSerializer = [AFHTTPResponseSerializer serializer];//TODO:针对返回数据不规范的情况
     manager.requestSerializer.cachePolicy = NSURLRequestReloadIgnoringLocalCacheData;
-    manager.requestSerializer.timeoutInterval = 15.0f;//设置POST和GET的超时时间
+    manager.requestSerializer.timeoutInterval = 25.0f;//设置POST和GET的超时时间
     //解决返回的Content-Type始终是application/xml问题！
-//    [manager.requestSerializer setValue:@"application/json" forHTTPHeaderField:@"Accept"];
-     manager.responseSerializer.acceptableContentTypes = [manager.responseSerializer.acceptableContentTypes setByAddingObject:@"text/html"];
+    [manager.requestSerializer setValue:@"application/xml" forHTTPHeaderField:@"Accept"];
     
     //   定义返回成功的block
     void (^requestSuccessed1)(AFHTTPRequestOperation *operation, id responseObject) = ^(AFHTTPRequestOperation *operation, id responseObject) {
@@ -235,7 +237,7 @@
         else if ([responseObject isKindOfClass:[NSString class]]) {
             baseModel = [[BaseModel alloc] initWithString:responseObject error:&initError];
         }
-        else {
+        else if ([responseObject isKindOfClass:[NSData class]]) {
             baseModel = [[BaseModel alloc] initWithData:responseObject error:&initError];
         }
         
