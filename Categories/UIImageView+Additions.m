@@ -77,9 +77,9 @@
     
     //处理相对路径
     if ([NSString isNotUrl:urlString]) {
-        newUrlString = [kResPathAppResUrl stringByAppendingFormat:@"%@%@",
-                        ([kResPathAppResUrl hasSuffix:@"/"] ? @"" : @"/"),//确保kResPathAppResUrl后面有1个字符'/'
-                        ([urlString hasPrefix:@"/"] ? [urlString substringFromIndex:1] : urlString)];//确保urlString前面没有字符'/'
+        newUrlString = [kResPathAppResUrl stringByAppendingFormat:@"%@/%@",
+                       [NSString replaceString:kResPathAppResUrl byRegex:@"/+$" to:@""],//去掉最后的'/'字符
+                       [NSString replaceString:urlString byRegex:@"^/+" to:@""]];//去掉urlString前面的'/'字符
     }
     
     if ([NSString isNotUrl:newUrlString]) {//处理相对路径后仍然不是合法的url，则返回默认图片

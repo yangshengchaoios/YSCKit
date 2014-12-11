@@ -199,8 +199,8 @@
     
 	//2. 组装完整的url地址
     NSString *urlString = [url stringByAppendingFormat:@"%@/%@",
-                           [NSString replaceString:url byRegex:@"/+$" to:@""],//去掉url最后的'/'字符
-                           [NSString replaceString:apiName byRegex:@"^/+" to:@""]];//去掉apiName前面的'/'字符                                                     //组装后的完整url地址
+                          [NSString replaceString:url byRegex:@"/+$" to:@""],//去掉url最后的'/'字符
+                          [NSString replaceString:apiName byRegex:@"^/+" to:@""]];//去掉apiName前面的'/'字符
     
 	//3. 组装数组参数
 	NSMutableString *newUrlString = [NSMutableString stringWithString:urlString];

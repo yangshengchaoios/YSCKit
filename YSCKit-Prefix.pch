@@ -131,7 +131,7 @@ return _sharedObject;
  */
 #pragma mark - special methods
 
-#define USERID                          [[Login sharedInstance] userId]
+#define USERID                          ([Login sharedInstance].user.userId == nil ? @"" : [Login sharedInstance].user.userId)
 #define TOKEN                           ([Login sharedInstance].token == nil ? @"" : [Login sharedInstance].token)
 #define ISLOGGED                        [[Login sharedInstance] isLogged]
 #define USER                            [Login sharedInstance].user
