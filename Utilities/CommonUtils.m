@@ -106,25 +106,6 @@
 }
 
 /**
- *  初始化App默认样式
- */
-+ (void)initAppDefaultUI:(NSString *)navibarImageName {
-    //将状态栏字体改为白色（前提是要设置[View controller-based status bar appearance]为NO）
-    [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent];
-    
-    //改变Navibar的颜色和背景图片
-    //	[[UINavigationBar appearance] setBarTintColor:kDefaultNaviBarColor];
-    [[UINavigationBar appearance] setBackgroundImage:[UIImage imageNamed:navibarImageName]
-                                       forBarMetrics:UIBarMetricsDefault];
-    //设置字体为白色
-    [[UINavigationBar appearance] setTintColor:[UIColor whiteColor]];
-    //设置Title为白色,Title大小为18
-    [[UINavigationBar appearance] setTitleTextAttributes:@{ NSForegroundColorAttributeName : [UIColor whiteColor],
-                                                            NSFontAttributeName : [UIFont boldSystemFontOfSize:18] }];
-    [[UINavigationBar appearance] setBarStyle:UIBarStyleBlackTranslucent];
-}
-
-/**
  *  创建搜索栏
  *
  *  @return
