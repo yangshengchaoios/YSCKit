@@ -15,8 +15,26 @@
     return YES;
 }
 
+/**
+ *  下面两个方法用于子类字段名称映射
+ *
+ *  @return
+ */
++ (NSDictionary *)jsonToModelMapping {
+    return nil;
+}
 +(JSONKeyMapper*)keyMapper { //将大写首字母转换为小写
-    JSONModelKeyMapBlock toModel = ^ NSString* (NSString* keyName) {
+    NSDictionary* userToModelMap = [self jsonToModelMapping];
+    NSDictionary* userToJSONMap  = [NSMutableDictionary dictionaryWithObjects:userToModelMap.allKeys
+                                                                      forKeys:userToModelMap.allValues];
+    JSONModelKeyMapBlock toModel = ^ NSString* (NSString *keyName) {
+        //1. 先映射字段名称
+        NSString *result = [userToModelMap valueForKeyPath:keyName];
+        if ([NSString isNotEmpty:result]) {
+            keyName = result;
+        }
+        
+        //2. 将json字段第一个字母变小写
         if ([keyName length] > 0) {
             NSString *firstLetter = [keyName substringToIndex:1];
             if ([[firstLetter uppercaseString] isEqualToString:firstLetter] &&
@@ -27,6 +45,13 @@
         return keyName;
     };
     JSONModelKeyMapBlock toJSON = ^ NSString* (NSString* keyName) {
+        //1. 先映射字段名称
+        NSString *result = [userToJSONMap valueForKeyPath:keyName];
+        if ([NSString isNotEmpty:result]) {
+            keyName = result;
+        }
+        
+        //2. 将model字段第一个字母变大写
         if ([keyName length] > 0) {
             NSString *firstLetter = [keyName substringToIndex:1];
             if ([[firstLetter lowercaseString] isEqualToString:firstLetter] &&
@@ -37,7 +62,8 @@
         return keyName;
     };
     
-    return [[JSONKeyMapper alloc] initWithJSONToModelBlock:toModel modelToJSONBlock:toJSON];
+    return [[JSONKeyMapper alloc] initWithJSONToModelBlock:toModel
+                                          modelToJSONBlock:toJSON];
 }
 
 @end
@@ -48,22 +74,51 @@
     return YES;
 }
 
+/**
+ *  下面两个方法用于子类字段名称映射
+ *
+ *  @return
+ */
++ (NSDictionary *)jsonToModelMapping {
+    return nil;
+}
 +(JSONKeyMapper*)keyMapper { //将大写首字母转换为小写
-    JSONModelKeyMapBlock toModel = ^ NSString* (NSString* keyName) {
+    NSDictionary* userToModelMap = [self jsonToModelMapping];
+    NSDictionary* userToJSONMap  = [NSMutableDictionary dictionaryWithObjects:userToModelMap.allKeys
+                                                                      forKeys:userToModelMap.allValues];
+    JSONModelKeyMapBlock toModel = ^ NSString* (NSString *keyName) {
+        //1. 先映射字段名称
+        NSString *result = [userToModelMap valueForKeyPath:keyName];
+        if ([NSString isNotEmpty:result]) {
+            keyName = result;
+        }
+        
+        //2. 将json字段第一个字母变小写
         if ([keyName length] > 0) {
-            return [[[keyName substringToIndex:1] lowercaseString] stringByAppendingString:[keyName substringFromIndex:1]];
+            NSString *firstLetter = [keyName substringToIndex:1];
+            if ([[firstLetter uppercaseString] isEqualToString:firstLetter] &&
+                ( ! [[firstLetter lowercaseString] isEqualToString:firstLetter])) {//假如第一个字母大写
+                return [[firstLetter lowercaseString] stringByAppendingString:[keyName substringFromIndex:1]];
+            }
         }
-        else {
-            return keyName;
-        }
+        return keyName;
     };
     JSONModelKeyMapBlock toJSON = ^ NSString* (NSString* keyName) {
+        //1. 先映射字段名称
+        NSString *result = [userToJSONMap valueForKeyPath:keyName];
+        if ([NSString isNotEmpty:result]) {
+            keyName = result;
+        }
+        
+        //2. 将model字段第一个字母变大写
         if ([keyName length] > 0) {
-            return [[[keyName substringToIndex:1] uppercaseString] stringByAppendingString:[keyName substringFromIndex:1]];
+            NSString *firstLetter = [keyName substringToIndex:1];
+            if ([[firstLetter lowercaseString] isEqualToString:firstLetter] &&
+                ( ! [[firstLetter uppercaseString] isEqualToString:firstLetter])) {//假如第一个字母小写
+                return [[firstLetter uppercaseString] stringByAppendingString:[keyName substringFromIndex:1]];
+            }
         }
-        else {
-            return keyName;
-        }
+        return keyName;
     };
     
     return [[JSONKeyMapper alloc] initWithJSONToModelBlock:toModel

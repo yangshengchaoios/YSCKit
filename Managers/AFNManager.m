@@ -108,9 +108,6 @@
                     else if ([dataModel isKindOfClass:[NSDictionary class]]) {
                         dataModel = [[modelName alloc] initWithDictionary:(NSDictionary *)dataModel error:&initError];
                     }
-                    else if ([responseObject isKindOfClass:[NSData class]]) {
-                        dataModel = [[modelName alloc] initWithData:(NSData *)responseObject error:&initError];
-                    }
                 }
                 
                 //针对转换映射后的处理
@@ -228,6 +225,10 @@
     
     //   定义返回成功的block
     void (^requestSuccessed1)(AFHTTPRequestOperation *operation, id responseObject) = ^(AFHTTPRequestOperation *operation, id responseObject) {
+        //如果返回的数据是编过码的，则需要转换成字符串，方便输出调试
+        if ([responseObject isKindOfClass:[NSData class]]) {
+            responseObject = [[NSString alloc] initWithData:responseObject encoding:NSUTF8StringEncoding];
+        }
         NSLog(@"request success! \r\noperation=%@\r\nresponseObject=%@", operation, responseObject);
         JSONModelError *initError;
         BaseModel *baseModel = nil;
@@ -236,9 +237,6 @@
         }
         else if ([responseObject isKindOfClass:[NSString class]]) {
             baseModel = [[BaseModel alloc] initWithString:responseObject error:&initError];
-        }
-        else if ([responseObject isKindOfClass:[NSData class]]) {
-            baseModel = [[BaseModel alloc] initWithData:responseObject error:&initError];
         }
         
         if ([NSObject isNotEmpty:baseModel]) {
@@ -254,7 +252,7 @@
         }
     };
     //   定义返回失败的block
-    void (^requestFailure1)(AFHTTPRequestOperation *operation, id responseObject) = ^(AFHTTPRequestOperation *operation, NSError *error) {
+    void (^requestFailure1)(AFHTTPRequestOperation *operation, NSError *error) = ^(AFHTTPRequestOperation *operation, NSError *error) {
         NSLog(@"request failed! \r\noperation=%@\r\nerror=%@", operation, error);
         if (200 != operation.response.statusCode) {
             [LogManager saveLog:[NSString stringWithFormat:@"请求参数%@", newDictParam]];
@@ -281,7 +279,7 @@
     //        return [mutablePairs componentsJoinedByString:@"&"];
     //    }];
     
-	NSLog(@"requestType = %d, newDictParam = %@", requestType, newDictParam);
+	NSLog(@"requestType = %ld, newDictParam = %@", requestType, newDictParam);
 	if (RequestTypeGET == requestType) {
 		NSLog(@"getting data...");
 		[manager   GET:newUrlString

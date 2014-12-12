@@ -17,6 +17,8 @@
 @property (strong, nonatomic) NSString *message;
 @property (strong, nonatomic) NSObject<ConvertOnDemand> *data;
 
++ (NSDictionary *)jsonToModelMapping;
+
 @end
 
 
@@ -24,5 +26,7 @@
  *  公共model的基类，主要是设置所有参数都是optional的，并添加序列化和反序列化方法
  */
 @interface BaseDataModel : JSONModel
+
++ (NSDictionary *)jsonToModelMapping;
 
 @end
