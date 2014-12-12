@@ -10,8 +10,6 @@ pod 'FMDB', :head
 
 pod 'SDURLCache', :head
 
-pod 'JSONKit', :head
-
 pod 'SDWebImage', :head
 
 pod 'MBProgressHUD', :head
@@ -28,7 +26,7 @@ pod 'MarqueeLabel', :head
 
 pod 'Reachability', :head
 
-pod 'SMPageControl', :head
+pod 'SMPageControl', :git => 'https://github.com/yangshengchaoios/SMPageControl.git'
 
 pod 'DRDynamicSlideShow', :head
 
