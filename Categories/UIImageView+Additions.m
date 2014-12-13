@@ -73,14 +73,28 @@
     self.image = nil;
     self.clipsToBounds = YES;
     self.backgroundColor = DefaultBackgroundColor;
-    NSString *newUrlString = [urlString copy];
+    NSString *newUrlString = [NSString trimString:[urlString copy]];
     
-    //处理相对路径
-    if ([NSString isNotUrl:urlString]) {
-        newUrlString = [[NSString replaceString:kResPathAppResUrl byRegex:@"/+$" to:@""] stringByAppendingFormat:@"/%@",
-                       [NSString replaceString:urlString byRegex:@"^/+" to:@""]];
+    //判断是否本地图片
+    if([NSString isNotEmpty:newUrlString]) {
+        if ( ! [NSString isContains:@"/" inString:newUrlString]) {//TODO:简单判断是不是网络地址
+            UIImage *localImage = [UIImage imageNamed:newUrlString];
+            if([NSObject isNotEmpty:localImage]) {
+                self.image = localImage;
+                return;
+            }
+        }
+    }
+    else {
+        self.image = DefaultPlaceholderImage;
+        return;
     }
     
+    //处理相对路径
+    if ([NSString isNotUrl:newUrlString]) {
+        newUrlString = [[NSString replaceString:kResPathAppResUrl byRegex:@"/+$" to:@""] stringByAppendingFormat:@"/%@",
+                       [NSString replaceString:newUrlString byRegex:@"^/+" to:@""]];
+    }
     if ([NSString isNotUrl:newUrlString]) {//处理相对路径后仍然不是合法的url，则返回默认图片
         self.image = DefaultPlaceholderImage;
         return;
