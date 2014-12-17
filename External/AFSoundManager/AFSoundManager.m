@@ -29,9 +29,7 @@
     return soundManager;
 }
 
--(void)startPlayingLocalFileWithName:(NSString *)name andBlock:(progressBlock)block {
-    
-    NSString *filePath = [NSString stringWithFormat:@"%@/%@", [[NSBundle mainBundle]resourcePath], name];
+-(void)startPlayingLocalFileWithName:(NSString *)filePath andBlock:(progressBlock)block {
     NSURL *fileURL = [NSURL fileURLWithPath:filePath];
     NSError *error = nil;
     
