@@ -222,6 +222,9 @@
     manager.requestSerializer.timeoutInterval = kDefaultAFNTimeOut;//设置POST和GET的超时时间
     //解决返回的Content-Type始终是application/xml问题！
     [manager.requestSerializer setValue:@"application/xml" forHTTPHeaderField:@"Accept"];
+    [manager.requestSerializer setValue:kParamVersionValue forHTTPHeaderField:kParamVersion];
+    [manager.requestSerializer setValue:@"default udid of ios" forHTTPHeaderField:kParamUdid];
+    [manager.requestSerializer setValue:kParamFromValue forHTTPHeaderField:kParamFrom];
     
     //   定义返回成功的block
     void (^requestSuccessed1)(AFHTTPRequestOperation *operation, id responseObject) = ^(AFHTTPRequestOperation *operation, id responseObject) {
@@ -322,16 +325,16 @@
  *  @return signature
  */
 + (NSString *)signatureWithParam:(NSMutableDictionary *)param {
-    //1. 默认参数:version, udid, from
-    if ([NSString isEmpty:param[kParamVersion]]) {
-        [param setValue:kParamVersionValue forKey:kParamVersion];
-    }
-    if ([NSString isEmpty:param[kParamUdid]]) {
-        [param setValue:@"default udid of ios" forKey:kParamUdid];//TODO:获取设备唯一编号
-    }
-    if ([NSString isEmpty:param[kParamFrom]]) {
-        [param setValue:kParamFromValue forKey:kParamFrom];
-    }
+//    //1. 默认参数:version, udid, from
+//    if ([NSString isEmpty:param[kParamVersion]]) {
+//        [param setValue:kParamVersionValue forKey:kParamVersion];
+//    }
+//    if ([NSString isEmpty:param[kParamUdid]]) {
+//        [param setValue:@"default udid of ios" forKey:kParamUdid];//TODO:获取设备唯一编号
+//    }
+//    if ([NSString isEmpty:param[kParamFrom]]) {
+//        [param setValue:kParamFromValue forKey:kParamFrom];
+//    }
     
     NSArray *keys = [[param allKeys] sortedArrayUsingSelector:@selector(compare:)];
     
