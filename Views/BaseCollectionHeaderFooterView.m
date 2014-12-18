@@ -19,7 +19,7 @@
 }
 
 + (CGSize)SizeOfView {
-    return AUTOLAYOUT_SIZE(CGSizeMake(640, 200));
+    return AUTOLAYOUT_SIZE_WH(XIB_WIDTH, 200);
 }
 
 + (UINib *)NibNameOfView {
