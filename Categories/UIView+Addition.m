@@ -204,6 +204,14 @@
     self.layer.cornerRadius = radius;
     self.layer.masksToBounds = YES;
 }
++ (void)makeBorderForView:(UIView *)view withColor:(UIColor *)color borderWidth:(CGFloat)width {
+    ReturnWhenObjectIsEmpty(view);
+    [view makeBorderWithColor:color borderWidth:width];
+}
+- (void)makeBorderWithColor:(UIColor *)color borderWidth:(CGFloat)width {
+    self.layer.borderColor = color.CGColor;
+    self.layer.borderWidth = width;
+}
 
 
 #pragma mark - 添加手势

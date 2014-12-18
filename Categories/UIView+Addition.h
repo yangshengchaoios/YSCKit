@@ -51,6 +51,8 @@
 - (void)makeCircleView;
 + (void)makeRoundForView:(UIView *)view withRadius:(CGFloat)radius;
 - (void)makeRoundWithRadius:(CGFloat)radius;
++ (void)makeBorderForView:(UIView *)view withColor:(UIColor *)color borderWidth:(CGFloat)width;
+- (void)makeBorderWithColor:(UIColor *)color borderWidth:(CGFloat)width;
 
 #pragma mark - 添加手势
 /**
