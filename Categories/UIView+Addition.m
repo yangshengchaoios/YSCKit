@@ -210,7 +210,7 @@
 }
 - (void)makeBorderWithColor:(UIColor *)color borderWidth:(CGFloat)width {
     self.layer.borderColor = color.CGColor;
-    self.layer.borderWidth = width;
+    self.layer.borderWidth = AUTOLAYOUT_LENGTH(width);
 }
 
 
