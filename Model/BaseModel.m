@@ -34,8 +34,8 @@
             keyName = result;
         }
         
-        //2. 将json字段第一个字母变小写
-        if ([keyName length] > 0) {
+        //2. 将json字段第一个字母变小写(如果已经有字段映射的话就不改变)
+        if ([NSString isEmpty:result] && [keyName length] > 0) {
             NSString *firstLetter = [keyName substringToIndex:1];
             if ([[firstLetter uppercaseString] isEqualToString:firstLetter] &&
                 ( ! [[firstLetter lowercaseString] isEqualToString:firstLetter])) {//假如第一个字母大写
@@ -51,8 +51,8 @@
             keyName = result;
         }
         
-        //2. 将model字段第一个字母变大写
-        if ([keyName length] > 0) {
+        //2. 将model字段第一个字母变大写(如果已经有字段映射的话就不改变)
+        if ([NSString isEmpty:result] && [keyName length] > 0) {
             NSString *firstLetter = [keyName substringToIndex:1];
             if ([[firstLetter lowercaseString] isEqualToString:firstLetter] &&
                 ( ! [[firstLetter uppercaseString] isEqualToString:firstLetter])) {//假如第一个字母小写
@@ -93,8 +93,8 @@
             keyName = result;
         }
         
-        //2. 将json字段第一个字母变小写
-        if ([keyName length] > 0) {
+        //2. 将json字段第一个字母变小写(如果已经有字段映射的话就不改变)
+        if ([NSString isEmpty:result] && [keyName length] > 0) {
             NSString *firstLetter = [keyName substringToIndex:1];
             if ([[firstLetter uppercaseString] isEqualToString:firstLetter] &&
                 ( ! [[firstLetter lowercaseString] isEqualToString:firstLetter])) {//假如第一个字母大写
@@ -110,8 +110,8 @@
             keyName = result;
         }
         
-        //2. 将model字段第一个字母变大写
-        if ([keyName length] > 0) {
+        //2. 将model字段第一个字母变大写(如果已经有字段映射的话就不改变)
+        if ([NSString isEmpty:result] && [keyName length] > 0) {
             NSString *firstLetter = [keyName substringToIndex:1];
             if ([[firstLetter lowercaseString] isEqualToString:firstLetter] &&
                 ( ! [[firstLetter uppercaseString] isEqualToString:firstLetter])) {//假如第一个字母小写
