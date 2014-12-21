@@ -20,6 +20,7 @@
     #import <BlocksKit+MessageUI.h>
     #import <MBProgressHUD/MBProgressHUD.h>
     #import <POP/POP.h>
+    #import <FMDB/FMDB.h>
     #import "PureLayout.h"
 
     //定义固定常量和公用枚举

@@ -18,7 +18,7 @@
 + (void)configUmeng;
 + (UIView *)createSearchBar:(NSInteger)textFieldTag;
 
-#pragma mark 格式化金额
+#pragma mark - 格式化金额
 
 /**
  *  常用的价格字符串格式化方法（默认：显示￥、显示小数点）
@@ -47,7 +47,18 @@
  */
 + (NSString *)formatPrice:(NSNumber *)price showMoneyTag:(BOOL)isTagUsed showDecimalPoint:(BOOL) isDecimal useUnit:(BOOL)isUnitUsed;
 
-#pragma mark 打电话
+#pragma mark - 打电话
 
-+ (void)makeCall:(NSString *)phoneNumber;
++ (void)MakeACall:(NSString *)phoneNumber;
+
+#pragma mark - 更新Sqlite操作
+
++ (BOOL)SqliteUpdate:(NSString *)sql;
++ (BOOL)SqliteUpdate:(NSString *)sql dbPath:(NSString *)dbPath;
+
+
+#pragma mark - 过去了多长时间
+
++ (NSString *)TimePassed:(NSString *)startTimeStamp;
+
 @end

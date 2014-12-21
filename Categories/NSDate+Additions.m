@@ -116,6 +116,11 @@
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
++ (NSDate *)dateBeforeYesterday {
+    return [NSDate dateWithDaysBeforeNow:2];
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 + (NSDate *)dateWithHoursFromNow:(NSUInteger)dHours {
 	NSTimeInterval aTimeInterval = [[NSDate date] timeIntervalSinceReferenceDate] + D_HOUR * dHours;
 	NSDate *newDate = [NSDate dateWithTimeIntervalSinceReferenceDate:aTimeInterval];
@@ -186,6 +191,11 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 - (BOOL)isYesterday {
 	return [self isEqualToDateIgnoringTime:[NSDate dateYesterday]];
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+- (BOOL)isBeforeYesterday {
+    return [self isEqualToDateIgnoringTime:[NSDate dateBeforeYesterday]];
 }
 
 // This hard codes the assumption that a week is 7 days

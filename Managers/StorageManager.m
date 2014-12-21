@@ -47,7 +47,7 @@
  *  @param userId 用户id
  */
 - (void)setUserId:(NSString *)userId {
-    if ( ! [self isEmpty:userId]) {
+    if ([NSString isNotEmpty:userId]) {
         self.userDir = [userId stringByAppendingString:([userId hasSuffix:@"/"] ? @"" : @"/")];//确保最后一个字符是'/'
     }
     else {

@@ -40,6 +40,7 @@
 + (NSDate *)dateNow;
 + (NSDate *)dateTomorrow;
 + (NSDate *)dateYesterday;
++ (NSDate *)dateBeforeYesterday;
 + (NSDate *)dateWithDaysFromNow:(NSUInteger)days;
 + (NSDate *)dateWithDaysBeforeNow:(NSUInteger)days;
 + (NSDate *)dateWithHoursFromNow:(NSUInteger)dHours;
@@ -57,6 +58,7 @@
 - (BOOL)isToday;
 - (BOOL)isTomorrow;
 - (BOOL)isYesterday;
+- (BOOL)isBeforeYesterday;
 - (BOOL)isSameWeekAsDate:(NSDate *)aDate;
 - (BOOL)isThisWeek;
 - (BOOL)isNextWeek;

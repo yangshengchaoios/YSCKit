@@ -198,7 +198,7 @@
 
 #pragma mark 打电话
 
-+ (void)makeCall:(NSString *)phoneNumber {
++ (void)MakeACall:(NSString *)phoneNumber {
     if ([self isEmpty:phoneNumber]) {
         return;
     }
@@ -212,4 +212,71 @@
     [alertView bk_setCancelButtonWithTitle:@"取消" handler:nil];
     [alertView show];
 }
+
+#pragma makr - Sqlite操作
+
++ (BOOL)SqliteUpdate:(NSString *)sql {
+    return [self SqliteUpdate:sql dbPath:DBRealPath];
+}
+
++ (BOOL)SqliteUpdate:(NSString *)sql dbPath:(NSString *)dbPath {
+    BOOL isSuccess = NO;
+    FMDatabase *db = [FMDatabase databaseWithPath:dbPath];
+    if ([db open]) {
+        isSuccess = [db executeUpdate:sql];
+    }
+    [db close];
+    return isSuccess;
+}
+
+
+#pragma mark - 过去了多长时间
+/**
+ *  1. 如果是1分钟以内  返回 'xx秒之前'
+ *  2. 如果是60分钟以内 返回 'xx分钟之前'
+ *  3. 如果是大于1小时且在当天  返回 'x小时之前'
+ *  4. 如果是昨天      返回  '昨天hh:mm:ss'
+ *  5. 如果是前天      返回  '前天hh:mm:ss'
+ *  6. 今年以内        返回  'MM-dd'
+ *  7. 其它           返回  'yyyy-MM-dd'
+ *
+ *  @param startTimeStamp 开始的时间戳
+ *
+ *  @return
+ */
++ (NSString *)TimePassed:(NSString *)startTimeStamp {
+    NSDate *startDateTime = [NSDate dateFromTimeStamp:startTimeStamp];
+    NSDate *nowDate = [NSDate date];
+    //其它
+    if ([startDateTime isLastYear]) {
+        return [startDateTime stringWithFormat:DateFormat3];
+    }
+    
+    //当年以内
+    if ([startDateTime isEarlierThanDate:[[NSDate dateBeforeYesterday] dateAtStartOfDay]]) {
+        return [startDateTime stringWithFormat:@"MM-dd"];
+    }
+    
+    //判断前天
+    if ([startDateTime isBeforeYesterday]) {
+        return [NSString stringWithFormat:@"前天%@",[startDateTime stringWithFormat:@"hh:mm:ss"]];
+    }
+    
+    //判断昨天
+    if ([startDateTime isYesterday]) {
+        return [NSString stringWithFormat:@"昨天%@",[startDateTime stringWithFormat:@"hh:mm:ss"]];
+    }
+    
+    NSInteger hoursPassed = [startDateTime hoursBeforeDate:nowDate];
+    NSInteger minutesPassed = [startDateTime minutesBeforeDate:nowDate];
+    NSInteger secondsPassed = (NSInteger)[nowDate timeIntervalSinceDate:startDateTime];
+    if (hoursPassed > 0) {
+        return [NSString stringWithFormat:@"%ld小时之前", hoursPassed];
+    }
+    if (minutesPassed > 0) {
+        return [NSString stringWithFormat:@"%ld分钟之前", minutesPassed];
+    }
+    return [NSString stringWithFormat:@"%ld秒之前", secondsPassed];
+}
+
 @end
