@@ -6,7 +6,7 @@
 //  Copyright (c) 2014年 YSHCH_TEAM. All rights reserved.
 //
 
-#import "UIResponder+Additions.h"
+#import "UIResponder+Additions.h" 
 
 static __weak id currentFirstResponder;
 
@@ -26,9 +26,12 @@ static __weak id currentFirstResponder;
     UIViewController *pushedViewController = nil;
     //检测是否有class文件 同时兼容xib布局的情况
     if (nil == pushedViewController) {
-        if (8.0f > IOS_VERSION) {
+        //针对ios7或iphone5以下的情况需要单独的xib布局文件，因为用autolayout会很卡
+        if (IOS_VERSION < 8.0 || [UIDevice currentDeviceType] < DeviceTypeiPhone640x1136) {
             NSString *ios7XibName = [NSString stringWithFormat:@"%@_IOS7", className];
-            pushedViewController = [[NSClassFromString(className) alloc] initWithNibName:ios7XibName bundle:nil];
+            if([[NSBundle mainBundle] pathForResource:ios7XibName ofType:@"nib"] != nil) {
+                pushedViewController = [[NSClassFromString(className) alloc] initWithNibName:ios7XibName bundle:nil];
+            }
         }
         
         if (nil == pushedViewController) {//ios8或者没有单独xib的vc
