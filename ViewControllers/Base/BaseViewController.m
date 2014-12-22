@@ -300,35 +300,6 @@
 	}
 }
 
-- (UIViewController *)createBaseViewController:(NSString *)className {
-    UIViewController *pushedViewController = nil;
-    
-	//第一步：检测是否在storyboard里有布局
-	if (!pushedViewController) {
-		@try {
-			pushedViewController = [self.storyBoard instantiateViewControllerWithIdentifier:className];
-		}
-		@catch (NSException *exception) {
-			NSLog(@"class[%@] is not found in storyboard!", className);
-		}
-		@finally {
-		}
-	}
-    
-	//第二步：检测是否有class文件 同时兼容xib布局的情况
-	if (nil == pushedViewController) {
-        NSString *ios7XibName = [NSString stringWithFormat:@"%@_IOS7", className];
-        pushedViewController = [[NSClassFromString(className) alloc] initWithNibName:ios7XibName bundle:nil];
-        if (nil == pushedViewController) {//ios8或者没有单独xib的vc
-            pushedViewController = [[NSClassFromString(className) alloc] initWithNibName:className bundle:nil];
-        }
-	}
-	NSAssert(pushedViewController, @"class[%@] is not exists in this project!", className);
-    pushedViewController.hidesBottomBarWhenPushed = YES;
-    NSLog(@"进入页面:%@", className);
-    return pushedViewController;
-}
-
 
 #pragma mark - 这里可以获取相对布局的view大小
 - (void)viewDidiLoadExtension {
@@ -352,7 +323,7 @@
 
 - (UIViewController *)pushViewController:(NSString *)className withParams:(NSDictionary *)paramDict animated:(BOOL)animated {
     [self hideKeyboard];
-    UIViewController *pushedViewController = [self createBaseViewController:className];
+    UIViewController *pushedViewController = [UIResponder createBaseViewController:className];
     NSMutableDictionary *mutableParamDict = [NSMutableDictionary dictionaryWithDictionary:paramDict];
     if ( ! mutableParamDict[kParamBackType]) {
         [mutableParamDict setValue:@(BackTypeImage) forKey:kParamBackType];   //这里设置的返回按钮由即将push出来的viewController负责处理
@@ -433,7 +404,7 @@
 
 - (UIViewController *)presentViewController:(NSString *)className withParams:(NSDictionary *)paramDict {
     [self hideKeyboard];
-    UIViewController *viewController = [self createBaseViewController:className];
+    UIViewController *viewController = [UIResponder createBaseViewController:className];
     NSMutableDictionary *mutableParamDict = [NSMutableDictionary dictionaryWithDictionary:paramDict];
     if ( ! mutableParamDict[kParamBackType]) {
         [mutableParamDict setValue:@(BackTypeImage) forKey:kParamBackType];//这里设置的返回按钮由即将presented出来的viewController负责处理
@@ -490,7 +461,7 @@
 //FIXME:该动画不起作用为什么？
 //- (UIViewController *)pushViewController:(NSString *)className withParams:(NSDictionary *)paramDict withAnimation:(ADTransition *)transition {
 //    [self hideKeyboard];
-//	UIViewController *pushedViewController = [self createBaseViewController:className];
+//	UIViewController *pushedViewController = [UIResponder createBaseViewController:className];
 //    NSMutableDictionary *mutableParamDict = [NSMutableDictionary dictionaryWithDictionary:paramDict];
 //	if ([pushedViewController isKindOfClass:[BaseViewController class]]) {
 //		[(BaseViewController *)pushedViewController setParams:mutableParamDict];

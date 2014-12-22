@@ -12,5 +12,5 @@
 @interface UIResponder (Additions)
 
 + (id)currentFirstResponder;
-
++ (UIViewController *)createBaseViewController:(NSString *)className;
 @end

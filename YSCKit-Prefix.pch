@@ -39,6 +39,7 @@
     #import "NSString+Addition.h"
     #import "UIImageView+Additions.h"
     #import "UIDevice+Additions.h"
+    #import "UIResponder+Additions.h"
 
     //Utils
     #import "FileUtils.h"
