@@ -316,8 +316,12 @@
 	}
     
 	//第二步：检测是否有class文件 同时兼容xib布局的情况
-	if (!pushedViewController) {
-		pushedViewController = [[NSClassFromString(className) alloc] initWithNibName:className bundle:nil];
+	if (nil == pushedViewController) {
+        NSString *ios7XibName = [NSString stringWithFormat:@"%@_IOS7", className];
+        pushedViewController = [[NSClassFromString(className) alloc] initWithNibName:ios7XibName bundle:nil];
+        if (nil == pushedViewController) {//ios8或者没有单独xib的vc
+            pushedViewController = [[NSClassFromString(className) alloc] initWithNibName:className bundle:nil];
+        }
 	}
 	NSAssert(pushedViewController, @"class[%@] is not exists in this project!", className);
     pushedViewController.hidesBottomBarWhenPushed = YES;
