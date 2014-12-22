@@ -571,6 +571,24 @@
                                                                                                  kCFStringEncodingUTF8));
 }
 
+#pragma mark - URL编码解码
++ (NSString *)URLEncode:(NSString *)string {
+    ReturnEmptyWhenObjectIsEmpty(string)
+    return [string URLEncodeString];
+}
+- (NSString *)URLEncodeString {
+    return [self stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+}
+
++ (NSString *)URLDecode:(NSString *)string {
+    ReturnEmptyWhenObjectIsEmpty(string)
+    return [string URLDecodeString];
+}
+
+- (NSString *)URLDecodeString {
+    return [self stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+}
+
 #pragma mark - 私有方法
 /**
  *  将NSData数组转换成十六进制字符串

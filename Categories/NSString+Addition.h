@@ -149,11 +149,17 @@
 + (NSString *)Sha1Hash:(NSString *)string;
 - (NSString *)Sha1HashString;
 
-#pragma mark UTF8编码解码
+#pragma mark - UTF8编码解码
 + (NSString *)UTF8Encoded:(NSString *)string;
 - (NSString *)UTF8EncodedString;
 + (NSString *)UTF8Decoded:(NSString *)string;
 - (NSString *)UTF8DecodedString;
+
+#pragma mark - URL编码解码
++ (NSString *)URLEncode:(NSString *)string;
+- (NSString *)URLEncodeString;
++ (NSString *)URLDecode:(NSString *)string;
+- (NSString *)URLDecodeString;
 
 @end
 
