@@ -9,4 +9,6 @@
 #import <UIKit/UIKit.h>
 
 @interface NSLayoutConstraint (Additions)
+
+- (NSString *)asciiArtDescription;
 @end

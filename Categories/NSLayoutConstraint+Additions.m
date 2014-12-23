@@ -13,7 +13,7 @@
 - (NSString *)description
 {
     NSString *description = super.description;
-//    NSString *asciiArtDescription = self.asciiArtDescription;
+    NSString *asciiArtDescription = self.asciiArtDescription;
     UIView *firstItem = (UIView *)self.firstItem;
     UIView *secondItem = (UIView *)self.secondItem;
     
@@ -23,5 +23,20 @@
             NSStringFromCGRect(firstItem.frame),
             NSStringFromCGRect(secondItem.frame)];
 }
+
+//- (NSString *)description {
+//    NSMutableString *myDescription = [NSMutableString stringWithFormat:@"%@, ", [self asciiArtDescription]];
+//    UIView *firstView = (UIView *)[self firstItem];
+//    if (firstView) {
+//        [myDescription appendFormat:@"First View: 0x%0x: %@, ", (int)firstView, firstView.nametag];
+//    }
+//    
+//    UIView *secondView = (UIView *)[self secondItem];
+//    if (secondView) {
+//        [myDescription appendFormat:@"Second View: 0x%0x: %@", (int)secondView, secondView.nametag];
+//    }
+//    
+//    return myDescription;
+//}
 
 @end
