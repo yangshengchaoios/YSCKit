@@ -120,6 +120,26 @@
     }
 }
 
+- (void)removeAllConstraints {
+    for (NSLayoutConstraint *constraint in self.constraints) {
+#if __PureLayout_MinBaseSDK_iOS_8_0
+        if ([self respondsToSelector:@selector(setActive:)]) {
+            constraint.active = NO;
+        }
+#endif /* __PureLayout_MinBaseSDK_iOS_8_0 */
+        
+        if (constraint.firstItem) {
+            [constraint.firstItem removeConstraint:constraint];
+        }
+        if (constraint.secondItem) {
+            [constraint.secondItem removeConstraint:constraint];
+        }
+    }
+    for (UIView *subView in self.subviews) {
+        [subView removeAllConstraints];
+    }
+}
+
 #pragma mark - 图片选择器
 + (UIActionSheet *)showImagePickerActionSheetWithDelegate:(id<UINavigationControllerDelegate,
                                                            UIImagePickerControllerDelegate,

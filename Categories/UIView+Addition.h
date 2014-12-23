@@ -34,6 +34,10 @@
  *  移除view上所有的子view
  */
 - (void)removeAllSubviews;
+/**
+ *  移除view(包括subviews)上所有constraints
+ */
+- (void)removeAllConstraints;
 
 #pragma mark - 图片选择器
 + (UIActionSheet *)showImagePickerActionSheetWithDelegate:(id<UINavigationControllerDelegate,
@@ -79,7 +83,6 @@
 
 + (void)resetFontSizeOfView:(UIView *)view;
 - (void)resetFontSizeOfView;
-
 
 #pragma mark - 计算自动布局的size
 - (void)autoLayoutSize;

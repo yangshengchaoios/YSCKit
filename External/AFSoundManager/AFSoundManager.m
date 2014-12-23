@@ -29,68 +29,33 @@
     return soundManager;
 }
 
--(void)startPlayingLocalFileWithName:(NSString *)filePath andBlock:(progressBlock)block {
+-(void)startPlayingLocalFileWithName:(NSString *)name andBlock:(progressBlock)block {
+    
+    NSString *filePath = [NSString stringWithFormat:@"%@/%@", [[NSBundle mainBundle]resourcePath], name];
     NSURL *fileURL = [NSURL fileURLWithPath:filePath];
     NSError *error = nil;
-    
+    [self stop];
     _audioPlayer = [[AVAudioPlayer alloc]initWithContentsOfURL:fileURL error:&error];
     [_audioPlayer play];
-    
-    __block int percentage = 0;
-    
-    _timer = [NSTimer scheduledTimerWithTimeInterval:1 block:^{
-        
-        if (percentage != 100) {
-            
-            percentage = (int)((_audioPlayer.currentTime * 100)/_audioPlayer.duration);
-            int timeRemaining = _audioPlayer.duration - _audioPlayer.currentTime;
-            
-            block(percentage, _audioPlayer.currentTime, timeRemaining, error, NO);
-        } else {
-            
-            int timeRemaining = _audioPlayer.duration - _audioPlayer.currentTime;
-
-            block(100, _audioPlayer.currentTime, timeRemaining, error, YES);
-            
-            [_timer invalidate];
-        }
+    _timer = [NSTimer scheduledTimerWithTimeInterval:0.5 block:^{
+        float totalTime = _audioPlayer.duration;
+        float elapsedTime = _audioPlayer.currentTime;
+        block(totalTime, elapsedTime,nil);
     } repeats:YES];
 }
 
 -(void)startStreamingRemoteAudioFromURL:(NSString *)url andBlock:(progressBlock)block {
     
     NSURL *streamingURL = [NSURL URLWithString:url];
-    NSError *error = nil;
-    
+    [self stop];
     _player = [[AVPlayer alloc]initWithURL:streamingURL];
     [_player play];
     
-    if (!error) {
-    
-        __block int percentage = 0;
-        
-        _timer = [NSTimer scheduledTimerWithTimeInterval:1 block:^{
-            
-            if (percentage != 100) {
-                
-                percentage = (int)((CMTimeGetSeconds(_player.currentItem.currentTime) * 100)/CMTimeGetSeconds(_player.currentItem.duration));
-                int timeRemaining = CMTimeGetSeconds(_player.currentItem.duration) - CMTimeGetSeconds(_player.currentItem.currentTime);
-                
-                block(percentage, CMTimeGetSeconds(_player.currentItem.currentTime), timeRemaining, error, NO);
-            } else {
-                
-                int timeRemaining = CMTimeGetSeconds(_player.currentItem.duration) - CMTimeGetSeconds(_player.currentItem.currentTime);
-                
-                block(100, CMTimeGetSeconds(_player.currentItem.currentTime), timeRemaining, error, YES);
-                
-                [_timer invalidate];
-            }
-        } repeats:YES];
-    } else {
-        
-        block(0, 0, 0, error, YES);
-        [_audioPlayer stop];
-    }
+    _timer = [NSTimer scheduledTimerWithTimeInterval:0.5 block:^{
+        float totalTime = CMTimeGetSeconds(_player.currentItem.duration);
+        float elapsedTime = CMTimeGetSeconds(_player.currentItem.currentTime);
+        block(totalTime, elapsedTime,nil);
+    } repeats:YES];
     
 }
 
@@ -200,7 +165,7 @@
 -(BOOL)areHeadphonesConnected {
     
     AVAudioSessionRouteDescription *route = [[AVAudioSession sharedInstance]currentRoute];
-        
+    
     BOOL headphonesLocated = NO;
     
     for (AVAudioSessionPortDescription *portDescription in route.outputs) {

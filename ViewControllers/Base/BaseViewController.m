@@ -169,6 +169,13 @@
     if ([self scrollableView]) {
         [self followScrollView:[self scrollableView]];
     }
+    
+    if (IOS7_OR_EARLIER) {
+        NSString *ios7XibName = [NSString stringWithFormat:@"%@_IOS7", NSStringFromClass(self.class)];
+        if([[NSBundle mainBundle] pathForResource:ios7XibName ofType:@"nib"] != nil) {
+            [self.view removeAllConstraints];
+        }
+    }
 }
 
 
@@ -303,7 +310,7 @@
 
 #pragma mark - 这里可以获取相对布局的view大小
 - (void)viewDidiLoadExtension {
-    
+
 }
 
 #pragma mark - constraints

@@ -15,7 +15,7 @@
 
 @interface AFSoundManager : NSObject
 
-typedef void (^progressBlock)(int percentage, CGFloat elapsedTime, CGFloat timeRemaining, NSError *error, BOOL finished);
+typedef void (^progressBlock)(CGFloat totalTime, CGFloat elapsedTime, NSError *error);
 
 +(instancetype)sharedManager;
 
