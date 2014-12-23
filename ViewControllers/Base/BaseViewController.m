@@ -170,12 +170,12 @@
         [self followScrollView:[self scrollableView]];
     }
     
-    if (IOS7_OR_EARLIER) {
-        NSString *ios7XibName = [NSString stringWithFormat:@"%@_IOS7", NSStringFromClass(self.class)];
-        if([[NSBundle mainBundle] pathForResource:ios7XibName ofType:@"nib"] != nil) {
-            [self.view removeAllConstraints];
-        }
-    }
+//    if (NO_AUTOLAYOUT) {
+//        NSString *ios7XibName = [NSString stringWithFormat:@"%@_IOS7", NSStringFromClass(self.class)];
+//        if([[NSBundle mainBundle] pathForResource:ios7XibName ofType:@"nib"] != nil) {
+//            [self.view removeAllConstraints];
+//        }
+//    }
 }
 
 

@@ -27,7 +27,7 @@ static __weak id currentFirstResponder;
     //检测是否有class文件 同时兼容xib布局的情况
     if (nil == pushedViewController) {
         //针对ios7或iphone5以下的情况需要单独的xib布局文件，因为用autolayout会很卡
-        if (IOS_VERSION < 8.0 || [UIDevice currentDeviceType] < DeviceTypeiPhone640x1136) {
+        if (NO_AUTOLAYOUT) {
             NSString *ios7XibName = [NSString stringWithFormat:@"%@_IOS7", className];
             if([[NSBundle mainBundle] pathForResource:ios7XibName ofType:@"nib"] != nil) {
                 pushedViewController = [[NSClassFromString(className) alloc] initWithNibName:ios7XibName bundle:nil];
