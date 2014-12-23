@@ -8,12 +8,35 @@
 
 #import "NSLayoutConstraint+Additions.h"
 
+@interface UIView(AutoLayoutDebugging)
+
+- (void)exerciseAmiguityInLayoutRepeatedly:(BOOL)recursive;
+
+@end
+
+@implementation UIView(AutoLayoutDebugging)
+
+- (void)exerciseAmiguityInLayoutRepeatedly:(BOOL)recursive {
+    if (self.hasAmbiguousLayout) {
+        [NSTimer scheduledTimerWithTimeInterval:.5
+                                         target:self
+                                       selector:@selector(exerciseAmbiguityInLayout)
+                                       userInfo:nil
+                                        repeats:YES];
+    }
+    if (recursive) {
+        for (UIView *subview in self.subviews) {
+            [subview exerciseAmiguityInLayoutRepeatedly:YES];
+        }
+    }
+}
+
+@end
+
+
 @implementation NSLayoutConstraint (Additions)
 
-- (NSString *)description
-{
-    NSString *description = super.description;
-    NSString *asciiArtDescription = self.asciiArtDescription;
+- (NSString *)description {
     UIView *firstItem = (UIView *)self.firstItem;
     UIView *secondItem = (UIView *)self.secondItem;
     

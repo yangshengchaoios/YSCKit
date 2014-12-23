@@ -10,5 +10,5 @@
 
 @interface NSLayoutConstraint (Additions)
 
-- (NSString *)asciiArtDescription;
+
 @end
