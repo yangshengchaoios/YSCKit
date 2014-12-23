@@ -19,18 +19,17 @@
 @implementation AFSoundManager
 
 +(instancetype)sharedManager {
-    
     static AFSoundManager *soundManager = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         soundManager = [[self alloc]init];
+        soundManager.audioArray = [NSMutableArray array];
     });
     
     return soundManager;
 }
 
 -(void)startPlayingLocalFileWithName:(NSString *)name andBlock:(progressBlock)block {
-    
     NSString *filePath = [NSString stringWithFormat:@"%@/%@", [[NSBundle mainBundle]resourcePath], name];
     NSURL *fileURL = [NSURL fileURLWithPath:filePath];
     NSError *error = nil;
@@ -45,7 +44,6 @@
 }
 
 -(void)startStreamingRemoteAudioFromURL:(NSString *)url andBlock:(progressBlock)block {
-    
     NSURL *streamingURL = [NSURL URLWithString:url];
     [self stop];
     _player = [[AVPlayer alloc]initWithURL:streamingURL];
@@ -56,22 +54,22 @@
         float elapsedTime = CMTimeGetSeconds(_player.currentItem.currentTime);
         block(totalTime, elapsedTime,nil);
     } repeats:YES];
-    
 }
 
--(NSDictionary *)retrieveInfoForCurrentPlaying {
+-(void)startPlayingAudio:(NSArray *)audioArray withIndex:(NSInteger)audioIndex {
+    self.audioPlayIndex = audioIndex;
+    //TODO:
+}
+
+-(void)playCurrentAudio {
+    [self stop];
+    PlayRecordModel *playRecord = self.audioArray[self.audioPlayIndex];
     
-    if (_audioPlayer.url) {
-        
-        NSArray *parts = [_audioPlayer.url.absoluteString componentsSeparatedByString:@"/"];
-        NSString *filename = [parts objectAtIndex:[parts count]-1];
-        
-        NSDictionary *info = @{@"name": filename, @"duration": [NSNumber numberWithInt:_audioPlayer.duration], @"elapsed time": [NSNumber numberWithInt:_audioPlayer.currentTime], @"remaining time": [NSNumber numberWithInt:(_audioPlayer.duration - _audioPlayer.currentTime)], @"volume": [NSNumber numberWithFloat:_audioPlayer.volume]};
-        
-        return info;
-    } else {
-        return nil;
-    }
+    //1. 判断播放本地文件还是网络文件
+    
+    //2. 开始播放
+    
+    //3. 更新数据库信息
 }
 
 -(void)pause {
@@ -97,6 +95,20 @@
     
     int32_t timeScale = _player.currentItem.asset.duration.timescale;
     [_player seekToTime:CMTimeMake(0.000000, timeScale)];
+}
+
+-(void)playNextAudio {
+    if (self.audioPlayIndex + 1 < [self.audioArray count]) {
+        self.audioPlayIndex++;
+        [self playCurrentAudio];
+    }
+}
+
+-(void)playPreviousAudio {
+    if ((self.audioPlayIndex - 1) >= 0 && (self.audioPlayIndex - 1) < [self.audioArray count]) {
+        self.audioPlayIndex--;
+        [self playCurrentAudio];
+    }
 }
 
 -(void)moveToSecond:(int)second {
@@ -193,7 +205,6 @@
 @implementation NSTimer (Blocks)
 
 +(id)scheduledTimerWithTimeInterval:(NSTimeInterval)inTimeInterval block:(void (^)())inBlock repeats:(BOOL)inRepeats {
-    
     void (^block)() = [inBlock copy];
     id ret = [self scheduledTimerWithTimeInterval:inTimeInterval target:self selector:@selector(executeSimpleBlock:) userInfo:block repeats:inRepeats];
     
@@ -201,7 +212,6 @@
 }
 
 +(id)timerWithTimeInterval:(NSTimeInterval)inTimeInterval block:(void (^)())inBlock repeats:(BOOL)inRepeats {
-    
     void (^block)() = [inBlock copy];
     id ret = [self timerWithTimeInterval:inTimeInterval target:self selector:@selector(executeSimpleBlock:) userInfo:block repeats:inRepeats];
     
@@ -209,7 +219,6 @@
 }
 
 +(void)executeSimpleBlock:(NSTimer *)inTimer {
-    
     if ([inTimer userInfo]) {
         void (^block)() = (void (^)())[inTimer userInfo];
         block();
@@ -224,18 +233,14 @@ static NSString *const NSTimerPauseDate = @"NSTimerPauseDate";
 static NSString *const NSTimerPreviousFireDate = @"NSTimerPreviousFireDate";
 
 -(void)pauseTimer {
-    
     objc_setAssociatedObject(self, (__bridge const void *)(NSTimerPauseDate), [NSDate date], OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     objc_setAssociatedObject(self, (__bridge const void *)(NSTimerPreviousFireDate), self.fireDate, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-    
     self.fireDate = [NSDate distantFuture];
 }
 
 -(void)resumeTimer {
-    
     NSDate *pauseDate = objc_getAssociatedObject(self, (__bridge const void *)NSTimerPauseDate);
     NSDate *previousFireDate = objc_getAssociatedObject(self, (__bridge const void *)NSTimerPreviousFireDate);
-    
     const NSTimeInterval pauseTime = -[pauseDate timeIntervalSinceNow];
     self.fireDate = [NSDate dateWithTimeInterval:pauseTime sinceDate:previousFireDate];
 }
