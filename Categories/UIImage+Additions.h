@@ -21,6 +21,6 @@
 + (UIImage *)resizeImage:(UIImage *)image toSize:(CGSize)size;
 + (UIImage *)resizeImage:(UIImage *)image toSize:(CGSize)size scale:(BOOL)scale;
 
-//拉伸图片
+//拉伸图片(被ImageUtils中的stretch代替了)
 + (UIImage *)stretchImage:(UIImage *)image withEdgeInset:(UIEdgeInsets)edgeInset;
 @end
