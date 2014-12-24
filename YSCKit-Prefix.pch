@@ -71,6 +71,8 @@
     #import "BaseCollectionHeaderFooterView.h"
 
 #import "AFSoundManager.h"
+#import "TCBlobDownload.h"
+#import "ABAudioDownloader.h"
 #endif
 
 

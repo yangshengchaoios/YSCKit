@@ -133,7 +133,7 @@
  *  @return 用户图片目录
  */
 - (NSString *)directoryPathOfAudioByUserId {
-    return [[self directoryPathOfLibraryCachesByUserId] stringByAppendingPathComponent:@"Audioes/"];
+    return [[self directoryPathOfLibraryCachesByUserId] stringByAppendingPathComponent:@"Audioes"];
 }
 
 /**
