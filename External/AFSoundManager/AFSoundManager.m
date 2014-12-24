@@ -29,65 +29,149 @@
     return soundManager;
 }
 
--(void)startPlayingLocalFileWithName:(NSString *)name andBlock:(progressBlock)block {
-    NSString *filePath = [NSString stringWithFormat:@"%@/%@", [[NSBundle mainBundle]resourcePath], name];
+-(void)startPlayingLocalFileWithName:(NSString *)filePath withBlock:(progressBlock)block {
     NSURL *fileURL = [NSURL fileURLWithPath:filePath];
-    NSError *error = nil;
     [self stop];
+    NSError *error = nil;
     _audioPlayer = [[AVAudioPlayer alloc]initWithContentsOfURL:fileURL error:&error];
-    [_audioPlayer play];
-    _timer = [NSTimer scheduledTimerWithTimeInterval:0.5 block:^{
-        float totalTime = _audioPlayer.duration;
-        float elapsedTime = _audioPlayer.currentTime;
-        block(totalTime, elapsedTime,nil);
-    } repeats:YES];
+    if (error == nil) {
+        [_audioPlayer play];
+        self.audioPlayStatus = AudioPlayStatusPlaying;
+        
+        WeakSelfType blockSelf = self;
+        _timer = [NSTimer scheduledTimerWithTimeInterval:0.5 block:^{
+            float totalTime = blockSelf.audioPlayer.duration;
+            float elapsedTime = blockSelf.audioPlayer.currentTime;
+            if (block) {
+                block(totalTime, elapsedTime,nil);
+            }
+            
+            //更新监控属性
+            blockSelf.audioTotalTime = ceilf(totalTime);
+            blockSelf.audioElapsedTime = ceilf(elapsedTime);
+            if (blockSelf.audioTotalTime > 0) {
+                blockSelf.audioPlayProgress = blockSelf.audioElapsedTime / blockSelf.audioTotalTime;
+            }
+            else {
+                blockSelf.audioPlayProgress = 0;
+            }
+        } repeats:YES];
+    }
+    else {
+        if (block) {
+            block(0, 0,error);
+        }
+    }
 }
 
--(void)startStreamingRemoteAudioFromURL:(NSString *)url andBlock:(progressBlock)block {
-    NSURL *streamingURL = [NSURL URLWithString:url];
+//用来播放临时在线文件
+-(void)startStreamingRemoteAudioFromURL:(NSString *)url withBlock:(progressBlock)block {
+    NSURL *streamingURL = [NSURL URLWithString:[NSString URLEncode:url]];
     [self stop];
     _player = [[AVPlayer alloc]initWithURL:streamingURL];
     [_player play];
+    self.audioPlayStatus = AudioPlayStatusPlaying;
     
+    WeakSelfType blockSelf = self;
     _timer = [NSTimer scheduledTimerWithTimeInterval:0.5 block:^{
-        float totalTime = CMTimeGetSeconds(_player.currentItem.duration);
-        float elapsedTime = CMTimeGetSeconds(_player.currentItem.currentTime);
-        block(totalTime, elapsedTime,nil);
+        float totalTime = CMTimeGetSeconds(blockSelf.player.currentItem.duration);
+        float elapsedTime = CMTimeGetSeconds(blockSelf.player.currentItem.currentTime);
+        if (block) {
+            block(totalTime, elapsedTime,nil);
+        }
+        
+        //更新监控属性
+        blockSelf.audioTotalTime = ceilf(totalTime);
+        blockSelf.audioElapsedTime = ceilf(elapsedTime);
+        if (blockSelf.audioTotalTime > 0 && blockSelf.audioElapsedTime > 0) {
+            blockSelf.audioPlayProgress = blockSelf.audioElapsedTime / blockSelf.audioTotalTime;
+        }
+        else {
+            blockSelf.audioPlayProgress = 0;
+        }
     } repeats:YES];
 }
 
+//PlayRecordModelArray
 -(void)startPlayingAudio:(NSArray *)audioArray withIndex:(NSInteger)audioIndex {
-    self.audioPlayIndex = audioIndex;
-    //TODO:
+    [self.audioArray removeAllObjects];
+    [self.audioArray addObjectsFromArray:audioArray];
+    
+    [self playAudioAtIndex:audioIndex];
 }
 
--(void)playCurrentAudio {
-    [self stop];
-    PlayRecordModel *playRecord = self.audioArray[self.audioPlayIndex];
-    
-    //1. 判断播放本地文件还是网络文件
-    
-    //2. 开始播放
-    
-    //3. 更新数据库信息
+-(void)playAudioAtIndex:(NSInteger)playIndex {
+    if (playIndex >= 0 && playIndex < [self.audioArray count]) {
+        self.audioPlayIndex = playIndex;
+        PlayRecordModel *playRecord = self.audioArray[self.audioPlayIndex];
+        if ([FileUtils isExistsAtPath:playRecord.audioLocalPath]) {//如果是本地文件
+            [self startPlayingLocalFileWithName:playRecord.audioLocalPath withBlock:nil];
+            [playRecord saveToSqlite];
+        }
+        else if ([NSString isUrl:playRecord.audioUrl]) {//如果是网络文件
+            [self startStreamingRemoteAudioFromURL:playRecord.audioUrl withBlock:nil];
+            [playRecord saveToSqlite];
+        }
+        else {
+//            [self playNextAudio];
+        }
+    }
+}
+-(BaseDataModel *)currentPlayingModel {
+    if (self.audioPlayIndex >= 0 && self.audioPlayIndex < [self.audioArray count]) {
+        return self.audioArray[self.audioPlayIndex];
+    }
+    else {
+        return nil;
+    }
+}
+
+- (void)setAudioPlayProgress:(CGFloat)audioPlayProgress {
+    NSLog(@"afs play progress = %f", audioPlayProgress);
+    _audioPlayProgress = audioPlayProgress;
+    if (audioPlayProgress >= 1.0f) {
+        [self stop];// OR [self playNextAudio]
+        //保存结束信息
+        if (self.audioPlayIndex >= 0 && self.audioPlayIndex < [self.audioArray count]) {
+            PlayRecordModel *playRecord = self.audioArray[self.audioPlayIndex];
+            [playRecord savePauseTimeToSqlite:@"OVER"];
+        }
+    }
+    else if (audioPlayProgress == 0) {
+        self.audioPlayStatus = AudioPlayStatusReadyToPlay;
+        self.audioElapsedTime = 0;
+    }
+    else {
+        self.audioPlayStatus = AudioPlayStatusPlaying;
+    }
 }
 
 -(void)pause {
     [_audioPlayer pause];
     [_player pause];
     [_timer pauseTimer];
+    self.audioPlayStatus = AudioPlayStatusPause;
+    
+    //保存暂停信息
+    if (self.audioPlayIndex >= 0 && self.audioPlayIndex < [self.audioArray count]) {
+        PlayRecordModel *playRecord = self.audioArray[self.audioPlayIndex];
+        [playRecord savePauseTimeToSqlite:[[NSDate dateFromTimeInterval:self.audioElapsedTime] stringWithFormat:@"mm:ss"]];
+    }
 }
 
 -(void)resume {
     [_audioPlayer play];
     [_player play];
     [_timer resumeTimer];
+    self.audioPlayStatus = AudioPlayStatusPlaying;
 }
 
 -(void)stop {
     [_audioPlayer stop];
     _player = nil;
     [_timer pauseTimer];
+    
+    self.audioPlayProgress = 0;
 }
 
 -(void)restart {
@@ -95,19 +179,25 @@
     
     int32_t timeScale = _player.currentItem.asset.duration.timescale;
     [_player seekToTime:CMTimeMake(0.000000, timeScale)];
+    self.audioPlayStatus = AudioPlayStatusPlaying;
+}
+-(void)reset {
+    [self stop];
+    self.audioPlayIndex = -1;
+    [self.audioArray removeAllObjects];
 }
 
 -(void)playNextAudio {
-    if (self.audioPlayIndex + 1 < [self.audioArray count]) {
-        self.audioPlayIndex++;
-        [self playCurrentAudio];
+    NSInteger newPlayIndex = self.audioPlayIndex + 1; //TODO:recycle
+    if (newPlayIndex < [self.audioArray count]) {
+        [self playAudioAtIndex:newPlayIndex];
     }
 }
 
 -(void)playPreviousAudio {
-    if ((self.audioPlayIndex - 1) >= 0 && (self.audioPlayIndex - 1) < [self.audioArray count]) {
-        self.audioPlayIndex--;
-        [self playCurrentAudio];
+    NSInteger newPlayIndex = self.audioPlayIndex - 1; //TODO:recycle
+    if (newPlayIndex >= 0 && newPlayIndex < [self.audioArray count]) {
+        [self playAudioAtIndex:newPlayIndex];
     }
 }
 
@@ -175,27 +265,20 @@
 }
 
 -(BOOL)areHeadphonesConnected {
-    
     AVAudioSessionRouteDescription *route = [[AVAudioSession sharedInstance]currentRoute];
-    
     BOOL headphonesLocated = NO;
-    
     for (AVAudioSessionPortDescription *portDescription in route.outputs) {
-        
         headphonesLocated |= ([portDescription.portType isEqualToString:AVAudioSessionPortHeadphones]);
     }
-    
     return headphonesLocated;
 }
 
 -(void)forceOutputToDefaultDevice {
-    
     [AFAudioRouter initAudioSessionRouting];
     [AFAudioRouter switchToDefaultHardware];
 }
 
 -(void)forceOutputToBuiltInSpeakers {
-    
     [AFAudioRouter initAudioSessionRouting];
     [AFAudioRouter forceOutputToBuiltInSpeakers];
 }

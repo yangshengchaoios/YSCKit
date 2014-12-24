@@ -116,7 +116,7 @@
     WeakSelfType blockSelf = self;
     
     //view基本参数设置
-    if ([NSString isEmpty:self.navigationItem.title]) {//已经有标题的就不再设置了
+    if ([NSString isEmpty:self.navigationItem.title] && [NSString isNotEmpty:self.params[kParamTitle]]) {//已经有标题的就不再设置了
         self.navigationItem.title = self.params[kParamTitle];
     }
     self.view.clipsToBounds = YES;

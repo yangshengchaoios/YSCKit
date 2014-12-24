@@ -40,7 +40,7 @@
     #import "UIImageView+Additions.h"
     #import "UIDevice+Additions.h"
     #import "UIResponder+Additions.h"
-#import "NSLayoutConstraint+Additions.h"
+    #import "NSLayoutConstraint+Additions.h"
 
     //Utils
     #import "FileUtils.h"
@@ -69,6 +69,8 @@
     #import "BaseCollectionViewCell.h"
     #import "BaseTableViewHeaderFooterView.h"
     #import "BaseCollectionHeaderFooterView.h"
+
+#import "AFSoundManager.h"
 #endif
 
 

@@ -88,14 +88,14 @@
 /**
  *  /Library/Caches/UserId/Audioes/
  *
- *  @return 用户图片目录
+ *  @return 用户音频目录
  */
 - (NSString *)directoryPathOfAudioByUserId;
 
 /**
  *  /Library/Caches/UserId/Videoes/
  *
- *  @return 用户图片目录
+ *  @return 用户视频目录
  */
 - (NSString *)directoryPathOfVideoByUserId;
 

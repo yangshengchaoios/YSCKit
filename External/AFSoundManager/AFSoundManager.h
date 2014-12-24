@@ -12,6 +12,14 @@
 #import <objc/runtime.h>
 
 #import "AFAudioRouter.h"
+
+typedef NS_ENUM(NSInteger, AudioPlayStatus) {
+    AudioPlayStatusReadyToPlay = 0,
+    AudioPlayStatusPlaying,
+    AudioPlayStatusPause,
+    AudioPlayStatusPlayError
+};
+
 typedef void (^progressBlock)(CGFloat totalTime, CGFloat elapsedTime, NSError *error);
 
 
@@ -28,16 +36,21 @@ typedef void (^progressBlock)(CGFloat totalTime, CGFloat elapsedTime, NSError *e
 @property (nonatomic, assign) CGFloat audioPlayProgress;    //当前播放的进度百分比
 @property (nonatomic, assign) CGFloat audioTotalTime;       //音频总时长(s)
 @property (nonatomic, assign) CGFloat audioElapsedTime;     //已经播放的时长(s)
-@property (nonatomic, assign) BOOL isAudioPlaying;          //当前的音频是否正在播放
+@property (nonatomic, assign) AudioPlayStatus audioPlayStatus;          //当前的音频的播放状态
 
--(void)startPlayingLocalFileWithName:(NSString *)name andBlock:(progressBlock)block;
--(void)startStreamingRemoteAudioFromURL:(NSString *)url andBlock:(progressBlock)block;
+-(void)startPlayingLocalFileWithName:(NSString *)name withBlock:(progressBlock)block;
+-(void)startStreamingRemoteAudioFromURL:(NSString *)url withBlock:(progressBlock)block;
+
+//PlayRecordModelArray
 -(void)startPlayingAudio:(NSArray *)audioArray withIndex:(NSInteger)audioIndex;
+-(void)playAudioAtIndex:(NSInteger)playIndex;
+-(BaseDataModel *)currentPlayingModel;
 
 -(void)pause;
 -(void)resume;
 -(void)stop;
 -(void)restart;
+-(void)reset;
 
 -(void)playNextAudio;
 -(void)playPreviousAudio;
