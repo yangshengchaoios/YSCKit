@@ -257,6 +257,7 @@ NSString * const TCHTTPStatusCode = @"httpStatus";
     }
     
     dispatch_async(dispatch_get_main_queue(), ^{
+        self.downloadProgress = self.progress;
         if (self.progressBlock) {
             self.progressBlock(self.receivedDataLength, self.expectedDataLength, self.remainingTime, self.progress);
         }

@@ -31,20 +31,19 @@ typedef void (^progressBlock)(CGFloat totalTime, CGFloat elapsedTime, NSError *e
 @property (nonatomic, strong) AVPlayer *player;
 @property (nonatomic, strong) AVAudioRecorder *recorder;
 
-@property (nonatomic, strong) NSMutableArray *audioArray;   //<PlayRecordModel>
+@property (nonatomic, copy) BookModel *currentPlayingBook;  //当前播放的书籍
 @property (nonatomic, assign) NSInteger audioPlayIndex;     //当前播放的下标
 @property (nonatomic, assign) CGFloat audioPlayProgress;    //当前播放的进度百分比
 @property (nonatomic, assign) CGFloat audioTotalTime;       //音频总时长(s)
 @property (nonatomic, assign) CGFloat audioElapsedTime;     //已经播放的时长(s)
 @property (nonatomic, assign) AudioPlayStatus audioPlayStatus;          //当前的音频的播放状态
 
--(void)startPlayingLocalFileWithName:(NSString *)name withBlock:(progressBlock)block;
+-(void)startPlayingLocalFileWithPath:(NSString *)name withBlock:(progressBlock)block;
 -(void)startStreamingRemoteAudioFromURL:(NSString *)url withBlock:(progressBlock)block;
 
-//PlayRecordModelArray
--(void)startPlayingAudio:(NSArray *)audioArray withIndex:(NSInteger)audioIndex;
+-(void)startPlayingBook:(BookModel *)bookModel withIndex:(NSInteger)audioIndex;
 -(void)playAudioAtIndex:(NSInteger)playIndex;
--(BaseDataModel *)currentPlayingModel;
+-(ChapterModel *)currentPlayingChapter;
 
 -(void)pause;
 -(void)resume;

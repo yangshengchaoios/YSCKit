@@ -23,13 +23,12 @@
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         soundManager = [[self alloc]init];
-        soundManager.audioArray = [NSMutableArray array];
     });
     
     return soundManager;
 }
 
--(void)startPlayingLocalFileWithName:(NSString *)filePath withBlock:(progressBlock)block {
+-(void)startPlayingLocalFileWithPath:(NSString *)filePath withBlock:(progressBlock)block {
     NSURL *fileURL = [NSURL fileURLWithPath:filePath];
     [self stop];
     NSError *error = nil;
@@ -66,7 +65,7 @@
 
 //用来播放临时在线文件
 -(void)startStreamingRemoteAudioFromURL:(NSString *)url withBlock:(progressBlock)block {
-    NSURL *streamingURL = [NSURL URLWithString:[NSString URLEncode:url]];
+    NSURL *streamingURL = [NSURL URLWithString:url];
     [self stop];
     _player = [[AVPlayer alloc]initWithURL:streamingURL];
     [_player play];
@@ -92,34 +91,29 @@
     } repeats:YES];
 }
 
-//PlayRecordModelArray
--(void)startPlayingAudio:(NSArray *)audioArray withIndex:(NSInteger)audioIndex {
-    [self.audioArray removeAllObjects];
-    [self.audioArray addObjectsFromArray:audioArray];
-    
+-(void)startPlayingBook:(BookModel *)bookModel withIndex:(NSInteger)audioIndex {
+    self.currentPlayingBook = bookModel;
     [self playAudioAtIndex:audioIndex];
 }
 
 -(void)playAudioAtIndex:(NSInteger)playIndex {
-    if (playIndex >= 0 && playIndex < [self.audioArray count]) {
+    if (playIndex >= 0 && playIndex < [self.currentPlayingBook.chapters count]) {
         self.audioPlayIndex = playIndex;
-        PlayRecordModel *playRecord = self.audioArray[self.audioPlayIndex];
+        ChapterModel *playRecord = self.currentPlayingBook.chapters[self.audioPlayIndex];
         if ([FileUtils isExistsAtPath:playRecord.audioLocalPath]) {//如果是本地文件
-            [self startPlayingLocalFileWithName:playRecord.audioLocalPath withBlock:nil];
-            [playRecord saveToSqlite];
+            [self startPlayingLocalFileWithPath:playRecord.audioLocalPath withBlock:nil];
         }
         else if ([NSString isUrl:playRecord.audioUrl]) {//如果是网络文件
             [self startStreamingRemoteAudioFromURL:playRecord.audioUrl withBlock:nil];
-            [playRecord saveToSqlite];
         }
         else {
 //            [self playNextAudio];
         }
     }
 }
--(BaseDataModel *)currentPlayingModel {
-    if (self.audioPlayIndex >= 0 && self.audioPlayIndex < [self.audioArray count]) {
-        return self.audioArray[self.audioPlayIndex];
+-(ChapterModel *)currentPlayingChapter {
+    if (self.audioPlayIndex >= 0 && self.audioPlayIndex < [self.currentPlayingBook.chapters count]) {
+        return self.currentPlayingBook.chapters[self.audioPlayIndex];
     }
     else {
         return nil;
@@ -131,11 +125,7 @@
     _audioPlayProgress = audioPlayProgress;
     if (audioPlayProgress >= 1.0f) {
         [self stop];// OR [self playNextAudio]
-        //保存结束信息
-        if (self.audioPlayIndex >= 0 && self.audioPlayIndex < [self.audioArray count]) {
-            PlayRecordModel *playRecord = self.audioArray[self.audioPlayIndex];
-            [playRecord savePauseTimeToSqlite:@"OVER"];
-        }
+        //TODO:保存结束信息
     }
     else if (audioPlayProgress == 0) {
         self.audioPlayStatus = AudioPlayStatusReadyToPlay;
@@ -152,11 +142,7 @@
     [_timer pauseTimer];
     self.audioPlayStatus = AudioPlayStatusPause;
     
-    //保存暂停信息
-    if (self.audioPlayIndex >= 0 && self.audioPlayIndex < [self.audioArray count]) {
-        PlayRecordModel *playRecord = self.audioArray[self.audioPlayIndex];
-        [playRecord savePauseTimeToSqlite:[[NSDate dateFromTimeInterval:self.audioElapsedTime] stringWithFormat:@"mm:ss"]];
-    }
+    //TODO:保存暂停信息
 }
 
 -(void)resume {
@@ -184,19 +170,22 @@
 -(void)reset {
     [self stop];
     self.audioPlayIndex = -1;
-    [self.audioArray removeAllObjects];
+    self.currentPlayingBook = nil;
 }
 
 -(void)playNextAudio {
-    NSInteger newPlayIndex = self.audioPlayIndex + 1; //TODO:recycle
-    if (newPlayIndex < [self.audioArray count]) {
+    NSInteger newPlayIndex = self.audioPlayIndex + 1;
+    if ([[NSUserDefaults standardUserDefaults] boolForKey:kParamIsPlayCycle]) {
+        newPlayIndex = newPlayIndex % [self.currentPlayingBook.chapters count];
+    }
+    if (newPlayIndex < [self.currentPlayingBook.chapters count]) {
         [self playAudioAtIndex:newPlayIndex];
     }
 }
 
 -(void)playPreviousAudio {
-    NSInteger newPlayIndex = self.audioPlayIndex - 1; //TODO:recycle
-    if (newPlayIndex >= 0 && newPlayIndex < [self.audioArray count]) {
+    NSInteger newPlayIndex = self.audioPlayIndex - 1;
+    if (newPlayIndex >= 0 && newPlayIndex < [self.currentPlayingBook.chapters count]) {
         [self playAudioAtIndex:newPlayIndex];
     }
 }
@@ -228,7 +217,6 @@
 }
 
 -(void)startRecordingAudioWithFileName:(NSString *)name andExtension:(NSString *)extension shouldStopAtSecond:(NSTimeInterval)second {
-    
     _recorder = [[AVAudioRecorder alloc]initWithURL:[NSURL fileURLWithPath:[NSString stringWithFormat:@"%@/%@.%@", [NSHomeDirectory() stringByAppendingString:@"/Documents"], name, extension]] settings:nil error:nil];
     
     if (second == 0 && !second) {
