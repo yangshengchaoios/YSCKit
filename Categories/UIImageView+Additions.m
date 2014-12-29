@@ -69,8 +69,14 @@
                 autoThumbnail:(BOOL)thumbnail
                    withFadeIn:(BOOL)withAnimate
                     completed:(SetImageCompletionBlock)complete {
+    WeakSelfType blockSelf = self;
     //设置基本参数
-    self.image = nil;
+    if (placeholderImage == nil) {
+        self.image = DefaultPlaceholderImage;
+    }
+    else {
+        self.image = placeholderImage;
+    }
     self.clipsToBounds = YES;
     self.backgroundColor = DefaultBackgroundColor;
     NSString *newUrlString = [NSString trimString:[urlString copy]];
@@ -86,7 +92,6 @@
         }
     }
     else {
-        self.image = DefaultPlaceholderImage;
         return;
     }
     
@@ -95,19 +100,13 @@
         newUrlString = [[NSString replaceString:kResPathAppResUrl byRegex:@"/+$" to:@""] stringByAppendingFormat:@"/%@",
                        [NSString replaceString:newUrlString byRegex:@"^/+" to:@""]];
     }
-    if ([NSString isNotUrl:newUrlString]) {//处理相对路径后仍然不是合法的url，则返回默认图片
-        self.image = DefaultPlaceholderImage;
+    //处理相对路径后仍然不是合法的url，则返回默认图片
+    if ([NSString isNotUrl:newUrlString]) {
         return;
     }
     
-    NSURL *imageUrl = [NSURL URLWithString:newUrlString];
-    if ([NSObject isEmpty:placeholderImage]) {
-        placeholderImage = DefaultPlaceholderImage;
-    }
-    WeakSelfType blockSelf = self;
-    
     //采用SDWebImage的缓存方案
-    [self sd_setImageWithURL:imageUrl
+    [self sd_setImageWithURL:[NSURL URLWithString:newUrlString]
             placeholderImage:placeholderImage
                    completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL)  {
                        if ( ! error) {
