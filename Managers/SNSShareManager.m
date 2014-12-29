@@ -44,7 +44,7 @@
     return [UMSocialSnsPlatformManager getSocialPlatformWithName:platformName];
 }
 
-
+#pragma mark - 分享功能
 
 + (void)ShareWithContent:(NSString *)content
                    image:(UIImage *)image
@@ -53,7 +53,16 @@
     NSString *platformName = [self PlatformTypeOfUMeng:shareType];
     //调用UMeng的社会化分享控件
     if (platformName) {
-        [[UMSocialDataService defaultDataService] postSNSWithTypes:@[platformName] content:content image:image location:nil urlResource:nil presentedController:nil completion:result];
+        [[UMSocialDataService defaultDataService] postSNSWithTypes:@[platformName]
+                                                           content:content
+                                                             image:image
+                                                          location:nil
+                                                       urlResource:nil
+                                               presentedController:nil
+                                                        completion:result];
+    }
+    else {
+        result(nil);
     }
 }
 

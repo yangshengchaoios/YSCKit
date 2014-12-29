@@ -79,7 +79,7 @@
     [UMSocialData openLog:YES];
     
     //如果你要支持不同的屏幕方向，需要这样设置，否则在iPhone只支持一个竖屏方向
-    [UMSocialConfig setSupportedInterfaceOrientations:UIInterfaceOrientationMaskAll];
+//    [UMSocialConfig setSupportedInterfaceOrientations:UIInterfaceOrientationMaskAll];
     
     //设置友盟社会化组件appkey
     [UMSocialData setAppKey:kUMAppKey];
@@ -91,12 +91,9 @@
     [UMSocialSinaHandler openSSOWithRedirectURL:AppRedirectUrlOfWeibo];
     
     //打开腾讯微博SSO开关，设置回调地址
-    //    [UMSocialTencentWeiboHandler openSSOWithRedirectUrl:AppRedirectUrlOfWeibo];
+//    [UMSocialTencentWeiboHandler openSSOWithRedirectUrl:AppRedirectUrlOfWeibo];
     
-    
-    //设置分享到QQ空间的应用Id，和分享url 链接
-    [UMSocialQQHandler setQQWithAppId:AppKeyQQ appKey:AppSecretQQ url:AppRedirectUrlOfWeibo];
-    //设置支持没有客户端情况下使用SSO授权
+    //设置支持没有客户端情况下是否支持单独授权
     [UMSocialQQHandler setSupportWebView:YES];
     
     

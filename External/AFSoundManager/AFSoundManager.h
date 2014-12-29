@@ -30,6 +30,8 @@ typedef void (^progressBlock)(CGFloat totalTime, CGFloat elapsedTime, NSError *e
 @property (nonatomic, strong) AVAudioPlayer *audioPlayer;
 @property (nonatomic, strong) AVPlayer *player;
 @property (nonatomic, strong) AVAudioRecorder *recorder;
+@property (nonatomic, strong) UISlider* volumeViewSlider;
+@property (nonatomic, assign) CGFloat currentVolume;        //监控该参数更新UI界面
 
 @property (nonatomic, copy) BookModel *currentPlayingBook;  //当前播放的书籍
 @property (nonatomic, assign) NSInteger audioPlayIndex;     //当前播放的下标
@@ -44,6 +46,7 @@ typedef void (^progressBlock)(CGFloat totalTime, CGFloat elapsedTime, NSError *e
 -(void)startPlayingBook:(BookModel *)bookModel withIndex:(NSInteger)audioIndex;
 -(void)playAudioAtIndex:(NSInteger)playIndex;
 -(ChapterModel *)currentPlayingChapter;
+- (CGFloat)getCurrentVolume;//获得初始化音量必须调用该方法
 
 -(void)pause;
 -(void)resume;

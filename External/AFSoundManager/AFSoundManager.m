@@ -8,6 +8,11 @@
 
 #import "AFSoundManager.h"
 
+#import <MediaPlayer/MediaPlayer.h>
+
+#import <AudioToolbox/AudioToolbox.h>
+#import <AVFoundation/AVFoundation.h>
+
 @interface AFSoundManager ()
 
 @property (nonatomic, strong) NSTimer *timer;
@@ -23,9 +28,52 @@
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         soundManager = [[self alloc]init];
+        
+        //初始化系统音量控制
+        MPVolumeView *volumeView = [[MPVolumeView alloc] init];
+        for (UIView *view in [volumeView subviews]){
+            if ([view isKindOfClass:NSClassFromString(@"MPVolumeSlider")]) {
+                soundManager.volumeViewSlider = (UISlider*)view;
+                break;
+            }
+        }
+        
+//        //监控调整硬件上的音量控制器
+//        NSError *error;
+//        [[AVAudioSession sharedInstance] setActive:YES error:&error];
+//        [[NSNotificationCenter defaultCenter] addObserver:soundManager selector:@selector(volumeChanged:) name:@"AVSystemController_SystemVolumeDidChangeNotification" object:nil];
     });
     
     return soundManager;
+}
+
+- (void)volumeChanged:(NSNotification *)notification {
+    if (self.volumeViewSlider) {
+        _currentVolume = self.volumeViewSlider.value;
+    }
+    else {
+        _currentVolume = self.audioPlayer.volume;
+    }
+}
+
+//获得初始化音量必须调用该方法
+- (CGFloat)getCurrentVolume {
+    if (self.volumeViewSlider) {
+        return self.volumeViewSlider.value;
+    }
+    else {
+        return self.audioPlayer.volume;
+    }
+}
+
+- (void)setCurrentVolume:(CGFloat)currentVolume {
+    _currentVolume = currentVolume;
+    if (self.volumeViewSlider) {
+        [self.volumeViewSlider setValue:currentVolume]; //这里会自动触发针对currentVolume的监控回调
+    }
+    else {
+        [self.audioPlayer setVolume:currentVolume];
+    }
 }
 
 -(void)startPlayingLocalFileWithPath:(NSString *)filePath withBlock:(progressBlock)block {
@@ -109,6 +157,21 @@
         else {
 //            [self playNextAudio];
         }
+        
+        if (ISLOGGED) {
+            //更新播放记录
+            [AFNManager getDataWithAPI:kResPathAppModifyPlayRecord
+                          andDictParam:@{kParamUserId : USERID,
+                                         kParamBookId : self.currentPlayingBook.bookId,
+                                         kParamChapterId : playRecord.chapterId}
+                             modelName:nil
+                      requestSuccessed:^(id responseObject) {
+                          NSLog(@"更新播放记录成功");
+                      }
+                        requestFailure:^(NSInteger errorCode, NSString *errorMessage) {
+                            NSLog(@"error:%@", errorMessage);
+                        }];
+        }
     }
 }
 -(ChapterModel *)currentPlayingChapter {
@@ -121,11 +184,14 @@
 }
 
 - (void)setAudioPlayProgress:(CGFloat)audioPlayProgress {
-    NSLog(@"afs play progress = %f", audioPlayProgress);
     _audioPlayProgress = audioPlayProgress;
     if (audioPlayProgress >= 1.0f) {
-        [self stop];// OR [self playNextAudio]
-        //TODO:保存结束信息
+        if ([[NSUserDefaults standardUserDefaults] boolForKey:kParamIsPlayCycle]) {
+            [self playNextAudio];
+        }
+        else {
+            [self stop];
+        }
     }
     else if (audioPlayProgress == 0) {
         self.audioPlayStatus = AudioPlayStatusReadyToPlay;
