@@ -5,7 +5,7 @@
 //  Copyright (c) 2013 Thibault Charbonnier. All rights reserved.
 //
 
-static const double kBufferSize = 3*1024*1024; // 3 MB
+static const double kBufferSize = 1 * 1024; // 1 KB
 static const NSTimeInterval kDefaultRequestTimeout = 60;
 static const NSInteger kNumberOfSamples = 5;
 static NSString * const kErrorDomain = @"com.thibaultcha.tcblobdownload";
@@ -32,6 +32,7 @@ NSString * const TCHTTPStatusCode = @"httpStatus";
 @property (nonatomic, assign) uint64_t expectedDataLength;
 @property (nonatomic, assign) uint64_t receivedDataLength;
 @property (nonatomic, assign) uint64_t previousTotal;
+@property (nonatomic, assign) uint64_t downloadedFileSize;
 @property (nonatomic, assign, readwrite) NSInteger speedRate;
 @property (nonatomic, assign, readwrite) NSInteger remainingTime;
 // Blocks
@@ -123,11 +124,15 @@ NSString * const TCHTTPStatusCode = @"httpStatus";
         [fm createFileAtPath:self.pathToFile
                     contents:nil
                   attributes:nil];
+        self.receivedDataLength = 0;
+        self.downloadedFileSize = 0;
     }
     else {
         uint64_t fileSize = [[fm attributesOfItemAtPath:self.pathToFile error:nil] fileSize];
         NSString *range = [NSString stringWithFormat:@"bytes=%lld-", fileSize];
         [fileRequest setValue:range forHTTPHeaderField:@"Range"];
+        self.receivedDataLength = fileSize;
+        self.downloadedFileSize = fileSize;
     }
     
     // Initialization of everything we'll need to download the file
@@ -187,21 +192,14 @@ NSString * const TCHTTPStatusCode = @"httpStatus";
 - (void)connection:(NSURLConnection*)connection didReceiveResponse:(NSURLResponse *)response
 {
     NSHTTPURLResponse *httpUrlResponse = (NSHTTPURLResponse *)response;
-    
     if (httpUrlResponse.statusCode == 416) { // Requested range not satisfiable
         // Delete the file and retry (without the bad range header)
-        NSError *fileError;
-        [[NSFileManager defaultManager] removeItemAtPath:self.pathToFile error:&fileError];
-        if (!fileError) {
-            [self start];
-            return;
-        }
-        else {
-            TCLog(@"An error occured while removing file - %@", fileError);
-        }
+        [[NSFileManager defaultManager] removeItemAtPath:self.pathToFile error:nil];
+        [self start];
+        return;
     }
 
-    self.expectedDataLength = [response expectedContentLength];
+    self.expectedDataLength = [response expectedContentLength] + self.downloadedFileSize;
 
     NSError *error;
     
