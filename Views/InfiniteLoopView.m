@@ -7,7 +7,6 @@
 //
 
 #import "InfiniteLoopView.h"
-#import "SMPageControl.h"
 
 #define TagOfContentViewStart   56214
 #define HeightOfPageControl     20
@@ -16,7 +15,6 @@
 
 @property (nonatomic, strong) UIScrollView *scrollView;
 @property (nonatomic, strong) NSTimer *timer;
-@property (nonatomic, strong) SMPageControl *pageControl;
 @property (nonatomic, copy) PageDidChangedAtIndex pageDidChangedAtIndex;
 
 @end
