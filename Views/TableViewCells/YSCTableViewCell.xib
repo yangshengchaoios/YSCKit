@@ -59,9 +59,6 @@
                             </label>
                             <switch hidden="YES" opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="PHG-5n-Sin" userLabel="switch">
                                 <rect key="frame" x="571" y="19" width="51" height="31"/>
-                                <constraints>
-                                    <constraint firstAttribute="width" secondItem="PHG-5n-Sin" secondAttribute="height" multiplier="49:31" id="bmQ-KM-XmS"/>
-                                </constraints>
                                 <color key="onTintColor" red="1" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                 <connections>
                                     <action selector="stateChanged:" destination="QzL-IP-N49" eventType="valueChanged" id="aP3-NO-a3T"/>
@@ -86,7 +83,6 @@
                             <constraint firstAttribute="centerY" secondItem="Yvs-8y-vUL" secondAttribute="centerY" id="axy-jv-QCc"/>
                             <constraint firstItem="aos-Ng-hNR" firstAttribute="leading" secondItem="Hsk-mk-vIV" secondAttribute="leading" constant="88" id="dHb-pH-mV4"/>
                             <constraint firstAttribute="trailing" secondItem="MlT-a1-jib" secondAttribute="trailing" id="dZc-tu-Iho"/>
-                            <constraint firstItem="PHG-5n-Sin" firstAttribute="width" secondItem="Hsk-mk-vIV" secondAttribute="width" multiplier="49:640" id="e4N-Up-cCL"/>
                             <constraint firstItem="MlT-a1-jib" firstAttribute="top" secondItem="Hsk-mk-vIV" secondAttribute="top" id="hqG-Hp-gpm"/>
                             <constraint firstAttribute="trailing" secondItem="PHG-5n-Sin" secondAttribute="trailing" constant="20" id="lHp-Q9-Arx"/>
                             <constraint firstItem="sBm-Yw-eea" firstAttribute="leading" secondItem="Hsk-mk-vIV" secondAttribute="leading" constant="20" id="ngI-we-iiY"/>
