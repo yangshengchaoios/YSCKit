@@ -78,7 +78,7 @@
         self.image = placeholderImage;
     }
     self.clipsToBounds = YES;
-    self.backgroundColor = DefaultBackgroundColor;
+    self.backgroundColor = [UIColor clearColor];
     NSString *newUrlString = [NSString trimString:[urlString copy]];
     
     //判断是否本地图片
