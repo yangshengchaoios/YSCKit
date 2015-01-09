@@ -8,6 +8,12 @@
 
 #import <UIKit/UIKit.h>
 
+typedef void(^PullToRefreshSuccessed)(void);
+typedef void(^PullToRefreshFailed)(void);
+
 @interface BasePullToRefreshView : UIView
+
+@property (nonatomic, strong) UIView *segmentedControlView;
+@property (nonatomic, strong) UIScrollView *scrollView;
 
 @end
