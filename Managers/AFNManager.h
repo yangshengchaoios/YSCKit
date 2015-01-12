@@ -102,6 +102,6 @@ typedef NS_ENUM (NSInteger, RequestType) {
 
 
 //TODO:测试参数加密字符串
-//+ (NSString *)signatureWithParam:(NSDictionary *)param;
++ (NSString *)signatureWithParam:(NSDictionary *)param;
 
 @end
