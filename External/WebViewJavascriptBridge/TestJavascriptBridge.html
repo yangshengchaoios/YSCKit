@@ -1,0 +1,38 @@
+<!doctype html>
+<html><head>
+    <style type='text/css'>
+        html { font-family:Helvetica; color:#222; }
+        h1 { color:steelblue; font-size:24px; margin-top:24px; }
+        button { margin:0 3px 10px; font-size:12px; }
+        .logLine { border-bottom:1px solid #ccc; padding:4px 2px; font-family:courier; font-size:11px; }
+        </style>
+</head><body>
+    <h1>WebViewJavascriptBridge Demo</h1>
+    <script>
+        window.onerror = function(err) {
+
+        }
+    
+    function connectWebViewJavascriptBridge(callback) {
+        if (window.WebViewJavascriptBridge) {
+            callback(WebViewJavascriptBridge)
+        } else {
+            document.addEventListener('WebViewJavascriptBridgeReady', function() {
+                                      callback(WebViewJavascriptBridge)
+                                      }, false)
+        }
+    }
+    
+    connectWebViewJavascriptBridge(function(bridge) {
+                                   var callbackButton = document.getElementById('buttons').appendChild(document.createElement('button'))
+                                   callbackButton.innerHTML = 'goBack'
+                                   callbackButton.onclick = function(e) {
+                                        e.preventDefault()
+                                        //bridge.callHandler('goBack', {'foo': 'bar'}, function(response) {})
+                                        bridge.callHandler('startPlay', {'fileName' : 'fall.wav'}, function(response) {})
+                                        //bridge.callHandler('stopPlay', {'fileName' : ''}, function(response) {})
+                                   }
+                                   })
+        </script>
+    <div id='buttons'></div>
+</body></html>

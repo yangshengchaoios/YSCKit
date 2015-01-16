@@ -14,6 +14,7 @@
 + (instancetype)sharedInstance;
 
 - (void)playWithAudioType:(AudioType)type repeatCount:(NSInteger)count;
+- (void)playWithAudioFile:(NSString *)filePath;
 - (void)stopPlaying;
 
 @end

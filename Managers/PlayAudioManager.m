@@ -40,6 +40,20 @@
 	}
 }
 
+- (void)playWithAudioFile:(NSString *)filePath {
+    if ([FileUtils isExistsAtPath:filePath]) {
+        AVAudioSession *audioSession = [AVAudioSession sharedInstance];
+        [audioSession setCategory:AVAudioSessionCategoryAmbient withOptions:AVAudioSessionCategoryOptionDefaultToSpeaker error:nil];
+        [audioSession setActive:YES error:nil];
+        NSURL *soundURL = [[NSURL alloc] initFileURLWithPath:filePath];
+        self.audioPlayer = [[AVAudioPlayer alloc] initWithContentsOfURL:soundURL error:nil];
+        [self.audioPlayer prepareToPlay];
+        [self.audioPlayer setNumberOfLoops:0];
+        [self.audioPlayer setDelegate:self];
+        [self.audioPlayer play];
+    }
+}
+
 - (void)stopPlaying {
     if (self.audioPlayer) {
         [self.audioPlayer stop];
