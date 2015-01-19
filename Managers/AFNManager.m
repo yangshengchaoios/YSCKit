@@ -234,6 +234,7 @@
         if ([responseObject isKindOfClass:[NSData class]]) {
             responseObject = [[NSString alloc] initWithData:responseObject encoding:NSUTF8StringEncoding];
         }
+        responseObject = [NSString replaceString:responseObject byRegex:@"[\r\n\t]" to:@""];
         NSLog(@"request success! \r\noperation=%@\r\nresponseObject=%@", operation, responseObject);
         JSONModelError *initError;
         BaseModel *baseModel = nil;
