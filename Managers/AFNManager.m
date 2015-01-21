@@ -265,7 +265,6 @@
             [LogManager saveLog:error.localizedDescription];
             if (401 == operation.response.statusCode) {
                 requestFailure(1003, @"您还未登录呢！");
-                [[Login sharedInstance] clearLoginData];
             }
             else {
                 requestFailure(1004, @"网络错误！");

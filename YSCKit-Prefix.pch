@@ -60,19 +60,13 @@
     //自定义view(对于全局需要使用的自定义view放这里)
 
     //业务逻辑相关
-    #import "DataModel.h"
-    #import "RegionModel.h"
-    #import "Login.h"
+    #import "BaseModel.h"
     #import "BasePullToRefreshTableViewController.h"
     #import "BasePullToRefreshCollectionViewController.h"
     #import "BaseTableViewCell.h"
     #import "BaseCollectionViewCell.h"
     #import "BaseTableViewHeaderFooterView.h"
     #import "BaseCollectionHeaderFooterView.h"
-
-#import "AFSoundManager.h"
-#import "TCBlobDownload.h"
-#import "ABAudioDownloader.h"
 #endif
 
 
