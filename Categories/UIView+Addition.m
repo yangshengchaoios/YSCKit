@@ -346,6 +346,18 @@
 
 
 #pragma mark -  show & hide HUD
+- (MBProgressHUD *)showHUDLoading:(NSString *)hintString {
+    MBProgressHUD *hud = [MBProgressHUD HUDForView:self];
+    if (hud) {
+        [hud show:YES];
+    }
+    else {
+        hud = [MBProgressHUD showHUDAddedTo:self animated:YES];
+    }
+    hud.labelText = hintString;
+    hud.mode = MBProgressHUDModeIndeterminate;
+    return hud;
+}
 + (MBProgressHUD *)showHUDLoadingOnWindow:(NSString *)hintString {
     UIView *view = [UIApplication sharedApplication].keyWindow;
 	MBProgressHUD *hud = [MBProgressHUD HUDForView:view];
@@ -360,12 +372,26 @@
 	return hud;
 }
 
+- (void)hideHUDLoading {
+    MBProgressHUD *hud = [MBProgressHUD HUDForView:self];
+    [hud hide:YES];
+}
 + (void)hideHUDLoadingOnWindow {
     UIView *view = [UIApplication sharedApplication].keyWindow;
     MBProgressHUD *hud = [MBProgressHUD HUDForView:view];
 	[hud hide:YES];
 }
 
+- (void)showResultThenHide:(NSString *)resultString {
+    MBProgressHUD *hud = [MBProgressHUD HUDForView:self];
+    if (!hud) {
+        hud = [MBProgressHUD showHUDAddedTo:self animated:YES];
+    }
+    hud.labelText = resultString;
+    hud.mode = MBProgressHUDModeText;
+    [hud show:YES];
+    [hud hide:YES afterDelay:1];
+}
 + (void)showResultThenHideOnWindow:(NSString *)resultString {
     UIView *view = [UIApplication sharedApplication].keyWindow;
     MBProgressHUD *hud = [MBProgressHUD HUDForView:view];

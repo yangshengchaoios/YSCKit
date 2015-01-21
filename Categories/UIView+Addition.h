@@ -92,8 +92,11 @@
  *
  */
 #pragma mark -  show & hide HUD
+- (MBProgressHUD *)showHUDLoading:(NSString *)hintString;
 + (MBProgressHUD *)showHUDLoadingOnWindow:(NSString *)hintString;
+- (void)hideHUDLoading;
 + (void)hideHUDLoadingOnWindow;
+- (void)showResultThenHide:(NSString *)resultString;
 + (void)showResultThenHideOnWindow:(NSString *)resultString;
 
 #pragma mark - alert view

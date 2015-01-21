@@ -19,7 +19,7 @@
     
     [AFNManager getDataWithAPI:kResPathAppUpdateNewVersion
                   andDictParam:nil
-                     modelName:Class(NewVersionModel)
+                     modelName:ClassOfObject(NewVersionModel)
               requestSuccessed: ^(id responseObject) {
                   NewVersionModel * versionModel = (NewVersionModel *)responseObject;
                   if ([NSObject isNotEmpty:versionModel]) {
