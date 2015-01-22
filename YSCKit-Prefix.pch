@@ -60,7 +60,7 @@
     //自定义view(对于全局需要使用的自定义view放这里)
 
     //业务逻辑相关
-    #import "BaseModel.h"
+    #import "DataModel.h"
     #import "BasePullToRefreshTableViewController.h"
     #import "BasePullToRefreshCollectionViewController.h"
     #import "BaseTableViewCell.h"
