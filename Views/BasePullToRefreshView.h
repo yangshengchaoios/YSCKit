@@ -11,9 +11,15 @@
 #import "MJRefresh.h"
 
 typedef NS_ENUM(NSInteger, ContentViewType) {
-    ContentViewTypeTableView = 0,
+    ContentViewTypeTableView = 0,       //默认
     ContentViewTypeCollectionView,
     ContentViewTypeScrollView
+};
+
+typedef NS_ENUM(NSInteger, UITableViewSeperatorType) {
+    UITableViewSeperatorTypeEdge = 0, //默认
+    UITableViewSeperatorTypeCustom,     //cell里自定义
+    UITableViewSeperatorTypeFull
 };
 
 //-------------------定义block类型-----------------------------------------------------
@@ -38,10 +44,20 @@ typedef NSString *(^HintStringAtIndex)(NSInteger index);                 //没�
 typedef UIView *(^LayoutCell)(id data, NSIndexPath *indexPath, NSInteger index); //根据数据来布局界面
 typedef RequestType (^RequestTypeAtIndex)(NSInteger index);              //
 
+//UITableView特有
+typedef CGFloat (^TableViewCellHeightAtIndex)(id data, NSIndexPath *indexPath, NSInteger index);
+typedef UIColor *(^TableViewSeperatorColorAtIndex)(NSInteger index);
+typedef UITableViewSeperatorType (^TableViewSeperatorTypeAtIndex)(NSInteger index);
+typedef UIEdgeInsets (^TableViewSeperatorEdgeInsetAtIndex)(NSInteger index);
+//UICollectionView特有
+typedef CGSize (^ItemSizeAtIndex)(NSInteger index);
+typedef UIEdgeInsets (^ItemEdgeInsetsAtIndex)(NSInteger index);
+typedef CGFloat (^MinimumRowSpacingForSectionAtIndex)(NSInteger section, NSInteger index);//cell的最小行间距
+typedef CGFloat (^MinimumColumnSpacingForSectionAtIndex)(NSInteger section, NSInteger index);//cell的最小列间距
+
 #pragma mark - 可选设置的block
 typedef void(^PullToRefreshSuccessedAtIndex)(NSInteger index);                  //接口返回成功的回调
 typedef void(^PullToRefreshFailedAtIndex)(NSInteger index);                     //接口返回失败的回调
-typedef NSString *(^SegmentTitleAtIndex)(NSInteger index);                      //每个segment的title
 typedef void (^ClickCell)(id data, NSIndexPath *indexPath, NSInteger index);    //点击某个cell
 
 
@@ -57,9 +73,10 @@ typedef void (^ClickCell)(id data, NSIndexPath *indexPath, NSInteger index);    
 //-------------------必要的属性---------------------------------------------------------
 #pragma mark - 必要的属性
 @property (nonatomic, strong) UIScrollView *scrollView;
-@property (nonatomic, strong) HMSegmentedControl *segmentedControlView;
+@property (nonatomic, strong) HMSegmentedControl *segmentedControl;
+@property (nonatomic, strong) NSArray *segmentedTitleArray;          //用于控制contentView的个数
 @property (nonatomic, strong) NSMutableArray *contentDataArray;             //二维数组
-@property (nonatomic, strong) NSMutableArray *contentViewArray;             //
+@property (nonatomic, strong) NSMutableArray *contentViewArray;             //contentView数组
 @property (nonatomic, strong) NSMutableArray *contentPageIndexArray;        //分页的页码
 @property (nonatomic, assign) NSInteger currentIndex;                       //当前的contentView位置
 
@@ -70,7 +87,8 @@ typedef void (^ClickCell)(id data, NSIndexPath *indexPath, NSInteger index);    
 @property (nonatomic, copy) NibNameOfCellAtIndex nibNameOfCellAtIndex;
 
 #pragma mark - 已有默认定义的属性
-@property (nonatomic, assign) NSInteger totalSegmentedCount;                //设置segment page的总数(默认1)
+@property (nonatomic, strong) NSString *viewControllerClassName;            //当前view所在的viewcontroller(用于缓存数据)
+@property (nonatomic, assign) CGFloat contentViewSpace;                     //contentView之间的间隔(默认0)
 @property (nonatomic, assign) BOOL isUseSegmentedControl;                   //是否启用segmentedControl(默认NO)
 @property (nonatomic, assign) CGFloat segmentedHeight;                      //设置segmentedControlView的高度
 @property (nonatomic, copy) ContentViewTypeAtIndex contentViewTypeAtIndex;  //默认ContentViewTypeTableView
@@ -84,16 +102,26 @@ typedef void (^ClickCell)(id data, NSIndexPath *indexPath, NSInteger index);    
 @property (nonatomic, copy) HintStringAtIndex hintStringAtIndex;            //默认提示信息"暂时没有内容"
 @property (nonatomic, copy) LayoutCell layoutCell;                          //默认调用layoutDataModel:方法
 @property (nonatomic, copy) RequestTypeAtIndex requestTypeAtIndex;          //默认RequestTypeGET
+//UITableView特有
+@property (nonatomic, copy) TableViewCellHeightAtIndex tableViewCellHeightAtIndex;
+@property (nonatomic, copy) TableViewSeperatorColorAtIndex tableViewSeperatorColorAtIndex;  //默认 RGB(170, 170, 170)
+@property (nonatomic, copy) TableViewSeperatorEdgeInsetAtIndex tableViewSeperatorEdgeInsetAtIndex;
+@property (nonatomic, copy) TableViewSeperatorTypeAtIndex tableViewSeperatorTypeAtIndex;
+//UICollectionView特有
+@property (nonatomic, copy) ItemSizeAtIndex itemSizeAtIndex;
+@property (nonatomic, copy) ItemEdgeInsetsAtIndex itemEdgeInsetsAtIndex;
+@property (nonatomic, copy) MinimumRowSpacingForSectionAtIndex minimumRowSpacingForSectionAtIndex;
+@property (nonatomic, copy) MinimumColumnSpacingForSectionAtIndex minimumColumnSpacingForSectionAtIndex;
 
 #pragma mark - 可选设置的属性(即默认为nil)
 @property (nonatomic, copy) PullToRefreshSuccessedAtIndex successedAtIndex;
 @property (nonatomic, copy) PullToRefreshFailedAtIndex failedAtIndex;
-@property (nonatomic, copy) SegmentTitleAtIndex segmentTitleAtIndex;
 @property (nonatomic, copy) ClickCell clickCell;
 
 
 //-------------------可供外部调用的方法---------------------------------------------------
 
+//在设置完必要的属性后，必须调用该方法进行子view的初始化
 - (void)layoutView;
 
 //触发下拉刷新
@@ -117,10 +145,10 @@ typedef void (^ClickCell)(id data, NSIndexPath *indexPath, NSInteger index);    
 - (void)reloadDataAtIndex:(NSInteger)index;
 
 //获取数据
-- (NSArray *)dataArray;
-- (NSArray *)dataArrayAtIndex:(NSInteger)index;
+- (NSMutableArray *)dataArray;
+- (NSMutableArray *)dataArrayAtIndex:(NSInteger)index;
 
-//获取scrollView
+//获取contentView
 - (UIScrollView *)contentView;
 - (UIScrollView *)contentViewAtIndex:(NSInteger)index;
 

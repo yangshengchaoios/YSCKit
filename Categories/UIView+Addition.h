@@ -104,6 +104,7 @@
 + (UIAlertView *)showAlertViewWithTitle:(NSString *)title andMessage:(NSString *)message;
 
 #pragma mark - current view controller
+- (UIViewController *)currentViewController;
 + (UIViewController *)currentViewController;
 + (UIViewController *)getVisibleViewControllerFrom:(UIViewController *)viewController;
 

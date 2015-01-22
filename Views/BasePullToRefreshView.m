@@ -8,6 +8,9 @@
 
 #import "BasePullToRefreshView.h"
 
+#define TagStartOfContentView   256
+#define KeyOfCachedData         @"KeyOfCachedData"
+
 @interface BasePullToRefreshView() <UITableViewDataSource, UITableViewDelegate, UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout>
 
 @end
@@ -24,7 +27,7 @@
     self = [super initWithFrame:frame];
     if (self) {
         NSLog(@"initWithFrame，%@", NSStringFromCGRect(self.frame));
-        [self initSbuviews];
+        [self initSubviews];
     }
     return self;
 }
@@ -34,7 +37,7 @@
     self = [super initWithCoder:aDecoder];
     if (self) {
         NSLog(@"initWithCoder，%@", NSStringFromCGRect(self.frame));
-        [self initSbuviews];
+        [self initSubviews];
     }
     return self;
 }
@@ -48,20 +51,19 @@
     NSLog(@"setNeedsDisplay，%@", NSStringFromCGRect(self.frame));
 }
 
-- (void)initSbuviews {
+- (void)initSubviews {
     NSLog(@"initSubviews，%@", NSStringFromCGRect(self.frame));
+    self.segmentedTitleArray = [NSMutableArray array];
     self.contentDataArray = [NSMutableArray array];
     self.contentViewArray = [NSMutableArray array];
     self.contentPageIndexArray = [NSMutableArray array];
     self.currentIndex = 0;
-    self.totalSegmentedCount = 1;
     self.isUseSegmentedControl = NO;
+    self.segmentedHeight = 80;
+    self.contentViewSpace = 0;
+    self.viewControllerClassName = @"";//TODO:get current view controller class name
     
     [self initBlocks];
-    
-    
-    
-    //TODO:添加约束
 }
 
 
@@ -86,7 +88,6 @@
     NSLog(@"layoutIfNeeded，%@", NSStringFromCGRect(self.frame));
 }
 
-
 - (void)setNeedsUpdateConstraints {
     [super setNeedsUpdateConstraints];
     NSLog(@"setNeedsUpdateConstraints，%@", NSStringFromCGRect(self.frame));
@@ -97,45 +98,35 @@
 //-------------------可供外部调用的方法---------------------------------------------------
 #pragma mark - 可供外部调用的方法
 
+//在设置完必要的属性后，必须调用该方法进行子view的初始化
 - (void)layoutView {
-    //1. 创建segmentedControlView
+    //1. 创建segmentedControl
     //条件：1> 启用参数
     //     2> 外部没有自定义
     //     3> 数据源大余1个
-    if (self.isUseSegmentedControl &&
-        (nil == self.segmentedControlView) &&
-        (self.totalSegmentedCount > 1)) {
-        self.segmentedControlView = [[HMSegmentedControl alloc] initWithFrame:CGRectZero];
-        self.segmentedControlView.backgroundColor = [UIColor clearColor];
-        [self addSubview:self.segmentedControlView];
-        //添加约束
-        [self.segmentedControlView autoPinEdgeToSuperviewEdge:ALEdgeLeft];
-        [self.segmentedControlView autoPinEdgeToSuperviewEdge:ALEdgeTop];
-        [self.segmentedControlView autoPinEdgeToSuperviewEdge:ALEdgeRight];
+    if (self.isUseSegmentedControl && (nil == self.segmentedControl)) {
+        [self initSegmentedControl];
     }
     
+    //2. 创建scrollView
     self.scrollView = [[UIScrollView alloc] initWithFrame:CGRectZero];
-    self.scrollView.backgroundColor = [UIColor blueColor];
+    self.scrollView.backgroundColor = [UIColor clearColor];
+    self.scrollView.pagingEnabled = YES;
+    self.scrollView.delegate = self;
     [self addSubview:self.scrollView];
     //添加约束
-    
-    
-    for (int i = 0; i < self.totalSegmentedCount; i++) {
-        ContentViewType type = self.contentViewTypeAtIndex(i);
-        UIScrollView *scrollView = nil;
-        if (ContentViewTypeTableView == type) {
-            
-        }
-        else if (ContentViewTypeCollectionView == type) {
-        
-        }
-        else if (ContentViewTypeScrollView == type) {
-        
-        }
-        if (scrollView) {
-            //添加约束
-        }
+    [self.scrollView autoPinEdgeToSuperviewEdge:ALEdgeLeading];
+    [self.scrollView autoPinEdgeToSuperviewEdge:ALEdgeTrailing];
+    [self.scrollView autoPinEdgeToSuperviewEdge:ALEdgeBottom];
+    if (self.segmentedControl) {
+        [self.scrollView autoPinEdge:ALEdgeTop toEdge:ALEdgeBottom ofView:self.segmentedControl];
     }
+    else {
+        [self.scrollView autoPinEdgeToSuperviewEdge:ALEdgeTop];
+    }
+    
+    //3. 创建contentView
+    [self initContentViews];
 }
 
 //触发下拉刷新
@@ -173,8 +164,10 @@
     [self loadMoreDataAtIndex:self.currentIndex];
 }
 - (void)loadMoreDataAtIndex:(NSInteger)index {
-    NSInteger currentPageIndex = [self.contentPageIndexArray[index] integerValue];
-    [self downloadPageData:currentPageIndex + 1 atIndex:index];
+    if (index >= 0 && index < [self.contentPageIndexArray count]) {
+        NSInteger currentPageIndex = [self.contentPageIndexArray[index] integerValue];
+        [self downloadPageData:(currentPageIndex + 1) atIndex:index];
+    }
 }
 
 //刷新界面显示
@@ -194,16 +187,16 @@
 }
 
 //获取数据
-- (NSArray *)dataArray {
+- (NSMutableArray *)dataArray {
     return [self dataArrayAtIndex:self.currentIndex];
 }
-- (NSArray *)dataArrayAtIndex:(NSInteger)index {
-    if (index < 0 || index >= [self.dataArray count]) {
+- (NSMutableArray *)dataArrayAtIndex:(NSInteger)index {
+    if (index < 0 || index >= [self.contentDataArray count]) {
         return nil;
     }
     else {
-        NSArray *tempArray = self.dataArray[index];
-        if ([tempArray isKindOfClass:[NSArray class]] && [NSArray isNotEmpty:tempArray]) {
+        NSMutableArray *tempArray = self.contentDataArray[index];
+        if ([tempArray isKindOfClass:[NSMutableArray class]]) {
             return tempArray;
         }
         else {
@@ -268,7 +261,7 @@
         return kResPathAppBaseUrl;
     };
     self.hintStringAtIndex = ^NSString *(NSInteger index) {
-        return nil;
+        return @"暂时没有内容";
     };
     self.layoutCell = ^UIView *(id data, NSIndexPath *indexPath, NSInteger index) {
         UIScrollView *contentView = [blockSelf contentViewAtIndex:index];
@@ -299,53 +292,279 @@
     self.requestTypeAtIndex = ^RequestType (NSInteger index) {
         return RequestTypeGET;
     };
+    
+    //UITableViewCell特有的
+    self.tableViewCellHeightAtIndex = ^CGFloat (id data, NSIndexPath *indexPath, NSInteger index) {
+        NSString *nibName = @"";
+        if (blockSelf.nibNameOfCellAtIndex) {
+            nibName = blockSelf.nibNameOfCellAtIndex(index);
+        }
+        if ([NSString isNotEmpty:nibName] && [NSClassFromString(nibName) isSubclassOfClass:[BaseTableViewCell class]]) {
+            return [NSClassFromString(nibName) HeightOfCell];
+        }
+        else {
+            return 44.0f;
+        }
+    };
+    self.tableViewSeperatorColorAtIndex = ^UIColor *(NSInteger index) {
+        return RGB(170, 170, 170);
+    };
+    self.tableViewSeperatorEdgeInsetAtIndex = ^UIEdgeInsets (NSInteger index) {
+        return UIEdgeInsetsZero;
+    };
+    self.tableViewSeperatorTypeAtIndex = ^UITableViewSeperatorType (NSInteger index) {
+        return UITableViewSeperatorTypeEdge;
+    };
+    
+    //UICollectionView特有的
+    self.itemSizeAtIndex = ^CGSize (NSInteger index) {
+        return CGSizeMake(0, 0);//TODO:
+    };
+    self.itemEdgeInsetsAtIndex = ^UIEdgeInsets (NSInteger index) {
+        return UIEdgeInsetsMake(0, 0, 0, 0);
+    };
+    self.minimumRowSpacingForSectionAtIndex = ^CGFloat (NSInteger section, NSInteger index) {
+        return 0;
+    };
+    self.minimumColumnSpacingForSectionAtIndex = ^CGFloat (NSInteger section, NSInteger index) {
+        return 0;
+    };
 }
-
+//初始化segmentedControl
+- (void)initSegmentedControl {
+    //1. 新建segementedControl
+    self.segmentedControl = [[HMSegmentedControl alloc] initWithFrame:CGRectZero];
+    self.segmentedControl.backgroundColor = [UIColor clearColor];
+    [self addSubview:self.segmentedControl];
+    
+    //2. 添加约束
+    [self.segmentedControl autoPinEdgeToSuperviewEdge:ALEdgeLeft];
+    [self.segmentedControl autoPinEdgeToSuperviewEdge:ALEdgeTop];
+    [self.segmentedControl autoPinEdgeToSuperviewEdge:ALEdgeRight];
+    [self.segmentedControl autoSetDimension:ALDimensionHeight toSize:self.segmentedHeight];
+    
+    //3. 设置基本属性
+    if (nil == self.segmentedTitleArray) {
+        self.segmentedTitleArray = [NSMutableArray array];
+    }
+    WeakSelfType blockSelf = self;
+    self.segmentedControl.textColor = kDefaultTextColor;
+    self.segmentedControl.selectedTextColor = kDefaultTextColor;
+    self.segmentedControl.selectionIndicatorColor = [UIColor redColor];
+    self.segmentedControl.font = [UIFont systemFontOfSize:20];
+    self.segmentedControl.sectionTitles = self.segmentedTitleArray;
+    self.segmentedControl.segmentEdgeInset = UIEdgeInsetsMake(0, 10, 0, 10);
+    self.segmentedControl.selectionStyle = HMSegmentedControlSelectionStyleFullWidthStripe;
+    self.segmentedControl.selectionIndicatorLocation = HMSegmentedControlSelectionIndicatorLocationDown;
+    self.segmentedControl.selectionIndicatorHeight = 2;
+    [self.segmentedControl setIndexChangeBlock:^(NSInteger pageIndex) {
+        blockSelf.currentIndex = pageIndex;
+        CGFloat pageWidth = blockSelf.scrollView.width + blockSelf.contentViewSpace;
+        [blockSelf.scrollView setContentOffset:CGPointMake(pageIndex * pageWidth, 0) animated:NO];
+        
+        //判断是否触发下拉刷新
+        BOOL refreshEnableWhenEntered = YES;
+        if (blockSelf.refreshEnableWhenEnteredAtIndex) {
+            refreshEnableWhenEntered = blockSelf.refreshEnableWhenEnteredAtIndex(pageIndex);
+        }
+        if ([NSArray isEmpty:[blockSelf dataArray]] && refreshEnableWhenEntered) {
+            [blockSelf beginRefreshing];
+        }
+    }];
+}
+//初始化contentViews
+- (void)initContentViews {
+    WeakSelfType blockSelf = self;
+    if (nil == self.contentViewArray) {
+        self.contentViewArray = [NSMutableArray array];
+    }
+    else {
+        [self.contentViewArray removeAllObjects];
+    }
+    [self.scrollView removeAllSubviews];
+    for (int i = 0; i < MAX(1, [self.segmentedTitleArray count]); i++) {
+        ContentViewType type = self.contentViewTypeAtIndex(i);
+        UIView *contentView = nil;
+        NSString *nibName = @"";
+        if (self.nibNameOfCellAtIndex) {
+            nibName = self.nibNameOfCellAtIndex(i);
+        }
+        //1. 创建contentView
+        if (ContentViewTypeTableView == type) {
+            contentView = [[UITableView alloc] initWithFrame:CGRectZero];
+            ((UITableView *)contentView).dataSource = self;
+            ((UITableView *)contentView).delegate = self;
+            ((UITableView *)contentView).tableHeaderView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 0, 0.01)];
+            ((UITableView *)contentView).tableFooterView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 0, 0.01)];
+            if ([NSString isNotEmpty:nibName]) {
+                [(UITableView *)contentView registerNib:[UINib nibWithNibName:nibName bundle:nil] forCellReuseIdentifier:kCellIdentifier];
+            }
+            //TODO:设置seperator
+            UITableViewSeperatorType seperatoryType = UITableViewSeperatorTypeEdge;
+            UIColor *color = RGB(170, 170, 170);
+            if (self.tableViewSeperatorTypeAtIndex) {
+                seperatoryType = self.tableViewSeperatorTypeAtIndex(i);
+            }
+            if (self.tableViewSeperatorColorAtIndex) {
+                color = self.tableViewSeperatorColorAtIndex(i);
+            }
+            ((UITableView *)contentView).separatorColor = color;
+            ((UITableView *)contentView).separatorStyle = UITableViewCellSeparatorStyleSingleLine;
+            
+            if (UITableViewSeperatorTypeCustom == seperatoryType) {
+                ((UITableView *)contentView).separatorStyle = UITableViewCellSeparatorStyleNone;
+            }
+            else if (UITableViewSeperatorTypeEdge == seperatoryType) {
+                UIEdgeInsets edgeInset = UIEdgeInsetsZero;
+                if (self.tableViewSeperatorEdgeInsetAtIndex) {
+                    edgeInset = self.tableViewSeperatorEdgeInsetAtIndex(i);
+                }
+                ((UITableView *)contentView).separatorInset = edgeInset;
+            }
+        }
+        else if (ContentViewTypeCollectionView == type) {
+            contentView = [[UICollectionView alloc] initWithFrame:CGRectZero];
+            ((UICollectionView *)contentView).dataSource = self;
+            ((UICollectionView *)contentView).delegate = self;
+            ((UICollectionView *)contentView).alwaysBounceVertical = YES;
+            ((UICollectionView *)contentView).showsHorizontalScrollIndicator = YES;
+            ((UICollectionView *)contentView).showsVerticalScrollIndicator = YES;
+            if ([NSString isNotEmpty:nibName]) {
+                [(UICollectionView *)contentView registerNib:[UINib nibWithNibName:nibName bundle:nil] forCellWithReuseIdentifier:kItemCellIdentifier];
+            }
+        }
+        else if (ContentViewTypeScrollView == type) {
+            contentView = [[UIScrollView alloc] initWithFrame:CGRectZero];
+            ((UIScrollView *)contentView).delegate = self;
+        }
+        else {
+            contentView = [[UIView alloc] initWithFrame:CGRectZero];
+        }
+        
+        //2. 设置contentView
+        contentView.backgroundColor = [UIColor randomColor];//TODO:test
+        contentView.tag = TagStartOfContentView + i;
+        [self.contentViewArray addObject:contentView];
+        [self.scrollView addSubview:contentView];
+        
+        //3. 添加约束
+        [contentView autoPinEdgeToSuperviewEdge:ALEdgeTop];
+        [contentView autoPinEdgeToSuperviewEdge:ALEdgeBottom];
+        [contentView autoMatchDimension:ALDimensionWidth toDimension:ALDimensionWidth ofView:self.scrollView];
+        [contentView autoMatchDimension:ALDimensionHeight toDimension:ALDimensionHeight ofView:self.scrollView];
+        if (0 == i) {//第一个的leading要基于self.scrollView
+            [contentView autoPinEdgeToSuperviewEdge:ALEdgeLeading];
+        }
+        else {
+            [contentView autoPinEdge:ALEdgeLeading toEdge:ALEdgeTrailing ofView:self.contentViewArray[i - 1] withOffset:self.contentViewSpace];
+        }
+        if ([self.segmentedTitleArray count] - 1 == i) {//最后一个的trailing要基于self.scrollView
+            [contentView autoPinEdgeToSuperviewEdge:ALEdgeTrailing];
+        }
+        
+        //4. 下拉刷新&上拉加载更多
+        if ([contentView isKindOfClass:[UIScrollView class]]) {
+            BOOL refreshEnable = YES;
+            BOOL refreshEnableWhenEntered = YES;
+            BOOL loadMoreEnable = YES;
+            if (self.refreshEnableAtIndex) {
+                refreshEnable = self.refreshEnableAtIndex(i);
+            }
+            if (self.refreshEnableWhenEnteredAtIndex) {
+                refreshEnableWhenEntered = self.refreshEnableWhenEnteredAtIndex(i);
+            }
+            if (self.loadMoreEnableAtIndex) {
+                loadMoreEnable = self.loadMoreEnableAtIndex(i);
+            }
+            
+            if (refreshEnable) {
+                [(UIScrollView *)contentView addHeaderWithCallback:^{
+                    [blockSelf refreshDataAtIndex:i];
+                }];
+                if (refreshEnableWhenEntered) {
+                    [(UIScrollView *)contentView headerBeginRefreshing];
+                }
+            }
+            if (loadMoreEnable) {
+                [(UIScrollView *)contentView addFooterWithCallback:^{
+                    [blockSelf loadMoreDataAtIndex:i];
+                }];
+            }
+        }
+        
+        //5. 初始化页码数组和数据源数组
+        [self.contentPageIndexArray addObject:@(0)];
+        [self.contentDataArray addObject:[NSMutableArray array]];
+        
+        //6. 加载缓存数据
+        BOOL shouldCacheData = NO;
+        if (self.shouldCacheDataAtIndex) {
+            shouldCacheData = self.shouldCacheDataAtIndex(i);
+        }
+        if (shouldCacheData) {
+            NSArray *cacheArray = [self cachedObjectForKey:KeyOfCachedData atIndex:i];
+            if ([cacheArray isKindOfClass:[NSArray class]] && [NSArray isNotEmpty:cacheArray]) {
+                [[self dataArrayAtIndex:i] addObjectsFromArray:cacheArray];
+            }
+        }
+    }
+}
 //下载一页的数据(兼容下拉刷新和上拉加载更多)
 - (void)downloadPageData:(NSInteger)pageIndex atIndex:(NSInteger)index {
     WeakSelfType blockSelf = self;
     //1. 定义网络返回成功的回调
-    RequestSuccessed requestSuccessedBlock = ^(id responseObject){
-        //        [blockSelf.contentScrollView headerEndRefreshing];
+    RequestSuccessed requestSuccessedBlock = ^(id responseObject) {
         [blockSelf hideHUDLoading];
-        blockSelf.contentPageIndexArray[index] = @(kDefaultPageStartIndex);
+        [[blockSelf contentViewAtIndex:index] headerEndRefreshing];
+        BOOL isPullToRefresh = (kDefaultPageStartIndex == pageIndex); //是否下拉刷新
         
         //1. 获取结果数组
         NSArray *dataArray = nil;
         if ([responseObject isKindOfClass:[NSArray class]]) {
             dataArray = (NSArray *)responseObject;
         }
-        else if([responseObject isKindOfClass:[BaseDataModel class]]){
-            dataArray = @[responseObject];
-        }
-        //------------
         
         //2. 根据组装后的数组刷新列表
         NSArray *newDataArray = nil;
-        if ([dataArray count] > 0 && blockSelf.preProcessDataAtIndex) {
-            newDataArray = blockSelf.preProcessDataAtIndex(dataArray, index);
-        }
-        if ([newDataArray count] > 0) {
-            //            [blockSelf reloadByReplacing:newDataArray];
-        }
-        else {//清空已有的数据
-            NSMutableArray *tempArray = blockSelf.contentDataArray[index];
-            if ([tempArray isMemberOfClass:[NSMutableArray class]]) {
-                [tempArray removeAllObjects];
+        if ([dataArray count] > 0) {
+            blockSelf.contentPageIndexArray[index] = @(pageIndex);  //只要接口成功返回了数据，就把当前请求的页码保存起来
+            if (blockSelf.preProcessDataAtIndex) {
+                newDataArray = blockSelf.preProcessDataAtIndex(dataArray, index);
             }
         }
-        //------------
         
+        //3. 根据新数组刷新界面显示
+        if (isPullToRefresh) {//处理下拉刷新
+            if ([newDataArray count] > 0) {
+                 [blockSelf reloadByReplacing:newDataArray atIndex:index];
+            }
+            else {//假如经过处理后的数组为空，则需要清空之前的数据
+                NSArray *tempArray = [blockSelf dataArrayAtIndex:index];
+                if ([tempArray isMemberOfClass:[NSMutableArray class]]) {
+                    [(NSMutableArray *)tempArray removeAllObjects];
+                }
+            }
+            [blockSelf reloadDataAtIndex:index];
+        }
+        else {//处理加载更多
+            if ([newDataArray count] > 0) {
+             [blockSelf reloadByAdding:newDataArray atIndex:index];
+            }
+            else {
+                [blockSelf showResultThenHide:@"没有更多了"];
+            }
+        }
+        
+        //4. 判断是否设置了回调
         if (blockSelf.successedAtIndex) {
             blockSelf.successedAtIndex(index);
         }
-        [blockSelf reloadData];
     };
     
     //2. 定义网络返回失败的回调
-    RequestFailure requestFailureBlock = ^(NSInteger errorCode, NSString *errorMessage){
-        //        [blockSelf.contentScrollView headerEndRefreshing];
+    RequestFailure requestFailureBlock = ^(NSInteger errorCode, NSString *errorMessage) {
         [blockSelf showResultThenHide:errorMessage];
+        [[blockSelf contentViewAtIndex:index] headerEndRefreshing];
         if (blockSelf.failedAtIndex) {
             blockSelf.failedAtIndex(index);
         }
@@ -366,7 +585,7 @@
     }
     NSDictionary *dictParam = nil;
     if (blockSelf.dictParamAtIndex) {
-        dictParam = blockSelf.dictParamAtIndex(kDefaultPageStartIndex, index);
+        dictParam = blockSelf.dictParamAtIndex(pageIndex, index);
     }
     Class modelClass = nil;
     if (blockSelf.modelClassAtIndex) {
@@ -389,6 +608,297 @@
                  requestSuccessed:requestSuccessedBlock
                    requestFailure:requestFailureBlock];
     }
+}
+//刷新界面
+- (void)reloadByReplacing:(NSArray *)array atIndex:(NSInteger)index {
+    NSMutableArray *currentDataArray = [self dataArrayAtIndex:index];
+    [currentDataArray removeAllObjects];
+    [currentDataArray addObjectsFromArray:array];
+    
+    BOOL shouldCacheData = NO;
+    if (self.shouldCacheDataAtIndex) {
+        shouldCacheData = self.shouldCacheDataAtIndex(index);
+    }
+    if (shouldCacheData) {
+        [self saveObject:array forKey:KeyOfCachedData atIndex:index];
+    }
+}
+//加载更多
+- (void)reloadByAdding:(NSArray *)array atIndex:(NSInteger)index {
+    UIScrollView *contentView = [self contentViewAtIndex:index];
+    NSMutableArray *currentDataArray = [self dataArrayAtIndex:index];
+    if ([contentView isKindOfClass:[UITableView class]]) {
+        NSInteger displayedIndex = [currentDataArray count];
+        NSIndexSet *insertedIndexSet = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange([currentDataArray count], [array count])];
+        [currentDataArray insertObjects:array atIndexes:insertedIndexSet];
+        
+        NSMutableArray *insertedIndexPaths = [NSMutableArray array];
+        for (NSUInteger i = 0; i < [array count]; i++) {
+            [insertedIndexPaths addObject:[NSIndexPath indexPathForRow:displayedIndex + i inSection:0]];
+        }
+        [(UITableView *)contentView beginUpdates];
+        [(UITableView *)contentView insertRowsAtIndexPaths:insertedIndexPaths withRowAnimation:UITableViewRowAnimationAutomatic];
+        [(UITableView *)contentView endUpdates];
+    }
+    else if ([contentView isKindOfClass:[UICollectionView class]]) {
+        NSInteger displayedIndex = [currentDataArray count];
+        NSIndexSet *insertedIndexSet = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange([currentDataArray count], [array count])];
+        [currentDataArray insertObjects:array atIndexes:insertedIndexSet];
+        
+        [UIView setAnimationsEnabled:NO];//默认的动画效果有点乱，这里先把所有动画关掉
+        [(UICollectionView *)contentView performBatchUpdates:^{
+            NSMutableArray *insertedIndexPaths = [NSMutableArray array];
+            for (NSUInteger i = 0; i < [array count]; i++) {
+                [insertedIndexPaths addObject:[NSIndexPath indexPathForRow:displayedIndex + i inSection:0]];
+            }
+            [(UICollectionView *)contentView insertItemsAtIndexPaths:insertedIndexPaths];
+        }
+                                                  completion:nil];
+        [UIView setAnimationsEnabled:YES];
+    }
+}
+//获取缓存数组
+- (NSArray *)cachedObjectForKey:(NSString *)cachedKey atIndex:(NSInteger)index {
+    NSString *fileName = [NSString stringWithFormat:@"%@_%ld.dat", self.viewControllerClassName, index];
+    NSString *filePath = [[[StorageManager sharedInstance] directoryPathOfLibraryCachesCommon] stringByAppendingPathComponent:fileName];
+    NSDictionary *cacheInfo = [[StorageManager sharedInstance] unarchiveDictionaryFromFilePath:filePath];
+    if ([cacheInfo objectForKey:cachedKey]) {
+        return cacheInfo[cachedKey];
+    }
+    else {
+        return nil;
+    }
+}
+//缓存数组
+- (void)saveObject:(NSArray *)object forKey:(NSString *)cachedKey atIndex:(NSInteger)index {
+    ReturnWhenObjectIsEmpty(object);
+    ReturnWhenObjectIsEmpty(cachedKey);
+    
+    @try {
+        NSString *fileName = [NSString stringWithFormat:@"%@_%ld.dat", self.viewControllerClassName, index];
+        NSString *filePath = [[[StorageManager sharedInstance] directoryPathOfLibraryCachesCommon] stringByAppendingPathComponent:fileName];
+        BOOL isSuccess = [[StorageManager sharedInstance] archiveDictionary:@{cachedKey : object}
+                                                                 toFilePath:filePath
+                                                                  overwrite:NO];
+        if (isSuccess) {
+            NSLog(@"缓存成功！");
+        }
+        else {
+            NSLog(@"缓存失败！");
+        }
+    }
+    @catch (NSException *exception)
+    {
+        NSLog(@"将数组保存至本地缓存时出错！%@",
+              exception); //可能是没有在对象里做序列号和反序列化！
+    }
+    @finally
+    {
+    }
+}
+
+
+//-------------------------------------------------------------------------------------------
+//
+//  UITableView相关回调方法
+//
+//-------------------------------------------------------------------------------------------
+#pragma mark - UITableViewDataSource
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
+    NSInteger index = tableView.tag - TagStartOfContentView;
+    return 1;//TODO:
+}
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+    NSInteger index = tableView.tag - TagStartOfContentView;
+    if (self.cellCountAtIndex) {
+        return self.cellCountAtIndex(index);
+    }
+    else {
+        return 0;
+    }
+}
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+    NSInteger index = tableView.tag - TagStartOfContentView;
+    id objectModel = nil;
+    if (indexPath.row < [self.dataArray count]) {
+        objectModel = self.dataArray[indexPath.row];
+    }
+    
+    UITableViewCell *cell = nil;
+    if (self.layoutCell) {
+        cell = (UITableViewCell *)self.layoutCell(objectModel, indexPath, index);
+    }
+    return cell;
+}
+
+#pragma mark - UITableViewDelegate
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
+    NSInteger index = tableView.tag - TagStartOfContentView;
+    id objectModel = nil;
+    if (indexPath.row < [self.dataArray count]) {
+        objectModel = self.dataArray[indexPath.row];
+    }
+    
+    CGFloat rowHeight = 0;
+    if (self.tableViewCellHeightAtIndex) {
+        rowHeight = self.tableViewCellHeightAtIndex(objectModel, indexPath, index);
+    }
+    return rowHeight;
+}
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    NSInteger index = tableView.tag - TagStartOfContentView;
+    id objectModel = nil;
+    if (indexPath.row < [self.dataArray count]) {
+        objectModel = self.dataArray[indexPath.row];
+    }
+    
+    if (self.clickCell) {
+        self.clickCell(objectModel, indexPath, index);
+    }
+}
+- (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath {
+    NSInteger index = tableView.tag - TagStartOfContentView;
+    UITableViewSeperatorType seperatoryType = UITableViewSeperatorTypeEdge;
+    if (self.tableViewSeperatorTypeAtIndex) {
+        seperatoryType = self.tableViewSeperatorTypeAtIndex(index);
+    }
+    if (UITableViewSeperatorTypeFull != seperatoryType) {
+        return;
+    }
+    
+    // Remove seperator inset
+    if ([cell respondsToSelector:@selector(setSeparatorInset:)]) {
+        [cell setSeparatorInset:UIEdgeInsetsZero];
+    }
+    
+    // Prevent the cell from inheriting the Table View's margin settings
+    if ([cell respondsToSelector:@selector(setPreservesSuperviewLayoutMargins:)]) {
+        [cell setPreservesSuperviewLayoutMargins:NO];
+    }
+    
+    // Explictly set your cell's layout margins
+    if ([cell respondsToSelector:@selector(setLayoutMargins:)]) {
+        [cell setLayoutMargins:UIEdgeInsetsZero];
+    }
+}
+
+
+//-------------------------------------------------------------------------------------------
+//
+//  UICollectionView相关回调方法
+//
+//-------------------------------------------------------------------------------------------
+#pragma mark - UICollectionViewDataSource
+- (NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView {
+    NSInteger index = collectionView.tag - TagStartOfContentView;
+    return 1;//TODO:
+}
+- (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
+    NSInteger index = collectionView.tag - TagStartOfContentView;
+    if (self.cellCountAtIndex) {
+        return self.cellCountAtIndex(index);
+    }
+    else {
+        return 0;
+    }
+}
+- (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
+    NSInteger index = collectionView.tag - TagStartOfContentView;
+    id objectModel = nil;
+    if (indexPath.row < [self.dataArray count]) {
+        objectModel = self.dataArray[indexPath.row];
+    }
+    
+    UICollectionViewCell *cell = nil;
+    if (self.layoutCell) {
+        cell = (UICollectionViewCell *)self.layoutCell(objectModel, indexPath, index);
+    }
+    return cell;
+}
+
+#pragma mark - UICollectionFlowLayout
+- (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath {
+    NSInteger index = collectionView.tag - TagStartOfContentView;
+    if (self.itemSizeAtIndex) {
+        return self.itemSizeAtIndex(index);
+    }
+    else {
+        return CGSizeZero;
+    }
+}
+- (UIEdgeInsets)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout insetForSectionAtIndex:(NSInteger)section {
+    NSInteger index = collectionView.tag - TagStartOfContentView;
+    if (self.itemEdgeInsetsAtIndex) {
+        return self.itemEdgeInsetsAtIndex(index);
+    }
+    else {
+        return UIEdgeInsetsZero;
+    }
+}
+//cell的最小行间距
+- (CGFloat)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout minimumLineSpacingForSectionAtIndex:(NSInteger)section {
+    NSInteger index = collectionView.tag - TagStartOfContentView;
+    if (self.minimumRowSpacingForSectionAtIndex) {
+        return self.minimumRowSpacingForSectionAtIndex(section, index);
+    }
+    else {
+        return 0;
+    }
+}
+//cell的最小列间距
+- (CGFloat)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout minimumInteritemSpacingForSectionAtIndex:(NSInteger)section {
+    NSInteger index = collectionView.tag - TagStartOfContentView;
+    if (self.minimumColumnSpacingForSectionAtIndex) {
+        return self.minimumColumnSpacingForSectionAtIndex(section, index);
+    }
+    else {
+        return 0;
+    }
+}
+
+#pragma mark - UICollectionViewDelegate
+- (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
+    NSInteger index = collectionView.tag - TagStartOfContentView;
+    id objectModel = nil;
+    if (indexPath.row < [self.dataArray count]) {
+        objectModel = self.dataArray[indexPath.row];
+    }
+    
+    if (self.clickCell) {
+        self.clickCell(objectModel, indexPath, index);
+    }
+}
+
+
+//-------------------------------------------------------------------------------------------
+//
+//  UIScrollView相关回调方法
+//
+//-------------------------------------------------------------------------------------------
+#pragma mark - UIScrollViewDelegate
+- (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView {
+    if (scrollView != self.scrollView) {//屏蔽contentView回调该方法
+        return;
+    }
+    CGFloat pageWidth = scrollView.width + self.contentViewSpace;
+    int pageIndex = floor((scrollView.contentOffset.x - pageWidth / 2) / pageWidth) + 1;
+    if (self.contentViewSpace > 0) {
+        [scrollView setContentOffset:CGPointMake(pageIndex * pageWidth, 0) animated:NO];
+    }
+    self.currentIndex = pageIndex;
+    [self.segmentedControl setSelectedSegmentIndex:pageIndex animated:YES];
+}
+- (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate {
+    if (scrollView != self.scrollView) {//屏蔽contentView回调该方法
+        return;
+    }
+    CGFloat pageWidth = scrollView.width + self.contentViewSpace;
+    int pageIndex = floor((scrollView.contentOffset.x - pageWidth / 2) / pageWidth) + 1;
+    if (self.contentViewSpace > 0) {
+        [scrollView setContentOffset:CGPointMake(pageIndex * pageWidth, 0) animated:NO];
+    }
+    self.currentIndex = pageIndex;
+    [self.segmentedControl setSelectedSegmentIndex:pageIndex animated:YES];
 }
 
 @end

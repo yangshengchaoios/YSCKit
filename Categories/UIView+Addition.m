@@ -417,6 +417,10 @@
 }
 
 #pragma mark - current view controller
+- (UIViewController *)currentViewController {
+    return nil;
+}
+
 + (UIViewController *)currentViewController {
     UIViewController *viewController = KeyWindow.rootViewController;
     return [UIView getVisibleViewControllerFrom:viewController];
