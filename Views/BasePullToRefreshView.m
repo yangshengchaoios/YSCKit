@@ -58,10 +58,13 @@
     self.contentViewArray = [NSMutableArray array];
     self.contentPageIndexArray = [NSMutableArray array];
     self.currentIndex = 0;
-    self.isUseSegmentedControl = NO;
-    self.segmentedHeight = 80;
+    
     self.contentViewSpace = 0;
     self.viewControllerClassName = @"";//TODO:get current view controller class name
+    self.isUseSegmentedControl = NO;
+    self.segmentedHeight = 44;
+    self.segmentedLeading = 10;
+    self.segmentedTailing = 10;
     
     [self initBlocks];
 }
@@ -119,7 +122,7 @@
     [self.scrollView autoPinEdgeToSuperviewEdge:ALEdgeTrailing];
     [self.scrollView autoPinEdgeToSuperviewEdge:ALEdgeBottom];
     if (self.segmentedControl) {
-        [self.scrollView autoPinEdge:ALEdgeTop toEdge:ALEdgeBottom ofView:self.segmentedControl];
+        [self.scrollView autoPinEdge:ALEdgeTop toEdge:ALEdgeBottom ofView:self.segmentedBottomLineView];
     }
     else {
         [self.scrollView autoPinEdgeToSuperviewEdge:ALEdgeTop];
@@ -332,15 +335,28 @@
 }
 //初始化segmentedControl
 - (void)initSegmentedControl {
+    //0. 添加segmentedControl的背景view
+    UIView *backgroundView = [[UIView alloc] initWithFrame:CGRectZero];
+    backgroundView.backgroundColor = [UIColor clearColor];
+    [self addSubview:backgroundView];
+    [backgroundView autoPinEdgeToSuperviewEdge:ALEdgeLeading withInset:self.segmentedLeading];
+    [backgroundView autoPinEdgeToSuperviewEdge:ALEdgeTop];
+    [backgroundView autoPinEdgeToSuperviewEdge:ALEdgeTrailing withInset:self.segmentedTailing];
+    [backgroundView autoSetDimension:ALDimensionHeight toSize:self.segmentedHeight];
+    //设置item之间的间隔线
+    for (int i = 0; i < [self.segmentedTitleArray count] - 1; i++) {
+        //TODO:
+    }
+    
     //1. 新建segementedControl
     self.segmentedControl = [[HMSegmentedControl alloc] initWithFrame:CGRectZero];
     self.segmentedControl.backgroundColor = [UIColor clearColor];
     [self addSubview:self.segmentedControl];
     
     //2. 添加约束
-    [self.segmentedControl autoPinEdgeToSuperviewEdge:ALEdgeLeft];
+    [self.segmentedControl autoPinEdgeToSuperviewEdge:ALEdgeLeading withInset:self.segmentedLeading];
     [self.segmentedControl autoPinEdgeToSuperviewEdge:ALEdgeTop];
-    [self.segmentedControl autoPinEdgeToSuperviewEdge:ALEdgeRight];
+    [self.segmentedControl autoPinEdgeToSuperviewEdge:ALEdgeTrailing withInset:self.segmentedTailing];
     [self.segmentedControl autoSetDimension:ALDimensionHeight toSize:self.segmentedHeight];
     
     //3. 设置基本属性
@@ -351,9 +367,8 @@
     self.segmentedControl.textColor = kDefaultTextColor;
     self.segmentedControl.selectedTextColor = kDefaultTextColor;
     self.segmentedControl.selectionIndicatorColor = [UIColor redColor];
-    self.segmentedControl.font = [UIFont systemFontOfSize:20];
+    self.segmentedControl.font = AUTOLAYOUT_FONT(24);
     self.segmentedControl.sectionTitles = self.segmentedTitleArray;
-    self.segmentedControl.segmentEdgeInset = UIEdgeInsetsMake(0, 10, 0, 10);
     self.segmentedControl.selectionStyle = HMSegmentedControlSelectionStyleFullWidthStripe;
     self.segmentedControl.selectionIndicatorLocation = HMSegmentedControlSelectionIndicatorLocationDown;
     self.segmentedControl.selectionIndicatorHeight = 2;
@@ -371,6 +386,16 @@
             [blockSelf beginRefreshing];
         }
     }];
+    
+    //4. 设置底部间隔线
+    self.segmentedBottomLineView = [[UIView alloc] initWithFrame:CGRectZero];
+    self.segmentedBottomLineView.backgroundColor = RGB(170, 170, 170);
+    [self addSubview:self.segmentedBottomLineView];
+    [self bringSubviewToFront:self.segmentedControl];
+    [self.segmentedBottomLineView autoPinEdgeToSuperviewEdge:ALEdgeLeading];
+    [self.segmentedBottomLineView autoPinEdge:ALEdgeBottom toEdge:ALEdgeBottom ofView:self.segmentedControl withOffset:0];
+    [self.segmentedBottomLineView autoPinEdgeToSuperviewEdge:ALEdgeTrailing];
+    [self.segmentedBottomLineView autoSetDimension:ALDimensionHeight toSize:AUTOLAYOUT_LENGTH(1)];
 }
 //初始化contentViews
 - (void)initContentViews {
@@ -399,7 +424,7 @@
             if ([NSString isNotEmpty:nibName]) {
                 [(UITableView *)contentView registerNib:[UINib nibWithNibName:nibName bundle:nil] forCellReuseIdentifier:kCellIdentifier];
             }
-            //TODO:设置seperator
+            //设置seperator
             UITableViewSeperatorType seperatoryType = UITableViewSeperatorTypeEdge;
             UIColor *color = RGB(170, 170, 170);
             if (self.tableViewSeperatorTypeAtIndex) {

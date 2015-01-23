@@ -61,6 +61,7 @@
 
     //业务逻辑相关
     #import "DataModel.h"
+    #import "Login.h"
     #import "BasePullToRefreshTableViewController.h"
     #import "BasePullToRefreshCollectionViewController.h"
     #import "BaseTableViewCell.h"

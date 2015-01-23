@@ -74,7 +74,8 @@ typedef void (^ClickCell)(id data, NSIndexPath *indexPath, NSInteger index);    
 #pragma mark - 必要的属性
 @property (nonatomic, strong) UIScrollView *scrollView;
 @property (nonatomic, strong) HMSegmentedControl *segmentedControl;
-@property (nonatomic, strong) NSArray *segmentedTitleArray;          //用于控制contentView的个数
+@property (nonatomic, strong) UIView *segmentedBottomLineView;              //segmentedControl底部间隔线
+@property (nonatomic, strong) NSArray *segmentedTitleArray;                 //用于控制contentView的个数
 @property (nonatomic, strong) NSMutableArray *contentDataArray;             //二维数组
 @property (nonatomic, strong) NSMutableArray *contentViewArray;             //contentView数组
 @property (nonatomic, strong) NSMutableArray *contentPageIndexArray;        //分页的页码
@@ -90,7 +91,9 @@ typedef void (^ClickCell)(id data, NSIndexPath *indexPath, NSInteger index);    
 @property (nonatomic, strong) NSString *viewControllerClassName;            //当前view所在的viewcontroller(用于缓存数据)
 @property (nonatomic, assign) CGFloat contentViewSpace;                     //contentView之间的间隔(默认0)
 @property (nonatomic, assign) BOOL isUseSegmentedControl;                   //是否启用segmentedControl(默认NO)
-@property (nonatomic, assign) CGFloat segmentedHeight;                      //设置segmentedControlView的高度
+@property (nonatomic, assign) CGFloat segmentedHeight;                      //设置segmentedControlView的高度(默认44)
+@property (nonatomic, assign) CGFloat segmentedLeading;                     //默认10
+@property (nonatomic, assign) CGFloat segmentedTailing;                     //默认10
 @property (nonatomic, copy) ContentViewTypeAtIndex contentViewTypeAtIndex;  //默认ContentViewTypeTableView
 @property (nonatomic, copy) PreProcessDataAtIndex preProcessDataAtIndex;                  //默认不处理
 @property (nonatomic, copy) ShouldCacheDataAtIndex shouldCacheDataAtIndex;  //默认NO
