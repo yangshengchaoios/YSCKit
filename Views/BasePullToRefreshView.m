@@ -518,7 +518,7 @@
         }
         
         //5. 初始化页码数组和数据源数组
-        [self.contentPageIndexArray addObject:@(0)];
+        [self.contentPageIndexArray addObject:@(kDefaultPageStartIndex)];
         [self.contentDataArray addObject:[NSMutableArray array]];
         
         //6. 加载缓存数据
@@ -652,34 +652,14 @@
 - (void)reloadByAdding:(NSArray *)array atIndex:(NSInteger)index {
     UIScrollView *contentView = [self contentViewAtIndex:index];
     NSMutableArray *currentDataArray = [self dataArrayAtIndex:index];
+    NSInteger oldCount = [currentDataArray count];
+    [currentDataArray addObjectsFromArray:array];
+    
     if ([contentView isKindOfClass:[UITableView class]]) {
-        NSInteger displayedIndex = [currentDataArray count];
-        NSIndexSet *insertedIndexSet = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange([currentDataArray count], [array count])];
-        [currentDataArray insertObjects:array atIndexes:insertedIndexSet];
-        
-        NSMutableArray *insertedIndexPaths = [NSMutableArray array];
-        for (NSUInteger i = 0; i < [array count]; i++) {
-            [insertedIndexPaths addObject:[NSIndexPath indexPathForRow:displayedIndex + i inSection:0]];
-        }
-        [(UITableView *)contentView beginUpdates];
-        [(UITableView *)contentView insertRowsAtIndexPaths:insertedIndexPaths withRowAnimation:UITableViewRowAnimationAutomatic];
-        [(UITableView *)contentView endUpdates];
+        [UIView insertTableViewCell:(UITableView *)contentView oldCount:oldCount addCount:[array count]];
     }
     else if ([contentView isKindOfClass:[UICollectionView class]]) {
-        NSInteger displayedIndex = [currentDataArray count];
-        NSIndexSet *insertedIndexSet = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange([currentDataArray count], [array count])];
-        [currentDataArray insertObjects:array atIndexes:insertedIndexSet];
-        
-        [UIView setAnimationsEnabled:NO];//默认的动画效果有点乱，这里先把所有动画关掉
-        [(UICollectionView *)contentView performBatchUpdates:^{
-            NSMutableArray *insertedIndexPaths = [NSMutableArray array];
-            for (NSUInteger i = 0; i < [array count]; i++) {
-                [insertedIndexPaths addObject:[NSIndexPath indexPathForRow:displayedIndex + i inSection:0]];
-            }
-            [(UICollectionView *)contentView insertItemsAtIndexPaths:insertedIndexPaths];
-        }
-                                                  completion:nil];
-        [UIView setAnimationsEnabled:YES];
+        [UIView insertCollectionViewCell:(UICollectionView *)contentView oldCount:oldCount addCount:[array count]];
     }
 }
 //获取缓存数组

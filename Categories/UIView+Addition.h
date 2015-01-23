@@ -108,4 +108,10 @@
 + (UIViewController *)currentViewController;
 + (UIViewController *)getVisibleViewControllerFrom:(UIViewController *)viewController;
 
+#pragma mark - UITableView insert cell
++ (void)insertTableViewCell:(UITableView *)tableView oldCount:(NSInteger)oldCount addCount:(NSInteger)addCount;
+
+#pragma mark - UICollectionView insert cell
++ (void)insertCollectionViewCell:(UICollectionView *)collectionView oldCount:(NSInteger)oldCount addCount:(NSInteger)addCount;
+
 @end

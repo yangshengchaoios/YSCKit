@@ -440,5 +440,30 @@
     }
 }
 
+#pragma mark - UITableView insert cell
++ (void)insertTableViewCell:(UITableView *)tableView oldCount:(NSInteger)oldCount addCount:(NSInteger)addCount {
+    NSMutableArray *insertedIndexPaths = [NSMutableArray array];
+    for (int i = 0; i < addCount; i++) {
+        [insertedIndexPaths addObject:[NSIndexPath indexPathForRow:oldCount + i inSection:0]];
+    }
+    [tableView beginUpdates];
+    [tableView insertRowsAtIndexPaths:insertedIndexPaths withRowAnimation:UITableViewRowAnimationAutomatic];
+    [tableView endUpdates];
+}
+
+#pragma mark - UICollectionView insert cell
++ (void)insertCollectionViewCell:(UICollectionView *)collectionView oldCount:(NSInteger)oldCount addCount:(NSInteger)addCount {
+    [UIView setAnimationsEnabled:NO];//默认的动画效果有点乱，这里先把所有动画关掉
+    [collectionView performBatchUpdates:^{
+        NSMutableArray *insertedIndexPaths = [NSMutableArray array];
+        for (int i = 0; i < addCount; i++) {
+            [insertedIndexPaths addObject:[NSIndexPath indexPathForRow:oldCount + i inSection:0]];
+        }
+        [collectionView insertItemsAtIndexPaths:insertedIndexPaths];
+    }
+                                              completion:nil];
+    [UIView setAnimationsEnabled:YES];
+}
+
 
 @end
