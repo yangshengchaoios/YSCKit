@@ -78,7 +78,7 @@
  */
 //控制调试信息的输出
 #define DEBUGMODEL      [[NSUserDefaults standardUserDefaults] boolForKey:@"DEBUG"]
-#define DEBUG_LOG       1  //只有在非DEBUG模式下起作用（0-关闭调试输出和日志记录功能  1-打开控制台输出和日志文件记录功能）
+#define DEBUG_LOG       0  //只有在非DEBUG模式下起作用（0-只有调试输出功能  1-打开控制台输出和日志文件记录功能）
 #define APPSTORE        0  //0-用企业证书打包版本  1-appstore审核版本
 
 #define __NSLog(s, ...) do { \
@@ -90,6 +90,9 @@ NSString *logString = [NSString stringWithFormat:@"[%@(%d)] %@",[[NSString strin
     else { \
         if (DEBUG_LOG) { \
             [LogManager saveLog:logString]; \
+            NSLog(@"%@", logString); \
+        } \
+        else { \
             NSLog(@"%@", logString); \
         } \
     } \
