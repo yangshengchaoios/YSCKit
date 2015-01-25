@@ -202,7 +202,7 @@
                                }];
     
     [actionSheet bk_setCancelButtonWithTitle:@"取消" handler:nil];
-    [actionSheet showInView:viewController.view.window];
+    [actionSheet showInView:viewController.view];
     return actionSheet;
 }
 
