@@ -16,7 +16,7 @@
 
 + (void)checkNewVersion;
 + (void)configUmeng;
-+ (UIView *)createSearchBar:(NSInteger)textFieldTag;
++ (UIView *)createSearchViewWithWidth:(NSInteger)width withTextField:(UITextField *)textField;
 
 #pragma mark - 格式化金额
 

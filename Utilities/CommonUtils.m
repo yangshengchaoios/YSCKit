@@ -103,34 +103,39 @@
 }
 
 /**
- *  创建搜索栏
+ *  创建搜索框
+ *
+ *  @param width     宽度
+ *  @param textField 输入框
  *
  *  @return
  */
-+ (UIView *)createSearchBar:(NSInteger)textFieldTag {
-    UIView *searchBoxContainerView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, AUTOLAYOUT_LENGTH(412), AUTOLAYOUT_LENGTH(56))];
++ (UIView *)createSearchViewWithWidth:(NSInteger)width withTextField:(UITextField *)textField {
+    UIView *searchBoxContainerView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, width, AUTOLAYOUT_LENGTH(56))];
     //1. 设置搜索框背景图片
-    UIImageView *searchBoxImageView = [[UIImageView alloc] initWithFrame:searchBoxContainerView.bounds];
+    UIImageView *searchBoxImageView = [[UIImageView alloc] initWithFrame:CGRectZero];
     searchBoxImageView.image = [UIImage imageNamed:@"bg_search"];
-    searchBoxImageView.center = searchBoxContainerView.center;
     [searchBoxContainerView addSubview:searchBoxImageView];
+    [searchBoxImageView autoPinEdgeToSuperviewEdge:ALEdgeTop];
+    [searchBoxImageView autoPinEdgeToSuperviewEdge:ALEdgeLeading];
+    [searchBoxImageView autoPinEdgeToSuperviewEdge:ALEdgeBottom];
+    [searchBoxImageView autoPinEdgeToSuperviewEdge:ALEdgeTrailing];
+    
     //2. 设置搜索图标icon
     UIImageView *searchIconImageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"icon_search"]];
-    searchIconImageView.left = 10;
-    searchIconImageView.centerY = searchBoxContainerView.height / 2;
     [searchBoxContainerView addSubview:searchIconImageView];
+    [searchIconImageView autoPinEdgeToSuperviewEdge:ALEdgeLeading withInset:AUTOLAYOUT_LENGTH(15)];
+    [searchIconImageView autoAlignAxisToSuperviewAxis:ALAxisHorizontal];
+    
     //3. 设置关键词输入框
-    UITextField *searchTextField = [[UITextField alloc] initWithFrame:CGRectZero];
-    searchTextField.placeholder = @"搜索商品与店铺";
-    searchTextField.font = AUTOLAYOUT_FONT(18);
-    searchTextField.textColor = [UIColor whiteColor];
-    [searchTextField setValue:[UIColor whiteColor] forKeyPath:@"_placeholderLabel.textColor"];
-    searchTextField.tag = textFieldTag;
-    searchTextField.height = 24;
-    searchTextField.centerY = searchIconImageView.centerY;
-    searchTextField.left = CGRectGetMaxX(searchIconImageView.frame) + 10;
-    searchTextField.width = searchBoxContainerView.width - searchTextField.left - 10;
-    [searchBoxContainerView addSubview:searchTextField];
+    textField.font = AUTOLAYOUT_FONT(26);
+    textField.textColor = [UIColor whiteColor];
+    [textField setValue:[UIColor whiteColor] forKeyPath:@"_placeholderLabel.textColor"];
+    [searchBoxContainerView addSubview:textField];
+    [textField autoPinEdgeToSuperviewEdge:ALEdgeLeading withInset:AUTOLAYOUT_LENGTH(60)];
+    [textField autoPinEdgeToSuperviewEdge:ALEdgeTop];
+    [textField autoPinEdgeToSuperviewEdge:ALEdgeBottom];
+    [textField autoPinEdgeToSuperviewEdge:ALEdgeTrailing withInset:AUTOLAYOUT_LENGTH(10)];
     
     return searchBoxContainerView;
 }
