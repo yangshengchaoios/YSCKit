@@ -57,8 +57,9 @@
 + (BOOL)SqliteUpdate:(NSString *)sql dbPath:(NSString *)dbPath;
 
 
-#pragma mark - 过去了多长时间
+#pragma mark - 过去了多长时间 + 还剩多少时间
 
-+ (NSString *)TimePassed:(NSString *)startTimeStamp;
++ (NSString *)TimePassed:(NSString *)timeStamp;
++ (NSString *)TimeRemain:(NSString *)timeStamp;
 
 @end

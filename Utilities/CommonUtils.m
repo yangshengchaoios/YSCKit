@@ -246,8 +246,8 @@
  *
  *  @return
  */
-+ (NSString *)TimePassed:(NSString *)startTimeStamp {
-    NSDate *startDateTime = [NSDate dateFromTimeStamp:startTimeStamp];
++ (NSString *)TimePassed:(NSString *)timeStamp {
+    NSDate *startDateTime = [NSDate dateFromTimeStamp:timeStamp];
     NSDate *nowDate = [NSDate date];
     //其它
     if ([startDateTime isLastYear]) {
@@ -279,6 +279,11 @@
         return [NSString stringWithFormat:@"%ld分钟之前", minutesPassed];
     }
     return [NSString stringWithFormat:@"%ld秒之前", secondsPassed];
+}
++ (NSString *)TimeRemain:(NSString *)timeStamp {
+    NSDate *startDateTime = [NSDate dateFromTimeStamp:timeStamp];
+    //TODO:计算还剩多长时间
+    return timeStamp;
 }
 
 @end
