@@ -7,7 +7,6 @@
 //
 
 #import "BaseViewController.h"
-#import "MLNavigationController.h"
 
 #define kHudIntervalShort 0.5f
 #define kHudIntervalNormal 1.0f
@@ -420,7 +419,7 @@
 		[(BaseViewController *)viewController setParams:mutableParamDict];
 	}
     
-	MLNavigationController *navigationController = [[MLNavigationController alloc] initWithRootViewController:viewController];
+	UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:viewController];
     navigationController.navigationController.navigationBar.translucent = NO;
     //--------自定义present出来的navigationbar背景图片--------
     [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleDefault];
