@@ -11,8 +11,8 @@
 
 #import <Foundation/Foundation.h>
 
-#define DateFormat1 @"yyyy-MM-dd hh:mm:ss"
-#define DateFormat2 @"yyyy.MM.dd hh:mm"
+#define DateFormat1 @"yyyy-MM-dd HH:mm:ss"
+#define DateFormat2 @"yyyy.MM.dd HH:mm"
 #define DateFormat3 @"yyyy-MM-dd"
 #define DateFormat4 @"yyyy.MM.dd"
 

@@ -61,5 +61,6 @@
 
 + (NSString *)TimePassed:(NSString *)timeStamp;
 + (NSString *)TimeRemain:(NSString *)timeStamp;
++ (NSString *)TimeRemain:(NSString *)timeStamp currentTime:(NSString *)currentTime;
 
 @end

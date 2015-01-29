@@ -248,9 +248,9 @@
  */
 + (NSString *)TimePassed:(NSString *)timeStamp {
     NSDate *startDateTime = [NSDate dateFromTimeStamp:timeStamp];
-    NSDate *nowDate = [NSDate date];
+    NSDate *nowDateTime = [NSDate date];
     //其它
-    if ([startDateTime isLastYear]) {
+    if ([startDateTime isLastYear] || [startDateTime isLaterThanDate:nowDateTime]) {
         return [startDateTime stringWithFormat:DateFormat3];
     }
     
@@ -269,9 +269,9 @@
         return [NSString stringWithFormat:@"昨天%@",[startDateTime stringWithFormat:@"hh:mm:ss"]];
     }
     
-    NSInteger hoursPassed = [startDateTime hoursBeforeDate:nowDate];
-    NSInteger minutesPassed = [startDateTime minutesBeforeDate:nowDate];
-    NSInteger secondsPassed = (NSInteger)[nowDate timeIntervalSinceDate:startDateTime];
+    NSInteger hoursPassed = [startDateTime hoursBeforeDate:nowDateTime];
+    NSInteger minutesPassed = [startDateTime minutesBeforeDate:nowDateTime];
+    NSInteger secondsPassed = (NSInteger)[nowDateTime timeIntervalSinceDate:startDateTime];
     if (hoursPassed > 0) {
         return [NSString stringWithFormat:@"%ld小时之前", hoursPassed];
     }
@@ -281,9 +281,30 @@
     return [NSString stringWithFormat:@"%ld秒之前", secondsPassed];
 }
 + (NSString *)TimeRemain:(NSString *)timeStamp {
-    NSDate *startDateTime = [NSDate dateFromTimeStamp:timeStamp];
-    //TODO:计算还剩多长时间
-    return timeStamp;
+    return [self TimeRemain:timeStamp currentTime:[[NSDate date] timeStamp]];
+}
++ (NSString *)TimeRemain:(NSString *)timeStamp currentTime:(NSString *)currentTime {
+    NSDate *nowDateTime = [NSDate dateFromTimeStamp:currentTime];
+    NSDate *endDateTime = [NSDate dateFromTimeStamp:timeStamp];
+    //其它
+    if ([endDateTime isNextYear] || [endDateTime isEarlierThanDate:nowDateTime]) {
+        return [endDateTime stringWithFormat:DateFormat3];
+    }
+    
+    //当年以内，7天以后
+    if ([endDateTime isLaterThanDate:[NSDate dateWithDaysFromNow:7]]) {
+        return [endDateTime stringWithFormat:@"MM-dd"];
+    }
+    
+    //7天以内
+    if ( ! [endDateTime isToday]) {
+        NSInteger days = [endDateTime daysAfterDate:nowDateTime];
+        NSInteger hours = [endDateTime hoursAfterDate:[nowDateTime dateByAddingDays:days]];
+        return [NSString stringWithFormat:@"%ld天 %ld小时", days, hours];
+    }
+    
+    //xx:xx:xx
+    return [[NSDate dateFromTimeInterval:[endDateTime timeIntervalSinceDate:nowDateTime]] stringWithFormat:@"HH:mm:ss"];
 }
 
 @end
