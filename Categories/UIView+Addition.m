@@ -337,6 +337,24 @@
     }
 }
 
++ (void)resetConstraintOfView:(UIView *)view {
+    ReturnWhenObjectIsEmpty(view);
+    [view resetConstraintOfView];
+}
+- (void)resetConstraintOfView {
+    for (NSLayoutConstraint *constraint in self.constraints) {
+        if (constraint.constant > 0) {
+            constraint.constant = AUTOLAYOUT_LENGTH(constraint.constant);
+        }
+    }
+    
+    if ([self.subviews count] > 0) {
+        for (UIView *subView in self.subviews) {
+            [subView resetConstraintOfView];
+        }
+    }
+}
+
 #pragma mark - 计算自动布局的size
 - (void)autoLayoutSize {
     CGSize size = AUTOLAYOUT_SIZE(self.frame.size);

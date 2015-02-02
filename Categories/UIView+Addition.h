@@ -84,6 +84,9 @@
 + (void)resetFontSizeOfView:(UIView *)view;
 - (void)resetFontSizeOfView;
 
++ (void)resetConstraintOfView:(UIView *)view;
+- (void)resetConstraintOfView;
+
 #pragma mark - 计算自动布局的size
 - (void)autoLayoutSize;
 
