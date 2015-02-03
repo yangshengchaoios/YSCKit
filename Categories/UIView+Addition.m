@@ -296,19 +296,6 @@
 
 
 #pragma mark - 递归遍历所有子view
-//设置调整布局相关的view背景颜色为空
-+ (void)clearBackgroundColorOfView:(UIView *)view {
-    ReturnWhenObjectIsEmpty(view);
-    [view clearBackgroundColorOfView];
-}
-- (void)clearBackgroundColorOfView {
-    for (UIView *subview in self.subviews) {
-        if (subview.tag >= 1000) {
-            subview.backgroundColor = [UIColor clearColor];
-        }
-        [subview clearBackgroundColorOfView];
-    }
-}
 
 //重新调整UILabel和UIButton的font
 + (void)resetFontSizeOfView:(UIView *)view {
