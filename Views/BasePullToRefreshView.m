@@ -295,6 +295,9 @@
     self.requestTypeAtIndex = ^RequestType (NSInteger index) {
         return RequestTypeGET;
     };
+    self.contentViewContentInsetAtIndex = ^UIEdgeInsets (NSInteger index) {
+        return UIEdgeInsetsZero;
+    };
     
     //UITableViewCell特有的
     self.tableViewCellHeightAtIndex = ^CGFloat (id data, NSIndexPath *indexPath, NSInteger index) {
@@ -321,10 +324,10 @@
     
     //UICollectionView特有的
     self.itemSizeAtIndex = ^CGSize (NSInteger index) {
-        return CGSizeMake(0, 0);//TODO:
+        return CGSizeZero;
     };
     self.itemEdgeInsetsAtIndex = ^UIEdgeInsets (NSInteger index) {
-        return UIEdgeInsetsMake(0, 0, 0, 0);
+        return UIEdgeInsetsZero;
     };
     self.minimumRowSpacingForSectionAtIndex = ^CGFloat (NSInteger section, NSInteger index) {
         return 0;
@@ -427,6 +430,9 @@
             //设置seperator
             UITableViewSeperatorType seperatoryType = UITableViewSeperatorTypeEdge;
             UIColor *color = RGB(170, 170, 170);
+            if (self.contentViewContentInsetAtIndex) {
+                ((UITableView *)contentView).contentInset = self.contentViewContentInsetAtIndex(i);
+            }
             if (self.tableViewSeperatorTypeAtIndex) {
                 seperatoryType = self.tableViewSeperatorTypeAtIndex(i);
             }
@@ -467,7 +473,6 @@
         }
         
         //2. 设置contentView
-        contentView.backgroundColor = [UIColor randomColor];//TODO:test
         contentView.tag = TagStartOfContentView + i;
         [self.contentViewArray addObject:contentView];
         [self.scrollView addSubview:contentView];
@@ -540,8 +545,13 @@
     //1. 定义网络返回成功的回调
     RequestSuccessed requestSuccessedBlock = ^(id responseObject) {
         [blockSelf hideHUDLoading];
-        [[blockSelf contentViewAtIndex:index] headerEndRefreshing];
         BOOL isPullToRefresh = (kDefaultPageStartIndex == pageIndex); //是否下拉刷新
+        if (isPullToRefresh) {
+            [[blockSelf contentViewAtIndex:index] headerEndRefreshing];
+        }
+        else {
+            [[blockSelf contentViewAtIndex:index] footerEndRefreshing];
+        }
         
         //1. 获取结果数组
         NSArray *dataArray = nil;
@@ -589,7 +599,12 @@
     //2. 定义网络返回失败的回调
     RequestFailure requestFailureBlock = ^(NSInteger errorCode, NSString *errorMessage) {
         [blockSelf showResultThenHide:errorMessage];
-        [[blockSelf contentViewAtIndex:index] headerEndRefreshing];
+        if (kDefaultPageStartIndex == pageIndex) {
+            [[blockSelf contentViewAtIndex:index] headerEndRefreshing];
+        }
+        else {
+            [[blockSelf contentViewAtIndex:index] footerEndRefreshing];
+        }
         if (blockSelf.failedAtIndex) {
             blockSelf.failedAtIndex(index);
         }

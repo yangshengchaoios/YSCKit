@@ -43,6 +43,7 @@ typedef NSString *(^PrefixOfUrlAtIndex)(NSInteger index);                //接�
 typedef NSString *(^HintStringAtIndex)(NSInteger index);                 //没有数据时的提示文本(当返回nil时，表示不显示TipsView)
 typedef UIView *(^LayoutCell)(id data, NSIndexPath *indexPath, NSInteger index); //根据数据来布局界面
 typedef RequestType (^RequestTypeAtIndex)(NSInteger index);              //
+typedef UIEdgeInsets (^ContentViewContentInsetAtIndex)(NSInteger index); //contentView.contentInset
 
 //UITableView特有
 typedef CGFloat (^TableViewCellHeightAtIndex)(id data, NSIndexPath *indexPath, NSInteger index);
@@ -105,6 +106,7 @@ typedef void (^ClickCell)(id data, NSIndexPath *indexPath, NSInteger index);    
 @property (nonatomic, copy) HintStringAtIndex hintStringAtIndex;            //默认提示信息"暂时没有内容"
 @property (nonatomic, copy) LayoutCell layoutCell;                          //默认调用layoutDataModel:方法
 @property (nonatomic, copy) RequestTypeAtIndex requestTypeAtIndex;          //默认RequestTypeGET
+@property (nonatomic, copy) ContentViewContentInsetAtIndex contentViewContentInsetAtIndex;//默认UIEdgeZero
 //UITableView特有
 @property (nonatomic, copy) TableViewCellHeightAtIndex tableViewCellHeightAtIndex;
 @property (nonatomic, copy) TableViewSeperatorColorAtIndex tableViewSeperatorColorAtIndex;  //默认 RGB(170, 170, 170)
