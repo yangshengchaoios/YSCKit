@@ -430,9 +430,6 @@
             //设置seperator
             UITableViewSeperatorType seperatoryType = UITableViewSeperatorTypeEdge;
             UIColor *color = RGB(170, 170, 170);
-            if (self.contentViewContentInsetAtIndex) {
-                ((UITableView *)contentView).contentInset = self.contentViewContentInsetAtIndex(i);
-            }
             if (self.tableViewSeperatorTypeAtIndex) {
                 seperatoryType = self.tableViewSeperatorTypeAtIndex(i);
             }
@@ -473,6 +470,11 @@
         }
         
         //2. 设置contentView
+        if ([contentView isKindOfClass:[UIScrollView class]]) {
+            if (self.contentViewContentInsetAtIndex) {
+                ((UIScrollView *)contentView).contentInset = self.contentViewContentInsetAtIndex(i);
+            }
+        }
         contentView.tag = TagStartOfContentView + i;
         [self.contentViewArray addObject:contentView];
         [self.scrollView addSubview:contentView];
