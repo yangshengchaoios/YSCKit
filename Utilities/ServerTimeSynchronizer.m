@@ -13,7 +13,7 @@
 @interface ServerTimeSynchronizer ()
 
 @property (assign, nonatomic) BOOL isSyncSuccessed;         //是否同步成功
-@property (assign, nonatomic) NSTimeInterval interval;      //(服务器时间 - 本地时间)s
+@property (assign, nonatomic) NSTimeInterval interval;      //(服务器时间 - 本地时间)ms
 @property (nonatomic, strong) NSLock *theLock;
 
 @end
@@ -34,7 +34,8 @@
 - (id)init {
 	self = [super init];
 	if (self) {
-		self.interval = 0;
+        self.interval = [[self loadCachedInterval] doubleValue];   //从缓存中读取默认值
+        self.currentTimeInterval = [[NSDate dateWithTimeIntervalSinceNow:self.interval / 1000] timeStamp];
         [self refreshServerTime];
         self.theLock = [[NSLock alloc] init];
         
@@ -60,7 +61,7 @@
 //心跳方法
 - (void)timerFired:(NSTimer *)theTimer {
 	[self.theLock lock];
-    self.currentTimeInterval = [[NSDate dateWithTimeIntervalSinceNow:self.interval] timeStamp];
+    self.currentTimeInterval = [[NSDate dateWithTimeIntervalSinceNow:self.interval / 1000] timeStamp];
     [self.theLock unlock];
 }
 
@@ -74,26 +75,25 @@
                   andDictParam:nil
                      modelName:nil
               requestSuccessed:^(id responseObject) {
-                  NSTimeInterval httpWaste = [[NSDate date] timeIntervalSinceDate:date];//计算接口调用的执行时间
-                  NSString *oldServerTime = [NSString stringWithFormat:@"%@", responseObject];
+                  NSDate *nowDate = [NSDate date];
+                  NSTimeInterval httpWaste = [nowDate timeIntervalSinceDate:date];//计算接口调用的执行时间(秒)
                   
-                  if (httpWaste < 2) {
+                  if (httpWaste >= 2) {//如果接口执行时间大于2秒就得重新请求
+                      [blockSelf refreshFaild];
+                  }
+                  else {
                       [NSObject cancelPreviousPerformRequestsWithTarget:self
                                                                selector:@selector(refreshServerTime)
                                                                  object:nil];
                       blockSelf.isSyncSuccessed = YES;
-                      NSTimeInterval serverTime = [oldServerTime doubleValue] + httpWaste / 2.0f;
-                      NSTimeInterval localTime = [[NSDate date] timeIntervalSince1970];
-                      blockSelf.interval =  serverTime - localTime;
+                      NSString *oldServerTime = [NSString stringWithFormat:@"%@", responseObject];//毫秒
+                      NSTimeInterval serverTime = [oldServerTime doubleValue] + httpWaste * 1000 / 2.0f;
+                      NSTimeInterval localTime = [nowDate timeIntervalSince1970] * 1000;
+                      blockSelf.interval = serverTime - localTime;
                       
                       [[StorageManager sharedInstance] archiveDictionary:@{ CachedKeyOfInterval : [NSString stringWithFormat:@"%f", blockSelf.interval] }
-                                                              toFilePath:[self cacheFilePath:nil]
+                                                              toFilePath:[blockSelf cacheFilePath:nil]
                                                                overwrite:YES];
-                      
-                      NSLog(@" \nblockSelf.interval:%f\nhttpWaste: %f",  blockSelf.interval,httpWaste);
-                  }
-                  else {
-                      [blockSelf refreshFaild];
                   }
               }
                 requestFailure:^(NSInteger errorCode, NSString *errorMessage) {
