@@ -112,18 +112,20 @@
                 
                 //针对转换映射后的处理
                 if (initError) {
-                    requestFailure(1101, initError.localizedDescription);
+                    if (requestFailure) {
+                        requestFailure(1101, initError.localizedDescription);
+                    }
                 }
                 else {
-                    requestSuccessed(dataModel);//注意：这里dataModel为nil也让它返回
+                    if (requestSuccessed) {
+                        requestSuccessed(dataModel);//注意：这里dataModel为nil也让它返回
+                    }
                 }
             }
-//            else if (2 == baseModel.State) {//扩展
-//            
-//            }
             else {
-                NSLog(@"message=%@", baseModel.message);
-                requestFailure(1103, baseModel.message);
+                if (requestFailure) {
+                    requestFailure(1103, baseModel.message);
+                }
             }
         } requestFailure:requestFailure];
 }
@@ -151,18 +153,26 @@
           if ([baseModel isKindOfClass:[BaseModel class]]) {
               if (1 == baseModel.state) {  //接口访问成功
                   NSLog(@"success message = %@", baseModel.message);
-                  requestSuccessed(baseModel);
+                  if (requestSuccessed) {
+                      requestSuccessed(baseModel);
+                  }
               }
               else {
-                  requestFailure(1101, baseModel.message);
+                  if (requestFailure) {
+                      requestFailure(1101, baseModel.message);
+                  }
               }
           }
           else {
-              requestFailure(1102, @"本地数据映射错误！");
+              if (requestFailure) {
+                  requestFailure(1102, @"本地数据映射错误！");
+              }
           }
           
       } requestFailure:^(NSInteger errorCode, NSString *errorMessage) {
-          requestFailure(1103, errorMessage);
+          if (requestFailure) {
+              requestFailure(1103, errorMessage);
+          }
       }];
 }
 
@@ -246,14 +256,21 @@
         }
         
         if ([NSObject isNotEmpty:baseModel]) {
-            requestSuccessed(baseModel);
+            if (requestSuccessed) {
+                requestSuccessed(baseModel);
+            }
         }
         else {
             if (initError) {
-                requestFailure(1001, initError.localizedDescription);
+                if (requestFailure) {
+                    requestFailure(1001, initError.localizedDescription);
+                }
+                
             }
             else {
-                requestFailure(1002, @"本地对象映射出错！");
+                if (requestFailure) {
+                    requestFailure(1002, @"本地对象映射出错！");
+                }
             }
         }
     };
@@ -264,14 +281,20 @@
             [LogManager saveLog:[NSString stringWithFormat:@"请求参数%@", newDictParam]];
             [LogManager saveLog:error.localizedDescription];
             if (401 == operation.response.statusCode) {
-                requestFailure(1003, @"您还未登录呢！");
+                if (requestFailure) {
+                    requestFailure(1003, @"您还未登录呢！");
+                }
             }
             else {
-                requestFailure(1004, @"网络错误！");
+                if (requestFailure) {
+                    requestFailure(1004, @"网络错误！");
+                }
             }
         }
         else {
-            requestFailure(operation.response.statusCode, error.localizedDescription);
+            if (requestFailure) {
+                requestFailure(operation.response.statusCode, error.localizedDescription);
+            }
         }
     };
     //   定义post的加密回调
