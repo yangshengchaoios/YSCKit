@@ -372,12 +372,11 @@
             continue;
         }
         //去掉key和value的前后空格字符
-        NSString *newKey = [NSString trimString:key];
+        NSString *newKey = Trim(key);
         NSString *newValue = [NSString stringWithFormat:@"%@", [NSObject isEmpty:value] ? @"" : value];
-        NSString *newUTF8Value = [NSString UTF8Encoded:[NSString trimString:newValue]];
-        //对value进行UTF8编码
-        [joinedString appendFormat:@"%@=%@", newKey, newUTF8Value];
-//        [param setValue:newUTF8Value forKey:newKey];
+        NSString *newUTF8Value = [NSString UTF8Encoded:Trim(newValue)];//对value进行UTF8编码
+        [joinedString appendFormat:@"%@=%@", newKey, Trim(newValue)];
+//        param[key] = newUTF8Value;
     }
     
     //3. 对参数进行md5加密
