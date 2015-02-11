@@ -350,17 +350,6 @@
  *  @return signature
  */
 + (NSString *)signatureWithParam:(NSMutableDictionary *)param {
-//    //1. 默认参数:version, udid, from
-//    if ([NSString isEmpty:param[kParamVersion]]) {
-//        [param setValue:kParamVersionValue forKey:kParamVersion];
-//    }
-//    if ([NSString isEmpty:param[kParamUdid]]) {
-//        [param setValue:@"default udid of ios" forKey:kParamUdid];//TODO:获取设备唯一编号
-//    }
-//    if ([NSString isEmpty:param[kParamFrom]]) {
-//        [param setValue:kParamFromValue forKey:kParamFrom];
-//    }
-    
     NSArray *keys = [[param allKeys] sortedArrayUsingSelector:@selector(compare:)];
     
     //2. 按照字典顺序拼接url字符串
@@ -374,15 +363,13 @@
         //去掉key和value的前后空格字符
         NSString *newKey = Trim(key);
         NSString *newValue = [NSString stringWithFormat:@"%@", [NSObject isEmpty:value] ? @"" : value];
-        NSString *newUTF8Value = [NSString UTF8Encoded:Trim(newValue)];//对value进行UTF8编码
+//        NSString *newUTF8Value = [NSString UTF8Encoded:Trim(newValue)];//对value进行UTF8编码
         [joinedString appendFormat:@"%@=%@", newKey, Trim(newValue)];
-//        param[key] = newUTF8Value;
     }
     
     //3. 对参数进行md5加密
     NSString *newString = [NSString stringWithFormat:@"%@%@", joinedString, kParamSecretKey];
-    NSLog(@"newString = %@", newString);
-    return [[NSString MD5Encrypt:newString] lowercaseString];
+    return [[NSString MD5Encrypt:[NSString UTF8Encoded:newString]] lowercaseString];
 }
 
 @end
