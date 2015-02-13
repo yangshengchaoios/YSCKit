@@ -26,7 +26,6 @@
 - (id)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
-        NSLog(@"initWithFrame，%@", NSStringFromCGRect(self.frame));
         [self initSubviews];
     }
     return self;
@@ -36,7 +35,6 @@
 - (id)initWithCoder:(NSCoder *)aDecoder {
     self = [super initWithCoder:aDecoder];
     if (self) {
-        NSLog(@"initWithCoder，%@", NSStringFromCGRect(self.frame));
         [self initSubviews];
     }
     return self;
@@ -48,11 +46,9 @@
  */
 - (void)setNeedsDisplay {
     [super setNeedsDisplay];
-    NSLog(@"setNeedsDisplay，%@", NSStringFromCGRect(self.frame));
 }
 
 - (void)initSubviews {
-    NSLog(@"initSubviews，%@", NSStringFromCGRect(self.frame));
     self.segmentedTitleArray = [NSMutableArray array];
     self.contentDataArray = [NSMutableArray array];
     self.contentViewArray = [NSMutableArray array];
@@ -73,27 +69,22 @@
 //////////////////////////////////////////////////////////////////////////////////////////
 - (void)setNeedsLayout {
     [super setNeedsLayout];
-    NSLog(@"setNeedsLayout，%@", NSStringFromCGRect(self.frame));
 }
 
 - (void)layoutSubviews {
     [super layoutSubviews];
-    NSLog(@"layoutSubviews，%@", NSStringFromCGRect(self.frame));
 }
 
 - (void)drawRect:(CGRect)rect {
-    NSLog(@"drawRect:%@，frame=%@", NSStringFromCGRect(rect), NSStringFromCGRect(self.frame));
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
 - (void)layoutIfNeeded {
     [super layoutIfNeeded];
-    NSLog(@"layoutIfNeeded，%@", NSStringFromCGRect(self.frame));
 }
 
 - (void)setNeedsUpdateConstraints {
     [super setNeedsUpdateConstraints];
-    NSLog(@"setNeedsUpdateConstraints，%@", NSStringFromCGRect(self.frame));
 }
 
 

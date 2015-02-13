@@ -41,6 +41,7 @@
     #import "UIDevice+Additions.h"
     #import "UIResponder+Additions.h"
     #import "NSLayoutConstraint+Additions.h"
+    #import "NSArray+Addition.h"
 
     //Utils
     #import "FileUtils.h"
