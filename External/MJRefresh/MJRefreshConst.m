@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
-const CGFloat MJRefreshViewHeight = 64.0;
+const CGFloat MJRefreshViewHeight = 50.0;
 const CGFloat MJRefreshFastAnimationDuration = 0.25;
 const CGFloat MJRefreshSlowAnimationDuration = 0.4;
 

@@ -25,9 +25,9 @@
 - (id)initWithFrame:(CGRect)frame
 {
     if (self = [super initWithFrame:frame]) {
-        self.pullToRefreshText = MJRefreshFooterPullToRefresh;
-        self.releaseToRefreshText = MJRefreshFooterReleaseToRefresh;
-        self.refreshingText = MJRefreshFooterRefreshing;
+//        self.pullToRefreshText = MJRefreshFooterPullToRefresh;
+//        self.releaseToRefreshText = MJRefreshFooterReleaseToRefresh;
+//        self.refreshingText = MJRefreshFooterRefreshing;
     }
     return self;
 }
@@ -36,7 +36,7 @@
 {
     [super layoutSubviews];
     
-    self.statusLabel.frame = self.bounds;
+//    self.statusLabel.frame = self.bounds;
 }
 
 - (void)willMoveToSuperview:(UIView *)newSuperview

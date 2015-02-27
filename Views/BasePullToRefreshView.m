@@ -56,7 +56,6 @@
     self.currentIndex = 0;
     
     self.contentViewSpace = 0;
-    self.viewControllerClassName = @"";//TODO:get current view controller class name
     self.isUseSegmentedControl = NO;
     self.segmentedHeight = 44;
     self.segmentedLeading = 10;
@@ -393,6 +392,8 @@
 }
 //初始化contentViews
 - (void)initContentViews {
+    self.viewControllerClassName = NSStringFromClass([UIView currentViewController].class);
+    NSAssert(self.viewControllerClassName, @"can not find view's viewcontroller!");
     WeakSelfType blockSelf = self;
     if (nil == self.contentViewArray) {
         self.contentViewArray = [NSMutableArray array];

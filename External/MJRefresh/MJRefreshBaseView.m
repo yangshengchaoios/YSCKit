@@ -17,6 +17,7 @@
     __weak UILabel *_statusLabel;
     __weak UIImageView *_arrowImage;
     __weak UIActivityIndicatorView *_activityView;
+    __weak UIImageView *_imageViews;
 }
 @end
 
@@ -25,46 +26,57 @@
 /**
  *  状态标签
  */
-- (UILabel *)statusLabel
+//- (UILabel *)statusLabel
+//{
+//    if (!_statusLabel) {
+//        UILabel *statusLabel = [[UILabel alloc] init];
+//        statusLabel.autoresizingMask = UIViewAutoresizingFlexibleWidth;
+//        statusLabel.font = [UIFont boldSystemFontOfSize:13];
+//        statusLabel.textColor = MJRefreshLabelTextColor;
+//        statusLabel.backgroundColor = [UIColor clearColor];
+//        statusLabel.textAlignment = NSTextAlignmentCenter;
+//        [self addSubview:_statusLabel = statusLabel];
+//    }
+//    return _statusLabel;
+//}
+
+- (UIImageView *)imageViews
 {
-    if (!_statusLabel) {
-        UILabel *statusLabel = [[UILabel alloc] init];
-        statusLabel.autoresizingMask = UIViewAutoresizingFlexibleWidth;
-        statusLabel.font = [UIFont boldSystemFontOfSize:13];
-        statusLabel.textColor = MJRefreshLabelTextColor;
-        statusLabel.backgroundColor = [UIColor clearColor];
-        statusLabel.textAlignment = NSTextAlignmentCenter;
-        [self addSubview:_statusLabel = statusLabel];
+    if (!_imageViews) {
+        UIImageView *imageViews = [[UIImageView alloc] init];
+        imageViews.contentMode = UIViewContentModeScaleAspectFit;
+        imageViews.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
+        [self addSubview:_imageViews = imageViews];
     }
-    return _statusLabel;
+    return _imageViews;
 }
 
 /**
  *  箭头图片
  */
-- (UIImageView *)arrowImage
-{
-    if (!_arrowImage) {
-        UIImageView *arrowImage = [[UIImageView alloc] initWithImage:[UIImage imageNamed:MJRefreshSrcName(@"arrow.png")]];
-        arrowImage.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin;
-        [self addSubview:_arrowImage = arrowImage];
-    }
-    return _arrowImage;
-}
+//- (UIImageView *)arrowImage
+//{
+//    if (!_arrowImage) {
+//        UIImageView *arrowImage = [[UIImageView alloc] initWithImage:[UIImage imageNamed:MJRefreshSrcName(@"arrow.png")]];
+//        arrowImage.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin;
+//        [self addSubview:_arrowImage = arrowImage];
+//    }
+//    return _arrowImage;
+//}
 
 /**
  *  状态标签
  */
-- (UIActivityIndicatorView *)activityView
-{
-    if (!_activityView) {
-        UIActivityIndicatorView *activityView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
-        activityView.bounds = self.arrowImage.bounds;
-        activityView.autoresizingMask = self.arrowImage.autoresizingMask;
-        [self addSubview:_activityView = activityView];
-    }
-    return _activityView;
-}
+//- (UIActivityIndicatorView *)activityView
+//{
+//    if (!_activityView) {
+//        UIActivityIndicatorView *activityView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+//        activityView.bounds = self.arrowImage.bounds;
+//        activityView.autoresizingMask = self.arrowImage.autoresizingMask;
+//        [self addSubview:_activityView = activityView];
+//    }
+//    return _activityView;
+//}
 
 #pragma mark - 初始化方法
 - (instancetype)initWithFrame:(CGRect)frame {
@@ -157,7 +169,7 @@
 #pragma mark 结束刷新
 - (void)endRefreshing
 {
-    double delayInSeconds = 0.3;
+    double delayInSeconds = 1.0f;
     dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
     dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
         self.state = MJRefreshStateNormal;
@@ -216,6 +228,20 @@
     // 3.存储状态
     _state = state;
     
+    self.drawingImgs = [NSArray arrayWithObjects:@"1.png",@"2.png",@"3.png",@"4.png",@"5.png",@"6.png",@"7.png",@"8.png",@"9.png",@"10.png",@"11.png",@"12.png", nil];
+    self.loadingImgs = [NSArray arrayWithObjects:[UIImage imageNamed:@"1.png"],[UIImage imageNamed:@"2.png"],[UIImage imageNamed:@"3.png"],[UIImage imageNamed:@"4.png"],[UIImage imageNamed:@"5.png"],[UIImage imageNamed:@"6.png"],  [UIImage imageNamed:@"7.png"],[UIImage imageNamed:@"8.png"],[UIImage imageNamed:@"9.png"],[UIImage imageNamed:@"10.png"],[UIImage imageNamed:@"11.png"],[UIImage imageNamed:@"12.png"],nil];
+    
+    CGFloat offset = -(self.scrollView.mj_contentOffsetY);
+    CGFloat percent = 0;
+    if (offset < 0) {
+        offset = 0;
+    }
+    if (offset > MJRefreshViewHeight) {
+        offset = MJRefreshViewHeight;
+    }
+    percent = offset / MJRefreshViewHeight;
+    NSUInteger drawingIndex = percent * (self.drawingImgs.count - 1);
+    
     // 4.根据状态执行不同的操作
     switch (state) {
 		case MJRefreshStateNormal: // 普通状态
@@ -226,6 +252,9 @@
                 } completion:^(BOOL finished) {
                     // 停止转圈圈
                     [self.activityView stopAnimating];
+                    
+                    [self.imageViews stopAnimating];
+                    self.imageViews.image = [UIImage imageNamed:self.drawingImgs[drawingIndex]];
                     
                     // 恢复alpha
                     self.activityView.alpha = 1.0;
@@ -240,8 +269,11 @@
                     // 停止转圈圈
                     [self.activityView stopAnimating];
                     
-                    // 设置文字
+//                    // 设置文字
                     [self settingLabelText];
+                    
+                    [self.imageViews stopAnimating];
+                    self.imageViews.image = [UIImage imageNamed:self.drawingImgs[drawingIndex]];
                 });
                 // 直接返回
                 return;
@@ -251,6 +283,9 @@
                 
                 // 停止转圈圈
                 [self.activityView stopAnimating];
+                
+                [self.imageViews stopAnimating];
+                self.imageViews.image = [UIImage imageNamed:self.drawingImgs[drawingIndex]];
             }
 			break;
         }
@@ -264,6 +299,10 @@
 			[self.activityView startAnimating];
             // 隐藏箭头
 			self.arrowImage.hidden = YES;
+            
+            self.imageViews.animationImages = self.loadingImgs;
+            self.imageViews.animationDuration = (CGFloat)self.loadingImgs.count/20.0;
+            [self.imageViews startAnimating];
             
             // 回调
             if ([self.beginRefreshingTaget respondsToSelector:self.beginRefreshingAction]) {
@@ -279,7 +318,7 @@
             break;
 	}
     
-    // 5.设置文字
+//    // 5.设置文字
     [self settingLabelText];
 }
 @end

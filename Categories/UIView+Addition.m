@@ -427,7 +427,7 @@
 }
 
 + (UIViewController *)currentViewController {
-    UIViewController *viewController = KeyWindow.rootViewController;
+    UIViewController *viewController = KeyWindow.rootViewController;//NOTE:只有当第一个viewController的viewDidLoad中无法获取
     return [UIView getVisibleViewControllerFrom:viewController];
 }
 
