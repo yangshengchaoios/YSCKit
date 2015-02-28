@@ -13,10 +13,10 @@
 /**
  *  检查是否有新版本需要更新
  */
-+ (void)checkNewVersion {
-//    return;
-    //TODO:远程开关
-    
++ (void)checkNewVersion:(BOOL)showMessage {
+    if (showMessage) {
+        [UIView showHUDLoadingOnWindow:@"正在检测新版本"];
+    }
     [AFNManager getDataWithAPI:kResPathAppUpdateNewVersion
                   andDictParam:nil
                      modelName:ClassOfObject(NewVersionModel)
@@ -24,30 +24,52 @@
                   NewVersionModel * versionModel = (NewVersionModel *)responseObject;
                   if ([NSObject isNotEmpty:versionModel]) {
                       BOOL isSkipTheVersion = [[NSUserDefaults standardUserDefaults] boolForKey:SkipVersion];
-                      if ((! isSkipTheVersion)
-                          && (VersionCompareResultAscending == [AppVersion compareWithVersion:versionModel.versionCode])
-                          && ([NSString isNotEmpty:versionModel.downloadUrl])) {
-                          NSString *title = [NSString stringWithFormat:@"有版本%@需要更新", versionModel.versionCode];
-                          NSString *message = [NSString trimString:versionModel.description];
-                          
-                          UIAlertView *alertView = [UIAlertView bk_alertViewWithTitle:title message:message];
-                          [alertView bk_addButtonWithTitle:@"立刻升级" handler:^{
-                              [[UIApplication sharedApplication] openURL:[NSURL URLWithString:versionModel.downloadUrl]];
-                              exit(0);
-                          }];
-                          if ( ! versionModel.isForced ) {   //非强制更新的话才显示更多选项
-                              [alertView bk_addButtonWithTitle:@"忽略此版本" handler:^{
-                                  [[NSUserDefaults standardUserDefaults] setBool:YES forKey:SkipVersion];
-                                  [[NSUserDefaults standardUserDefaults] synchronize];
-                              }];
-                              [alertView bk_setCancelButtonWithTitle:@"取消" handler:nil];//下次启动再次检测
+                      if ( ! isSkipTheVersion) {
+                          if (VersionCompareResultAscending == [AppVersion compareWithVersion:versionModel.versionCode]) {
+                              [UIView hideHUDLoadingOnWindow];
+                              if ([NSString isNotEmpty:versionModel.downloadUrl]) {
+                                  NSString *title = [NSString stringWithFormat:@"有版本%@需要更新", versionModel.versionCode];
+                                  NSString *message = [NSString trimString:versionModel.description];
+                                  
+                                  UIAlertView *alertView = [UIAlertView bk_alertViewWithTitle:title message:message];
+                                  [alertView bk_addButtonWithTitle:@"立刻升级" handler:^{
+                                      [[UIApplication sharedApplication] openURL:[NSURL URLWithString:versionModel.downloadUrl]];
+                                      exit(0);
+                                  }];
+                                  if ( ! versionModel.isForced ) {   //非强制更新的话才显示更多选项
+                                      [alertView bk_addButtonWithTitle:@"忽略此版本" handler:^{
+                                          [[NSUserDefaults standardUserDefaults] setBool:YES forKey:SkipVersion];
+                                          [[NSUserDefaults standardUserDefaults] synchronize];
+                                      }];
+                                      [alertView bk_setCancelButtonWithTitle:@"取消" handler:nil];//下次启动再次检测
+                                  }
+                                  [alertView show];
+                              }
+                              else {
+                                  [UIView showAlertVieWithMessage:@"下载地址出错"];
+                              }
                           }
-                          [alertView show];
+                          else {
+                              if (showMessage) {
+                                  [UIView showResultThenHideOnWindow:@"已经是最新版本"];
+                              }
+                          }
+                      }
+                      else {
+                          [UIView hideHUDLoadingOnWindow];
+                      }
+                  }
+                  else {
+                      if (showMessage) {
+                          [UIView showResultThenHideOnWindow:@"版本检测出错"];
                       }
                   }
               }
                 requestFailure: ^(NSInteger errorCode, NSString *errorMessage) {
                     NSLog(@"errorMessage = %@", errorMessage);
+                    if (showMessage) {
+                        [UIView showResultThenHideOnWindow:errorMessage];
+                    }
                 }];
 }
 
@@ -57,19 +79,14 @@
 + (void)configUmeng {
     
     //TODO:远程开关
-    NSLog(@"DEBUGMODEL = %d, kUMAppKey = %@", DEBUGMODEL, kUMAppKey);
+    
 #pragma mark - 设置UMeng应用的key
     [MobClick setAppVersion:AppVersion];
-    if (APPSTORE) {
-        [MobClick startWithAppkey:kUMAppKey reportPolicy:REALTIME channelId:kAppChannelAppStore];
+    if (DEBUGMODEL) {
+        [MobClick startWithAppkey:kUMAppKey reportPolicy:REALTIME channelId:kAppChannelDebug];
     }
     else {
-        if (DEBUGMODEL) {
-            [MobClick startWithAppkey:kUMAppKey reportPolicy:REALTIME channelId:kAppChannelDebug];
-        }
-        else {
-            [MobClick startWithAppkey:kUMAppKey reportPolicy:REALTIME channelId:kAppChannelOfficialWebsite];
-        }
+        [MobClick startWithAppkey:kUMAppKey reportPolicy:BATCH channelId:kAppChannelAppStore];
     }
     
     //统计相关
@@ -77,9 +94,6 @@
 #pragma mark - 分享相关
     //打开调试log的开关
     [UMSocialData openLog:YES];
-    
-    //如果你要支持不同的屏幕方向，需要这样设置，否则在iPhone只支持一个竖屏方向
-//    [UMSocialConfig setSupportedInterfaceOrientations:UIInterfaceOrientationMaskAll];
     
     //设置友盟社会化组件appkey
     [UMSocialData setAppKey:kUMAppKey];
@@ -90,7 +104,7 @@
     //打开新浪微博的SSO开关
     [UMSocialSinaHandler openSSOWithRedirectURL:AppRedirectUrlOfWeibo];
     
-    //打开腾讯微博SSO开关，设置回调地址
+    //TODO:打开腾讯微博SSO开关，设置回调地址
 //    [UMSocialTencentWeiboHandler openSSOWithRedirectUrl:AppRedirectUrlOfWeibo];
     
     //设置支持没有客户端情况下是否支持单独授权

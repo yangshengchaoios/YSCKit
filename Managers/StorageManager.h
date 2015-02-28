@@ -79,6 +79,13 @@
 - (NSString *)directoryPathOfLibraryCachesByUserId;
 
 /**
+ *  /Library/Caches/com.xxx.yyy
+ *
+ *  @return
+ */
+- (NSString *)directoryPathOfLibraryCachesBundleIdentifier;
+
+/**
  *  /Library/Caches/UserId/Pics/
  *
  *  @return 用户图片目录

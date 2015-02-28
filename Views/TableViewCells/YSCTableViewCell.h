@@ -22,7 +22,7 @@ typedef void (^StateChanged)(BOOL state);
 @interface YSCTableViewCell : BaseTableViewCell
 
 @property (weak, nonatomic) IBOutlet UIView *iconContainerView;
-@property (weak, nonatomic) IBOutlet NSLayoutConstraint *iconContainerWidth;    //88
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *iconContainerWidth;    //66
 @property (weak, nonatomic) IBOutlet UIImageView *iconImageView;
 
 //subtitle在左边
@@ -39,7 +39,7 @@ typedef void (^StateChanged)(BOOL state);
 @property (weak, nonatomic) IBOutlet UILabel *subtitleRightLabel;
 @property (weak, nonatomic) IBOutlet UIImageView *arrowImageView;
 @property (weak, nonatomic) IBOutlet UISwitch *stateSwitch;
-@property (weak, nonatomic) IBOutlet NSLayoutConstraint *subtitleRightTrail;    //34
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *subtitleRightTrail;    //45
 
 @property (assign, nonatomic) YSCTableViewCellStyle style;
 @property (copy, nonatomic) StateChanged stateChanged;

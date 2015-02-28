@@ -25,35 +25,35 @@
 @implementation UIImageView (Cache)
 
 - (void)setImageWithURLString:(NSString *)urlString {
-    [self setImageWithURLString:urlString placeholderImage:DefaultPlaceholderImage autoThumbnail:NO withFadeIn:NO completed:nil];
+    [self setImageWithURLString:urlString placeholderImage:DefaultPlaceholderImage withFadeIn:NO completed:nil];
 }
 
 - (void)setImageWithURLString:(NSString *)urlString completed:(SetImageCompletionBlock)complete {
-    [self setImageWithURLString:urlString placeholderImage:DefaultPlaceholderImage autoThumbnail:NO withFadeIn:NO completed:complete];
+    [self setImageWithURLString:urlString placeholderImage:DefaultPlaceholderImage withFadeIn:NO completed:complete];
 }
 
 - (void)setImageWithURLString:(NSString *)urlString placeholderImageName:(NSString *)placeholderImageName {
-    [self setImageWithURLString:urlString placeholderImage:[UIImage imageNamed:placeholderImageName] autoThumbnail:NO withFadeIn:NO completed:nil];
+    [self setImageWithURLString:urlString placeholderImage:[UIImage imageNamed:placeholderImageName] withFadeIn:NO completed:nil];
 }
 
 - (void)setImageWithURLString:(NSString *)urlString placeholderImageName:(NSString *)placeholderImageName completed:(SetImageCompletionBlock)complete {
-    [self setImageWithURLString:urlString placeholderImage:[UIImage imageNamed:placeholderImageName] autoThumbnail:NO withFadeIn:NO completed:complete];
+    [self setImageWithURLString:urlString placeholderImage:[UIImage imageNamed:placeholderImageName] withFadeIn:NO completed:complete];
 }
 
 - (void)setImageWithURLString:(NSString *)urlString withFadeIn:(BOOL)fadeIn {
-    [self setImageWithURLString:urlString placeholderImage:DefaultPlaceholderImage autoThumbnail:NO withFadeIn:fadeIn completed:nil];
+    [self setImageWithURLString:urlString placeholderImage:DefaultPlaceholderImage withFadeIn:fadeIn completed:nil];
 }
 
 - (void)setImageWithURLString:(NSString *)urlString placeholderImage:(UIImage *)holderImage {
-    [self setImageWithURLString:urlString placeholderImage:holderImage autoThumbnail:NO withFadeIn:NO completed:nil];
+    [self setImageWithURLString:urlString placeholderImage:holderImage withFadeIn:NO completed:nil];
 }
 
 - (void)setImageWithURLString:(NSString *)urlString placeholderImage:(UIImage *)holderImage completed:(SetImageCompletionBlock)complete {
-    [self setImageWithURLString:urlString placeholderImage:holderImage autoThumbnail:NO withFadeIn:NO completed:complete];
+    [self setImageWithURLString:urlString placeholderImage:holderImage withFadeIn:NO completed:complete];
 }
 
 - (void)setImageWithURLString:(NSString *)urlString placeholderImage:(UIImage *)holderImage withFadeIn:(BOOL)fadeIn {
-    [self setImageWithURLString:urlString placeholderImage:holderImage autoThumbnail:NO withFadeIn:fadeIn completed:nil];
+    [self setImageWithURLString:urlString placeholderImage:holderImage withFadeIn:fadeIn completed:nil];
 }
 
 /**
@@ -66,7 +66,6 @@
  */
 - (void)setImageWithURLString:(NSString *)urlString
              placeholderImage:(UIImage *)placeholderImage
-                autoThumbnail:(BOOL)thumbnail
                    withFadeIn:(BOOL)withAnimate
                     completed:(SetImageCompletionBlock)complete {
     WeakSelfType blockSelf = self;
@@ -83,7 +82,7 @@
     
     //判断是否本地图片
     if([NSString isNotEmpty:newUrlString]) {
-        if ( ! [NSString isContains:@"/" inString:newUrlString]) {//TODO:简单判断是不是网络地址
+        if ( ! [NSString isContains:@"/" inString:newUrlString]) {//简单判断是不是本地图片
             UIImage *localImage = [UIImage imageNamed:newUrlString];
             if([NSObject isNotEmpty:localImage]) {
                 self.image = localImage;
@@ -106,36 +105,48 @@
     }
     
     //采用SDWebImage的缓存方案
-    [self sd_setImageWithURL:[NSURL URLWithString:newUrlString]
-            placeholderImage:placeholderImage
-                   completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL)  {
-                       if ( ! error) {
-                           blockSelf.contentMode = UIViewContentModeScaleAspectFill;
-                           blockSelf.image = image;
-                           blockSelf.backgroundColor = [UIColor clearColor];
-                           
-                           if (thumbnail) {
-                               //TODO:处理缩略图
+    if ([[NSUserDefaults standardUserDefaults] boolForKey:@"EnableDownloadImage"]) {//下载网络图片
+        [self sd_setImageWithURL:[NSURL URLWithString:newUrlString]
+                placeholderImage:placeholderImage
+                       completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL)  {
+                           if ( ! error) {
+                               blockSelf.contentMode = UIViewContentModeScaleAspectFill;
+                               blockSelf.image = image;
+                               blockSelf.backgroundColor = [UIColor clearColor];
+
+                               if (withAnimate) {
+                                   blockSelf.alpha = 0.1f;
+                                   [UIView animateWithDuration:0.5f
+                                                         delay:0
+                                                       options:UIViewAnimationOptionCurveEaseIn
+                                                    animations:^{
+                                                        blockSelf.alpha = 1.0f;
+                                                    }
+                                                    completion:^(BOOL finished) {
+                                                        
+                                                    }];
+                               }
                            }
-                           
-                           if (withAnimate) {
-                               blockSelf.alpha = 0.1f;
-                               [UIView animateWithDuration:0.5f
-                                                     delay:0
-                                                   options:UIViewAnimationOptionCurveEaseIn
-                                                animations:^{
-                                                    blockSelf.alpha = 1.0f;
-                                                }
-                                                completion:^(BOOL finished) {
-                                                    
-                                                }];
+                           //设置回调
+                           if (complete) {
+                               complete(image, error);
                            }
-                       }
-                       //设置回调
-                       if (complete) {
-                           complete(image, error);
-                       }
-                   }];
+                       }];
+    }
+    else {//读取缓存图片
+        self.contentMode = UIViewContentModeScaleAspectFill;
+        self.backgroundColor = [UIColor clearColor];
+        UIImage *image = [[SDImageCache sharedImageCache] imageFromMemoryCacheForKey:[[NSURL URLWithString:newUrlString] absoluteString]];//先从内存中查找
+        if (image) {
+            self.image = image;
+        }
+        else {
+            image = [[SDImageCache sharedImageCache] imageFromDiskCacheForKey:[[NSURL URLWithString:newUrlString] absoluteString]];//再从硬盘中查找
+            if (image) {
+                self.image = image;
+            }
+        }
+    }
 }
 
 @end

@@ -68,8 +68,8 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="7 x 24小时为您服务" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Z53-9y-ha2" userLabel="subtitle_right">
-                                <rect key="frame" x="0.0" y="42" width="174" height="24"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="20"/>
+                                <rect key="frame" x="0.0" y="37" width="209" height="29"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="24"/>
                                 <color key="textColor" red="0.36078431370000003" green="0.36078431370000003" blue="0.36078431370000003" alpha="1" colorSpace="calibratedRGB"/>
                                 <nil key="highlightedColor"/>
                             </label>
@@ -85,7 +85,7 @@
                         </constraints>
                     </view>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ew0-HR-9Q9" userLabel="subtitle_right">
-                        <rect key="frame" x="545" y="41" width="53" height="27"/>
+                        <rect key="frame" x="534" y="41" width="53" height="27"/>
                         <fontDescription key="fontDescription" type="system" pointSize="22"/>
                         <color key="textColor" red="0.36078431372549019" green="0.36078431372549019" blue="0.36078431372549019" alpha="1" colorSpace="calibratedRGB"/>
                         <nil key="highlightedColor"/>
@@ -117,7 +117,7 @@
                     <constraint firstItem="efp-SC-OKq" firstAttribute="leading" secondItem="yyS-hm-DU6" secondAttribute="leading" id="bRm-oc-bgP"/>
                     <constraint firstAttribute="bottom" secondItem="efp-SC-OKq" secondAttribute="bottom" id="g4C-Tf-f6s"/>
                     <constraint firstAttribute="trailing" secondItem="PHG-5n-Sin" secondAttribute="trailing" constant="20" id="tIp-Hd-yuB"/>
-                    <constraint firstAttribute="trailingMargin" secondItem="ew0-HR-9Q9" secondAttribute="trailing" constant="34" id="ybU-ZV-fVx"/>
+                    <constraint firstAttribute="trailingMargin" secondItem="ew0-HR-9Q9" secondAttribute="trailing" constant="45" id="ybU-ZV-fVx"/>
                     <constraint firstAttribute="centerY" secondItem="MOY-9Y-OeU" secondAttribute="centerY" id="zLv-zb-GaS"/>
                 </constraints>
             </tableViewCellContentView>

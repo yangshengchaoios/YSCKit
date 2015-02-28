@@ -79,8 +79,8 @@
  */
 //控制调试信息的输出
 #define DEBUGMODEL      [[NSUserDefaults standardUserDefaults] boolForKey:@"DEBUG"]
-#define DEBUG_LOG       0  //只有在非DEBUG模式下起作用（0-只有调试输出功能  1-打开控制台输出和日志文件记录功能）
-#define APPSTORE        0  //0-用企业证书打包版本  1-appstore审核版本
+#define DEBUG_LOG       1  //只有在 "非DEBUG" 模式下起作用(提交测试时改为0) 作用：用于控制正式版本发布时的调试信息输出
+#define APPSTORE        0  //0-用企业证书打包版本  1-appstore审核版本(暂时不使用!)
 
 #define __NSLog(s, ...) do { \
 NSString *logString = [NSString stringWithFormat:@"[%@(%d)] %@",[[NSString stringWithUTF8String:__FILE__] lastPathComponent],__LINE__,[NSString stringWithFormat:(s), ##__VA_ARGS__]]; \
@@ -89,12 +89,9 @@ NSString *logString = [NSString stringWithFormat:@"[%@(%d)] %@",[[NSString strin
         [LogManager saveLog:logString];\
     } \
     else { \
-        if (DEBUG_LOG) { \
+        if ( DEBUG_LOG ) { \
+            NSLog(@"%@", logString); \
             [LogManager saveLog:logString]; \
-            NSLog(@"%@", logString); \
-        } \
-        else { \
-            NSLog(@"%@", logString); \
         } \
     } \
 } while (0)
@@ -135,6 +132,7 @@ return _sharedObject;
 #define ViewController(x)               [[NSClassFromString(x) alloc] initWithNibName:x bundle:nil]
 #define AppVersion                      [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"]
 #define BundleVersion                   [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"]
+#define BundleIdentifier                [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleIdentifier"]
 #define Welcome                         [NSString stringWithFormat:@"Welcome_V%@", AppVersion]
 #define SkipVersion                     [NSString stringWithFormat:@"SkipVersion_V%@", AppVersion]
 #define KeyWindow                       [UIApplication sharedApplication].keyWindow

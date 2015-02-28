@@ -15,6 +15,7 @@
     [self resetConstraintOfView];
     
     self.style = YSCTableViewCellStyleTitle;
+    self.stateSwitch.on = NO;
     self.subtitleLeftLabel.text = @"";
     self.subtitleBottomLabel.text = @"";
     self.subtitleRightLabel.text = @"";
@@ -51,7 +52,7 @@
     //--------------------------
     //控制icon是否显示
     if (YSCTableViewCellStyleIcon == (YSCTableViewCellStyleIcon & style)) {
-        self.iconContainerWidth.constant = AUTOLAYOUT_LENGTH(88);
+        self.iconContainerWidth.constant = AUTOLAYOUT_LENGTH(66);
         self.iconContainerView.hidden = NO;
     }
     else {
@@ -60,7 +61,7 @@
     }
     
     //控制副标题是否显示在主标题的下方
-    if (YSCTableViewCellStyleSubtitleBottom == (YSCTableViewCellStyleIcon & style)) {
+    if (YSCTableViewCellStyleSubtitleBottom == (YSCTableViewCellStyleSubtitleBottom & style)) {
         self.subtitleBottomContainerView.hidden = NO;
         self.subtitleLeftContainerView.hidden = YES;
     }
@@ -97,7 +98,7 @@
         if (YSCTableViewCellStyleSubtitleRight == (YSCTableViewCellStyleSubtitleRight & style)) {
             self.subtitleRightLabel.hidden = NO;
             if (YSCTableViewCellStyleArrow == (YSCTableViewCellStyleArrow & style)) {
-                self.subtitleRightTrail.constant = AUTOLAYOUT_LENGTH(34);
+                self.subtitleRightTrail.constant = AUTOLAYOUT_LENGTH(45);
             }
             else {
                 self.subtitleRightTrail.constant = AUTOLAYOUT_LENGTH(20);

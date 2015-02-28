@@ -119,6 +119,15 @@
 }
 
 /**
+ *  /Library/Caches/com.xxx.yyy
+ *
+ *  @return
+ */
+- (NSString *)directoryPathOfLibraryCachesBundleIdentifier {
+    return [self.directoryPathOfLibraryCaches stringByAppendingPathComponent:BundleIdentifier];
+}
+
+/**
  *  /Library/Caches/UserId/Pics/
  *
  *  @return 用户图片目录
@@ -330,11 +339,18 @@
 
 #pragma mark - 缓存清理
 /**
- *  删除整个目录/Library/Caches下所有的内容，并确保所有缓存目录都存在
+ *  删除Documents和Caches目录中的缓存数据，并确保所有缓存目录都存在
  */
 - (void)clearLibraryCaches {
-    [FileUtils clearDirectoryPath:self.directoryPathOfLibraryCaches];
+    //Documents
+    [FileUtils clearDirectoryPath:self.directoryPathOfDocumentsByUserId];
     [FileUtils clearDirectoryPath:self.directoryPathOfDocumentsLog];
+    
+    //Library/Caches
+    [FileUtils clearDirectoryPath:self.directoryPathOfLibraryCachesByUserId];
+    [FileUtils clearDirectoryPath:self.directoryPathOfLibraryCachesCommon];
+    [FileUtils clearDirectoryPath:self.directoryPathOfLibraryCachesBundleIdentifier];
+    
     [self ensureCommonDirectories];
     [self ensureUserDirectories];
 }
