@@ -104,6 +104,9 @@
     //打开新浪微博的SSO开关
     [UMSocialSinaHandler openSSOWithRedirectURL:AppRedirectUrlOfWeibo];
     
+    //设置分享到QQ/Qzone的应用Id，和分享url 链接
+    [UMSocialQQHandler setQQWithAppId:AppKeyQQ appKey:AppSecretQQ url:AppRedirectUrlOfWeibo];
+    
     //TODO:打开腾讯微博SSO开关，设置回调地址
 //    [UMSocialTencentWeiboHandler openSSOWithRedirectUrl:AppRedirectUrlOfWeibo];
     

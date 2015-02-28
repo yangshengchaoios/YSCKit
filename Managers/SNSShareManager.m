@@ -23,7 +23,7 @@
     else if (ShareTypeWeiboTencent == shareType) {
         platformName = UMShareToTencent;
     }
-    else if (ShareTypeWechatSession == shareType) {
+    else if (ShareTypeWechatSession == shareType || ShareTypeWeiXin == shareType) {
         platformName = UMShareToWechatSession;
     }
     else if (ShareTypeWechatTimeline == shareType) {
