@@ -21,6 +21,12 @@
 + (void)ShareWithContent:(NSString *)content
                    image:(UIImage *)image
                 platform:(ShareType)shareType
+     presentedController:(UIViewController *)viewController;
+
++ (void)ShareWithContent:(NSString *)content
+                   image:(UIImage *)image
+                platform:(ShareType)shareType
+     presentedController:(UIViewController *)viewController
                   result:(UMSocialDataServiceCompletion)result;
 
 @end

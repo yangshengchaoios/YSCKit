@@ -98,6 +98,9 @@
     //设置友盟社会化组件appkey
     [UMSocialData setAppKey:kUMAppKey];
     
+    //设置支持没有客户端情况下是否支持单独授权
+    [UMSocialQQHandler setSupportWebView:YES];
+    
     //设置微信AppId，设置分享url，默认使用友盟的网址
     [UMSocialWechatHandler setWXAppId:AppKeyWeiXin appSecret:AppSecretWeiXin url:AppRedirectUrlOfWeibo];
     
@@ -107,12 +110,8 @@
     //设置分享到QQ/Qzone的应用Id，和分享url 链接
     [UMSocialQQHandler setQQWithAppId:AppKeyQQ appKey:AppSecretQQ url:AppRedirectUrlOfWeibo];
     
-    //TODO:打开腾讯微博SSO开关，设置回调地址
+    //NOTE:打开腾讯微博SSO开关，设置回调地址 只支持32位
 //    [UMSocialTencentWeiboHandler openSSOWithRedirectUrl:AppRedirectUrlOfWeibo];
-    
-    //设置支持没有客户端情况下是否支持单独授权
-    [UMSocialQQHandler setSupportWebView:YES];
-    
     
 #pragma mark - 反馈相关
     [UMFeedback setLogEnabled:YES];

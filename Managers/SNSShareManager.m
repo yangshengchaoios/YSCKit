@@ -35,12 +35,16 @@
     else if (ShareTypeMobileQQ == shareType) {
         platformName = UMShareToQQ;
     }
+    else if (ShareTypeQQZone == shareType) {
+        platformName = UMShareToQzone;
+    }
     
     return platformName;
 }
 
 + (UMSocialSnsPlatform *)SocialSnsPlatform:(ShareType)shareType {
     NSString *platformName = [self PlatformTypeOfUMeng:shareType];
+    ReturnNilWhenObjectIsEmpty(platformName);
     return [UMSocialSnsPlatformManager getSocialPlatformWithName:platformName];
 }
 
@@ -49,21 +53,60 @@
 + (void)ShareWithContent:(NSString *)content
                    image:(UIImage *)image
                 platform:(ShareType)shareType
+     presentedController:(UIViewController *)viewController {
+    [self ShareWithContent:content image:image platform:shareType presentedController:viewController result:nil];
+}
+
++ (void)ShareWithContent:(NSString *)content
+                   image:(UIImage *)image
+                platform:(ShareType)shareType
+     presentedController:(UIViewController *)viewController
                   result:(UMSocialDataServiceCompletion)result {
     NSString *platformName = [self PlatformTypeOfUMeng:shareType];
-    //调用UMeng的社会化分享控件
-    if (platformName) {
-        [[UMSocialDataService defaultDataService] postSNSWithTypes:@[platformName]
-                                                           content:content
-                                                             image:image
-                                                          location:nil
-                                                       urlResource:nil
-                                               presentedController:nil
-                                                        completion:result];
+    UMSocialSnsPlatform *snsPlatform = [self SocialSnsPlatform:shareType];
+    if (nil == snsPlatform) {
+        if (UMShareToWechatSession == platformName ||
+            UMShareToWechatTimeline == platformName ||
+            UMShareToWechatFavorite == platformName) {
+            [UIView showResultThenHideOnWindow:@"请先安装微信客户端"];
+        }
+        else {
+            if (result) {
+                result(nil);
+            }
+        }
+        return;
     }
-    else {
-        result(nil);
+    
+    if (ShareTypeQQZone == shareType) {
+        if ([NSString isEmpty:content] || nil == image) {
+            [UIView showAlertVieWithMessage:@"分享到QQ空间必须同时设置文本和图片"];
+            return;
+        }
     }
+ 
+    [[UMSocialDataService defaultDataService] postSNSWithTypes:@[platformName]
+                                                       content:content
+                                                         image:image
+                                                      location:nil
+                                                   urlResource:nil
+                                           presentedController:viewController
+                                                    completion:^(UMSocialResponseEntity *response) {
+                                                        if (UMSResponseCodeSuccess == response.responseCode) {
+                                                            [UIView showResultThenHideOnWindow:@"分享成功"];
+                                                        }
+                                                        else if (UMSResponseCodeCancel == response.responseCode) {
+                                                            [UIView showResultThenHideOnWindow:@"取消分享"];
+                                                        }
+                                                        else {
+                                                            NSString *errorMessage = [NSString stringWithFormat:@"分享失败失败(%d)", response.responseCode];
+                                                            [UIView showResultThenHideOnWindow:errorMessage];
+                                                        }
+                                                        
+                                                        if (result) {
+                                                            result(response);
+                                                        }
+                                                    }];
 }
 
 @end
