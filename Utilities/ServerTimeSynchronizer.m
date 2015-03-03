@@ -13,7 +13,7 @@
 @interface ServerTimeSynchronizer ()
 
 @property (assign, nonatomic) BOOL isSyncSuccessed;         //是否同步成功
-@property (assign, nonatomic) NSTimeInterval interval;      //(服务器时间 - 本地时间)ms
+@property (assign, nonatomic) double interval;      //(服务器时间 - 本地时间)ms
 @property (nonatomic, strong) NSLock *theLock;
 
 @end
@@ -36,7 +36,6 @@
 	if (self) {
         self.interval = [[self loadCachedInterval] doubleValue];   //从缓存中读取默认值
         self.currentTimeInterval = [[NSDate dateWithTimeIntervalSinceNow:self.interval / 1000] timeStamp];
-        [self refreshServerTime];
         self.theLock = [[NSLock alloc] init];
         
 		[NSTimer scheduledTimerWithTimeInterval:1
@@ -61,6 +60,7 @@
 //心跳方法
 - (void)timerFired:(NSTimer *)theTimer {
 	[self.theLock lock];
+    NSLog(@"interval = %lf", self.interval);
     self.currentTimeInterval = [[NSDate dateWithTimeIntervalSinceNow:self.interval / 1000] timeStamp];
     [self.theLock unlock];
 }
@@ -77,6 +77,7 @@
               requestSuccessed:^(id responseObject) {
                   NSDate *nowDate = [NSDate date];
                   NSTimeInterval httpWaste = [nowDate timeIntervalSinceDate:date];//计算接口调用的执行时间(秒)
+                  NSLog(@"waste:%lf", httpWaste);
                   
                   if (httpWaste >= 2) {//如果接口执行时间大于2秒就得重新请求
                       [blockSelf refreshFaild];
@@ -90,6 +91,7 @@
                       NSTimeInterval serverTime = [oldServerTime doubleValue] + httpWaste * 1000 / 2.0f;
                       NSTimeInterval localTime = [nowDate timeIntervalSince1970] * 1000;
                       blockSelf.interval = serverTime - localTime;
+                      NSLog(@"%lf", blockSelf.interval);
                       
                       [[StorageManager sharedInstance] archiveDictionary:@{ CachedKeyOfInterval : [NSString stringWithFormat:@"%f", blockSelf.interval] }
                                                               toFilePath:[blockSelf cacheFilePath:nil]
