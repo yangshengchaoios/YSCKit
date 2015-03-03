@@ -168,6 +168,10 @@
     if ([self scrollableView]) {
         [self followScrollView:[self scrollableView]];
     }
+    
+    //相对布局——自动调整约束值和font大小
+    [self.view resetFontSizeOfView];
+    [self.view resetConstraintOfView];
 }
 
 
@@ -432,6 +436,9 @@
 - (void)dismissOnPresentingViewController {
 	if (self.presentingViewController) {
 		[self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
+        if ([self.presentingViewController isKindOfClass:[UITabBarController class]]) {//恢复statusbar字体颜色
+            [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent];
+        }
 	}
 }
 

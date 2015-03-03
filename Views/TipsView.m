@@ -70,7 +70,7 @@
     tipsView.tipsLabel = [[UILabel alloc] init];
     tipsView.tipsLabel.backgroundColor = [UIColor clearColor];
     tipsView.tipsLabel.textColor = kDefaultEmptyTextColor;
-    tipsView.tipsLabel.font = AUTOLAYOUT_FONT(16);
+    tipsView.tipsLabel.font = AUTOLAYOUT_FONT(30);
     tipsView.tipsLabel.textAlignment = NSTextAlignmentCenter;
     tipsView.tipsLabel.lineBreakMode = NSLineBreakByCharWrapping;
     tipsView.tipsLabel.numberOfLines = 0;

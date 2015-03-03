@@ -12,7 +12,6 @@
 
 - (void)awakeFromNib {
     [super awakeFromNib];
-    [self resetConstraintOfView];
     
     self.style = YSCTableViewCellStyleTitle;
     self.stateSwitch.on = NO;

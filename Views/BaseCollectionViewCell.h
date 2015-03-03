@@ -10,8 +10,6 @@
 
 @interface BaseCollectionViewCell : UICollectionViewCell
 
-@property (weak, nonatomic) IBOutlet UIView *containerView;
-
 + (CGSize)SizeOfCell;
 + (UINib *)NibNameOfCell;
 - (void)layoutDataModel:(BaseDataModel *)dataModel;

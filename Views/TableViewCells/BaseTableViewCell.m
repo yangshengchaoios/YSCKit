@@ -14,9 +14,9 @@
     [super awakeFromNib];
     
     self.clipsToBounds = YES;
-    self.containerView.backgroundColor = [UIColor clearColor];
     self.selectionStyle = UITableViewCellSelectionStyleNone;
-    [UIView resetFontSizeOfView:self];              //递归缩放label和button的字体大小
+    [self resetFontSizeOfView];         //递归缩放label和button的字体大小
+    [self resetConstraintOfView];
 }
 
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated {

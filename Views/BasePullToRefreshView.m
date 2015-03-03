@@ -360,7 +360,7 @@
     self.segmentedControl.textColor = kDefaultTextColor;
     self.segmentedControl.selectedTextColor = kDefaultTextColor;
     self.segmentedControl.selectionIndicatorColor = [UIColor redColor];
-    self.segmentedControl.font = AUTOLAYOUT_FONT(24);
+    self.segmentedControl.font = AUTOLAYOUT_FONT(28);
     self.segmentedControl.sectionTitles = self.segmentedTitleArray;
     self.segmentedControl.selectionStyle = HMSegmentedControlSelectionStyleFullWidthStripe;
     self.segmentedControl.selectionIndicatorLocation = HMSegmentedControlSelectionIndicatorLocationDown;
@@ -551,6 +551,9 @@
         NSArray *dataArray = nil;
         if ([responseObject isKindOfClass:[NSArray class]]) {
             dataArray = (NSArray *)responseObject;
+        }
+        else if([responseObject isKindOfClass:[BaseDataModel class]]){
+            dataArray = @[responseObject];
         }
         
         //2. 根据组装后的数组刷新列表

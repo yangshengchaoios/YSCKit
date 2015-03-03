@@ -13,8 +13,8 @@
 - (void)awakeFromNib {
     [super awakeFromNib];
     
-    self.containerView.backgroundColor = [UIColor clearColor];
-    [UIView resetFontSizeOfView:self];              //递归缩放label和button的字体大小
+    [self resetFontSizeOfView];         //递归缩放label和button的字体大小
+    [self resetConstraintOfView];
 }
 
 + (CGFloat)HeightOfView {

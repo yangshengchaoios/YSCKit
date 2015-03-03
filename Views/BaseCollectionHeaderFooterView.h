@@ -10,10 +10,7 @@
 
 @interface BaseCollectionHeaderFooterView : UICollectionReusableView
 
-@property (weak, nonatomic) IBOutlet UIView *containerView;
-
 + (CGSize)SizeOfView;
-
 + (UINib *)NibNameOfView;
 
 @end

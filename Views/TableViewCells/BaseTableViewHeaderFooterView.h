@@ -10,8 +10,6 @@
 
 @interface BaseTableViewHeaderFooterView : UITableViewHeaderFooterView
 
-@property (weak, nonatomic) IBOutlet UIView *containerView;
-
 + (CGFloat)HeightOfView;
 + (UINib *)NibNameOfView;
 @end
