@@ -15,6 +15,7 @@
 @interface CommonUtils : NSObject
 
 + (void)checkNewVersion:(BOOL)showMessage;
++ (void)checkNewVersion:(BOOL)showMessage withParams:(NSDictionary *)params;
 + (void)configUmeng;
 + (UIView *)createSearchViewWithWidth:(NSInteger)width withTextField:(UITextField *)textField;
 

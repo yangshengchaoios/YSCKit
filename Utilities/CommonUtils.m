@@ -10,15 +10,15 @@
 
 @implementation CommonUtils
 
-/**
- *  检查是否有新版本需要更新
- */
 + (void)checkNewVersion:(BOOL)showMessage {
+    [self checkNewVersion:showMessage withParams:nil];
+}
++ (void)checkNewVersion:(BOOL)showMessage withParams:(NSDictionary *)params {
     if (showMessage) {
         [UIView showHUDLoadingOnWindow:@"正在检测新版本"];
     }
     [AFNManager getDataWithAPI:kResPathAppUpdateNewVersion
-                  andDictParam:nil
+                  andDictParam:params
                      modelName:ClassOfObject(NewVersionModel)
               requestSuccessed: ^(id responseObject) {
                   NewVersionModel * versionModel = (NewVersionModel *)responseObject;
@@ -197,7 +197,7 @@
         formatedPrice = [NSString stringWithFormat:@"%0.2f", [price doubleValue]];
     }
     else {
-        formatedPrice = [NSString stringWithFormat:@"%ld", [price integerValue]];
+        formatedPrice = [NSString stringWithFormat:@"%ld", (long)[price integerValue]];
     }
     
     //是否添加前缀 ￥
@@ -289,12 +289,12 @@
     NSInteger minutesPassed = [startDateTime minutesBeforeDate:nowDateTime];
     NSInteger secondsPassed = (NSInteger)[nowDateTime timeIntervalSinceDate:startDateTime];
     if (hoursPassed > 0) {
-        return [NSString stringWithFormat:@"%ld小时之前", hoursPassed];
+        return [NSString stringWithFormat:@"%ld小时之前", (long)hoursPassed];
     }
     if (minutesPassed > 0) {
-        return [NSString stringWithFormat:@"%ld分钟之前", minutesPassed];
+        return [NSString stringWithFormat:@"%ld分钟之前", (long)minutesPassed];
     }
-    return [NSString stringWithFormat:@"%ld秒之前", secondsPassed];
+    return [NSString stringWithFormat:@"%ld秒之前", (long)secondsPassed];
 }
 + (NSString *)TimeRemain:(NSString *)timeStamp {
     return [self TimeRemain:timeStamp currentTime:[[NSDate date] timeStamp]];
@@ -316,7 +316,7 @@
     if ( ! [endDateTime isToday]) {
         NSInteger days = [endDateTime daysAfterDate:nowDateTime];
         NSInteger hours = [endDateTime hoursAfterDate:[nowDateTime dateByAddingDays:days]];
-        return [NSString stringWithFormat:@"%ld天 %ld小时", days, hours];
+        return [NSString stringWithFormat:@"%ld天 %ld小时", (long)days, (long)hours];
     }
     
     //xx:xx:xx

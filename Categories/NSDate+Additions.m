@@ -580,6 +580,88 @@
     return [[self dateFromTimeStamp:timeStamp] stringWithFormat:format];
 }
 
++ (NSDateComponents *)ComponentsBetweenStartDate:(NSDate *)startDate withEndDate:(NSDate *)endDate withComponents:(NSCalendarUnit)unitFlags {
+    //方法一：使用NSDateComponents
+    return [[NSCalendar currentCalendar] components:unitFlags fromDate:startDate toDate:endDate options:0];
+}
+
++ (NSDateComponents *)ComponentsRemainInterval:(NSTimeInterval)remainInterval withComponents:(NSCalendarUnit)unitFlags {
+    NSDateComponents *components = [NSDateComponents new];
+    
+    //方法二：计算间隔时间是根据从零时间点(1970-01-01)开始的NSDate对象(效率最低！)
+//    NSDate *sinceDate = [NSDate dateFromString:@"1970-01-01" withFormat:@"yyyy-MM-dd"];
+//    NSDate *tempDate = [NSDate dateWithTimeInterval:remainTimeInterval sinceDate:sinceDate];//NOTE:dateWithTimeIntervalSince1970会有时差问题
+//    NSInteger day = [tempDate daysAfterDate:sinceDate];//NOTE:这里不能用tempDate.day
+//    NSInteger hour = tempDate.hour;
+//    NSInteger minute = tempDate.minute;
+//    NSInteger second = tempDate.seconds;
+    
+    //方法三：最直接的方法(效率最高！)
+    NSInteger day = (NSInteger)(remainInterval / D_DAY);
+    NSInteger hour = (NSInteger)(remainInterval / D_HOUR) - 24 * day;
+    NSInteger minute = (NSInteger)(remainInterval / D_MINUTE) - 60 * hour - 24 * 60 * day;
+    NSInteger second = (NSInteger)remainInterval - 60 * minute - 60 * 60 * hour - 24 * 60 * 60 * day;
+    
+    //--------------------设置components START----------------------------------------
+    //设置day
+    if (NSDayCalendarUnit == (NSDayCalendarUnit & unitFlags)) {
+        [components setDay:day];
+    }
+    else {
+        [components setDay:0];
+    }
+    //设置hour
+    if (NSHourCalendarUnit == (NSHourCalendarUnit & unitFlags)) {
+        NSInteger tempHour = hour;
+        if (NSDayCalendarUnit != (NSDayCalendarUnit & unitFlags)) {
+            tempHour += 24 * day;
+        }
+        [components setHour:tempHour];
+    }
+    else {
+        [components setHour:0];
+    }
+    //设置minute
+    if (NSMinuteCalendarUnit == (NSMinuteCalendarUnit & unitFlags)) {
+        NSInteger tempMinute = minute;
+        if (NSHourCalendarUnit != (NSHourCalendarUnit & unitFlags)) {
+            tempMinute += 60 * hour;
+            if (NSDayCalendarUnit != (NSDayCalendarUnit & unitFlags)) {//只有当hour不存在，才有判断day的必要，下面类似
+                tempMinute += 24 * 60 * day;
+            }
+        }
+        [components setMinute:tempMinute];
+    }
+    else {
+        [components setMinute:0];
+    }
+    //设置second
+    if (NSSecondCalendarUnit == (NSSecondCalendarUnit & unitFlags)) {
+        NSInteger tempSecond = second;
+        if (NSMinuteCalendarUnit != (NSMinuteCalendarUnit & unitFlags)) {
+            tempSecond += 60 * minute;
+            if (NSHourCalendarUnit != (NSHourCalendarUnit & unitFlags)) {
+                tempSecond += 60 * 60 * hour;
+                if (NSDayCalendarUnit != (NSDayCalendarUnit & unitFlags)) {
+                    tempSecond += 24 * 60 * 60 * day;
+                }
+            }
+        }
+        [components setSecond:tempSecond];
+    }
+    else {
+        [components setSecond:0];
+    }
+    //--------------------设置components END----------------------------------------
+    
+    //方法四：重用
+//    NSDate *startDate = [NSDate date];
+//    NSDate *endDate = [NSDate dateWithTimeInterval:remainTimeInterval sinceDate:startDate];
+//    components = [NSDate ComponentsBetweenStartDate:startDate withEndDate:endDate withComponents:unitFlags];
+    
+    return components;
+}
+
 #pragma mark - private methods
 
 @end

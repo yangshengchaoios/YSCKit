@@ -87,11 +87,16 @@
 - (NSInteger)daysAfterDate:(NSDate *)aDate;
 - (NSInteger)daysBeforeDate:(NSDate *)aDate;
 
+// Calculte interval between two dates (NSDayCalendarUnit | NSHourCalendarUnit | NSMinuteCalendarUnit | NSSecondCalendarUnit)
++ (NSDateComponents *)ComponentsBetweenStartDate:(NSDate *)startDate withEndDate:(NSDate *)endDate withComponents:(NSCalendarUnit)unitFlags;
++ (NSDateComponents *)ComponentsRemainInterval:(NSTimeInterval)remainInterval withComponents:(NSCalendarUnit)unitFlags;
+
 // format the date to string
 - (NSString *)timeStamp;
 - (NSString *)stringWithFormat:(NSString *)format;
 - (NSString *)chineseMonth; //汉语月份
 - (NSString *)constellation;//星座
 + (NSString *)StringFromTimeStamp:(NSString *)timeStamp withFormat:(NSString *)format;
+
 
 @end
