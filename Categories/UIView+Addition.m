@@ -472,3 +472,16 @@
 
 
 @end
+
+@implementation UIView (Animation)
+
++ (void)flipView:(UIView *)view withTransition:(UIViewAnimationTransition)transition duration:(CGFloat)duration {
+    [UIView beginAnimations:@"animationID" context:nil];
+    [UIView setAnimationDuration:duration];
+    [UIView setAnimationCurve:UIViewAnimationCurveEaseOut];
+    [UIView setAnimationRepeatAutoreverses:NO];
+    [UIView setAnimationTransition:transition forView:view cache:YES];
+    [UIView commitAnimations];
+}
+
+@end

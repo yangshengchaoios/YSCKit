@@ -116,3 +116,10 @@
 + (void)insertCollectionViewCell:(UICollectionView *)collectionView oldCount:(NSInteger)oldCount addCount:(NSInteger)addCount;
 
 @end
+
+
+@interface UIView (Animation)
+
++ (void)flipView:(UIView *)view withTransition:(UIViewAnimationTransition)transition duration:(CGFloat)duration;
+
+@end
