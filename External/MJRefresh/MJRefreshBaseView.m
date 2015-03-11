@@ -26,19 +26,19 @@
 /**
  *  状态标签
  */
-//- (UILabel *)statusLabel
-//{
-//    if (!_statusLabel) {
-//        UILabel *statusLabel = [[UILabel alloc] init];
-//        statusLabel.autoresizingMask = UIViewAutoresizingFlexibleWidth;
-//        statusLabel.font = [UIFont boldSystemFontOfSize:13];
-//        statusLabel.textColor = MJRefreshLabelTextColor;
-//        statusLabel.backgroundColor = [UIColor clearColor];
-//        statusLabel.textAlignment = NSTextAlignmentCenter;
-//        [self addSubview:_statusLabel = statusLabel];
-//    }
-//    return _statusLabel;
-//}
+- (UILabel *)statusLabel
+{
+    if (!_statusLabel) {
+        UILabel *statusLabel = [[UILabel alloc] init];
+        statusLabel.autoresizingMask = UIViewAutoresizingFlexibleWidth;
+        statusLabel.font = [UIFont boldSystemFontOfSize:13];
+        statusLabel.textColor = MJRefreshLabelTextColor;
+        statusLabel.backgroundColor = [UIColor clearColor];
+        statusLabel.textAlignment = NSTextAlignmentCenter;
+        [self addSubview:_statusLabel = statusLabel];
+    }
+    return _statusLabel;
+}
 
 - (UIImageView *)imageViews
 {
@@ -54,29 +54,29 @@
 /**
  *  箭头图片
  */
-//- (UIImageView *)arrowImage
-//{
-//    if (!_arrowImage) {
-//        UIImageView *arrowImage = [[UIImageView alloc] initWithImage:[UIImage imageNamed:MJRefreshSrcName(@"arrow.png")]];
-//        arrowImage.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin;
-//        [self addSubview:_arrowImage = arrowImage];
-//    }
-//    return _arrowImage;
-//}
+- (UIImageView *)arrowImage
+{
+    if (!_arrowImage) {
+        UIImageView *arrowImage = [[UIImageView alloc] initWithImage:[UIImage imageNamed:MJRefreshSrcName(@"arrow.png")]];
+        arrowImage.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin;
+        [self addSubview:_arrowImage = arrowImage];
+    }
+    return _arrowImage;
+}
 
 /**
  *  状态标签
  */
-//- (UIActivityIndicatorView *)activityView
-//{
-//    if (!_activityView) {
-//        UIActivityIndicatorView *activityView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
-//        activityView.bounds = self.arrowImage.bounds;
-//        activityView.autoresizingMask = self.arrowImage.autoresizingMask;
-//        [self addSubview:_activityView = activityView];
-//    }
-//    return _activityView;
-//}
+- (UIActivityIndicatorView *)activityView
+{
+    if (!_activityView) {
+        UIActivityIndicatorView *activityView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+        activityView.bounds = self.arrowImage.bounds;
+        activityView.autoresizingMask = self.arrowImage.autoresizingMask;
+        [self addSubview:_activityView = activityView];
+    }
+    return _activityView;
+}
 
 #pragma mark - 初始化方法
 - (instancetype)initWithFrame:(CGRect)frame {
@@ -247,27 +247,10 @@
 		case MJRefreshStateNormal: // 普通状态
         {
             if (oldState == MJRefreshStateRefreshing) {
-                [UIView animateWithDuration:MJRefreshSlowAnimationDuration * 0.6 animations:^{
-                    self.activityView.alpha = 0.0;
-                } completion:^(BOOL finished) {
-                    // 停止转圈圈
-                    [self.activityView stopAnimating];
-                    
-                    [self.imageViews stopAnimating];
-                    self.imageViews.image = [UIImage imageNamed:self.drawingImgs[drawingIndex]];
-                    
-                    // 恢复alpha
-                    self.activityView.alpha = 1.0;
-                }];
                 dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(MJRefreshSlowAnimationDuration * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{ // 等头部回去
                     // 再次设置回normal
-//                    _state = MJRefreshStatePulling;
-//                    self.state = MJRefreshStateNormal;
-                    // 显示箭头
-                    self.arrowImage.hidden = NO;
-                    
-                    // 停止转圈圈
-                    [self.activityView stopAnimating];
+                    _state = MJRefreshStatePulling;
+                    self.state = MJRefreshStateNormal;
                     
 //                    // 设置文字
                     [self settingLabelText];
@@ -278,11 +261,6 @@
                 // 直接返回
                 return;
             } else {
-                // 显示箭头
-                self.arrowImage.hidden = NO;
-                
-                // 停止转圈圈
-                [self.activityView stopAnimating];
                 
                 [self.imageViews stopAnimating];
                 self.imageViews.image = [UIImage imageNamed:self.drawingImgs[drawingIndex]];
@@ -295,10 +273,7 @@
             
 		case MJRefreshStateRefreshing:
         {
-            // 开始转圈圈
-			[self.activityView startAnimating];
-            // 隐藏箭头
-			self.arrowImage.hidden = YES;
+            
             
             self.imageViews.animationImages = self.loadingImgs;
             self.imageViews.animationDuration = (CGFloat)self.loadingImgs.count/20.0;

@@ -25,9 +25,9 @@
 - (id)initWithFrame:(CGRect)frame
 {
     if (self = [super initWithFrame:frame]) {
-//        self.pullToRefreshText = MJRefreshFooterPullToRefresh;
-//        self.releaseToRefreshText = MJRefreshFooterReleaseToRefresh;
-//        self.refreshingText = MJRefreshFooterRefreshing;
+        self.pullToRefreshText = MJRefreshFooterPullToRefresh;
+        self.releaseToRefreshText = MJRefreshFooterReleaseToRefresh;
+        self.refreshingText = MJRefreshFooterRefreshing;
     }
     return self;
 }
@@ -36,7 +36,7 @@
 {
     [super layoutSubviews];
     
-//    self.statusLabel.frame = self.bounds;
+    self.statusLabel.frame = self.bounds;
 }
 
 - (void)willMoveToSuperview:(UIView *)newSuperview
@@ -139,7 +139,32 @@
                 [UIView animateWithDuration:MJRefreshSlowAnimationDuration animations:^{
                     self.scrollView.mj_contentInsetBottom = self.scrollViewOriginalInset.bottom;
                 }];
+                [UIView animateWithDuration:MJRefreshSlowAnimationDuration * 0.6 animations:^{
+                    self.activityView.alpha = 0.0;
+                } completion:^(BOOL finished) {
+                    // 停止转圈圈
+                    [self.activityView stopAnimating];
+                    
+                    // 恢复alpha
+                    self.activityView.alpha = 1.0;
+                }];
+                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(MJRefreshSlowAnimationDuration * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{ // 等头部回去
+                    // 显示箭头
+                    self.arrowImage.hidden = NO;
+                    
+                    // 停止转圈圈
+                    [self.activityView stopAnimating];
+                });
+                // 直接返回
+                return;
+
+
             } else {
+                // 显示箭头
+                self.arrowImage.hidden = NO;
+                
+                // 停止转圈圈
+                [self.activityView stopAnimating];
                 // 执行动画
                 [UIView animateWithDuration:MJRefreshFastAnimationDuration animations:^{
                     self.arrowImage.transform = CGAffineTransformMakeRotation(M_PI);
@@ -165,6 +190,10 @@
             
         case MJRefreshStateRefreshing:
         {
+            // 开始转圈圈
+            [self.activityView startAnimating];
+            // 隐藏箭头
+            self.arrowImage.hidden = YES;
             // 记录刷新前的数量
             self.lastRefreshCount = [self totalDataCountInScrollView];
             

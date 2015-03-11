@@ -52,9 +52,9 @@
 - (id)initWithFrame:(CGRect)frame
 {
     if (self = [super initWithFrame:frame]) {
-        self.pullToRefreshText = MJRefreshHeaderPullToRefresh;
-        self.releaseToRefreshText = MJRefreshHeaderReleaseToRefresh;
-        self.refreshingText = MJRefreshHeaderRefreshing;
+//        self.pullToRefreshText = MJRefreshHeaderPullToRefresh;
+//        self.releaseToRefreshText = MJRefreshHeaderReleaseToRefresh;
+//        self.refreshingText = MJRefreshHeaderRefreshing;
     }
     return self;
 }
@@ -178,6 +178,7 @@
 #pragma mark 设置状态
 - (void)setState:(MJRefreshState)state
 {
+    self.arrowImage.hidden = YES;
     // 1.一样的就直接返回
     if (self.state == state) return;
     
@@ -193,7 +194,7 @@
         {
             // 刷新完毕
             if (MJRefreshStateRefreshing == oldState) {
-                self.arrowImage.transform = CGAffineTransformIdentity;
+//                self.arrowImage.transform = CGAffineTransformIdentity;
                 // 保存刷新时间
                 self.lastUpdateTime = [NSDate date];
                 
@@ -203,9 +204,9 @@
                 }];
             } else {
                 // 执行动画
-                [UIView animateWithDuration:MJRefreshFastAnimationDuration animations:^{
-                    self.arrowImage.transform = CGAffineTransformIdentity;
-                }];
+//                [UIView animateWithDuration:MJRefreshFastAnimationDuration animations:^{
+//                    self.arrowImage.transform = CGAffineTransformIdentity;
+//                }];
             }
 			break;
         }
@@ -213,9 +214,9 @@
 		case MJRefreshStatePulling: // 松开可立即刷新
         {
             // 执行动画
-            [UIView animateWithDuration:MJRefreshFastAnimationDuration animations:^{
-                self.arrowImage.transform = CGAffineTransformMakeRotation(M_PI);
-            }];
+//            [UIView animateWithDuration:MJRefreshFastAnimationDuration animations:^{
+//                self.arrowImage.transform = CGAffineTransformMakeRotation(M_PI);
+//            }];
 			break;
         }
             
