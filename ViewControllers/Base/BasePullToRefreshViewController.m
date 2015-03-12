@@ -104,6 +104,7 @@
 
 - (void)refreshWithSuccessed:(PullToRefreshSuccessed)successed failed:(PullToRefreshFailed)failed withRequestType:(RequestType)requestType
 {
+    self.isAnimating = YES;
     WeakSelfType blockSelf = self;
     RequestSuccessed requestSuccessedBlock = ^(id responseObject){
         [blockSelf.contentScrollView headerEndRefreshing];
@@ -138,6 +139,7 @@
         if (successed) {
             successed();
         }
+        [blockSelf bk_performBlock:^(id obj) { blockSelf.isAnimating = NO;} afterDelay:1.5];
         [blockSelf reloadData];
     };
     
@@ -145,10 +147,10 @@
         [blockSelf.contentScrollView headerEndRefreshing];
         [blockSelf showAlertVieWithMessage:errorMessage];
         blockSelf.isTipsViewHidden = ([blockSelf.dataArray count] > 0);//判断总的数组是否为空
-//
-//        if (failed) {
-//            failed();
-//        }
+        [blockSelf bk_performBlock:^(id obj) { blockSelf.isAnimating = NO;} afterDelay:1.5];
+        if (failed) {
+            failed();
+        }
     };
     if(requestType == RequestTypeGET){
         [AFNManager getDataFromUrl:[self prefixOfUrl]
@@ -186,9 +188,8 @@
 }
 
 - (void)loadMoreWithSuccessed:(PullToRefreshSuccessed)successed failed:(PullToRefreshFailed)failed withRequestType:(RequestType)requestType{
-
+    self.isAnimating = YES;
     WeakSelfType blockSelf = self;
-    
     RequestSuccessed requestSuccessedBlock = ^(id responseObject){
         [blockSelf.contentScrollView footerEndRefreshing];
         [blockSelf hideHUDLoading];
@@ -224,7 +225,7 @@
         if (successed) {
             successed();
         }
-
+        [blockSelf bk_performBlock:^(id obj) { blockSelf.isAnimating = NO;} afterDelay:1.5];
     };
     
     
@@ -232,7 +233,7 @@
         [blockSelf.contentScrollView footerEndRefreshing];
         [blockSelf showAlertVieWithMessage:errorMessage];
         blockSelf.isTipsViewHidden = ([blockSelf.dataArray count] > 0);//判断总的数组是否为空
-        
+        [blockSelf bk_performBlock:^(id obj) { blockSelf.isAnimating = NO;} afterDelay:1.5];
         if (failed) {
             failed();
         }

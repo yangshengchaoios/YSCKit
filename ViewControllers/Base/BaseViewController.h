@@ -31,6 +31,7 @@
 @property (nonatomic, assign) BOOL isAppeared;      //当前viewcontroller是否显示
 @property (nonatomic, assign) BOOL isSetupConstraints;          //是否已经设置过约束了
 @property (nonatomic, assign) BOOL isRunViewDidLoadExtension;   //扩展viewDidLoad方法，只执行一次，但由于与UI size相关，放在了viewDidAppear中调用，因此需要一个bool值来控制
+@property (assign, nonatomic) BOOL isAnimating;
 
 #pragma mark - 这里可以获取相对布局的view大小，在viewDidAppear中调用
 - (void)viewDidiLoadExtension;
