@@ -259,6 +259,7 @@
     self.layoutCell = ^UIView *(id data, NSIndexPath *indexPath, NSInteger index) {
         UIScrollView *contentView = [blockSelf contentViewAtIndex:index];
         if (nil != contentView) {
+            contentView.scrollsToTop = NO;
             if ([contentView isKindOfClass:[UITableView class]]) {
                 BaseTableViewCell *cell = [(UITableView *)contentView dequeueReusableCellWithIdentifier:kCellIdentifier];
                 if ([cell isKindOfClass:[BaseTableViewCell class]]) {
@@ -401,6 +402,7 @@
     else {
         [self.contentViewArray removeAllObjects];
     }
+    self.scrollView.scrollsToTop = NO;
     [self.scrollView removeAllSubviews];
     for (int i = 0; i < MAX(1, [self.segmentedTitleArray count]); i++) {
         ContentViewType type = self.contentViewTypeAtIndex(i);

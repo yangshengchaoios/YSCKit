@@ -51,6 +51,7 @@
 	self.scrollView.showsHorizontalScrollIndicator = NO;
 	self.scrollView.contentOffset = CGPointMake(0, 0);
 	self.scrollView.pagingEnabled = YES;
+    self.scrollView.scrollsToTop = NO;
 	[self addSubview:self.scrollView];
     [self.scrollView autoPinEdgeToSuperviewEdge:ALEdgeTop withInset:0];
     [self.scrollView autoPinEdgeToSuperviewEdge:ALEdgeLeft withInset:0];
