@@ -76,8 +76,9 @@
     else {
         self.image = placeholderImage;
     }
+    self.contentMode = UIViewContentModeCenter;
     self.clipsToBounds = YES;
-    self.backgroundColor = [UIColor clearColor];
+    self.backgroundColor = kDefaultImageBackColor;
     NSString *newUrlString = [NSString trimString:[urlString copy]];
     
     //判断是否本地图片
@@ -134,15 +135,16 @@
                        }];
     }
     else {//读取缓存图片
-        self.contentMode = UIViewContentModeScaleAspectFill;
         self.backgroundColor = [UIColor clearColor];
         UIImage *image = [[SDImageCache sharedImageCache] imageFromMemoryCacheForKey:[[NSURL URLWithString:newUrlString] absoluteString]];//先从内存中查找
         if (image) {
+            self.contentMode = UIViewContentModeScaleAspectFill;
             self.image = image;
         }
         else {
             image = [[SDImageCache sharedImageCache] imageFromDiskCacheForKey:[[NSURL URLWithString:newUrlString] absoluteString]];//再从硬盘中查找
             if (image) {
+                self.contentMode = UIViewContentModeScaleAspectFill;
                 self.image = image;
             }
         }
