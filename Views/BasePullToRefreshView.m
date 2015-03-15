@@ -296,7 +296,8 @@
         if (blockSelf.nibNameOfCellAtIndex) {
             nibName = blockSelf.nibNameOfCellAtIndex(index);
         }
-        if ([NSString isNotEmpty:nibName] && [NSClassFromString(nibName) isSubclassOfClass:[BaseTableViewCell class]]) {
+        if ([NSString isNotEmpty:nibName] &&
+            [NSClassFromString(nibName) isSubclassOfClass:[BaseTableViewCell class]]) {
             return [NSClassFromString(nibName) HeightOfCell];
         }
         else {
@@ -315,7 +316,17 @@
     
     //UICollectionView特有的
     self.itemSizeAtIndex = ^CGSize (NSInteger index) {
-        return CGSizeZero;
+        NSString *nibName = @"";
+        if (blockSelf.nibNameOfCellAtIndex) {
+            nibName = blockSelf.nibNameOfCellAtIndex(index);
+        }
+        if ([NSString isNotEmpty:nibName] &&
+            [NSClassFromString(nibName) isSubclassOfClass:[BaseCollectionViewCell class]]) {
+            return [NSClassFromString(nibName) SizeOfCell];
+        }
+        else {
+            return CGSizeZero;
+        }
     };
     self.itemEdgeInsetsAtIndex = ^UIEdgeInsets (NSInteger index) {
         return UIEdgeInsetsZero;
@@ -393,7 +404,9 @@
 }
 //初始化contentViews
 - (void)initContentViews {
-    self.viewControllerClassName = NSStringFromClass([UIView currentViewController].class);
+    if ([NSString isEmpty:self.viewControllerClassName]) {
+        self.viewControllerClassName = NSStringFromClass([UIView currentViewController].class);
+    }
     NSAssert(self.viewControllerClassName, @"can not find view's viewcontroller!");
     WeakSelfType blockSelf = self;
     if (nil == self.contentViewArray) {
@@ -445,7 +458,8 @@
             }
         }
         else if (ContentViewTypeCollectionView == type) {
-            contentView = [[UICollectionView alloc] initWithFrame:CGRectZero];
+            UICollectionViewLayout *layout = [UICollectionViewFlowLayout new];
+            contentView = [[UICollectionView alloc] initWithFrame:CGRectZero collectionViewLayout:layout];
             ((UICollectionView *)contentView).dataSource = self;
             ((UICollectionView *)contentView).delegate = self;
             ((UICollectionView *)contentView).alwaysBounceVertical = YES;
@@ -570,7 +584,7 @@
         //3. 根据新数组刷新界面显示
         if (isPullToRefresh) {//处理下拉刷新
             if ([newDataArray count] > 0) {
-                 [blockSelf reloadByReplacing:newDataArray atIndex:index];
+                [blockSelf reloadByReplacing:newDataArray atIndex:index];
             }
             else {//假如经过处理后的数组为空，则需要清空之前的数据
                 NSArray *tempArray = [blockSelf dataArrayAtIndex:index];
@@ -582,7 +596,7 @@
         }
         else {//处理加载更多
             if ([newDataArray count] > 0) {
-             [blockSelf reloadByAdding:newDataArray atIndex:index];
+                [blockSelf reloadByAdding:newDataArray atIndex:index];
             }
             else {
                 [blockSelf showResultThenHide:@"没有更多了"];

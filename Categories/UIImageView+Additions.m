@@ -86,6 +86,7 @@
         if ( ! [NSString isContains:@"/" inString:newUrlString]) {//简单判断是不是本地图片
             UIImage *localImage = [UIImage imageNamed:newUrlString];
             if([NSObject isNotEmpty:localImage]) {
+                self.contentMode = UIViewContentModeScaleAspectFill;
                 self.image = localImage;
                 return;
             }
@@ -98,7 +99,7 @@
     //处理相对路径
     if ([NSString isNotUrl:newUrlString]) {
         newUrlString = [[NSString replaceString:kResPathAppResUrl byRegex:@"/+$" to:@""] stringByAppendingFormat:@"/%@",
-                       [NSString replaceString:newUrlString byRegex:@"^/+" to:@""]];
+                        [NSString replaceString:newUrlString byRegex:@"^/+" to:@""]];
     }
     //处理相对路径后仍然不是合法的url，则返回默认图片
     if ([NSString isNotUrl:newUrlString]) {
@@ -114,7 +115,7 @@
                                blockSelf.contentMode = UIViewContentModeScaleAspectFill;
                                blockSelf.image = image;
                                blockSelf.backgroundColor = [UIColor clearColor];
-
+                               
                                if (withAnimate) {
                                    blockSelf.alpha = 0.1f;
                                    [UIView animateWithDuration:0.5f

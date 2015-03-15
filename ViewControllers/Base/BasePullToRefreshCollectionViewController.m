@@ -15,27 +15,27 @@
 @implementation BasePullToRefreshCollectionViewController
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
-	self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
-	if (self) {
-		// Custom initialization
-	}
-	return self;
+    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
+    if (self) {
+        // Custom initialization
+    }
+    return self;
 }
 
 - (void)didReceiveMemoryWarning {
-	[super didReceiveMemoryWarning];
+    [super didReceiveMemoryWarning];
 }
 
 - (void)viewDidLoad {
-	[super viewDidLoad];
-
+    [super viewDidLoad];
+    
     if ([NSString isNotEmpty:[self nibNameOfCell]]) {
         [self.collectionView registerNib:[UINib nibWithNibName:[self nibNameOfCell] bundle:nil] forCellWithReuseIdentifier:kItemCellIdentifier];
     }
-	self.collectionView.showsHorizontalScrollIndicator = NO;        //TODO:以后这里可以扩展
-	self.collectionView.showsVerticalScrollIndicator = YES;
-	self.collectionView.delegate = self;
-	self.collectionView.dataSource = self;
+    self.collectionView.showsHorizontalScrollIndicator = NO;        //TODO:以后这里可以扩展
+    self.collectionView.showsVerticalScrollIndicator = YES;
+    self.collectionView.delegate = self;
+    self.collectionView.dataSource = self;
     self.collectionView.backgroundColor = kDefaultViewColor;
     self.collectionView.alwaysBounceVertical = YES;
 }
@@ -94,64 +94,64 @@
 }
 
 - (UIEdgeInsets)itemEdgeInsets {
-	return UIEdgeInsetsMake(20, 20, 20, 20);
+    return AUTOLAYOUT_EDGEINSETS(20, 20, 20, 20);
 }
 //cell的最小行间距
 - (CGFloat)minimumLineSpacingForSectionAtIndex:(NSInteger)section {
-	return 20.0f;
+    return AUTOLAYOUT_LENGTH(20);
 }
 //cell的最小列间距
 - (CGFloat)minimumInteritemSpacingForSectionAtIndex:(NSInteger)section {
-	return 20.0f;
+    return 0;
 }
 
 #pragma mark - UICollectionViewDataSource
 
 - (NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView {
-	return 1;
+    return 1;
 }
 
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
-	return [self cellCount];
+    return [self cellCount];
 }
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
-	id objectModel = nil;
-	if (indexPath.row < [self.dataArray count]) {
-		objectModel = [self.dataArray objectAtIndex:indexPath.row];
-	}
-	UICollectionViewCell *cell = (UICollectionViewCell *)[self layoutCellWithData:objectModel atIndexPath:indexPath];
-	return cell;
+    id objectModel = nil;
+    if (indexPath.row < [self.dataArray count]) {
+        objectModel = [self.dataArray objectAtIndex:indexPath.row];
+    }
+    UICollectionViewCell *cell = (UICollectionViewCell *)[self layoutCellWithData:objectModel atIndexPath:indexPath];
+    return cell;
 }
 
 #pragma mark - UICollectionFlowLayout
 
 - (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath {
-	return [self itemSize];
+    return [self itemSize];
 }
 
 - (UIEdgeInsets)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout insetForSectionAtIndex:(NSInteger)section {
-	return [self itemEdgeInsets];
+    return [self itemEdgeInsets];
 }
 
 //cell的最小行间距
 - (CGFloat)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout minimumLineSpacingForSectionAtIndex:(NSInteger)section {
-	return [self minimumLineSpacingForSectionAtIndex:section];
+    return [self minimumLineSpacingForSectionAtIndex:section];
 }
 
 //cell的最小列间距
 - (CGFloat)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout minimumInteritemSpacingForSectionAtIndex:(NSInteger)section {
-	return [self minimumInteritemSpacingForSectionAtIndex:section];
+    return [self minimumInteritemSpacingForSectionAtIndex:section];
 }
 
 #pragma mark - UICollectionViewDelegate
 
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
-	id objectModel = nil;
-	if (indexPath.row < [self.dataArray count]) {
-		objectModel = [self.dataArray objectAtIndex:indexPath.row];
-	}
-	[self clickedCell:objectModel atIndexPath:indexPath];
+    id objectModel = nil;
+    if (indexPath.row < [self.dataArray count]) {
+        objectModel = [self.dataArray objectAtIndex:indexPath.row];
+    }
+    [self clickedCell:objectModel atIndexPath:indexPath];
 }
 
 @end
