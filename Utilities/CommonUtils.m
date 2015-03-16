@@ -130,7 +130,7 @@
     UIView *searchBoxContainerView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, width, AUTOLAYOUT_LENGTH(56))];
     //1. 设置搜索框背景图片
     UIImageView *searchBoxImageView = [[UIImageView alloc] initWithFrame:CGRectZero];
-    searchBoxImageView.image = [UIImage imageNamed:@"bg_search"];
+    searchBoxImageView.image = [UIImage imageNamed:@"bg_searchBlack"];
     [searchBoxContainerView addSubview:searchBoxImageView];
     [searchBoxImageView autoPinEdgeToSuperviewEdge:ALEdgeTop];
     [searchBoxImageView autoPinEdgeToSuperviewEdge:ALEdgeLeading];
