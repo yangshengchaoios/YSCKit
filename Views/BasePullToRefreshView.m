@@ -333,10 +333,10 @@
         }
     };
     self.itemEdgeInsetsAtIndex = ^UIEdgeInsets (NSInteger index) {
-        return UIEdgeInsetsZero;
+        return AUTOLAYOUT_EDGEINSETS(20, 20, 0, 20);//NOTE:这里设置bottom没有任何作用！
     };
     self.minimumRowSpacingForSectionAtIndex = ^CGFloat (NSInteger section, NSInteger index) {
-        return 0;
+        return AUTOLAYOUT_LENGTH(20);
     };
     self.minimumColumnSpacingForSectionAtIndex = ^CGFloat (NSInteger section, NSInteger index) {
         return 0;
@@ -382,17 +382,25 @@
     self.segmentedControl.selectionIndicatorLocation = HMSegmentedControlSelectionIndicatorLocationDown;
     self.segmentedControl.selectionIndicatorHeight = 2;
     [self.segmentedControl setIndexChangeBlock:^(NSInteger pageIndex) {
+        if (pageIndex == blockSelf.currentIndex) {
+            return ;
+        }
         blockSelf.currentIndex = pageIndex;
         CGFloat pageWidth = blockSelf.scrollView.width + blockSelf.contentViewSpace;
         [blockSelf.scrollView setContentOffset:CGPointMake(pageIndex * pageWidth, 0) animated:NO];
         
         //判断是否触发下拉刷新
-        BOOL refreshEnableWhenEntered = YES;
-        if (blockSelf.refreshEnableWhenEnteredAtIndex) {
-            refreshEnableWhenEntered = blockSelf.refreshEnableWhenEnteredAtIndex(pageIndex);
-        }
-        if ([NSArray isEmpty:[blockSelf dataArray]] && refreshEnableWhenEntered) {
+        if ([NSArray isEmpty:[blockSelf dataArray]]) {
             [blockSelf beginRefreshing];
+        }
+        else {
+            BOOL refreshEnableWhenEntered = YES;
+            if (blockSelf.refreshEnableWhenEnteredAtIndex) {
+                refreshEnableWhenEntered = blockSelf.refreshEnableWhenEnteredAtIndex(pageIndex);
+            }
+            if (refreshEnableWhenEntered) {
+                [blockSelf beginRefreshing];
+            }
         }
     }];
     
@@ -920,18 +928,12 @@
 //-------------------------------------------------------------------------------------------
 #pragma mark - UIScrollViewDelegate
 - (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView {
-    if (scrollView != self.scrollView) {//屏蔽contentView回调该方法
-        return;
-    }
-    CGFloat pageWidth = scrollView.width + self.contentViewSpace;
-    int pageIndex = floor((scrollView.contentOffset.x - pageWidth / 2) / pageWidth) + 1;
-    if (self.contentViewSpace > 0) {
-        [scrollView setContentOffset:CGPointMake(pageIndex * pageWidth, 0) animated:NO];
-    }
-    self.currentIndex = pageIndex;
-    [self.segmentedControl setSelectedSegmentIndex:pageIndex animated:YES];
+    [self didWhenScrollViewEnded:scrollView];
 }
 - (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate {
+    [self didWhenScrollViewEnded:scrollView];
+}
+- (void)didWhenScrollViewEnded:(UIScrollView *)scrollView {
     if (scrollView != self.scrollView) {//屏蔽contentView回调该方法
         return;
     }
@@ -940,8 +942,10 @@
     if (self.contentViewSpace > 0) {
         [scrollView setContentOffset:CGPointMake(pageIndex * pageWidth, 0) animated:NO];
     }
-    self.currentIndex = pageIndex;
     [self.segmentedControl setSelectedSegmentIndex:pageIndex animated:YES];
+    if (self.segmentedControl.indexChangeBlock) {
+        self.segmentedControl.indexChangeBlock(pageIndex);
+    }
 }
 
 @end

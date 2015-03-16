@@ -94,7 +94,7 @@
 }
 
 - (UIEdgeInsets)itemEdgeInsets {
-    return AUTOLAYOUT_EDGEINSETS(20, 20, 20, 20);
+    return AUTOLAYOUT_EDGEINSETS(20, 20, 0, 20);//NOTE:这里设置bottom没有任何作用！
 }
 //cell的最小行间距
 - (CGFloat)minimumLineSpacingForSectionAtIndex:(NSInteger)section {
