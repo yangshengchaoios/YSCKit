@@ -105,6 +105,7 @@
     self.scrollView = [[UIScrollView alloc] initWithFrame:CGRectZero];
     self.scrollView.backgroundColor = [UIColor clearColor];
     self.scrollView.pagingEnabled = YES;
+    self.scrollView.showsHorizontalScrollIndicator = NO;
     self.scrollView.delegate = self;
     [self addSubview:self.scrollView];
     //添加约束
@@ -239,6 +240,9 @@
         return YES;
     };
     self.loadMoreEnableAtIndex = ^BOOL (NSInteger index) {
+        return YES;
+    };
+    self.scrollEnableAtIndex = ^BOOL (NSInteger index) {
         return YES;
     };
     self.cellCountAtIndex = ^NSInteger (NSInteger index) {
@@ -483,6 +487,7 @@
                 ((UIScrollView *)contentView).contentInset = self.contentViewContentInsetAtIndex(i);
             }
         }
+        contentView.backgroundColor = [UIColor clearColor];
         contentView.tag = TagStartOfContentView + i;
         [self.contentViewArray addObject:contentView];
         [self.scrollView addSubview:contentView];
@@ -507,6 +512,7 @@
             BOOL refreshEnable = YES;
             BOOL refreshEnableWhenEntered = YES;
             BOOL loadMoreEnable = YES;
+            BOOL scrollEnable = YES;
             if (self.refreshEnableAtIndex) {
                 refreshEnable = self.refreshEnableAtIndex(i);
             }
@@ -515,6 +521,9 @@
             }
             if (self.loadMoreEnableAtIndex) {
                 loadMoreEnable = self.loadMoreEnableAtIndex(i);
+            }
+            if (self.scrollEnableAtIndex) {
+                scrollEnable = self.scrollEnableAtIndex(i);
             }
             
             if (refreshEnable) {
@@ -530,6 +539,7 @@
                     [blockSelf loadMoreDataAtIndex:i];
                 }];
             }
+            ((UIScrollView *)contentView).scrollEnabled = scrollEnable;
         }
         
         //5. 初始化页码数组和数据源数组

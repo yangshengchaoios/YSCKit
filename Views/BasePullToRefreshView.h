@@ -38,6 +38,7 @@ typedef BOOL (^ShouldCacheDataAtIndex)(NSInteger index);                 //是�
 typedef BOOL (^RefreshEnableAtIndex)(NSInteger index);                   //是否启用下拉刷新(默认YES)
 typedef BOOL (^RefreshEnableWhenEnteredAtIndex)(NSInteger index);        //是否在第一次进入界面就触发下拉刷新(以后进入界面就根据当前页面的数据是否为空来判断是否触发下拉刷新，默认YES)
 typedef BOOL (^LoadMoreEnableAtIndex)(NSInteger index);                  //是否启用加载更多(默认YES)
+typedef BOOL (^ScrollEnableAtIndex)(NSInteger index);                    //是否启用加载更多(默认YES)
 typedef NSInteger (^CellCountAtIndex)(NSInteger index);                  //控制显示条目
 typedef NSString *(^PrefixOfUrlAtIndex)(NSInteger index);                //接口前缀(默认是业务接口前缀kResPathAppBaseUrl)
 typedef NSString *(^HintStringAtIndex)(NSInteger index);                 //没有数据时的提示文本(当返回nil时，表示不显示TipsView)
@@ -101,6 +102,7 @@ typedef void (^ClickCell)(id data, NSIndexPath *indexPath, NSInteger index);    
 @property (nonatomic, copy) RefreshEnableAtIndex refreshEnableAtIndex;      //默认YES
 @property (nonatomic, copy) RefreshEnableWhenEnteredAtIndex refreshEnableWhenEnteredAtIndex;//默认YES
 @property (nonatomic, copy) LoadMoreEnableAtIndex loadMoreEnableAtIndex;    //默认YES
+@property (nonatomic, copy) ScrollEnableAtIndex scrollEnableAtIndex;        //默认YES
 @property (nonatomic, copy) CellCountAtIndex cellCountAtIndex;              //默认dataArray[i].count
 @property (nonatomic, copy) PrefixOfUrlAtIndex prefixOfUrlAtIndex;          //默认kResPathAppBaseUrl
 @property (nonatomic, copy) HintStringAtIndex hintStringAtIndex;            //默认提示信息"暂时没有内容"

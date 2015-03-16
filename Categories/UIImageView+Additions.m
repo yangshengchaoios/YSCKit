@@ -136,15 +136,16 @@
                        }];
     }
     else {//读取缓存图片
-        self.backgroundColor = [UIColor clearColor];
         UIImage *image = [[SDImageCache sharedImageCache] imageFromMemoryCacheForKey:[[NSURL URLWithString:newUrlString] absoluteString]];//先从内存中查找
         if (image) {
+            self.backgroundColor = [UIColor clearColor];
             self.contentMode = UIViewContentModeScaleAspectFill;
             self.image = image;
         }
         else {
             image = [[SDImageCache sharedImageCache] imageFromDiskCacheForKey:[[NSURL URLWithString:newUrlString] absoluteString]];//再从硬盘中查找
             if (image) {
+                self.backgroundColor = [UIColor clearColor];
                 self.contentMode = UIViewContentModeScaleAspectFill;
                 self.image = image;
             }
