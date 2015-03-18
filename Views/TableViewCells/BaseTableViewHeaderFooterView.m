@@ -23,5 +23,12 @@
 + (UINib *)NibNameOfView {
     return [UINib nibWithNibName:NSStringFromClass(self.class) bundle:nil];
 }
+- (void)layoutDataModel:(BaseDataModel *)dataModel {
+    
+}
+
+- (void)layoutDataModels:(NSArray *)dataModelArray {
+    
+}
 
 @end

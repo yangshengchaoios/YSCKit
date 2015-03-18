@@ -1,9 +1,9 @@
 //
 //  BasePullToRefreshView.m
-//  HYTCosmetic
+//  YSCKit
 //
 //  Created by yangshengchao on 15/1/4.
-//  Copyright (c) 2015年 ZhongDaYunKe. All rights reserved.
+//  Copyright (c) 2015年 yangshengchao. All rights reserved.
 //
 
 #import "BasePullToRefreshView.h"

@@ -12,4 +12,7 @@
 
 + (CGFloat)HeightOfView;
 + (UINib *)NibNameOfView;
+- (void)layoutDataModel:(BaseDataModel *)dataModel;
+- (void)layoutDataModels:(NSArray *)dataModelArray;
+
 @end
