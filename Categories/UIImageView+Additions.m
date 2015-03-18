@@ -9,11 +9,6 @@
 #import "UIImageView+Additions.h"
 #import <SDWebImage/UIImageView+WebCache.h>
 
-#define DefaultBackgroundColor          [UIColor colorWithWhite:0.97f alpha:1.0f]       //UIImageView默认背景颜色
-#define DefaultPlaceholderImageName     @"default_image"
-#define DefaultPlaceholderImage         [UIImage imageNamed:DefaultPlaceholderImageName]       //本项目的默认图片
-
-
 @implementation UIImageView (Additions)
 
 @end
@@ -25,11 +20,11 @@
 @implementation UIImageView (Cache)
 
 - (void)setImageWithURLString:(NSString *)urlString {
-    [self setImageWithURLString:urlString placeholderImage:DefaultPlaceholderImage withFadeIn:NO completed:nil];
+    [self setImageWithURLString:urlString placeholderImage:DefaultImage withFadeIn:NO completed:nil];
 }
 
 - (void)setImageWithURLString:(NSString *)urlString completed:(SetImageCompletionBlock)complete {
-    [self setImageWithURLString:urlString placeholderImage:DefaultPlaceholderImage withFadeIn:NO completed:complete];
+    [self setImageWithURLString:urlString placeholderImage:DefaultImage withFadeIn:NO completed:complete];
 }
 
 - (void)setImageWithURLString:(NSString *)urlString placeholderImageName:(NSString *)placeholderImageName {
@@ -41,7 +36,7 @@
 }
 
 - (void)setImageWithURLString:(NSString *)urlString withFadeIn:(BOOL)fadeIn {
-    [self setImageWithURLString:urlString placeholderImage:DefaultPlaceholderImage withFadeIn:fadeIn completed:nil];
+    [self setImageWithURLString:urlString placeholderImage:DefaultImage withFadeIn:fadeIn completed:nil];
 }
 
 - (void)setImageWithURLString:(NSString *)urlString placeholderImage:(UIImage *)holderImage {
@@ -70,24 +65,31 @@
                     completed:(SetImageCompletionBlock)complete {
     WeakSelfType blockSelf = self;
     //设置基本参数
-    if (placeholderImage == nil) {
-        self.image = DefaultPlaceholderImage;
+    self.clipsToBounds = YES;
+    self.backgroundColor = kDefaultImageBackColor;
+    NSString *newUrlString = [NSString trimString:[urlString copy]];
+    if (nil == placeholderImage) {
+        self.image = DefaultImage;
     }
     else {
         self.image = placeholderImage;
     }
-    self.contentMode = UIViewContentModeCenter;
-    self.clipsToBounds = YES;
-    self.backgroundColor = kDefaultImageBackColor;
-    NSString *newUrlString = [NSString trimString:[urlString copy]];
+    
+    //如果默认图片比imageView还要大，需要保证默认图片不能被切
+    if (self.image.size.width > self.width || self.image.size.height > self.height) {
+        self.contentMode = UIViewContentModeScaleAspectFit;
+    }
+    else {
+        self.contentMode = UIViewContentModeCenter;
+    }
     
     //判断是否本地图片
     if([NSString isNotEmpty:newUrlString]) {
         if ( ! [NSString isContains:@"/" inString:newUrlString]) {//简单判断是不是本地图片
             UIImage *localImage = [UIImage imageNamed:newUrlString];
-            if([NSObject isNotEmpty:localImage]) {
-                self.contentMode = UIViewContentModeScaleAspectFill;
+            if(localImage) {
                 self.image = localImage;
+                self.contentMode = UIViewContentModeScaleAspectFill;
                 return;
             }
         }
@@ -112,9 +114,9 @@
                 placeholderImage:placeholderImage
                        completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL)  {
                            if ( ! error) {
-                               blockSelf.contentMode = UIViewContentModeScaleAspectFill;
                                blockSelf.image = image;
                                blockSelf.backgroundColor = [UIColor clearColor];
+                               blockSelf.contentMode = UIViewContentModeScaleAspectFill;
                                
                                if (withAnimate) {
                                    blockSelf.alpha = 0.1f;
@@ -138,16 +140,16 @@
     else {//读取缓存图片
         UIImage *image = [[SDImageCache sharedImageCache] imageFromMemoryCacheForKey:[[NSURL URLWithString:newUrlString] absoluteString]];//先从内存中查找
         if (image) {
+            self.image = image;
             self.backgroundColor = [UIColor clearColor];
             self.contentMode = UIViewContentModeScaleAspectFill;
-            self.image = image;
         }
         else {
             image = [[SDImageCache sharedImageCache] imageFromDiskCacheForKey:[[NSURL URLWithString:newUrlString] absoluteString]];//再从硬盘中查找
             if (image) {
+                self.image = image;
                 self.backgroundColor = [UIColor clearColor];
                 self.contentMode = UIViewContentModeScaleAspectFill;
-                self.image = image;
             }
         }
     }

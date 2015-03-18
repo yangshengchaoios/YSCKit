@@ -22,27 +22,27 @@
 /**
  *  时间标签
  */
-//- (UILabel *)lastUpdateTimeLabel
-//{
-//    if (!_lastUpdateTimeLabel) {
-//        // 1.创建控件
-//        UILabel *lastUpdateTimeLabel = [[UILabel alloc] init];
-//        lastUpdateTimeLabel.autoresizingMask = UIViewAutoresizingFlexibleWidth;
-//        lastUpdateTimeLabel.font = [UIFont boldSystemFontOfSize:12];
-//        lastUpdateTimeLabel.textColor = MJRefreshLabelTextColor;
-//        lastUpdateTimeLabel.backgroundColor = [UIColor clearColor];
-//        lastUpdateTimeLabel.textAlignment = NSTextAlignmentCenter;
-//        [self addSubview:_lastUpdateTimeLabel = lastUpdateTimeLabel];
-//        
-//        // 2.加载时间
-//        if(self.dateKey){
-//            self.lastUpdateTime = [[NSUserDefaults standardUserDefaults] objectForKey:self.dateKey];
-//        } else {
-//            self.lastUpdateTime = [[NSUserDefaults standardUserDefaults] objectForKey:MJRefreshHeaderTimeKey];
-//        }
-//    }
-//    return _lastUpdateTimeLabel;
-//}
+- (UILabel *)lastUpdateTimeLabel
+{
+    if (!_lastUpdateTimeLabel) {
+        // 1.创建控件
+        UILabel *lastUpdateTimeLabel = [[UILabel alloc] init];
+        lastUpdateTimeLabel.autoresizingMask = UIViewAutoresizingFlexibleWidth;
+        lastUpdateTimeLabel.font = [UIFont boldSystemFontOfSize:11];
+        lastUpdateTimeLabel.textColor = MJRefreshLabelTextColor;
+        lastUpdateTimeLabel.backgroundColor = [UIColor clearColor];
+        lastUpdateTimeLabel.textAlignment = NSTextAlignmentCenter;
+        [self addSubview:_lastUpdateTimeLabel = lastUpdateTimeLabel];
+        
+        // 2.加载时间
+        if(self.dateKey){
+            self.lastUpdateTime = [[NSUserDefaults standardUserDefaults] objectForKey:self.dateKey];
+        } else {
+            self.lastUpdateTime = [[NSUserDefaults standardUserDefaults] objectForKey:MJRefreshHeaderTimeKey];
+        }
+    }
+    return _lastUpdateTimeLabel;
+}
 
 + (instancetype)header
 {
@@ -65,11 +65,11 @@
     
     CGFloat statusX = 0;
     CGFloat statusY = 0;
-    CGFloat statusHeight = self.mj_height * 0.5;
+    CGFloat statusHeight = self.mj_height * 0.48;
     CGFloat statusWidth = self.mj_width;
 //     1.状态标签
     self.imageViews.frame = CGRectMake(statusX, statusY, statusWidth, statusHeight);
-    self.imageViews.frame = CGRectMake(self.centerX-50, 0, 100, 40);
+    self.imageViews.frame = CGRectMake(self.centerX-50, 0, 100, 30);
     
     // 2.时间标签
     CGFloat lastUpdateY = statusHeight;
