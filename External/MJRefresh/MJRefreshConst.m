@@ -9,8 +9,8 @@
 #import <UIKit/UIKit.h>
 
 const CGFloat MJRefreshViewHeight = 50.0;
-const CGFloat MJRefreshFastAnimationDuration = 0.25;
-const CGFloat MJRefreshSlowAnimationDuration = 0.4;
+const CGFloat MJRefreshFastAnimationDuration = 0.1;
+const CGFloat MJRefreshSlowAnimationDuration = 0.3;
 
 NSString *const MJRefreshBundleName = @"MJRefresh.bundle";
 
