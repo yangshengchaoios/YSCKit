@@ -144,7 +144,7 @@
         dispatch_async(dispatch_get_main_queue(), ^{//更新主线程的UI
 		    BOOL reachable = [ReachabilityManager sharedInstance].reachable;
 		    [blockSelf networkReachablityChanged:reachable];
-		});
+        });
     }];
     
     //设置导航栏
