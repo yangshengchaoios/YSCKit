@@ -79,16 +79,21 @@
  *  @param isTipsViewHidden
  */
 - (void)setIsTipsViewHidden:(BOOL)isTipsViewHidden {
+    [self setIsTipsViewHidden:isTipsViewHidden withTipText:[self hintStringWhenNoData]];
+}
+- (void)setIsTipsViewHidden:(BOOL)isTipsViewHidden withTipText:(NSString *)tipText {
     _isTipsViewHidden = isTipsViewHidden;
     
     if ([self tipsViewEnable]) {
-        if (self.tipsView == nil) {
-            self.tipsView = [TipsView showTips:[self hintStringWhenNoData]
-                                        inView:[self contentScrollView]];
-        }
-        if (self.tipsView.hidden != isTipsViewHidden) {
-            self.tipsView.hidden = isTipsViewHidden;
-        }
+        WeakSelfType blockSelf = self;
+        TipsView *tipsView = [TipsView showTipText:tipText
+                                            onView:[self contentScrollView]
+                                         hintImage:[UIImage imageNamed:@"icon_failed"]
+                                       buttonTitle:@"重新加载"
+                                      buttonHandle:^{
+                                          [blockSelf.contentScrollView headerBeginRefreshing];
+                                      }];
+        tipsView.hidden = isTipsViewHidden;
     }
 }
 
@@ -126,13 +131,14 @@
         if ([dataArray count] > 0) {
             newDataArray = [blockSelf preProcessData:dataArray];
         }
-        blockSelf.isTipsViewHidden = ([newDataArray count] > 0);
         if ([newDataArray count] > 0) {
+            blockSelf.isTipsViewHidden = YES;
             [blockSelf reloadByReplacing:newDataArray];
         }
         else {
             //清空已有的数据
             [blockSelf.dataArray removeAllObjects];
+            blockSelf.isTipsViewHidden = NO;
         }
         //------------
         
@@ -145,9 +151,20 @@
     
     RequestFailure requestFailureBlock = ^(NSInteger errorCode, NSString *errorMessage){
         [blockSelf.contentScrollView headerEndRefreshing];
-        [blockSelf showAlertVieWithMessage:errorMessage];
-        blockSelf.isTipsViewHidden = ([blockSelf.dataArray count] > 0);//判断总的数组是否为空
+        
+        //1. 如果没有数据就将错误信息显示在tipsView上
+        if ([NSArray isEmpty:blockSelf.dataArray]) {
+            [blockSelf setIsTipsViewHidden:NO withTipText:errorMessage];
+        }
+        else {
+            blockSelf.isTipsViewHidden = YES;
+            [blockSelf showAlertVieWithMessage:errorMessage];
+        }
+        
+        //2. TODO:动画延时处理
         [blockSelf bk_performBlock:^(id obj) { blockSelf.isAnimating = NO;} afterDelay:1.5];
+        
+        //3. 回调
         if (failed) {
             failed();
         }
@@ -231,9 +248,20 @@
     
     RequestFailure requestFailureBlock = ^(NSInteger errorCode, NSString *errorMessage){
         [blockSelf.contentScrollView footerEndRefreshing];
-        [blockSelf showAlertVieWithMessage:errorMessage];
-        blockSelf.isTipsViewHidden = ([blockSelf.dataArray count] > 0);//判断总的数组是否为空
+
+        //1. 如果没有数据就将错误信息显示在tipsView上
+        if ([NSArray isEmpty:blockSelf.dataArray]) {
+            [blockSelf setIsTipsViewHidden:NO withTipText:errorMessage];
+        }
+        else {
+            blockSelf.isTipsViewHidden = YES;
+            [blockSelf showAlertVieWithMessage:errorMessage];
+        }
+        
+        //2. TODO:动画延时处理
         [blockSelf bk_performBlock:^(id obj) { blockSelf.isAnimating = NO;} afterDelay:1.5];
+        
+        //3. 回调
         if (failed) {
             failed();
         }
@@ -300,7 +328,7 @@
 }
 
 - (NSString *)hintStringWhenNoData {
-    return @"暂时没有内容";
+    return @"返回数据为空";
 }
 
 - (BOOL)tipsViewEnable {

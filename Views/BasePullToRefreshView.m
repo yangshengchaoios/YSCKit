@@ -258,7 +258,7 @@
         return kResPathAppBaseUrl;
     };
     self.hintStringAtIndex = ^NSString *(NSInteger index) {
-        return @"暂时没有内容";
+        return @"返回数据为空";
     };
     self.layoutCell = ^UIView *(id data, NSIndexPath *indexPath, NSInteger index) {
         UIScrollView *contentView = [blockSelf contentViewAtIndex:index];

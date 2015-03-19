@@ -13,28 +13,39 @@ typedef void(^TipsTapHandle)(void);
 
 @interface TipsView : UIView
 
-- (void)setTipsLabelText:(NSString *)tips;
++ (instancetype)showTipText:(NSString *)tipText
+                     onView:(UIView *)view;
++ (instancetype)showTipText:(NSString *)tipText
+                     onView:(UIView *)view
+             withEdgeInsets:(UIEdgeInsets)edgeInsets;
 
-+ (instancetype)showTips:(NSString *)tips
-                   inView:(UIView *)view;
++ (instancetype)showTipText:(NSString *)tipText
+                     onView:(UIView *)view
+                  hintImage:(UIImage *)hintImage;
++ (instancetype)showTipText:(NSString *)tipText
+                     onView:(UIView *)view
+                  hintImage:(UIImage *)hintImage
+             withEdgeInsets:(UIEdgeInsets)edgeInsets;
 
-+ (instancetype)showTips:(NSString *)tips
-                   inView:(UIView *)view
-                withImage:(UIImage *)image
-           andPressHandle:(TipsTapHandle)pressHandle;
++ (instancetype)showTipText:(NSString *)tipText
+                     onView:(UIView *)view
+                  hintImage:(UIImage *)hintImage
+                buttonTitle:(NSString *)buttonTitle
+               buttonHandle:(TipsTapHandle)handle;
++ (instancetype)showTipText:(NSString *)tipText
+                     onView:(UIView *)view
+                  hintImage:(UIImage *)hintImage
+                buttonTitle:(NSString *)buttonTitle
+               buttonHandle:(TipsTapHandle)handle
+             withEdgeInsets:(UIEdgeInsets)edgeInsets;
 
-+ (instancetype)showTips:(NSString *)tips
-                   inView:(UIView *)view
-                withImage:(UIImage *)image
-           andButtonTitle:(NSString *)buttonTitle
-          andButtonHandle:(TipsTapHandle)handle;
-
-+ (instancetype)showTips:(NSString *)tips
-                   inView:(UIView *)view
-                withImage:(UIImage *)image
-     andButtonNormalImage:(UIImage *)normalImage
-  andButtonHighLightImage:(UIImage *)highLightImage
-           andButtonTitle:(NSString *)buttonTitle
-          andButtonHandle:(TipsTapHandle)handle;
++ (instancetype)showTipText:(NSString *)tipText
+                     onView:(UIView *)view
+             withEdgeInsets:(UIEdgeInsets)edgeInsets
+                  hintImage:(UIImage *)hintImage
+                buttonTitle:(NSString *)buttonTitle
+            buttonTextColor:(UIColor *)textColor
+      buttonBackgroundColor:(UIColor *)backgroundColor
+               buttonHandle:(TipsTapHandle)handle;
 
 @end

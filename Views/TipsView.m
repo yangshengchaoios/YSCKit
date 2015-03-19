@@ -8,7 +8,7 @@
 
 #import "TipsView.h"
 
-#define MariginOfTipsLabel       15.0f
+#define MariginOfTipsLabel       10.0f
 #define TagOfTipsView            12345
 
 @interface TipsView ()
@@ -24,34 +24,66 @@
 - (id)init {
     self = [super init];
     if (self) {
+        self.tipsLabel = [[UILabel alloc] init];
+        self.tipsLabel.backgroundColor = [UIColor clearColor];
+        self.tipsLabel.textColor = kDefaultEmptyTextColor;
+        self.tipsLabel.font = AUTOLAYOUT_FONT(28);
+        self.tipsLabel.textAlignment = NSTextAlignmentCenter;
+        self.tipsLabel.lineBreakMode = NSLineBreakByCharWrapping;
+        self.tipsLabel.numberOfLines = 0;
+        [self addSubview:self.tipsLabel];
+        
         
     }
     return self;
 }
 
-/**
- *  可以根据设置的tipstring动态调整大小和位置
- *
- *  @param tips 自定义提醒内容
- */
-- (void)setTipsLabelText:(NSString *)tips {
-    self.tipsLabel.text = tips;
-    self.tipsLabel.width = self.width * 6 / 8;
-    [self.tipsLabel sizeToFit];                 //计算出label的大小，目的是为了给image和button位置参照
-    self.tipsLabel.centerX = self.centerX;
-    self.tipsLabel.centerY = self.centerY;
-    
-    if (self.tipsImageView) {
-        self.tipsImageView.centerY = self.centerY - (self.tipsImageView.height + self.tipsLabel.height) / 2.0f - MariginOfTipsLabel;
-    }
-    if (self.tipsButton) {
-        self.tipsButton.centerY = self.centerY + (self.tipsButton.height + self.tipsLabel.height) / 2.0f + MariginOfTipsLabel;
-    }
++ (instancetype)showTipText:(NSString *)tipText
+                     onView:(UIView *)view {
+    return [self showTipText:tipText onView:view withEdgeInsets:UIEdgeInsetsZero hintImage:nil buttonTitle:nil buttonTextColor:nil buttonBackgroundColor:nil buttonHandle:nil];
+}
++ (instancetype)showTipText:(NSString *)tipText
+                     onView:(UIView *)view
+             withEdgeInsets:(UIEdgeInsets)edgeInsets {
+    return [self showTipText:tipText onView:view withEdgeInsets:edgeInsets hintImage:nil buttonTitle:nil buttonTextColor:nil buttonBackgroundColor:nil buttonHandle:nil];
 }
 
-+ (instancetype)showTips:(NSString *)tips
-                   inView:(UIView *)view {
-    
++ (instancetype)showTipText:(NSString *)tipText
+                     onView:(UIView *)view
+                  hintImage:(UIImage *)hintImage {
+    return [self showTipText:tipText onView:view withEdgeInsets:UIEdgeInsetsZero hintImage:hintImage buttonTitle:nil buttonTextColor:nil buttonBackgroundColor:nil buttonHandle:nil];
+}
++ (instancetype)showTipText:(NSString *)tipText
+                     onView:(UIView *)view
+                  hintImage:(UIImage *)hintImage
+             withEdgeInsets:(UIEdgeInsets)edgeInsets {
+    return [self showTipText:tipText onView:view withEdgeInsets:edgeInsets hintImage:hintImage buttonTitle:nil buttonTextColor:nil buttonBackgroundColor:nil buttonHandle:nil];
+}
+
++ (instancetype)showTipText:(NSString *)tipText
+                     onView:(UIView *)view
+                  hintImage:(UIImage *)hintImage
+                buttonTitle:(NSString *)buttonTitle
+               buttonHandle:(TipsTapHandle)handle {
+    return [self showTipText:tipText onView:view withEdgeInsets:UIEdgeInsetsZero hintImage:hintImage buttonTitle:buttonTitle buttonTextColor:nil buttonBackgroundColor:nil buttonHandle:handle];
+}
++ (instancetype)showTipText:(NSString *)tipText
+                     onView:(UIView *)view
+                  hintImage:(UIImage *)hintImage
+                buttonTitle:(NSString *)buttonTitle
+               buttonHandle:(TipsTapHandle)handle
+             withEdgeInsets:(UIEdgeInsets)edgeInsets {
+    return [self showTipText:tipText onView:view withEdgeInsets:edgeInsets hintImage:hintImage buttonTitle:buttonTitle buttonTextColor:nil buttonBackgroundColor:nil buttonHandle:handle];
+}
+
++ (instancetype)showTipText:(NSString *)tipText
+                     onView:(UIView *)view
+             withEdgeInsets:(UIEdgeInsets)edgeInsets
+                  hintImage:(UIImage *)hintImage
+                buttonTitle:(NSString *)buttonTitle
+            buttonTextColor:(UIColor *)textColor
+      buttonBackgroundColor:(UIColor *)backgroundColor
+               buttonHandle:(TipsTapHandle)handle {
     TipsView *tipsView = nil;
     if ([view viewWithTag:TagOfTipsView]) {
         tipsView = (TipsView *)[view viewWithTag:TagOfTipsView];
@@ -59,111 +91,59 @@
     else {
         tipsView = [[TipsView alloc] init];
     }
-    
+    tipsView.left = edgeInsets.left;
+    tipsView.top = edgeInsets.top;
+    tipsView.width = view.width - edgeInsets.left - edgeInsets.right;
+    tipsView.height = view.height - edgeInsets.top - edgeInsets.bottom;
     tipsView.tag = TagOfTipsView;
     tipsView.backgroundColor = [UIColor clearColor];
-    tipsView.top = 0;
-    tipsView.left = 0;
-    tipsView.width = view.width;
-    tipsView.height = view.height;
-    
-    tipsView.tipsLabel = [[UILabel alloc] init];
-    tipsView.tipsLabel.backgroundColor = [UIColor clearColor];
-    tipsView.tipsLabel.textColor = kDefaultEmptyTextColor;
-    tipsView.tipsLabel.font = AUTOLAYOUT_FONT(30);
-    tipsView.tipsLabel.textAlignment = NSTextAlignmentCenter;
-    tipsView.tipsLabel.lineBreakMode = NSLineBreakByCharWrapping;
-    tipsView.tipsLabel.numberOfLines = 0;
-    [tipsView setTipsLabelText:tips];
-    
-    [tipsView addSubview:tipsView.tipsLabel];
-    
     [view addSubview:tipsView];//这句代码会遮挡view上的其他控件
     //    [view insertSubview:tipsView atIndex:0];//保证tipsView只在view上面一层  TODO:需要测试
     
-    return tipsView;
-    
-}
-
-+ (instancetype)showTips:(NSString *)tips
-                   inView:(UIView *)view
-                withImage:(UIImage *)image
-           andPressHandle:(TipsTapHandle)pressHandle {
-    
-    TipsView *tipsView = [TipsView showTips:tips inView:view];
-    
-    if (image) {
-        tipsView.tipsImageView = [[UIImageView alloc] initWithImage:image];
-        tipsView.tipsImageView.centerX = tipsView.centerX;
-        tipsView.tipsImageView.centerY = tipsView.centerY - (tipsView.tipsImageView.height + tipsView.tipsLabel.height) / 2.0f - MariginOfTipsLabel;
-        tipsView.tipsImageView.autoresizingMask = UIViewAutoresizingFlexibleBottomMargin;
-        [tipsView addSubview:tipsView.tipsImageView];
+    //1. 显示提示文本
+    if ([NSString isNotEmpty:tipText]) {
+        tipsView.tipsLabel.text = tipText;
+        tipsView.tipsLabel.width = tipsView.width * 6 / 8;
+        [tipsView.tipsLabel sizeToFit];                 //计算出label的大小，目的是为了给image和button位置参照
+        tipsView.tipsLabel.centerX = tipsView.centerX;
+        tipsView.tipsLabel.centerY = tipsView.centerY - 20;
     }
     
-    if (pressHandle) {
-        tipsView.userInteractionEnabled = YES;
-        [tipsView bk_whenTapped:^{
-            pressHandle();
-        }];
-    }
-    
-    return tipsView;
-}
-
-+ (instancetype)showTips:(NSString *)tips
-                   inView:(UIView *)view
-                withImage:(UIImage *)image
-           andButtonTitle:(NSString *)buttonTitle
-          andButtonHandle:(TipsTapHandle)handle {
-    return [TipsView showTips:tips
-                          inView:view
-                       withImage:image
-            andButtonNormalImage:[UIImage imageNamed:@"button_orange"]
-         andButtonHighLightImage:[UIImage imageNamed:@"button_orange"]
-                  andButtonTitle:buttonTitle
-                 andButtonHandle:handle];
-}
-
-+ (instancetype)showTips:(NSString *)tips
-                   inView:(UIView *)view
-                withImage:(UIImage *)image
-     andButtonNormalImage:(UIImage *)normalImage
-  andButtonHighLightImage:(UIImage *)highLightImage
-           andButtonTitle:(NSString *)buttonTitle
-          andButtonHandle:(TipsTapHandle)handle {
-    
-    TipsView *tipsView = [TipsView showTips:tips
-                                     inView:view
-                                  withImage:image
-                             andPressHandle:nil];
-    
-    tipsView.tipsButton = [[UIButton alloc]init];
-    tipsView.tipsButton.backgroundColor = [UIColor clearColor];
-    if (normalImage) {
-        [tipsView.tipsButton setBackgroundImage:normalImage forState:UIControlStateNormal];
-    }
-    else {
+    //2. 显示提示图片
+    if (hintImage) {
+        //创建imageview
+        if (nil == tipsView.tipsImageView) {
+            tipsView.tipsImageView = [[UIImageView alloc] initWithImage:hintImage];
+            [tipsView addSubview:tipsView.tipsImageView];
+        }
         
+        //调整位置
+        tipsView.tipsImageView.centerX = tipsView.tipsLabel.centerX;
+        tipsView.tipsImageView.centerY = tipsView.tipsLabel.centerY - (tipsView.tipsImageView.height + tipsView.tipsLabel.height) / 2.0f - MariginOfTipsLabel;
     }
-    if (highLightImage) {
-        [tipsView.tipsButton setBackgroundImage:highLightImage forState:UIControlStateHighlighted];
-    }
-    else {
-        
-    }
-    [tipsView.tipsButton setTitle:buttonTitle forState:UIControlStateNormal];
-    tipsView.tipsButton.titleLabel.font = AUTOLAYOUT_FONT(16);
-    tipsView.tipsButton.titleLabel.textColor = [UIColor whiteColor];
-    tipsView.tipsButton.width = 100.0f;
-    tipsView.tipsButton.height = 32.0f;
-    tipsView.tipsButton.centerX = tipsView.centerX;
-    tipsView.tipsButton.centerY = tipsView.centerY + (tipsView.tipsButton.height + tipsView.tipsLabel.height) / 2.0f + MariginOfTipsLabel;
-    [tipsView addSubview:tipsView.tipsButton];
     
-    if (handle) {
-        [tipsView.tipsButton bk_addEventHandler:^(id sender) {
-            handle();
-        } forControlEvents:UIControlEventTouchUpInside];
+    //3. 显示按钮
+    if ([NSString isNotEmpty:buttonTitle]) {
+        //创建button
+        if (nil == tipsView.tipsButton) {
+            tipsView.tipsButton = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, 135, 40)];
+            tipsView.tipsButton.titleLabel.font = AUTOLAYOUT_FONT(32);
+            [tipsView.tipsButton setTitle:buttonTitle forState:UIControlStateNormal];
+            [tipsView.tipsButton setTitleColor:((nil == textColor) ? [UIColor whiteColor] : textColor)
+                                      forState:UIControlStateNormal];
+            [tipsView.tipsButton setBackgroundColor:((nil == backgroundColor) ? RGB(193, 4, 8) : backgroundColor)];
+            [UIView makeRoundForView:tipsView.tipsButton withRadius:5];
+            [tipsView addSubview:tipsView.tipsButton];
+            if (handle) {
+                [tipsView.tipsButton bk_addEventHandler:^(id sender) {
+                    handle();
+                } forControlEvents:UIControlEventTouchUpInside];
+            }
+        }
+        
+        //调整位置
+        tipsView.tipsButton.centerX = tipsView.tipsLabel.centerX;
+        tipsView.tipsButton.centerY = tipsView.tipsLabel.centerY + (tipsView.tipsButton.height + tipsView.tipsLabel.height) / 2.0f + MariginOfTipsLabel;
     }
     
     return tipsView;
