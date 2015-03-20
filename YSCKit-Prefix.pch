@@ -165,5 +165,5 @@ return _sharedObject;
 #define removeNObserver(_name)                      ([[NSNotificationCenter defaultCenter] removeObserver:self name:_name object:nil])
 #define removeAllObservers(_self)                   ([[NSNotificationCenter defaultCenter] removeObserver:_self])
 #define postN(_name)                                ([[NSNotificationCenter defaultCenter] postNotificationName:_name object:nil userInfo:nil])
-#define postNWithObj(_name,_obj)                    ([[NSNotificationCenter defaultCenter] postNotificationName:_name object:_obj userInfo:nil])
-#define postNWithInfo(_name,_info)                  ([[NSNotificationCenter defaultCenter] postNotificationName:_name object:nil userInfo:_info])
+#define postNWithObj(_name,_obj)                    ([[NSNotificationCenter defaultCenter] postNotificationName:_name object:(_obj) userInfo:nil])
+#define postNWithInfo(_name,_info)                  ([[NSNotificationCenter defaultCenter] postNotificationName:_name object:nil userInfo:(_info)])

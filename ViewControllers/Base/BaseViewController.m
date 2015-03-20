@@ -418,6 +418,8 @@
     
 	UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:viewController];
     navigationController.navigationController.navigationBar.translucent = NO;
+    navigationController.interactivePopGestureRecognizer.enabled = YES;
+    navigationController.interactivePopGestureRecognizer.delegate = self;
     //--------自定义present出来的navigationbar背景图片--------
     [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleDefault];
     [navigationController.navigationBar setTintColor:[UIColor blackColor]];//这个控制返回箭头按钮的颜色
