@@ -13,13 +13,13 @@
 typedef NS_ENUM(NSInteger, ContentViewType) {
     ContentViewTypeTableView = 0,       //默认
     ContentViewTypeCollectionView,
-    ContentViewTypeScrollView
+    ContentViewTypeScrollView,
+    ContentViewTypeWebView
 };
 
 typedef NS_ENUM(NSInteger, UITableViewSeperatorType) {
-    UITableViewSeperatorTypeEdge = 0, //默认
-    UITableViewSeperatorTypeCustom,     //cell里自定义
-    UITableViewSeperatorTypeFull
+    UITableViewSeperatorTypeEdge = 0,   //默认
+    UITableViewSeperatorTypeCustom      //cell里自定义(即不用tableView本身的分割线)
 };
 
 //-------------------定义block类型-----------------------------------------------------

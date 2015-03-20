@@ -30,9 +30,18 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+    //1. 注册cell
     if ([NSString isNotEmpty:[self nibNameOfCell]]) {
         [self.tableView registerNib:[UINib nibWithNibName:[self nibNameOfCell] bundle:nil] forCellReuseIdentifier:kCellIdentifier];
     }
+    //2. 设置cell的分割线
+    if ([self.tableView respondsToSelector:@selector(setSeparatorInset:)]) {
+        [self.tableView setSeparatorInset:[self edgeInsetsOfCellSeperator]];
+    }
+    if ([self.tableView respondsToSelector:@selector(setLayoutMargins:)]) {
+        [self.tableView setLayoutMargins:[self edgeInsetsOfCellSeperator]];
+    }
+    //3. 设置其他参数
     self.tableView.tableHeaderView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 0, 0.01)];
     self.tableView.tableFooterView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 0, 0.01)];
     self.tableView.dataSource = self;
@@ -88,6 +97,14 @@
         return 44.0f;
     }
 }
+- (UIEdgeInsets)edgeInsetsOfCellSeperator {
+    //生效的条件：
+    //1. iOS7只需要设置tableView.seperatorInset
+    //2. iOS8除了设置上面的参数外还需要设置另外两个：
+    //   (1) tableView.layoutMargins
+    //   (2) cell.layoutMargins(在回调方法tableView:tableView willDisplayCell:forRowAtIndexPath:)
+    return AUTOLAYOUT_EDGEINSETS(0, 10, 0, 0);
+}
 
 #pragma mark - UITableViewDataSource
 
@@ -130,6 +147,11 @@
         objectModel = [self.dataArray objectAtIndex:indexPath.row];
     }
     [self clickedCell:objectModel atIndexPath:indexPath];
+}
+- (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath {
+    if ([cell respondsToSelector:@selector(setLayoutMargins:)]) {
+        [cell setLayoutMargins:[self edgeInsetsOfCellSeperator]];
+    }
 }
 
 @end

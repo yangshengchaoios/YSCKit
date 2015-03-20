@@ -309,7 +309,7 @@
         }
     };
     self.tableViewSeperatorColorAtIndex = ^UIColor *(NSInteger index) {
-        return RGB(170, 170, 170);
+        return RGB(213, 213, 213);
     };
     self.tableViewSeperatorEdgeInsetAtIndex = ^UIEdgeInsets (NSInteger index) {
         return UIEdgeInsetsZero;
@@ -446,27 +446,36 @@
             if ([NSString isNotEmpty:nibName]) {
                 [(UITableView *)contentView registerNib:[UINib nibWithNibName:nibName bundle:nil] forCellReuseIdentifier:kCellIdentifier];
             }
-            //设置seperator
+            
+            //获取seperator相关参数
             UITableViewSeperatorType seperatoryType = UITableViewSeperatorTypeEdge;
-            UIColor *color = RGB(170, 170, 170);
             if (self.tableViewSeperatorTypeAtIndex) {
                 seperatoryType = self.tableViewSeperatorTypeAtIndex(i);
             }
-            if (self.tableViewSeperatorColorAtIndex) {
-                color = self.tableViewSeperatorColorAtIndex(i);
-            }
-            ((UITableView *)contentView).separatorColor = color;
-            ((UITableView *)contentView).separatorStyle = UITableViewCellSeparatorStyleSingleLine;
             
+            //设置分割线
             if (UITableViewSeperatorTypeCustom == seperatoryType) {
                 ((UITableView *)contentView).separatorStyle = UITableViewCellSeparatorStyleNone;
             }
             else if (UITableViewSeperatorTypeEdge == seperatoryType) {
+                ((UITableView *)contentView).separatorStyle = UITableViewCellSeparatorStyleSingleLine;
+                //颜色
+                UIColor *color = RGB(213, 213, 213);
+                if (self.tableViewSeperatorColorAtIndex) {
+                    color = self.tableViewSeperatorColorAtIndex(i);
+                }
+                ((UITableView *)contentView).separatorColor = color;
+                //设置seperatorInset
                 UIEdgeInsets edgeInset = UIEdgeInsetsZero;
                 if (self.tableViewSeperatorEdgeInsetAtIndex) {
                     edgeInset = self.tableViewSeperatorEdgeInsetAtIndex(i);
                 }
-                ((UITableView *)contentView).separatorInset = edgeInset;
+                if ([(UITableView *)contentView respondsToSelector:@selector(setSeparatorInset:)]) {
+                    [(UITableView *)contentView setSeparatorInset:edgeInset];
+                }
+                if ([(UITableView *)contentView respondsToSelector:@selector(setLayoutMargins:)]) {
+                    [(UITableView *)contentView setLayoutMargins:edgeInset];
+                }
             }
         }
         else if (ContentViewTypeCollectionView == type) {
@@ -813,23 +822,16 @@
     if (self.tableViewSeperatorTypeAtIndex) {
         seperatoryType = self.tableViewSeperatorTypeAtIndex(index);
     }
-    if (UITableViewSeperatorTypeFull != seperatoryType) {
-        return;
+    if (UITableViewSeperatorTypeEdge != seperatoryType) {
+        return;//如果不是启用tableview本身的seperator的话就直接返回
     }
     
-    // Remove seperator inset
-    if ([cell respondsToSelector:@selector(setSeparatorInset:)]) {
-        [cell setSeparatorInset:UIEdgeInsetsZero];
-    }
-    
-    // Prevent the cell from inheriting the Table View's margin settings
-    if ([cell respondsToSelector:@selector(setPreservesSuperviewLayoutMargins:)]) {
-        [cell setPreservesSuperviewLayoutMargins:NO];
-    }
-    
-    // Explictly set your cell's layout margins
     if ([cell respondsToSelector:@selector(setLayoutMargins:)]) {
-        [cell setLayoutMargins:UIEdgeInsetsZero];
+        UIEdgeInsets edgeInset = UIEdgeInsetsZero;
+        if (self.tableViewSeperatorEdgeInsetAtIndex) {
+            edgeInset = self.tableViewSeperatorEdgeInsetAtIndex(index);
+        }
+        [cell setLayoutMargins:edgeInset];
     }
 }
 
