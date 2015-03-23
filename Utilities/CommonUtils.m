@@ -128,12 +128,13 @@
  */
 + (UIView *)createSearchViewWithWidth:(NSInteger)width withTextField:(UITextField *)textField {
     if (width <= 0) {
-        width = 1000;
+        width = NSIntegerMax;
     }
-    UIView *searchBoxContainerView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, width, AUTOLAYOUT_LENGTH(60))];
+    UIView *searchBoxContainerView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, AUTOLAYOUT_LENGTH(width), AUTOLAYOUT_LENGTH(60))];
     searchBoxContainerView.backgroundColor = RGBA(10, 10, 10, 0.3);
     [UIView makeRoundForView:searchBoxContainerView withRadius:AUTOLAYOUT_LENGTH(60) / 2];
-//    //1. 设置搜索框背景图片
+    
+    //1. 设置搜索框背景图片
 //    UIImageView *searchBoxImageView = [[UIImageView alloc] initWithFrame:CGRectZero];
 //    searchBoxImageView.image = [UIImage imageNamed:@"bg_searchBlack"];
 //    [searchBoxContainerView addSubview:searchBoxImageView];
@@ -149,7 +150,7 @@
     [searchIconImageView autoAlignAxisToSuperviewAxis:ALAxisHorizontal];
     
     //3. 设置关键词输入框
-    textField.font = AUTOLAYOUT_FONT(26);
+    textField.font = AUTOLAYOUT_FONT(28);
     textField.textColor = [UIColor whiteColor];
     [textField setValue:[UIColor whiteColor] forKeyPath:@"_placeholderLabel.textColor"];
     [searchBoxContainerView addSubview:textField];
