@@ -127,15 +127,20 @@
  *  @return
  */
 + (UIView *)createSearchViewWithWidth:(NSInteger)width withTextField:(UITextField *)textField {
-    UIView *searchBoxContainerView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, width, AUTOLAYOUT_LENGTH(56))];
-    //1. 设置搜索框背景图片
-    UIImageView *searchBoxImageView = [[UIImageView alloc] initWithFrame:CGRectZero];
-    searchBoxImageView.image = [UIImage imageNamed:@"bg_searchBlack"];
-    [searchBoxContainerView addSubview:searchBoxImageView];
-    [searchBoxImageView autoPinEdgeToSuperviewEdge:ALEdgeTop];
-    [searchBoxImageView autoPinEdgeToSuperviewEdge:ALEdgeLeading];
-    [searchBoxImageView autoPinEdgeToSuperviewEdge:ALEdgeBottom];
-    [searchBoxImageView autoPinEdgeToSuperviewEdge:ALEdgeTrailing];
+    if (width <= 0) {
+        width = 1000;
+    }
+    UIView *searchBoxContainerView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, width, AUTOLAYOUT_LENGTH(60))];
+    searchBoxContainerView.backgroundColor = RGBA(10, 10, 10, 0.3);
+    [UIView makeRoundForView:searchBoxContainerView withRadius:AUTOLAYOUT_LENGTH(60) / 2];
+//    //1. 设置搜索框背景图片
+//    UIImageView *searchBoxImageView = [[UIImageView alloc] initWithFrame:CGRectZero];
+//    searchBoxImageView.image = [UIImage imageNamed:@"bg_searchBlack"];
+//    [searchBoxContainerView addSubview:searchBoxImageView];
+//    [searchBoxImageView autoPinEdgeToSuperviewEdge:ALEdgeTop];
+//    [searchBoxImageView autoPinEdgeToSuperviewEdge:ALEdgeLeading];
+//    [searchBoxImageView autoPinEdgeToSuperviewEdge:ALEdgeBottom];
+//    [searchBoxImageView autoPinEdgeToSuperviewEdge:ALEdgeTrailing];
     
     //2. 设置搜索图标icon
     UIImageView *searchIconImageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"icon_search"]];
