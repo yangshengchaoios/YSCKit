@@ -109,7 +109,8 @@
     }
     
     //采用SDWebImage的缓存方案
-    if ([[NSUserDefaults standardUserDefaults] boolForKey:@"EnableDownloadImage"]) {//下载网络图片
+    if ([[ReachabilityManager sharedInstance].reachability isReachableViaWiFi] ||
+        [[NSUserDefaults standardUserDefaults] boolForKey:@"EnableDownloadImage"]) {//wifi环境下一定会显示图片
         [self sd_setImageWithURL:[NSURL URLWithString:newUrlString]
                 placeholderImage:placeholderImage
                        completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL)  {

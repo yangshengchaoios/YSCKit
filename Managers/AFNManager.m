@@ -218,8 +218,6 @@
     
     //4. 对提交的dict添加一个加密的参数'signature'
     NSMutableDictionary *newDictParam = [NSMutableDictionary dictionaryWithDictionary:dictParam];
-    //TODO:test
-//    [newDictParam setValue:@"ios" forKey:@"PlatformType"];//GetRanks，GetHomeRecommends，GetRecommendList，GetBooksByRecommendId，GetBooksByCategory，GetRelativeBooks，GetBooksBySpecial，GetSearchBooks
 #if IsNeedSignParams
     NSString *signature = [self signatureWithParam:newDictParam];
     if ([NSString isNotEmpty:signature]) {//当加密字符串不为空的时候就新增一个参数'signature'
