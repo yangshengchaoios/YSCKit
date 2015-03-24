@@ -322,11 +322,12 @@
 	}
 	else if (RequestTypeUploadFile == requestType) {
 		NSLog(@"uploading data...");
-        
 		[manager       POST:newUrlString
                  parameters:newDictParam
   constructingBodyWithBlock: ^(id < AFMultipartFormData > formData) {
-      [formData appendPartWithFileData:imageData name:@"file" fileName:@"avatar.png" mimeType:@"application/octet-stream"];
+      if (imageData) {
+          [formData appendPartWithFileData:imageData name:@"file" fileName:@"avatar.png" mimeType:@"application/octet-stream"];
+      }
   }
                     success:requestSuccessed1
                     failure:requestFailure1];
