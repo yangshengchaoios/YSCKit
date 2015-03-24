@@ -43,6 +43,7 @@
     #import "NSLayoutConstraint+Additions.h"
     #import "NSArray+Addition.h"
     #import "UIScrollView+Additions.h"
+    #import "UIImage+Additions.h"
 
     //Utils
     #import "FileUtils.h"

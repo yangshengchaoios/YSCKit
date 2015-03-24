@@ -7,7 +7,7 @@
 //
 
 #import "NSAttributedString+EmojiAttributedString.h"
-#import "UIImage+Additions.h"
+
 @implementation NSAttributedString (EmojiAttributedString)
 - (NSAttributedString *)emojiAttributedString
 {
