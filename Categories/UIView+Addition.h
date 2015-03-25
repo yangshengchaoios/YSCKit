@@ -38,6 +38,10 @@
  *  移除view(包括subviews)上所有constraints
  */
 - (void)removeAllConstraints;
+/**
+ *  隐藏所有子view
+ */
+- (void)hideAllSubviews;
 
 #pragma mark - 图片选择器
 + (UIActionSheet *)showImagePickerActionSheetWithDelegate:(id<UINavigationControllerDelegate,

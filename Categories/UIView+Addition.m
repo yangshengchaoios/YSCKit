@@ -140,6 +140,12 @@
     }
 }
 
+- (void)hideAllSubviews {
+    for (UIView *subView in self.subviews) {
+        subView.hidden = YES;
+    }
+}
+
 #pragma mark - 图片选择器
 + (UIActionSheet *)showImagePickerActionSheetWithDelegate:(id<UINavigationControllerDelegate,
                                                            UIImagePickerControllerDelegate,
