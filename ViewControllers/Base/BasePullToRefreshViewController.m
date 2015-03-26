@@ -328,7 +328,7 @@
 }
 
 - (NSString *)hintStringWhenNoData {
-    return @"返回数据为空";
+    return kDefaultTipText;
 }
 
 - (BOOL)tipsViewEnable {
