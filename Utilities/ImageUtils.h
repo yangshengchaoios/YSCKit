@@ -28,4 +28,10 @@
 
 //模糊图片2 0.0 to 1.0
 + (UIImage*)blurryImage1:(UIImage *)image withBlurLevel:(CGFloat)blurAmount;
+
+//后台模糊效果
++ (void)addBlurEffect;
+//移除后台模糊
++ (void)removeBlurEffect;
+
 @end

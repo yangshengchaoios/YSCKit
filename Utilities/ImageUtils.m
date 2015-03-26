@@ -14,6 +14,8 @@
 #import <QuartzCore/QuartzCore.h>
 #import <Accelerate/Accelerate.h>
 
+#define TagOfBlurView 19999
+
 @implementation ImageUtils
 
 //判断图片是否是透明的
@@ -210,4 +212,27 @@
 
 }
 
+//后台模糊效果
++ (void)addBlurEffect {
+    UIImageView *imageView = [[UIImageView alloc] initWithFrame:[UIScreen mainScreen].bounds];
+    imageView.tag = TagOfBlurView;
+    imageView.image = [ImageUtils blurryImage:[KeyWindow screenshotOfView] withBlurLevel:0.1];
+    [[[UIApplication sharedApplication] keyWindow] addSubview:imageView];
+}
+//移除后台模糊
++ (void)removeBlurEffect {
+    NSArray *subViews = [[UIApplication sharedApplication] keyWindow].subviews;
+    for (id object in subViews) {
+        if ([[object class] isSubclassOfClass:[UIImageView class]]) {
+            UIImageView *imageView = (UIImageView *)object;
+            if(TagOfBlurView == imageView.tag) {
+                [UIView animateWithDuration:0.2 animations:^{
+                    imageView.alpha = 0;
+                    [imageView removeFromSuperview];
+                }];
+                break;
+            }
+        }
+    }
+}
 @end
