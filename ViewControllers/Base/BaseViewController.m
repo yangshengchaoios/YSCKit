@@ -416,7 +416,10 @@
 		[(BaseViewController *)viewController setParams:mutableParamDict];
 	}
     
-	UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:viewController];
+    return [self presentNormalViewController:viewController];
+}
+- (UIViewController *)presentNormalViewController:(UIViewController *)viewController {
+    UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:viewController];
     navigationController.navigationController.navigationBar.translucent = NO;
     navigationController.interactivePopGestureRecognizer.enabled = YES;
     navigationController.interactivePopGestureRecognizer.delegate = self;
@@ -430,8 +433,8 @@
     [navigationController.navigationBar setBackgroundImage:PresentNaviBarImage
                                              forBarMetrics:UIBarMetricsDefault];
     //---------------------------END-----------------------
-	[self presentViewController:navigationController animated:YES completion:nil];
-	return navigationController;
+    [self presentViewController:navigationController animated:YES completion:nil];
+    return navigationController;
 }
 
 //在self上一级viewController调用dismiss（通常情况下使用该方法）
