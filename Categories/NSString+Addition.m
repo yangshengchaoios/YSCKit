@@ -205,6 +205,17 @@
     return [[expression stringByReplacingMatchesInString:self options:0 range:NSMakeRange(0, [self length]) withTemplate:toString] trimString];
 }
 
+#pragma mark - 汉字转拼音
++ (NSString *)toPinYin:(NSString *)hanzi {
+    ReturnEmptyWhenObjectIsEmpty(hanzi)
+    return [hanzi toPinYin];
+}
+- (NSString *)toPinYin {
+    NSMutableString *mutableString = [NSMutableString stringWithString:self];
+    CFStringTransform((CFMutableStringRef)mutableString, NULL, kCFStringTransformToLatin, false);
+    mutableString = (NSMutableString *)[mutableString stringByFoldingWithOptions:NSDiacriticInsensitiveSearch locale:[NSLocale currentLocale]];
+    return [NSString stringWithString:mutableString];
+}
 
 #pragma mark - 字符串分解
 + (NSArray *)splitString:(NSString *)string byRegex:(NSString *)pattern {

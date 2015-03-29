@@ -79,6 +79,10 @@
 - (NSString *)replaceByRegex:(NSString *)pattern to:(NSString *)toString options:(NSRegularExpressionOptions)options;
 
 
+#pragma mark - 汉字转拼音
++ (NSString *)toPinYin:(NSString *)hanzi;
+- (NSString *)toPinYin;
+
 #pragma mark - 字符串分解
 /**
  *  根据分隔符切分字符串为数组 (默认是大小写敏感的)
