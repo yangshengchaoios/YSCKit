@@ -223,7 +223,7 @@
     if (self.state == state) return;
     
     // 2.旧状态
-    MJRefreshState oldState = self.state;
+//    MJRefreshState oldState = self.state;
     
     // 3.存储状态
     _state = state;
@@ -246,25 +246,25 @@
     switch (state) {
 		case MJRefreshStateNormal: // 普通状态
         {
-            if (oldState == MJRefreshStateRefreshing) {
-                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(MJRefreshSlowAnimationDuration * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{ // 等头部回去
-                    // 再次设置回normal
-                    _state = MJRefreshStatePulling;
-                    self.state = MJRefreshStateNormal;
-                    
-//                    // 设置文字
-                    [self settingLabelText];
-                    
-                    [self.imageViews stopAnimating];
-                    self.imageViews.image = [UIImage imageNamed:self.drawingImgs[drawingIndex]];
-                });
-                // 直接返回
-                return;
-            } else {
-                
+//            if (oldState == MJRefreshStateRefreshing) {
+//                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(MJRefreshSlowAnimationDuration * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{ // 等头部回去
+//                    // 再次设置回normal
+//                    _state = MJRefreshStatePulling;
+//                    self.state = MJRefreshStateNormal;
+//                    
+////                    // 设置文字
+//                    [self settingLabelText];
+//                    
+//                    [self.imageViews stopAnimating];
+//                    self.imageViews.image = [UIImage imageNamed:self.drawingImgs[drawingIndex]];
+//                });
+//                // 直接返回
+//                return;
+//            } else {
+            
                 [self.imageViews stopAnimating];
                 self.imageViews.image = [UIImage imageNamed:self.drawingImgs[drawingIndex]];
-            }
+//            }
 			break;
         }
             
@@ -273,8 +273,6 @@
             
 		case MJRefreshStateRefreshing:
         {
-            
-            
             self.imageViews.animationImages = self.loadingImgs;
             self.imageViews.animationDuration = (CGFloat)self.loadingImgs.count/20.0;
             [self.imageViews startAnimating];

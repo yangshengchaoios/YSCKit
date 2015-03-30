@@ -69,7 +69,7 @@
     CGFloat statusWidth = self.mj_width;
 //     1.状态标签
     self.imageViews.frame = CGRectMake(statusX, statusY, statusWidth, statusHeight);
-    self.imageViews.frame = CGRectMake(self.centerX-50, 0, 100, 30);
+//    self.imageViews.frame = CGRectMake(self.centerX-50, 0, 100, 30);
     
     // 2.时间标签
     CGFloat lastUpdateY = statusHeight;
