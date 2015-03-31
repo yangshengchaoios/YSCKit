@@ -760,6 +760,10 @@
 		[self showResultThenHideOnWindow:@"网络断开了"];
 	}
 }
+//专门针对tableview的seperator左右间隔进行设置
+- (UIEdgeInsets)edgeInsetsOfCellSeperator {
+    return UIEdgeInsetsZero;
+}
 
 #pragma mark - UITextFieldDelegate
 
