@@ -10,8 +10,6 @@
 
 @interface BasePullToRefreshViewController ()
 
-@property (nonatomic, assign) BOOL isTipsViewHidden;        //设置没有数据的提示view是否隐藏
-
 @end
 
 @implementation BasePullToRefreshViewController
@@ -84,16 +82,16 @@
 - (void)setIsTipsViewHidden:(BOOL)isTipsViewHidden withTipText:(NSString *)tipText {
     _isTipsViewHidden = isTipsViewHidden;
     
-    if ([self tipsViewEnable]) {
+    if ([self tipsViewEnable] && ! self.tipsView) {
         WeakSelfType blockSelf = self;
-        TipsView *tipsView = [TipsView showTipText:tipText
-                                            onView:[self contentScrollView]
-                                         hintImage:[UIImage imageNamed:@"icon_failed"]
-                                       buttonTitle:@"重新加载"
-                                      buttonHandle:^{
-                                          [blockSelf.contentScrollView headerBeginRefreshing];
-                                      }];
-        tipsView.hidden = isTipsViewHidden;
+        self.tipsView = [TipsView showTipText:tipText
+                                       onView:[self contentScrollView]
+                                    hintImage:[UIImage imageNamed:@"icon_failed"]
+                                  buttonTitle:@"重新加载"
+                                 buttonHandle:^{
+                                     [blockSelf.contentScrollView headerBeginRefreshing];
+                                 }];
+        self.tipsView.hidden = isTipsViewHidden;
     }
 }
 
