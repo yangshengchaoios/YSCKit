@@ -13,8 +13,7 @@
 
 @interface AppConfigManager ()
 
-@property (nonatomic, copy) NSDictionary *appConfigDictionary;
-@property (nonatomic, copy) NSDictionary *appDebugConfigDictionary;
+@property (nonatomic, strong) NSMutableDictionary *appParams;//缓存app运行过程中永远不变的参数集
 
 @end
 
@@ -24,6 +23,14 @@
     DEFINE_SHARED_INSTANCE_USING_BLOCK(^ {
         return [[self alloc] init];
     })
+}
+
+- (id)init {
+    self  = [super init];
+    if (self) {
+        self.appParams = [NSMutableDictionary dictionary];
+    }
+    return self;
 }
 
 #pragma mark - AppConfig.plist管理
@@ -37,38 +44,49 @@
  */
 - (NSString *)valueInAppConfig:(NSString *)key {
     ReturnEmptyWhenObjectIsEmpty(key);
-    if (DEBUGMODEL) {//访问测试配置文件
-        if (![FileDefaultManager fileExistsAtPath:ConfigDebugPlistPath]) {
-            return @"";
+    //0. 获取UMeng的在线参数
+    NSString *tempOnlineValue = UMengParamValue(key);
+    
+    //1. 先判断缓存
+    if (self.appParams[key]) {
+        if ([NSString isNotEmpty:tempOnlineValue] &&
+            (! [tempOnlineValue isEqualToString:self.appParams[key]])) {
+            [self.appParams setValue:tempOnlineValue forKey:key];
         }
-        
-        if ( ! self.appDebugConfigDictionary) {
-            self.appDebugConfigDictionary = [NSDictionary dictionaryWithContentsOfFile:ConfigDebugPlistPath];
-        }
-        
-        if (self.appDebugConfigDictionary[key]) {
-            return self.appDebugConfigDictionary[key];
-        }
-        else {
-            return nil;
+        return self.appParams[key];
+    }
+    NSString *tempValue = @"";//最终需要返回的参数值
+    
+    //2. 获取本地配置的参数
+    NSString *tempLocalValue = @"";
+    if (DEBUGMODEL) {//访问测试环境的配置文件
+        if ([FileDefaultManager fileExistsAtPath:ConfigDebugPlistPath]) {
+            NSDictionary *dict = [NSDictionary dictionaryWithContentsOfFile:ConfigDebugPlistPath];
+            tempLocalValue = dict[key];
         }
     }
-    else {//访问正式的配置文件
-        if (![FileDefaultManager fileExistsAtPath:ConfigPlistPath]) {
-            return @"";
-        }
-        
-        if ( ! self.appConfigDictionary) {
-            self.appConfigDictionary = [NSDictionary dictionaryWithContentsOfFile:ConfigPlistPath];
-        }
-        
-        if (self.appConfigDictionary[key]) {
-            return self.appConfigDictionary[key];
-        }
-        else {
-            return nil;
+    else {
+        if ([FileDefaultManager fileExistsAtPath:ConfigPlistPath]) {
+            NSDictionary *dict = [NSDictionary dictionaryWithContentsOfFile:ConfigPlistPath];
+            tempLocalValue = dict[key];
         }
     }
+    
+    //4. 参数优先级判断(在线参数 > 本地参数)
+    if ([NSString isNotEmpty:tempOnlineValue]) {
+        tempValue = tempOnlineValue;
+    }
+    else {
+        if ([NSString isNotEmpty:tempLocalValue]) {
+            tempValue = tempLocalValue;
+        }
+    }
+    
+    //5. 将参数值加入缓存
+    if ([NSString isNotEmpty:tempValue]) {
+        [self.appParams setValue:tempValue forKey:key];
+    }
+    return tempValue;
 }
 
 @end

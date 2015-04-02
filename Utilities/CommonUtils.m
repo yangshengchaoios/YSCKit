@@ -88,6 +88,7 @@
     else {
         [MobClick startWithAppkey:kUMAppKey reportPolicy:BATCH channelId:kAppChannelAppStore];
     }
+    [MobClick updateOnlineConfig];
     
     //统计相关
     
