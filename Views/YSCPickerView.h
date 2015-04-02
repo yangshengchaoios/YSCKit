@@ -14,8 +14,6 @@ typedef NS_ENUM(NSInteger, YSCPickerType) {
     YSCPickerTypeDateTime,
     YSCPickerTypeAddress ,
 };
-typedef void (^SelectingBlock)(id selectingObject);
-typedef void (^CompletionBlock)();
 
 @interface YSCPickerView : UIView <UIPickerViewDelegate, UIPickerViewDataSource>
 
@@ -26,9 +24,9 @@ typedef void (^CompletionBlock)();
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *containerBottom;//260
 
 @property (assign, nonatomic) YSCPickerType pickerType;
-@property (copy, nonatomic) SelectingBlock selectingBlock;
-@property (copy, nonatomic) CompletionBlock completionShowBlock;
-@property (copy, nonatomic) CompletionBlock completionHideBlock;
+@property (copy, nonatomic) CallBackWithResponseBlock selectingBlock;
+@property (copy, nonatomic) CallBackBlock completionShowBlock;
+@property (copy, nonatomic) CallBackBlock completionHideBlock;
 
 
 - (void)showPickerView:(id)initObject;

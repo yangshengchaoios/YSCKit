@@ -25,6 +25,8 @@
 - (void)awakeFromNib {
     [super awakeFromNib];
     WeakSelfType blockSelf = self;
+    [self resetFontSizeOfView];
+    [self resetConstraintOfView];
     
     //初始化
     self.containerBottom.constant = -AUTOLAYOUT_LENGTH(HeightOfContainerView);
@@ -205,15 +207,17 @@
             self.currentPovinceModel = self.provinceArray[row];
             [self.currentPovinceModel initCityArray];
             
-            self.currentCityModel = self.currentPovinceModel.cityArray[0];
-            [self.currentCityModel initSectionArray];
-            
-            self.currentSectionModel = self.currentCityModel.sectionArray[0];
-            
-            [pickerView reloadComponent:1];
-            [pickerView reloadComponent:2];
-            [pickerView selectRow:0 inComponent:1 animated:YES];
-            [pickerView selectRow:0 inComponent:2 animated:YES];
+            if ([self.currentPovinceModel.cityArray count] > 0) {//TODO:需要测试为什么有时候为空？
+                self.currentCityModel = self.currentPovinceModel.cityArray[0];
+                [self.currentCityModel initSectionArray];
+                
+                self.currentSectionModel = self.currentCityModel.sectionArray[0];
+                
+                [pickerView reloadComponent:1];
+                [pickerView reloadComponent:2];
+                [pickerView selectRow:0 inComponent:1 animated:YES];
+                [pickerView selectRow:0 inComponent:2 animated:YES];
+            }
         }
         else if (1 == component) {
             self.currentCityModel = self.currentPovinceModel.cityArray[row];
