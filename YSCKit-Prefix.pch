@@ -133,8 +133,9 @@ return _sharedObject;
 #define ViewInXib(_xibName, _index)     [[[NSBundle mainBundle] loadNibNamed:(_xibName) owner:nil options:nil] objectAtIndex:(_index)]
 #define NavigationViewController(x)     [[UINavigationController alloc]initWithRootViewController:[[NSClassFromString(x) alloc] initWithNibName:nil bundle:nil]]
 #define ViewController(x)               [[NSClassFromString(x) alloc] initWithNibName:x bundle:nil]
-#define AppVersion                      [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"]
-#define BundleVersion                   [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"]
+#define AppVersion                      [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"]//大版本号
+#define BundleVersion                   [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"]    //内部小版本号
+#define ProductVersion                  [NSString stringWithFormat:@"%@.%@", AppVersion, BundleVersion]             //产品版本(大版本+小版本)
 #define BundleIdentifier                [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleIdentifier"]
 #define Welcome                         [NSString stringWithFormat:@"Welcome_V%@", AppVersion]
 #define SkipVersion                     [NSString stringWithFormat:@"SkipVersion_V%@", AppVersion]

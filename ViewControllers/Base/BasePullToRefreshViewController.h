@@ -66,6 +66,7 @@ typedef void(^PullToRefreshFailed)(void);
 - (BOOL)tipsViewEnable;                             //当没有数据的时候是否显示tipsview（默认YES）
 - (UIView *)layoutCellWithData:(id)object atIndexPath:(NSIndexPath *)indexPath;     //根据数据来布局界面
 - (void)clickedCell:(id)object atIndexPath:(NSIndexPath *)indexPath;
+- (UIEdgeInsets)tipsViewEdgeInsets;
 
 #pragma mark - 最终的子类必须重写的方法
 

@@ -82,7 +82,7 @@
 - (void)setIsTipsViewHidden:(BOOL)isTipsViewHidden withTipText:(NSString *)tipText {
     _isTipsViewHidden = isTipsViewHidden;
     
-    if ([self tipsViewEnable] && ! self.tipsView) {
+    if ([self tipsViewEnable]) {
         WeakSelfType blockSelf = self;
         self.tipsView = [TipsView showTipText:tipText
                                        onView:[self contentScrollView]
@@ -90,9 +90,13 @@
                                   buttonTitle:@"重新加载"
                                  buttonHandle:^{
                                      [blockSelf.contentScrollView headerBeginRefreshing];
-                                 }];
+                                 }
+                               withEdgeInsets:[self tipsViewEdgeInsets]];
         self.tipsView.hidden = isTipsViewHidden;
     }
+}
+- (UIEdgeInsets)tipsViewEdgeInsets {
+    return UIEdgeInsetsZero;
 }
 
 /**

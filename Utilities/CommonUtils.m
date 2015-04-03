@@ -77,20 +77,17 @@
  *  配置Umeng参数
  */
 + (void)configUmeng {
-    
-    //TODO:远程开关
-    
 #pragma mark - 设置UMeng应用的key
-    [MobClick setAppVersion:AppVersion];
+    [MobClick setAppVersion:ProductVersion];
     if (DEBUGMODEL) {
-        [MobClick startWithAppkey:kUMAppKey reportPolicy:REALTIME channelId:kAppChannelDebug];
+        [MobClick startWithAppkey:kUMAppKeyDebug reportPolicy:REALTIME channelId:kAppChannelDebug];
     }
     else {
         [MobClick startWithAppkey:kUMAppKey reportPolicy:BATCH channelId:kAppChannelAppStore];
     }
-    [MobClick updateOnlineConfig];
+    [MobClick updateOnlineConfig];//更新在线参数
     
-    //统计相关
+    //TODO:统计相关
     
 #pragma mark - 分享相关
     //打开调试log的开关
