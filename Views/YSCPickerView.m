@@ -34,7 +34,7 @@
     [UIView makeRoundForView:self.doneButton withRadius:5];
     [UIView makeBorderForView:self.doneButton withColor:[UIColor blackColor] borderWidth:1];
     [self.datePicker bk_addEventHandler:^(id sender) {
-        if (YSCPickerTypeDate == blockSelf.pickerType) {
+        if (blockSelf.pickerType < YSCPickerTypeAddress) {
             if (blockSelf.selectingBlock) {
                 blockSelf.selectingBlock([blockSelf.datePicker date]);
             }
@@ -58,7 +58,7 @@
 }
 - (void)setPickerType:(YSCPickerType)pickerType {
     _pickerType = pickerType;
-    if (YSCPickerTypeDate == pickerType) {
+    if (pickerType < YSCPickerTypeAddress) {
         self.pickerView.hidden = YES;
         self.datePicker.hidden = NO;
     }
@@ -137,7 +137,7 @@
                 [self.pickerView reloadAllComponents];
             }
         }
-        else if (YSCPickerTypeDate == self.pickerType) {
+        else if (self.pickerType < YSCPickerTypeAddress) {
             NSDate *initDate = (NSDate *)initObject;
             if ([NSObject isEmpty:initDate] || (! [initDate isKindOfClass:[NSDate class]])) {
                 initDate = [NSDate date];

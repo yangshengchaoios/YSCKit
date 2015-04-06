@@ -129,8 +129,8 @@ return _sharedObject;
 #define RGB(r, g, b)                    [UIColor colorWithRed:r / 255.0f green:g / 255.0f blue:b / 255.0f alpha:1.0f]
 #define RGBA(r, g, b, a)                [UIColor colorWithRed:r / 255.0f green:g / 255.0f blue:b / 255.0f alpha:a]
 #define RGBHEX(hexstring)               [UIColor colorWithHexString:[NSString replaceString:hexstring byRegex:@"[#]" to:@""]]
-#define FirstViewInXib(_xibName)        ViewInXib(_xibName, 0)
 #define ViewInXib(_xibName, _index)     [[[NSBundle mainBundle] loadNibNamed:(_xibName) owner:nil options:nil] objectAtIndex:(_index)]
+#define FirstViewInXib(_xibName)        ViewInXib(_xibName, 0)
 #define NavigationViewController(x)     [[UINavigationController alloc]initWithRootViewController:[[NSClassFromString(x) alloc] initWithNibName:nil bundle:nil]]
 #define ViewController(x)               [[NSClassFromString(x) alloc] initWithNibName:x bundle:nil]
 #define AppVersion                      [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"]//大版本号
