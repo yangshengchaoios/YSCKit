@@ -28,13 +28,15 @@ typedef void(^SetImageCompletionBlock)(UIImage *image, NSError *error);
  */
 - (void)setImageWithURLString:(NSString *)urlString;
 - (void)setImageWithURLString:(NSString *)urlString completed:(SetImageCompletionBlock)complete;
+- (void)setImageWithURLString:(NSString *)urlString withFadeIn:(BOOL)withAnimate;
+
 - (void)setImageWithURLString:(NSString *)urlString placeholderImageName:(NSString *)placeholderImageName;
 - (void)setImageWithURLString:(NSString *)urlString placeholderImageName:(NSString *)placeholderImageName completed:(SetImageCompletionBlock)complete;
-- (void)setImageWithURLString:(NSString *)urlString withFadeIn:(BOOL)fadeIn;
+- (void)setImageWithURLString:(NSString *)urlString placeholderImageName:(NSString *)placeholderImageName withFadeIn:(BOOL)withAnimate;
+
 - (void)setImageWithURLString:(NSString *)urlString placeholderImage:(UIImage *)holderImage;
 - (void)setImageWithURLString:(NSString *)urlString placeholderImage:(UIImage *)holderImage completed:(SetImageCompletionBlock)complete;
-- (void)setImageWithURLString:(NSString *)urlString placeholderImage:(UIImage *)holderImage withFadeIn:(BOOL)fadeIn;
-
+- (void)setImageWithURLString:(NSString *)urlString placeholderImage:(UIImage *)holderImage withFadeIn:(BOOL)withAnimate;
 /**
  *  处理部分图形模糊
  */

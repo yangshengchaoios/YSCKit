@@ -79,9 +79,7 @@
 - (void)setIsTipsViewHidden:(BOOL)isTipsViewHidden {
     [self setIsTipsViewHidden:isTipsViewHidden withTipText:[self hintStringWhenNoData]];
 }
-- (void)setIsTipsViewHidden:(BOOL)isTipsViewHidden withTipText:(NSString *)tipText {
-    _isTipsViewHidden = isTipsViewHidden;
-    
+- (void)setIsTipsViewHidden:(BOOL)isTipsViewHidden withTipText:(NSString *)tipText {    
     if ([self tipsViewEnable]) {
         WeakSelfType blockSelf = self;
         self.tipsView = [TipsView showTipText:tipText

@@ -13,7 +13,6 @@
  *  @return
  */
 #import "BaseViewController.h"
-#import "TipsView.h"
 #import "MJRefresh.h"
 
 // 缓存数组的唯一键
@@ -28,8 +27,6 @@ typedef void(^PullToRefreshFailed)(void);
 @interface BasePullToRefreshViewController : BaseViewController
 
 @property (nonatomic, strong) NSMutableArray *dataArray;
-@property (nonatomic, assign) BOOL isTipsViewHidden;        //设置没有数据的提示view是否隐藏
-@property (nonatomic, strong) TipsView *tipsView;   //提示信息，默认隐藏
 @property (nonatomic, assign) NSInteger currentPageIndex;   //分页的页码指针
 
 @property (nonatomic, copy) PullToRefreshFailed failedBlock;

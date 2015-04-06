@@ -20,35 +20,33 @@
 @implementation UIImageView (Cache)
 
 - (void)setImageWithURLString:(NSString *)urlString {
-    [self setImageWithURLString:urlString placeholderImage:DefaultImage withFadeIn:NO completed:nil];
+    [self setImageWithURLString:urlString completed:nil];
 }
-
 - (void)setImageWithURLString:(NSString *)urlString completed:(SetImageCompletionBlock)complete {
-    [self setImageWithURLString:urlString placeholderImage:DefaultImage withFadeIn:NO completed:complete];
+    [self setImageWithURLString:urlString placeholderImage:nil withFadeIn:YES completed:complete];
+}
+- (void)setImageWithURLString:(NSString *)urlString withFadeIn:(BOOL)withAnimate {
+    [self setImageWithURLString:urlString placeholderImage:nil withFadeIn:withAnimate completed:nil];
 }
 
 - (void)setImageWithURLString:(NSString *)urlString placeholderImageName:(NSString *)placeholderImageName {
-    [self setImageWithURLString:urlString placeholderImage:[UIImage imageNamed:placeholderImageName] withFadeIn:NO completed:nil];
+    [self setImageWithURLString:urlString placeholderImageName:placeholderImageName completed:nil];
 }
-
 - (void)setImageWithURLString:(NSString *)urlString placeholderImageName:(NSString *)placeholderImageName completed:(SetImageCompletionBlock)complete {
-    [self setImageWithURLString:urlString placeholderImage:[UIImage imageNamed:placeholderImageName] withFadeIn:NO completed:complete];
+    [self setImageWithURLString:urlString placeholderImage:[UIImage imageNamed:placeholderImageName] withFadeIn:YES completed:complete];
 }
-
-- (void)setImageWithURLString:(NSString *)urlString withFadeIn:(BOOL)fadeIn {
-    [self setImageWithURLString:urlString placeholderImage:DefaultImage withFadeIn:fadeIn completed:nil];
+- (void)setImageWithURLString:(NSString *)urlString placeholderImageName:(NSString *)placeholderImageName withFadeIn:(BOOL)withAnimate {
+    [self setImageWithURLString:urlString placeholderImage:[UIImage imageNamed:placeholderImageName] withFadeIn:withAnimate completed:nil];
 }
 
 - (void)setImageWithURLString:(NSString *)urlString placeholderImage:(UIImage *)holderImage {
-    [self setImageWithURLString:urlString placeholderImage:holderImage withFadeIn:NO completed:nil];
+    [self setImageWithURLString:urlString placeholderImage:holderImage completed:nil];
 }
-
 - (void)setImageWithURLString:(NSString *)urlString placeholderImage:(UIImage *)holderImage completed:(SetImageCompletionBlock)complete {
-    [self setImageWithURLString:urlString placeholderImage:holderImage withFadeIn:NO completed:complete];
+    [self setImageWithURLString:urlString placeholderImage:holderImage withFadeIn:YES completed:complete];
 }
-
-- (void)setImageWithURLString:(NSString *)urlString placeholderImage:(UIImage *)holderImage withFadeIn:(BOOL)fadeIn {
-    [self setImageWithURLString:urlString placeholderImage:holderImage withFadeIn:fadeIn completed:nil];
+- (void)setImageWithURLString:(NSString *)urlString placeholderImage:(UIImage *)holderImage withFadeIn:(BOOL)withAnimate {
+    [self setImageWithURLString:urlString placeholderImage:holderImage withFadeIn:withAnimate completed:nil];
 }
 
 /**
@@ -66,36 +64,36 @@
     WeakSelfType blockSelf = self;
     //设置基本参数
     self.clipsToBounds = YES;
-    self.backgroundColor = kDefaultImageBackColor;
     NSString *newUrlString = [NSString trimString:[urlString copy]];
     if (nil == placeholderImage) {
+        placeholderImage = DefaultImage;
         self.image = DefaultImage;
+        self.backgroundColor = kDefaultImageBackColor;
+        
+        //如果默认图片比imageView要小，则居中显示之
+        if (self.image.size.width < self.width && self.image.size.height < self.height) {
+            self.contentMode = UIViewContentModeCenter;
+        }
+        else {//否则就将默认图片等比例缩小到尽可能填充imageView
+            self.contentMode = UIViewContentModeScaleAspectFit;
+        }
     }
     else {
-        self.image = placeholderImage;
-    }
-    
-    //如果默认图片比imageView还要大，需要保证默认图片不能被切
-    if (self.image.size.width > self.width || self.image.size.height > self.height) {
-        self.contentMode = UIViewContentModeScaleAspectFit;
-    }
-    else {
-        self.contentMode = UIViewContentModeCenter;
+        [self setCustomImage:placeholderImage];
     }
     
     //判断是否本地图片
     if([NSString isNotEmpty:newUrlString]) {
-        if ( ! [NSString isContains:@"/" inString:newUrlString]) {//简单判断是不是本地图片
+        if (NO == [NSString isContains:@"/" inString:newUrlString]) {//简单判断是不是本地图片
             UIImage *localImage = [UIImage imageNamed:newUrlString];
             if(localImage) {
-                self.image = localImage;
-                self.contentMode = UIViewContentModeScaleAspectFill;
+                [self setCustomImage:localImage];
                 return;
             }
         }
     }
     else {
-        return;
+        return;//url为空就直接返回默认图片
     }
     
     //处理相对路径
@@ -107,7 +105,7 @@
     if ([NSString isNotUrl:newUrlString]) {
         return;
     }
-    
+
     //采用SDWebImage的缓存方案
     if ([[ReachabilityManager sharedInstance].reachability isReachableViaWiFi] ||
         [[NSUserDefaults standardUserDefaults] boolForKey:kParamEnableDownloadImage]) {//wifi环境下一定会显示图片
@@ -115,21 +113,17 @@
                 placeholderImage:placeholderImage
                        completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL)  {
                            if ( ! error) {
-                               blockSelf.image = image;
                                blockSelf.backgroundColor = [UIColor clearColor];
                                blockSelf.contentMode = UIViewContentModeScaleAspectFill;
                                
                                if (withAnimate) {
-                                   blockSelf.alpha = 0.1f;
-                                   [UIView animateWithDuration:0.5f
+                                   blockSelf.alpha = 0;
+                                   [UIView animateWithDuration:0.2f
                                                          delay:0
                                                        options:UIViewAnimationOptionCurveEaseIn
                                                     animations:^{
                                                         blockSelf.alpha = 1.0f;
-                                                    }
-                                                    completion:^(BOOL finished) {
-                                                        
-                                                    }];
+                                                    } completion:nil];
                                }
                            }
                            //设置回调
@@ -140,20 +134,18 @@
     }
     else {//读取缓存图片
         UIImage *image = [[SDImageCache sharedImageCache] imageFromMemoryCacheForKey:[[NSURL URLWithString:newUrlString] absoluteString]];//先从内存中查找
-        if (image) {
-            self.image = image;
-            self.backgroundColor = [UIColor clearColor];
-            self.contentMode = UIViewContentModeScaleAspectFill;
-        }
-        else {
+        if (nil == image) {
             image = [[SDImageCache sharedImageCache] imageFromDiskCacheForKey:[[NSURL URLWithString:newUrlString] absoluteString]];//再从硬盘中查找
-            if (image) {
-                self.image = image;
-                self.backgroundColor = [UIColor clearColor];
-                self.contentMode = UIViewContentModeScaleAspectFill;
-            }
         }
+        [self setCustomImage:image];
     }
+}
+
+- (void)setCustomImage:(UIImage *)image {
+    ReturnWhenObjectIsEmpty(image);
+    self.image = image;
+    self.backgroundColor = [UIColor clearColor];
+    self.contentMode = UIViewContentModeScaleAspectFill;
 }
 
 @end

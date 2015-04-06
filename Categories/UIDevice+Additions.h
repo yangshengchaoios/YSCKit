@@ -29,7 +29,38 @@ enum {
  */
 @property(readonly) double availableMemory;
 
-+ (DeviceType) currentDeviceType;
++ (DeviceType)currentDeviceType;
 + (BOOL)isRunningOnSimulator;
-+ (NSString *) platformString;
++ (NSString *)platformString;
+
+// 只能判断摄像头是否可用，但不能判断是否被用户禁用了!
++ (BOOL)isCameraAvailable;
++ (BOOL)isFrontCameraAvailable;
++ (BOOL)isBackCameraAvailable;
+
+//判断是否可用使用摄像头
++ (BOOL)isCanUseCamera;
+
+//判断是否可用打电话
++ (BOOL)isCanMakeCall;
+
+// 相册是否可用
+- (BOOL)isPhotoLibraryAvailable;
+// 照片流是否可用
+- (BOOL)isPhotoLiabaryAvailable;
+// 闪光灯是否可用
+- (BOOL)isCameraFlashAvailable;
+// 检测陀螺仪是否可用
+- (BOOL)isGyroscopeAvailable;
+// 检测指南针或磁力计
+- (BOOL)isHandingAvailable;
+// 检查摄像头是否支持录像
+- (BOOL)isCameraSupportShootingVideos;
+// 检查摄像头是否支持拍照
+- (BOOL)isCameraSupportTakingPhotos;
+// 是否可以在相册中选择视频
+- (BOOL)isCanUserPickVideosFromPhotoLibrary;
+// 是否可以在相册中选择图片
+- (BOOL)isCanUserPickPhotosFromPhotoLibrary;
+
 @end

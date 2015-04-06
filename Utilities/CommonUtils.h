@@ -50,7 +50,7 @@
 
 #pragma mark - 打电话
 
-+ (void)MakeACall:(NSString *)phoneNumber;
++ (void)MakeCall:(NSString *)phoneNumber;
 
 #pragma mark - 更新Sqlite操作
 

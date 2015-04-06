@@ -12,6 +12,7 @@
 
 
 //自定义view
+#import "TipsView.h"
 #import "TitleBarView.h"
 
 //第三方库
@@ -24,7 +25,8 @@
 
 #pragma mark - 视图切换
 @property (nonatomic, strong) NSDictionary *params; //显示该视图控制器的时候传入的参数
-
+@property (nonatomic, strong) TipsView *tipsView;   //提示信息，默认隐藏
+@property (nonatomic, assign) BOOL isTipsViewHidden;        //设置没有数据的提示view是否隐藏
 @property (nonatomic, strong) TitleBarView *titleBarView;
 @property (nonatomic, strong) UIButton *backButton;
 @property (nonatomic, assign) BackType backType;    //返回类型（是上一级还是侧边栏）默认是pop上一级

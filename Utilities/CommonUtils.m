@@ -220,8 +220,12 @@
 
 #pragma mark 打电话
 
-+ (void)MakeACall:(NSString *)phoneNumber {
++ (void)MakeCall:(NSString *)phoneNumber {
     if ([self isEmpty:phoneNumber]) {
+        return;
+    }
+    if (NO == [UIDevice isCanMakeCall]) {
+        [UIView showResultThenHideOnWindow:@"无法拨打电话"];
         return;
     }
     phoneNumber = [phoneNumber stringByReplacingOccurrencesOfString:@"-" withString:@""];//去掉-

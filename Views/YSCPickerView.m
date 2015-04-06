@@ -47,9 +47,12 @@
 
     
     //点击半透明关闭选择器
-    [self bk_whenTapped:^{
-        [blockSelf hidePickerView];
+    UITapGestureRecognizer *tapGesture = [[UITapGestureRecognizer alloc] bk_initWithHandler:^(UIGestureRecognizer *sender, UIGestureRecognizerState state, CGPoint location) {
+        if ( ! CGRectContainsPoint(blockSelf.containerView.frame, location)) {
+            [blockSelf hidePickerView];
+        }
     }];
+    [self addGestureRecognizer:tapGesture];
     
     //点击完成按钮关闭选择器
     [self.doneButton bk_addEventHandler:^(id sender) {

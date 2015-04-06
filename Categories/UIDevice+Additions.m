@@ -7,6 +7,9 @@
 //
 
 #import "UIDevice+Additions.h"
+#import <CoreLocation/CoreLocation.h>
+#import <MobileCoreServices/MobileCoreServices.h>
+#import <CoreMotion/CoreMotion.h>
 #include <sys/sysctl.h>
 #include <mach/mach.h>
 
@@ -122,6 +125,96 @@
     if ([platform isEqualToString:@"iPad2,3"])      return @"iPad 2 (CDMA)";
     if ([platform isEqualToString:@"i386"])         return @"Simulator";
     return @"";
+}
+
+// 只能判断摄像头是否可用，但不能判断是否被用户禁用了!
++ (BOOL)isCameraAvailable {
+    return [UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera];
+}
++ (BOOL)isFrontCameraAvailable {
+    return [UIImagePickerController isCameraDeviceAvailable:UIImagePickerControllerCameraDeviceFront];
+}
++ (BOOL)isBackCameraAvailable {
+    return [UIImagePickerController isCameraDeviceAvailable:UIImagePickerControllerCameraDeviceRear];
+}
+
+//判断是否可用使用摄像头
++ (BOOL)isCanUseCamera {
+    AVAuthorizationStatus status = [AVCaptureDevice authorizationStatusForMediaType:AVMediaTypeVideo];
+    return AVAuthorizationStatusAuthorized == status;
+}
+
+//判断是否可用打电话
++ (BOOL)isCanMakeCall {
+    return [[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:@"tel://"]];
+}
+
+// 相册是否可用
+- (BOOL)isPhotoLibraryAvailable {
+    return [UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypePhotoLibrary];
+}
+
+// 照片流是否可用
+- (BOOL)isPhotoLiabaryAvailable {
+    return [UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeSavedPhotosAlbum];
+}
+
+// 闪光灯是否可用
+- (BOOL)isCameraFlashAvailable {
+    return [UIImagePickerController isFlashAvailableForCameraDevice:UIImagePickerControllerCameraDeviceRear];
+}
+
+// 检测陀螺仪是否可用
+- (BOOL)isGyroscopeAvailable {
+    CMMotionManager *motionManager = [[CMMotionManager alloc] init];
+    return motionManager.gyroAvailable;
+}
+
+// 检测指南针或磁力计
+- (BOOL)isHandingAvailable {
+    return [CLLocationManager headingAvailable];
+}
+
+// 检查摄像头是否支持录像
+- (BOOL)isCameraSupportShootingVideos {
+    return [self isCameraSupportsMedia:(NSString *)kUTTypeMovie
+                            sourceType:UIImagePickerControllerSourceTypeCamera];
+}
+
+// 检查摄像头是否支持拍照
+- (BOOL)isCameraSupportTakingPhotos {
+    return [self isCameraSupportsMedia:(NSString *)kUTTypeImage
+                            sourceType:UIImagePickerControllerSourceTypeCamera];
+}
+
+// 是否可以在相册中选择视频
+- (BOOL)isCanUserPickVideosFromPhotoLibrary {
+    return [self isCameraSupportsMedia:(NSString *)kUTTypeMovie
+                            sourceType:UIImagePickerControllerSourceTypePhotoLibrary];
+}
+
+// 是否可以在相册中选择图片
+- (BOOL)isCanUserPickPhotosFromPhotoLibrary {
+    return [self isCameraSupportsMedia:(NSString *)kUTTypeImage
+                            sourceType:UIImagePickerControllerSourceTypePhotoLibrary];
+}
+
+// 判断是否支持某种多媒体类型：拍照，视频
+- (BOOL)isCameraSupportsMedia:(NSString *)paramMediaType
+                   sourceType:(UIImagePickerControllerSourceType)paramSourceType {
+    __block BOOL result = NO;
+    if ([paramMediaType length] == 0) {
+        return NO;
+    }
+    NSArray *availableMediaTypes = [UIImagePickerController availableMediaTypesForSourceType:paramSourceType];
+    [availableMediaTypes enumerateObjectsUsingBlock: ^(id obj, NSUInteger idx, BOOL *stop) {
+        NSString *mediaType = (NSString *)obj;
+        if ([mediaType isEqualToString:paramMediaType]) {
+            result = YES;
+            *stop = YES;
+        }
+    }];
+    return result;
 }
 
 @end
