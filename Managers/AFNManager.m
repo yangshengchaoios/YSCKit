@@ -232,7 +232,7 @@
     manager.requestSerializer.timeoutInterval = kDefaultAFNTimeOut;//设置POST和GET的超时时间
     //解决返回的Content-Type始终是application/xml问题！
     [manager.requestSerializer setValue:@"application/xml" forHTTPHeaderField:@"Accept"];
-    [manager.requestSerializer setValue:kParamVersionValue forHTTPHeaderField:kParamVersion];
+    [manager.requestSerializer setValue:ProductVersion forHTTPHeaderField:kParamVersion];
     [manager.requestSerializer setValue:@"default udid of ios" forHTTPHeaderField:kParamUdid];
     [manager.requestSerializer setValue:kParamFromValue forHTTPHeaderField:kParamFrom];
     

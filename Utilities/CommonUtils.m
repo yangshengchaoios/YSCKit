@@ -10,14 +10,18 @@
 
 @implementation CommonUtils
 
-+ (void)checkNewVersion:(BOOL)showMessage {
-    [self checkNewVersion:showMessage withParams:nil];
++ (void)checkNewVersionShowMessage:(BOOL)showMessage {
+    [self checkNewVersionShowMessage:showMessage withParams:nil];
 }
-+ (void)checkNewVersion:(BOOL)showMessage withParams:(NSDictionary *)params {
++ (void)checkNewVersionShowMessage:(BOOL)showMessage withParams:(NSDictionary *)params {
+    if (NO == [isNeedCheckNewVersion boolValue]) {
+        return;
+    }
     if (showMessage) {
         [UIView showHUDLoadingOnWindow:@"正在检测新版本"];
     }
-    [AFNManager getDataWithAPI:kResPathAppUpdateNewVersion
+    [AFNManager getDataFromUrl:kResPathAppNewVersionUrl
+                       withAPI:@""
                   andDictParam:params
                      modelName:ClassOfObject(NewVersionModel)
               requestSuccessed: ^(id responseObject) {
@@ -25,7 +29,7 @@
                   if ([NSObject isNotEmpty:versionModel]) {
                       BOOL isSkipTheVersion = [[NSUserDefaults standardUserDefaults] boolForKey:SkipVersion];
                       if ( ! isSkipTheVersion) {
-                          if (VersionCompareResultAscending == [AppVersion compareWithVersion:versionModel.versionCode]) {
+                          if (VersionCompareResultAscending == [ProductVersion compareWithVersion:versionModel.versionCode]) {
                               [UIView hideHUDLoadingOnWindow];
                               if ([NSString isNotEmpty:versionModel.downloadUrl]) {
                                   NSString *title = [NSString stringWithFormat:@"有版本%@需要更新", versionModel.versionCode];

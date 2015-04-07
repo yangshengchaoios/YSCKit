@@ -13,7 +13,7 @@
 
 @interface AppConfigManager ()
 
-@property (nonatomic, strong) NSMutableDictionary *appParams;//缓存app运行过程中永远不变的参数集
+@property (nonatomic, strong) NSMutableDictionary *appParams;//缓存app运行过程中永远不变的参数集 TODO:应该保存在document目录下
 
 @end
 

@@ -137,8 +137,8 @@ return _sharedObject;
 #define BundleVersion                   [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"]    //内部小版本号
 #define ProductVersion                  [NSString stringWithFormat:@"%@.%@", AppVersion, BundleVersion]             //产品版本(大版本+小版本)
 #define BundleIdentifier                [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleIdentifier"]
-#define Welcome                         [NSString stringWithFormat:@"Welcome_V%@", AppVersion]
-#define SkipVersion                     [NSString stringWithFormat:@"SkipVersion_V%@", AppVersion]
+#define Welcome                         [NSString stringWithFormat:@"Welcome_V%@", ProductVersion]
+#define SkipVersion                     [NSString stringWithFormat:@"SkipVersion_V%@", ProductVersion]
 #define KeyWindow                       [UIApplication sharedApplication].keyWindow
 #define FileDefaultManager              [NSFileManager defaultManager]
 #define AppProgramPath(x)               [[FileUtils DirectoryPathOfBundle] stringByAppendingPathComponent:x]
