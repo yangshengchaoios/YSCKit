@@ -14,67 +14,78 @@
     [self checkNewVersionShowMessage:showMessage withParams:nil];
 }
 + (void)checkNewVersionShowMessage:(BOOL)showMessage withParams:(NSDictionary *)params {
-    if (NO == [isNeedCheckNewVersion boolValue]) {
+    if ([@"0" isEqualToString:kCheckNewVersionType]) {
         return;
     }
-    if (showMessage) {
-        [UIView showHUDLoadingOnWindow:@"正在检测新版本"];
+    else if ([@"1" isEqualToString:kCheckNewVersionType]) {
+        if ([NSString isNotUrl:kCheckNewVersionUrl]) {
+            return;
+        }
+        if (showMessage) {
+            [UIView showHUDLoadingOnWindow:@"正在检测新版本"];
+        }
+        [AFNManager getDataFromUrl:kCheckNewVersionUrl
+                           withAPI:@""
+                      andDictParam:params
+                         modelName:ClassOfObject(NewVersionModel)
+                  requestSuccessed: ^(id responseObject) {
+                      [CommonUtils checkNewVersion:responseObject showMessage:showMessage];
+                  }
+                    requestFailure: ^(NSInteger errorCode, NSString *errorMessage) {
+                        if (showMessage) {
+                            [UIView showResultThenHideOnWindow:errorMessage];
+                        }
+                    }];
     }
-    [AFNManager getDataFromUrl:kResPathAppNewVersionUrl
-                       withAPI:@""
-                  andDictParam:params
-                     modelName:ClassOfObject(NewVersionModel)
-              requestSuccessed: ^(id responseObject) {
-                  NewVersionModel * versionModel = (NewVersionModel *)responseObject;
-                  if ([NSObject isNotEmpty:versionModel]) {
-                      BOOL isSkipTheVersion = [[NSUserDefaults standardUserDefaults] boolForKey:SkipVersion];
-                      if ( ! isSkipTheVersion) {
-                          if (VersionCompareResultAscending == [ProductVersion compareWithVersion:versionModel.versionCode]) {
-                              [UIView hideHUDLoadingOnWindow];
-                              if ([NSString isNotEmpty:versionModel.downloadUrl]) {
-                                  NSString *title = [NSString stringWithFormat:@"有版本%@需要更新", versionModel.versionCode];
-                                  NSString *message = [NSString trimString:versionModel.description];
-                                  
-                                  UIAlertView *alertView = [UIAlertView bk_alertViewWithTitle:title message:message];
-                                  [alertView bk_addButtonWithTitle:@"立刻升级" handler:^{
-                                      [[UIApplication sharedApplication] openURL:[NSURL URLWithString:versionModel.downloadUrl]];
-                                      exit(0);
-                                  }];
-                                  if ( ! versionModel.isForced ) {   //非强制更新的话才显示更多选项
-                                      [alertView bk_addButtonWithTitle:@"忽略此版本" handler:^{
-                                          [[NSUserDefaults standardUserDefaults] setBool:YES forKey:SkipVersion];
-                                          [[NSUserDefaults standardUserDefaults] synchronize];
-                                      }];
-                                      [alertView bk_setCancelButtonWithTitle:@"取消" handler:nil];//下次启动再次检测
-                                  }
-                                  [alertView show];
-                              }
-                              else {
-                                  [UIView showAlertVieWithMessage:@"下载地址出错"];
-                              }
-                          }
-                          else {
-                              if (showMessage) {
-                                  [UIView showResultThenHideOnWindow:@"已经是最新版本"];
-                              }
-                          }
-                      }
-                      else {
-                          [UIView hideHUDLoadingOnWindow];
-                      }
-                  }
-                  else {
-                      if (showMessage) {
-                          [UIView showResultThenHideOnWindow:@"版本检测出错"];
-                      }
-                  }
-              }
-                requestFailure: ^(NSInteger errorCode, NSString *errorMessage) {
-                    NSLog(@"errorMessage = %@", errorMessage);
-                    if (showMessage) {
-                        [UIView showResultThenHideOnWindow:errorMessage];
+    else if ([@"2" isEqualToString:kCheckNewVersionType]) {
+        //TODO:使用在线参数更新版本
+    }
+}
+
+//具体检测新版本的业务逻辑
++ (void)checkNewVersion:(NewVersionModel *)versionModel showMessage:(BOOL)showMessage {
+    if ([versionModel isKindOfClass:[NewVersionModel class]]) {
+        BOOL isSkipTheVersion = [[NSUserDefaults standardUserDefaults] boolForKey:SkipVersion];
+        if ( ! isSkipTheVersion) {
+            if (VersionCompareResultAscending == [ProductVersion compareWithVersion:versionModel.versionCode]) {
+                [UIView hideHUDLoadingOnWindow];
+                if ([NSString isNotEmpty:versionModel.downloadUrl]) {
+                    NSString *title = [NSString stringWithFormat:@"有版本%@需要更新", versionModel.versionCode];
+                    NSString *message = [NSString trimString:versionModel.description];
+                    
+                    UIAlertView *alertView = [UIAlertView bk_alertViewWithTitle:title message:message];
+                    [alertView bk_addButtonWithTitle:@"立刻升级" handler:^{
+                        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:versionModel.downloadUrl]];
+                        exit(0);
+                    }];
+                    if ( ! versionModel.isForced ) {   //非强制更新的话才显示更多选项
+                        [alertView bk_addButtonWithTitle:@"忽略此版本" handler:^{
+                            [[NSUserDefaults standardUserDefaults] setBool:YES forKey:SkipVersion];
+                            [[NSUserDefaults standardUserDefaults] synchronize];
+                        }];
+                        [alertView bk_setCancelButtonWithTitle:@"取消" handler:nil];//下次启动再次检测
                     }
-                }];
+                    [alertView show];
+                }
+                else {
+                    [UIView showAlertVieWithMessage:@"下载地址出错"];
+                }
+            }
+            else {
+                if (showMessage) {
+                    [UIView showResultThenHideOnWindow:@"已经是最新版本"];
+                }
+            }
+        }
+        else {
+            [UIView hideHUDLoadingOnWindow];
+        }
+    }
+    else {
+        if (showMessage) {
+            [UIView showResultThenHideOnWindow:@"版本检测出错"];
+        }
+    }
 }
 
 /**
@@ -83,22 +94,21 @@
 + (void)configUmeng {
 #pragma mark - 设置UMeng应用的key
     [MobClick setAppVersion:ProductVersion];
+    [UMSocialData openLog:YES];
+    [UMFeedback setLogEnabled:YES];
     if (DEBUGMODEL) {
-        [MobClick startWithAppkey:kUMAppKeyDebug reportPolicy:REALTIME channelId:kAppChannelDebug];
+        [MobClick startWithAppkey:kUMAppKeyDebug reportPolicy:REALTIME channelId:@"debug"];//TODO:配置文件
+        [UMSocialData setAppKey:kUMAppKeyDebug];//设置友盟社会化组件appkey
+        [UMFeedback checkWithAppkey:kUMAppKeyDebug];
     }
     else {
-        [MobClick startWithAppkey:kUMAppKey reportPolicy:BATCH channelId:kAppChannelAppStore];
+        [MobClick startWithAppkey:kUMAppKeyRelease reportPolicy:BATCH channelId:@"appstore"];//TODO:配置文件
+        [UMSocialData setAppKey:kUMAppKeyRelease];//设置友盟社会化组件appkey
+        [UMFeedback checkWithAppkey:kUMAppKeyRelease];
     }
     [MobClick updateOnlineConfig];//更新在线参数
     
-    //TODO:统计相关
-    
-#pragma mark - 分享相关
-    //打开调试log的开关
-    [UMSocialData openLog:YES];
-    
-    //设置友盟社会化组件appkey
-    [UMSocialData setAppKey:kUMAppKey];
+#pragma mark - 分享相关设置
     
     //设置支持没有客户端情况下是否支持单独授权
     [UMSocialQQHandler setSupportWebView:YES];
@@ -114,10 +124,6 @@
     
     //NOTE:打开腾讯微博SSO开关，设置回调地址 只支持32位
 //    [UMSocialTencentWeiboHandler openSSOWithRedirectUrl:AppRedirectUrlOfWeibo];
-    
-#pragma mark - 反馈相关
-    [UMFeedback setLogEnabled:YES];
-    [UMFeedback checkWithAppkey:kUMAppKey];
 }
 
 /**
