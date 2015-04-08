@@ -103,6 +103,7 @@
 + (void)hideHUDLoadingOnWindow;
 - (void)showResultThenHide:(NSString *)resultString;
 + (void)showResultThenHideOnWindow:(NSString *)resultString;
++ (void)showResultThenHideOnWindow:(NSString *)resultString afterDelay:(NSTimeInterval)delay;
 
 #pragma mark - alert view
 + (UIAlertView *)showAlertVieWithMessage:(NSString *)message;

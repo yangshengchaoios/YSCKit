@@ -404,15 +404,18 @@
     [hud hide:YES afterDelay:1];
 }
 + (void)showResultThenHideOnWindow:(NSString *)resultString {
+    [self showResultThenHideOnWindow:resultString afterDelay:1];
+}
++ (void)showResultThenHideOnWindow:(NSString *)resultString afterDelay:(NSTimeInterval)delay {
     UIView *view = [UIApplication sharedApplication].keyWindow;
     MBProgressHUD *hud = [MBProgressHUD HUDForView:view];
-	if (!hud) {
-		hud = [MBProgressHUD showHUDAddedTo:view animated:YES];
-	}
-	hud.labelText = resultString;
-	hud.mode = MBProgressHUDModeText;
-	[hud show:YES];
-	[hud hide:YES afterDelay:1];
+    if (!hud) {
+        hud = [MBProgressHUD showHUDAddedTo:view animated:YES];
+    }
+    hud.labelText = resultString;
+    hud.mode = MBProgressHUDModeText;
+    [hud show:YES];
+    [hud hide:YES afterDelay:delay];
 }
 
 #pragma mark - alert view
