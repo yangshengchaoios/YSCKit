@@ -244,7 +244,7 @@
         }
         responseObject = [NSString replaceString:responseObject byRegex:@"[\r\n\t]" to:@""];
         NSLog(@"request success! \r\noperation=%@\r\nresponseObject=%@", operation, responseObject);
-        JSONModelError *initError;
+        JSONModelError *initError = nil;
         BaseModel *baseModel = nil;
         if ([responseObject isKindOfClass:[NSDictionary class]]) {
             baseModel = [[BaseModel alloc] initWithDictionary:responseObject error:&initError];

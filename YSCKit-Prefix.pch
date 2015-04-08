@@ -133,9 +133,10 @@ return _sharedObject;
 #define FirstViewInXib(_xibName)        ViewInXib(_xibName, 0)
 #define NavigationViewController(x)     [[UINavigationController alloc]initWithRootViewController:[[NSClassFromString(x) alloc] initWithNibName:nil bundle:nil]]
 #define ViewController(x)               [[NSClassFromString(x) alloc] initWithNibName:x bundle:nil]
-#define AppVersion                      [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"]//大版本号
-#define BundleVersion                   [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"]    //内部小版本号
-#define ProductVersion                  [NSString stringWithFormat:@"%@.%@", AppVersion, BundleVersion]             //产品版本(大版本+小版本)
+#define AppVersion                      [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"]//app的版本号(两位数如1.2)
+#define MainVersion                     ([NSString isContains:@"." inString:AppVersion] ? [AppVersion substringToIndex:[AppVersion rangeOfString:@"."].location] : AppVersion)//取app版本号最前面的一位
+#define BundleVersion                   [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"]    //内部小版本号(一位数如3)
+#define ProductVersion                  [NSString stringWithFormat:@"%@.%@", AppVersion, BundleVersion]             //产品版本(大版本+小版本如1.2.3)
 #define BundleIdentifier                [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleIdentifier"]
 #define Welcome                         [NSString stringWithFormat:@"Welcome_V%@", ProductVersion]
 #define SkipVersion                     [NSString stringWithFormat:@"SkipVersion_V%@", ProductVersion]

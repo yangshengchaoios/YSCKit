@@ -35,22 +35,16 @@
 
 #pragma mark - AppConfig.plist管理
 
-/**
- *  返回项目配置文件里的配置信息
- *
- *  @param key
- *
- *  @return
- */
-- (NSString *)valueInAppConfig:(NSString *)key {
+//UMeng参数值优先级 > 本地参数值
+- (NSString *)valueOfAppConfig:(NSString *)key {
     ReturnEmptyWhenObjectIsEmpty(key);
     //0. 获取UMeng的在线参数
-    NSString *tempOnlineValue = UMengParamValue(key);
+    NSString *tempOnlineValue = [self valueOfUMengConfig:key];
     
     //1. 先判断缓存
     if (self.appParams[key]) {
         if ([NSString isNotEmpty:tempOnlineValue] &&
-            (! [tempOnlineValue isEqualToString:self.appParams[key]])) {
+            ( ! [tempOnlineValue isEqualToString:self.appParams[key]])) {
             [self.appParams setValue:tempOnlineValue forKey:key];
         }
         return self.appParams[key];
@@ -58,6 +52,29 @@
     NSString *tempValue = @"";//最终需要返回的参数值
     
     //2. 获取本地配置的参数
+    NSString *tempLocalValue = [self valueOfLocalConfig:key];
+    
+    //3. 参数优先级判断(在线参数 > 本地参数)
+    if ([NSString isNotEmpty:tempOnlineValue]) {
+        tempValue = tempOnlineValue;
+    }
+    else {
+        if ([NSString isNotEmpty:tempLocalValue]) {
+            tempValue = tempLocalValue;
+        }
+    }
+    
+    //4. 将参数值加入缓存
+    if ([NSString isNotEmpty:tempValue]) {
+        [self.appParams setValue:tempValue forKey:key];
+    }
+    return tempValue;
+}
+
+//本地配置文件参数值
+//TODO:临时缓存
+- (NSString *)valueOfLocalConfig:(NSString *)key {
+    ReturnEmptyWhenObjectIsEmpty(key);
     NSString *tempLocalValue = @"";
     if (DEBUGMODEL) {//访问测试环境的配置文件
         if ([FileDefaultManager fileExistsAtPath:ConfigDebugPlistPath]) {
@@ -71,22 +88,24 @@
             tempLocalValue = dict[key];
         }
     }
-    
-    //4. 参数优先级判断(在线参数 > 本地参数)
-    if ([NSString isNotEmpty:tempOnlineValue]) {
-        tempValue = tempOnlineValue;
+    return tempLocalValue;
+}
+
+//UMeng在线参数值
+//TODO:判断下载完成
+- (NSString *)valueOfUMengConfig:(NSString *)key {
+    ReturnEmptyWhenObjectIsEmpty(key);
+    NSString *tempOnlineValue = UMengParamValueWithProductVersion(key);//s_1_0_0_kParam
+    if ([NSString isEmpty:tempOnlineValue]) {
+        tempOnlineValue = UMengParamValueWithAPPVersion(key);//s_1_0_kParam
     }
-    else {
-        if ([NSString isNotEmpty:tempLocalValue]) {
-            tempValue = tempLocalValue;
-        }
+    if ([NSString isEmpty:tempOnlineValue]) {
+        tempOnlineValue = UMengParamValueWithMainVersion(key);//s_1_kParam
     }
-    
-    //5. 将参数值加入缓存
-    if ([NSString isNotEmpty:tempValue]) {
-        [self.appParams setValue:tempValue forKey:key];
+    if ([NSString isEmpty:tempOnlineValue]) {
+        tempOnlineValue = UMengParamValue(key);//s_kParam
     }
-    return tempValue;
+    return tempOnlineValue;
 }
 
 @end

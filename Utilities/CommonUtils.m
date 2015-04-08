@@ -38,7 +38,14 @@
                     }];
     }
     else if ([@"2" isEqualToString:kCheckNewVersionType]) {
-        //TODO:使用在线参数更新版本
+        NSString *tempModel = kNewVersionModel;
+        if ([NSString isNotEmpty:tempModel]) {
+            JSONModelError *initError = nil;
+            NewVersionModel *versionModel = [[NewVersionModel alloc] initWithString:tempModel error:&initError];
+            if ([versionModel isKindOfClass:[NewVersionModel class]]) {
+                [CommonUtils checkNewVersion:versionModel showMessage:showMessage];
+            }
+        }
     }
 }
 
@@ -49,16 +56,16 @@
         if ( ! isSkipTheVersion) {
             if (VersionCompareResultAscending == [ProductVersion compareWithVersion:versionModel.versionCode]) {
                 [UIView hideHUDLoadingOnWindow];
-                if ([NSString isNotEmpty:versionModel.downloadUrl]) {
+                if ([NSString isNotEmpty:versionModel.downloadUrl]) {//TODO:这里可以进一步判断是否是标准的ios更新地址
                     NSString *title = [NSString stringWithFormat:@"有版本%@需要更新", versionModel.versionCode];
-                    NSString *message = [NSString trimString:versionModel.description];
+                    NSString *message = [NSString trimString:versionModel.versionDescription];
                     
                     UIAlertView *alertView = [UIAlertView bk_alertViewWithTitle:title message:message];
                     [alertView bk_addButtonWithTitle:@"立刻升级" handler:^{
                         [[UIApplication sharedApplication] openURL:[NSURL URLWithString:versionModel.downloadUrl]];
                         exit(0);
                     }];
-                    if ( ! versionModel.isForced ) {   //非强制更新的话才显示更多选项
+                    if (NO == versionModel.isForced ) {   //非强制更新的话才显示更多选项
                         [alertView bk_addButtonWithTitle:@"忽略此版本" handler:^{
                             [[NSUserDefaults standardUserDefaults] setBool:YES forKey:SkipVersion];
                             [[NSUserDefaults standardUserDefaults] synchronize];
@@ -96,17 +103,9 @@
     [MobClick setAppVersion:ProductVersion];
     [UMSocialData openLog:YES];
     [UMFeedback setLogEnabled:YES];
-    if (DEBUGMODEL) {
-        [MobClick startWithAppkey:kUMAppKeyDebug reportPolicy:REALTIME channelId:@"debug"];//TODO:配置文件
-        [UMSocialData setAppKey:kUMAppKeyDebug];//设置友盟社会化组件appkey
-        [UMFeedback checkWithAppkey:kUMAppKeyDebug];
-    }
-    else {
-        [MobClick startWithAppkey:kUMAppKeyRelease reportPolicy:BATCH channelId:@"appstore"];//TODO:配置文件
-        [UMSocialData setAppKey:kUMAppKeyRelease];//设置友盟社会化组件appkey
-        [UMFeedback checkWithAppkey:kUMAppKeyRelease];
-    }
-    [MobClick updateOnlineConfig];//更新在线参数
+    [MobClick startWithAppkey:kUMAppKey reportPolicy:REALTIME channelId:kAppChannel];//配置统计
+    [UMSocialData setAppKey:kUMAppKey];//设置友盟社会化组件
+    [UMFeedback checkWithAppkey:kUMAppKey];//配置用户反馈
     
 #pragma mark - 分享相关设置
     
