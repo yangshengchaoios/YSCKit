@@ -40,8 +40,7 @@
     else if ([@"2" isEqualToString:kCheckNewVersionType]) {
         NSString *tempModel = kNewVersionModel;
         if ([NSString isNotEmpty:tempModel]) {
-            JSONModelError *initError = nil;
-            NewVersionModel *versionModel = [[NewVersionModel alloc] initWithString:tempModel error:&initError];
+            NewVersionModel *versionModel = [[NewVersionModel alloc] initWithString:tempModel error:nil];
             if ([versionModel isKindOfClass:[NewVersionModel class]]) {
                 [CommonUtils checkNewVersion:versionModel showMessage:showMessage];
             }
