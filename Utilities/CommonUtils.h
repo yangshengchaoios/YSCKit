@@ -64,4 +64,9 @@
 + (NSString *)TimeRemain:(NSString *)timeStamp;
 + (NSString *)TimeRemain:(NSString *)timeStamp currentTime:(NSString *)currentTime;
 
+#pragma mark - NSURL获取参数
+
++ (NSDictionary *)GetParamsInNSURL:(NSURL *)url;
++ (NSDictionary *)GetParamsInQueryString:(NSString *)queryString;
+
 @end

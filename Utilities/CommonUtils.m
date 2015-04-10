@@ -339,4 +339,32 @@
     return [[NSDate dateFromTimeInterval:[endDateTime timeIntervalSinceDate:nowDateTime]] stringWithFormat:@"HH:mm:ss"];
 }
 
+#pragma mark - NSURL获取参数
+
++ (NSDictionary *)GetParamsInNSURL:(NSURL *)url {
+    ReturnNilWhenObjectIsEmpty(url)
+    return [self GetParamsInQueryString:url.query];
+}
+
++ (NSDictionary *)GetParamsInQueryString:(NSString *)queryString {
+    ReturnNilWhenObjectIsEmpty(queryString)
+    NSScanner *scanner = [NSScanner scannerWithString:queryString];
+    [scanner setCharactersToBeSkipped:[NSCharacterSet characterSetWithCharactersInString:@"&?"]];
+    if ([queryString isContains:@"?"]) {
+        [scanner scanUpToString:@"?" intoString:nil];//skip to ?
+    }
+    
+    NSMutableDictionary *parameters = [NSMutableDictionary dictionary];
+    NSString *tmpValue;
+    while ([scanner scanUpToString:@"&" intoString:&tmpValue]) {
+        NSArray *components = [tmpValue componentsSeparatedByString:@"="];
+        if (components.count >= 2) {
+            NSString *key = [components[0] stringByReplacingPercentEscapesUsingEncoding: NSUTF8StringEncoding];
+            NSString *value = [components[1] stringByReplacingPercentEscapesUsingEncoding: NSUTF8StringEncoding];
+            parameters[key] = value;
+        }
+    }
+    return parameters;
+}
+
 @end
