@@ -7,7 +7,6 @@
 //
 
 #import "HMSegmentedControl.h"
-#import "TipsView.h"
 #import "MJRefresh.h"
 
 typedef NS_ENUM(NSInteger, ContentViewType) {

@@ -101,7 +101,7 @@
     //1. 针对特定udid的参数
     if ([NSString isEmpty:tempOnlineValue]) {
         NSDictionary *tempDict = [[NSUserDefaults standardUserDefaults] dictionaryForKey:@"OpenUDID"];
-        if ([NSDictionary isNotEmpty:tempDict]) {
+        if ([NSDictionary isNotEmpty:tempDict] && [NSString isNotEmpty:tempDict[@"OpenUDID"]]) {
             tempOnlineValue = UMengParamValue(name,Trim(tempDict[@"OpenUDID"]),@"");//s_udid_param
         }
     }

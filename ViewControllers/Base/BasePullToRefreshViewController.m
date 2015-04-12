@@ -82,14 +82,19 @@
 - (void)setIsTipsViewHidden:(BOOL)isTipsViewHidden withTipText:(NSString *)tipText {    
     if ([self tipsViewEnable]) {
         WeakSelfType blockSelf = self;
-        self.tipsView = [TipsView showTipText:tipText
-                                       onView:[self contentScrollView]
-                                    hintImage:[UIImage imageNamed:@"icon_failed"]
-                                  buttonTitle:@"重新加载"
-                                 buttonHandle:^{
-                                     [blockSelf.contentScrollView headerBeginRefreshing];
-                                 }
-                               withEdgeInsets:[self tipsViewEdgeInsets]];
+        if (nil == self.tipsView) {
+            self.tipsView = [ZDYKTipsView CreateZDYKTipsViewOnView:[self contentScrollView]
+                                                        edgeInsets:[self tipsViewEdgeInsets]
+                                                       withMessage:tipText
+                                                         iconImage:[UIImage imageNamed:@"icon_failed"]
+                                                       buttonTitle:@"重新加载"
+                                                      buttonAction:^{
+                                                          [blockSelf.contentScrollView headerBeginRefreshing];
+                                                      }];
+        }
+        else {
+            self.tipsView.messageLabel.text = tipText;
+        }
         self.tipsView.hidden = isTipsViewHidden;
     }
 }
