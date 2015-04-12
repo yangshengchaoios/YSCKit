@@ -111,7 +111,7 @@ typedef void (^ClickCell)(id data, NSIndexPath *indexPath, NSInteger index);    
 @property (nonatomic, copy) ContentViewContentInsetAtIndex contentViewContentInsetAtIndex;//默认UIEdgeZero
 //UITableView特有
 @property (nonatomic, copy) TableViewCellHeightAtIndex tableViewCellHeightAtIndex;
-@property (nonatomic, copy) TableViewSeperatorColorAtIndex tableViewSeperatorColorAtIndex;  //默认 RGB(170, 170, 170)
+@property (nonatomic, copy) TableViewSeperatorColorAtIndex tableViewSeperatorColorAtIndex;  //默认 RGB(213, 213, 213)
 @property (nonatomic, copy) TableViewSeperatorEdgeInsetAtIndex tableViewSeperatorEdgeInsetAtIndex;
 @property (nonatomic, copy) TableViewSeperatorTypeAtIndex tableViewSeperatorTypeAtIndex;
 //UICollectionView特有
