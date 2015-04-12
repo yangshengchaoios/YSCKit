@@ -13,7 +13,7 @@
 
 @interface AppConfigManager ()
 
-@property (nonatomic, strong) NSMutableDictionary *appParams;//缓存app运行过程中永远不变的参数集
+@property (nonatomic, strong) NSMutableDictionary *localTempParams;//优先级最低
 
 @end
 
@@ -28,7 +28,9 @@
 - (id)init {
     self  = [super init];
     if (self) {
-        self.appParams = [NSMutableDictionary dictionary];
+        self.appTempParams = [NSMutableDictionary dictionary];
+        self.umengTempParams = [NSMutableDictionary dictionary];
+        self.localTempParams = [NSMutableDictionary dictionary];
     }
     return self;
 }
@@ -36,68 +38,75 @@
 #pragma mark - AppConfig.plist管理
 
 //UMeng参数值优先级 > 本地参数值
-//TODO:应该保存在document目录下
 - (NSString *)valueOfAppConfig:(NSString *)name {
     ReturnEmptyWhenObjectIsEmpty(name);
-    //0. 获取UMeng的在线参数
-    NSString *tempOnlineValue = [self valueOfUMengConfig:name];
-    
-    //1. 先判断缓存
-    if (self.appParams[name]) {
-        if ([NSString isNotEmpty:tempOnlineValue] &&
-            ( ! [tempOnlineValue isEqualToString:self.appParams[name]])) {
-            [self.appParams setValue:tempOnlineValue forKey:name];
-        }
-        return self.appParams[name];
-    }
-    NSString *tempValue = @"";//最终需要返回的参数值
-    
-    //2. 获取本地配置的参数
-    NSString *tempLocalValue = [self valueOfLocalConfig:name];
-    
-    //3. 参数优先级判断(在线参数 > 本地参数)
-    if ([NSString isNotEmpty:tempOnlineValue]) {
-        tempValue = tempOnlineValue;
-    }
-    else {
-        if ([NSString isNotEmpty:tempLocalValue]) {
-            tempValue = tempLocalValue;
-        }
-    }
-    
-    //4. 将参数值加入缓存
+    NSString *tempValue = Trim(self.appTempParams[name]);//最终需要返回的参数值
+    //1. 判断一级缓存
     if ([NSString isNotEmpty:tempValue]) {
-        [self.appParams setValue:tempValue forKey:name];
+        return tempValue;
+    }
+    
+    //2. 判断UMeng在线参数缓存
+    tempValue = [self valueOfUMengConfig:name];
+    if ([NSString isNotEmpty:tempValue]) {
+        [self.appTempParams setValue:tempValue forKey:name];
+        return tempValue;
+    }
+    
+    //3. 获取本地配置的参数
+    tempValue = [self valueOfLocalConfig:name];
+    if ([NSString isNotEmpty:tempValue]) {
+        [self.appTempParams setValue:tempValue forKey:name];
+        return tempValue;
     }
     return tempValue;
 }
 
-//本地配置文件参数值
-//TODO:临时缓存
+//本地配置文件参数值(只有第一次访问是读取硬盘的文件，以后就直接从内存中读取参数值)
 - (NSString *)valueOfLocalConfig:(NSString *)name {
     ReturnEmptyWhenObjectIsEmpty(name);
-    NSString *tempLocalValue = @"";
-    if (DEBUGMODEL) {//访问测试环境的配置文件
-        if ([FileDefaultManager fileExistsAtPath:ConfigDebugPlistPath]) {
-            NSDictionary *dict = [NSDictionary dictionaryWithContentsOfFile:ConfigDebugPlistPath];
-            tempLocalValue = dict[name];
-        }
+    //0. 检测缓存
+    NSString *tempLocalValue = Trim(self.localTempParams[name]);
+    if ([NSString isNotEmpty:tempLocalValue]) {
+        return tempLocalValue;
     }
-    else {
-        if ([FileDefaultManager fileExistsAtPath:ConfigPlistPath]) {
-            NSDictionary *dict = [NSDictionary dictionaryWithContentsOfFile:ConfigPlistPath];
-            tempLocalValue = dict[name];
+    //1. 加载到缓存
+    if ([NSDictionary isEmpty:self.localTempParams]) {
+        if (DEBUGMODEL) {//访问测试环境的配置文件
+            if ([FileDefaultManager fileExistsAtPath:ConfigDebugPlistPath]) {
+                NSDictionary *dict = [NSDictionary dictionaryWithContentsOfFile:ConfigDebugPlistPath];
+                [self.localTempParams addEntriesFromDictionary:dict];
+            }
         }
+        else {
+            if ([FileDefaultManager fileExistsAtPath:ConfigPlistPath]) {
+                NSDictionary *dict = [NSDictionary dictionaryWithContentsOfFile:ConfigPlistPath];
+                [self.localTempParams addEntriesFromDictionary:dict];
+            }
+        }
+        tempLocalValue = Trim(self.localTempParams[name]);
     }
     return tempLocalValue;
 }
 
-//UMeng在线参数值
-//TODO:判断下载完成
+//UMeng在线参数值(保证从该方法返回的都一定是最新的参数值)
 - (NSString *)valueOfUMengConfig:(NSString *)name {
     ReturnEmptyWhenObjectIsEmpty(name);
-    //1. 检测待渠道名称的参数
-    NSString *tempOnlineValue = @"";//TODO:临时缓存
+    //0. 检测缓存是否有值
+    NSString *tempOnlineValue = Trim(self.umengTempParams[name]);
+    if ([NSString isNotEmpty:tempOnlineValue]) {
+        return tempOnlineValue;//直接返回内存中的参数值
+    }
+    
+    //1. 针对特定udid的参数
+    if ([NSString isEmpty:tempOnlineValue]) {
+        NSDictionary *tempDict = [[NSUserDefaults standardUserDefaults] dictionaryForKey:@"OpenUDID"];
+        if ([NSDictionary isNotEmpty:tempDict]) {
+            tempOnlineValue = UMengParamValue(name,Trim(tempDict[@"OpenUDID"]),@"");//s_udid_param
+        }
+    }
+    
+    //2. 检测带渠道名称的参数
     if ([NSString isEmpty:tempOnlineValue]) {
         tempOnlineValue = UMengParamValue(name,kAppChannel,ProductVersion);//s_AppStore_1_0_0_param
     }
@@ -111,7 +120,7 @@
         tempOnlineValue = UMengParamValue(name,kAppChannel,@"");//s_AppStore_param
     }
     
-    //检测不带渠道名称的参数
+    //3. 检测不带渠道名称的参数
     if ([NSString isEmpty:tempOnlineValue]) {
         tempOnlineValue = UMengParamValue(name,@"",ProductVersion);//s_1_0_0_param
     }
@@ -126,6 +135,7 @@
     }
     
     NSLog(@"UMeng param[%@] value:%@", name, tempOnlineValue);
+    [self.umengTempParams setValue:tempOnlineValue forKey:name];
     return tempOnlineValue;
 }
 

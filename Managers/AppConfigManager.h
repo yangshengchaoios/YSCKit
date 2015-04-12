@@ -11,6 +11,9 @@
 
 @interface AppConfigManager : NSObject
 
+@property (nonatomic, strong) NSMutableDictionary *appTempParams;       //优先级最高
+@property (nonatomic, strong) NSMutableDictionary *umengTempParams;     //优先级次之
+
 + (instancetype)sharedInstance;
 
 #pragma mark - AppConfig.plist管理
