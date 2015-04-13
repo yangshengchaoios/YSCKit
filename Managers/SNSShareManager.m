@@ -84,7 +84,7 @@
             return;
         }
     }
- 
+    [UIView showResultThenHideOnWindow:@"正在分享中" afterDelay:5];
     [[UMSocialDataService defaultDataService] postSNSWithTypes:@[platformName]
                                                        content:content
                                                          image:image

@@ -102,7 +102,7 @@
     [MobClick setAppVersion:ProductVersion];
     [UMSocialData openLog:YES];
     [UMFeedback setLogEnabled:YES];
-    [MobClick startWithAppkey:kUMAppKey reportPolicy:REALTIME channelId:kAppChannel];//配置统计
+    [MobClick startWithAppkey:kUMAppKey reportPolicy:SENDWIFIONLY channelId:kAppChannel];//配置统计
     [UMSocialData setAppKey:kUMAppKey];//设置友盟社会化组件
     [UMFeedback checkWithAppkey:kUMAppKey];//配置用户反馈
     
