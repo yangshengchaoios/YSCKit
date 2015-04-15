@@ -343,6 +343,7 @@
  */
 - (void)clearLibraryCaches {
     //Documents
+    [FileUtils clearDirectoryPath:[self directoryPathOfDocumentsCommon]];
     [FileUtils clearDirectoryPath:self.directoryPathOfDocumentsByUserId];
     [FileUtils clearDirectoryPath:self.directoryPathOfDocumentsLog];
     

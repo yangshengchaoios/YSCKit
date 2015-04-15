@@ -134,7 +134,6 @@
         tempOnlineValue = UMengParamValue(name,@"",@"");//s_param
     }
     
-    NSLog(@"UMeng param[%@] value:%@", name, tempOnlineValue);
     [self.umengTempParams setValue:tempOnlineValue forKey:name];
     return tempOnlineValue;
 }
@@ -150,7 +149,6 @@
         [tempString appendFormat:@"%@_", [NSString replaceString:version byRegex:@"\\." to:@"_"]];
     }
     [tempString appendString:name];
-    NSLog(@"UMeng param:%@", tempString);
     return tempString;
 }
 

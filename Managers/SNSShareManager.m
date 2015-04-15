@@ -15,6 +15,7 @@
     return [UMSocialAccountManager isOauthAndTokenNotExpired:platformName];
 }
 
+//将本项目的分享类型转义成UMeng支持的分享类型
 + (NSString *)PlatformTypeOfUMeng:(ShareType)shareType {
     NSString *platformName = nil;
     if (ShareTypeWeiboSina == shareType) {
@@ -41,7 +42,7 @@
     
     return platformName;
 }
-
+//将本项目的分享类型映射到UMeng的分享类型对象
 + (UMSocialSnsPlatform *)SocialSnsPlatform:(ShareType)shareType {
     NSString *platformName = [self PlatformTypeOfUMeng:shareType];
     ReturnNilWhenObjectIsEmpty(platformName);
@@ -53,16 +54,20 @@
 + (void)ShareWithContent:(NSString *)content
                    image:(UIImage *)image
                 platform:(ShareType)shareType
+             urlResource:(NSString *)url
      presentedController:(UIViewController *)viewController {
-    [self ShareWithContent:content image:image platform:shareType presentedController:viewController result:nil];
+    [self ShareWithContent:content image:image platform:shareType urlResource:url presentedController:viewController result:nil];
 }
 
 + (void)ShareWithContent:(NSString *)content
                    image:(UIImage *)image
                 platform:(ShareType)shareType
+             urlResource:(NSString *)url
      presentedController:(UIViewController *)viewController
                   result:(UMSocialDataServiceCompletion)result {
     NSString *platformName = [self PlatformTypeOfUMeng:shareType];
+    
+    //------------------------获取分享对象------------------------------
     UMSocialSnsPlatform *snsPlatform = [self SocialSnsPlatform:shareType];
     if (nil == snsPlatform) {
         if (UMShareToWechatSession == platformName ||
@@ -77,6 +82,7 @@
         }
         return;
     }
+    //----------------------------------------------------------------
     
     if (ShareTypeQQZone == shareType) {
         if ([NSString isEmpty:content] || nil == image) {
@@ -85,11 +91,15 @@
         }
     }
     [UIView showResultThenHideOnWindow:@"正在分享中" afterDelay:5];
+    UMSocialUrlResource *urlResource = nil;
+    if ([NSString isNotEmpty:url]) {
+        urlResource = [[UMSocialUrlResource alloc] initWithSnsResourceType:UMSocialUrlResourceTypeImage url:url];
+    }
     [[UMSocialDataService defaultDataService] postSNSWithTypes:@[platformName]
                                                        content:content
                                                          image:image
                                                       location:nil
-                                                   urlResource:nil
+                                                   urlResource:urlResource
                                            presentedController:viewController
                                                     completion:^(UMSocialResponseEntity *response) {
                                                         if (UMSResponseCodeSuccess == response.responseCode) {

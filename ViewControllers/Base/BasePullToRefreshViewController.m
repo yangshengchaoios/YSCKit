@@ -150,7 +150,6 @@
         if (successed) {
             successed();
         }
-        [blockSelf bk_performBlock:^(id obj) { blockSelf.isAnimating = NO;} afterDelay:1.5];
         [blockSelf reloadData];
     };
     
@@ -166,10 +165,7 @@
             [blockSelf showAlertVieWithMessage:errorMessage];
         }
         
-        //2. TODO:动画延时处理
-        [blockSelf bk_performBlock:^(id obj) { blockSelf.isAnimating = NO;} afterDelay:1.5];
-        
-        //3. 回调
+        //2. 回调
         if (failed) {
             failed();
         }
@@ -247,7 +243,6 @@
         if (successed) {
             successed();
         }
-        [blockSelf bk_performBlock:^(id obj) { blockSelf.isAnimating = NO;} afterDelay:1.5];
     };
     
     
@@ -263,10 +258,7 @@
             [blockSelf showAlertVieWithMessage:errorMessage];
         }
         
-        //2. TODO:动画延时处理
-        [blockSelf bk_performBlock:^(id obj) { blockSelf.isAnimating = NO;} afterDelay:1.5];
-        
-        //3. 回调
+        //2. 回调
         if (failed) {
             failed();
         }
