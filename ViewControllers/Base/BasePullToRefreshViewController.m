@@ -34,6 +34,21 @@
         self.dataArray = [NSMutableArray array];
     }
     
+    // 空页面与网络错误页面提示
+    WeakSelfType blockSelf = self;
+    self.successBlock = ^{
+        blockSelf.tipsView.actionButton.hidden = YES;
+        blockSelf.tipsView.iconImageView.image = [UIImage imageNamed:@"icon_empty"];
+    };
+    self.failedBlock= ^{
+        blockSelf.tipsView.actionButton.hidden = NO;
+        blockSelf.tipsView.iconImageView.image = [UIImage imageNamed:@"icon_failed"];
+        [blockSelf.tipsView.actionButton bk_removeEventHandlersForControlEvents:UIControlEventTouchUpInside];
+        [blockSelf.tipsView.actionButton bk_addEventHandler:^(id sender) {
+            [blockSelf.contentScrollView headerBeginRefreshing];
+        } forControlEvents:UIControlEventTouchUpInside];
+    };
+    
     //加载本地缓存
     if ([self shouldCacheArray]) {
         NSArray *cacheArray = [self loadCacheArray];
