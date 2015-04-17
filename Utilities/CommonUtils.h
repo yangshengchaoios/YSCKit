@@ -17,6 +17,7 @@
 + (void)checkNewVersionShowMessage:(BOOL)showMessage;
 + (void)checkNewVersionShowMessage:(BOOL)showMessage withParams:(NSDictionary *)params;
 + (void)configUmeng;
++ (void)configUmengPushWithOptions:(NSDictionary *)launchOptions;
 + (UIView *)createSearchViewWithWidth:(NSInteger)width withTextField:(UITextField *)textField;
 
 #pragma mark - 格式化金额
