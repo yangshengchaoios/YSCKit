@@ -35,6 +35,21 @@
     return self;
 }
 
+- (NSString *)udid {
+    if (nil == _udid) {
+        NSString *tempUdid = @"";//保证只获取一次udid就保存在内存中！
+        NSDictionary *tempDict = [[NSUserDefaults standardUserDefaults] dictionaryForKey:@"OpenUDID"];
+        if ([NSDictionary isNotEmpty:tempDict] && [NSString isNotEmpty:tempDict[@"OpenUDID"]]) {
+            tempUdid = Trim(tempDict[@"OpenUDID"]);
+        }
+        if ([NSString isEmpty:tempUdid]) {
+            tempUdid = [UIDevice openUdid];
+        }
+        _udid = tempUdid;
+    }
+    return _udid;
+}
+
 #pragma mark - AppConfig.plist管理
 
 //UMeng参数值优先级 > 本地参数值
@@ -100,38 +115,35 @@
     
     //1. 针对特定udid的参数
     if ([NSString isEmpty:tempOnlineValue]) {
-        NSDictionary *tempDict = [[NSUserDefaults standardUserDefaults] dictionaryForKey:@"OpenUDID"];
-        if ([NSDictionary isNotEmpty:tempDict] && [NSString isNotEmpty:tempDict[@"OpenUDID"]]) {
-            tempOnlineValue = UMengParamValue(name,Trim(tempDict[@"OpenUDID"]),@"");//s_udid_param
-        }
+        tempOnlineValue = UMengParamValue(name, self.udid, @"");//s_udid_param
     }
     
     //2. 检测带渠道名称的参数
     if ([NSString isEmpty:tempOnlineValue]) {
-        tempOnlineValue = UMengParamValue(name,kAppChannel,ProductVersion);//s_AppStore_1_0_0_param
+        tempOnlineValue = UMengParamValue(name, kAppChannel, ProductVersion);//s_AppStore_1_0_0_param
     }
     if ([NSString isEmpty:tempOnlineValue]) {
-        tempOnlineValue = UMengParamValue(name,kAppChannel,AppVersion);//s_AppStore_1_0_param
+        tempOnlineValue = UMengParamValue(name, kAppChannel, AppVersion);//s_AppStore_1_0_param
     }
     if ([NSString isEmpty:tempOnlineValue]) {
-        tempOnlineValue = UMengParamValue(name,kAppChannel,MainVersion);//s_AppStore_1_param
+        tempOnlineValue = UMengParamValue(name, kAppChannel, MainVersion);//s_AppStore_1_param
     }
     if ([NSString isEmpty:tempOnlineValue]) {
-        tempOnlineValue = UMengParamValue(name,kAppChannel,@"");//s_AppStore_param
+        tempOnlineValue = UMengParamValue(name, kAppChannel, @"");//s_AppStore_param
     }
     
     //3. 检测不带渠道名称的参数
     if ([NSString isEmpty:tempOnlineValue]) {
-        tempOnlineValue = UMengParamValue(name,@"",ProductVersion);//s_1_0_0_param
+        tempOnlineValue = UMengParamValue(name, @"", ProductVersion);//s_1_0_0_param
     }
     if ([NSString isEmpty:tempOnlineValue]) {
-        tempOnlineValue = UMengParamValue(name,@"",AppVersion);//s_1_0_param
+        tempOnlineValue = UMengParamValue(name, @"", AppVersion);//s_1_0_param
     }
     if ([NSString isEmpty:tempOnlineValue]) {
-        tempOnlineValue = UMengParamValue(name,@"",MainVersion);//s_1_param
+        tempOnlineValue = UMengParamValue(name, @"", MainVersion);//s_1_param
     }
     if ([NSString isEmpty:tempOnlineValue]) {
-        tempOnlineValue = UMengParamValue(name,@"",@"");//s_param
+        tempOnlineValue = UMengParamValue(name, @"", @"");//s_param
     }
     
     [self.umengTempParams setValue:tempOnlineValue forKey:name];

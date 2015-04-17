@@ -233,7 +233,7 @@
     //解决返回的Content-Type始终是application/xml问题！
     [manager.requestSerializer setValue:@"application/xml" forHTTPHeaderField:@"Accept"];
     [manager.requestSerializer setValue:ProductVersion forHTTPHeaderField:kParamVersion];
-    [manager.requestSerializer setValue:@"default udid of ios" forHTTPHeaderField:kParamUdid];
+    [manager.requestSerializer setValue:[AppConfigManager sharedInstance].udid forHTTPHeaderField:kParamUdid];
     [manager.requestSerializer setValue:kParamFromValue forHTTPHeaderField:kParamFrom];
     
     //   定义返回成功的block

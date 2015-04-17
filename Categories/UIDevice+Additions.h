@@ -32,6 +32,8 @@ enum {
 + (DeviceType)currentDeviceType;
 + (BOOL)isRunningOnSimulator;
 + (NSString *)platformString;
+// 通过UMeng集成的相关方法获取设备唯一编号
++ (NSString *)openUdid;
 
 // 只能判断摄像头是否可用，但不能判断是否被用户禁用了!
 + (BOOL)isCameraAvailable;

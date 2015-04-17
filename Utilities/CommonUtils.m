@@ -100,8 +100,8 @@
 + (void)configUmeng {
 #pragma mark - 设置UMeng应用的key
     [MobClick setAppVersion:ProductVersion];
-    [UMSocialData openLog:YES];//启用测试模式
-    [UMFeedback setLogEnabled:YES];
+    [UMSocialData openLog:NO];//是否打开调试日志输出
+    [UMFeedback setLogEnabled:NO];
     [MobClick startWithAppkey:kUMAppKey reportPolicy:REALTIME channelId:kAppChannel];//配置统计
     [UMSocialData setAppKey:kUMAppKey];//设置友盟社会化组件
     [UMFeedback checkWithAppkey:kUMAppKey];//配置用户反馈
