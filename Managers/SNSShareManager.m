@@ -104,6 +104,7 @@
                                                     completion:^(UMSocialResponseEntity *response) {
                                                         if (UMSResponseCodeSuccess == response.responseCode) {
                                                             [UIView showResultThenHideOnWindow:@"分享成功"];
+                                                            [MobClick event:UMEventKeyShareSuccess];
                                                         }
                                                         else if (UMSResponseCodeCancel == response.responseCode) {
                                                             [UIView showResultThenHideOnWindow:@"取消分享"];
