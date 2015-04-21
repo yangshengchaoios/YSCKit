@@ -67,6 +67,7 @@ typedef void (^ClickCell)(id data, NSIndexPath *indexPath, NSInteger index);    
  *
  *  兼容多数据源、多类型 下拉刷新和上拉加载更多
  *  TODO:暂时只支持UITableView、UICollectionView、UIScrollView
+ *       未添加UMeng事件统计埋点
  *
  ************************************************************************************/
 @interface BasePullToRefreshView : UIView

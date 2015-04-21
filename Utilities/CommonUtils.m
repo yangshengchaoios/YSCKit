@@ -127,20 +127,19 @@
  *  配置Umeng的推送功能
  */
 + (void)configUmengPushWithOptions:(NSDictionary *)launchOptions {
-    //set AppKey and LaunchOptions
-    [UMessage startWithAppkey:@"5523e740fd98c563680002d6" launchOptions:launchOptions];
-    [UMessage setLogEnabled:YES];
+    [UMessage startWithAppkey:kUMAppKey launchOptions:launchOptions];
+    [UMessage setLogEnabled:NO];
     
 #if __IPHONE_OS_VERSION_MAX_ALLOWED >= _IPHONE80_
     if(IOS8_OR_LATER) { //register remoteNotification types
         UIMutableUserNotificationAction *action1 = [[UIMutableUserNotificationAction alloc] init];
-        action1.identifier = @"action1_identifier";
-        action1.title = @"Accept";
+        action1.identifier = @"identifier_accept";
+        action1.title = @"打开";
         action1.activationMode = UIUserNotificationActivationModeForeground;//当点击的时候启动程序
         
         UIMutableUserNotificationAction *action2 = [[UIMutableUserNotificationAction alloc] init];  //第二按钮
-        action2.identifier = @"action2_identifier";
-        action2.title = @"Reject";
+        action2.identifier = @"identifier_reject";
+        action2.title = @"拒绝";
         action2.activationMode = UIUserNotificationActivationModeBackground;//当点击的时候不启动程序，在后台处理
         action2.authenticationRequired = YES;//需要解锁才能处理，如果action.activationMode = UIUserNotificationActivationModeForeground;则这个属性被忽略；
         action2.destructive = YES;
