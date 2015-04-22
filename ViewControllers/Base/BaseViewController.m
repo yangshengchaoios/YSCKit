@@ -16,6 +16,13 @@
 
 @interface BaseViewController ()
 
+/**
+ *  在使用ADTransitionController动画的时候
+ *  以下两个delegate必须设置为property！否则在pop的时候会crash
+ */
+@property (nonatomic, strong) ADTransitioningDelegate *transitioningDelegate;
+@property (nonatomic, strong) ADNavigationControllerDelegate *navigationDelegate;
+
 @property (nonatomic, strong) UIStoryboard *storyBoard;
 @property (nonatomic, strong) NSString *reachabilityManagerIdentifier;
 
@@ -336,8 +343,24 @@
     }
     
     //NOTE:这里设置backBarButtonItem没有用！
-    
     [self.navigationController pushViewController:pushedViewController animated:animated];
+    return pushedViewController;
+}
+
+- (UIViewController *)pushViewController:(NSString *)className withParams:(NSDictionary *)paramDict transition:(ADTransition *)transition {
+    [self hideKeyboard];
+    UIViewController *pushedViewController = [UIResponder createBaseViewController:className];
+    NSMutableDictionary *mutableParamDict = [NSMutableDictionary dictionaryWithDictionary:paramDict];
+    if ( ! mutableParamDict[kParamBackType]) {
+        [mutableParamDict setValue:@(BackTypeImage) forKey:kParamBackType];   //这里设置的返回按钮由即将push出来的viewController负责处理
+    }
+    if ([pushedViewController isKindOfClass:[BaseViewController class]]) {
+        [(BaseViewController *)pushedViewController setParams:mutableParamDict];
+        ((BaseViewController *)pushedViewController).transitioningDelegate = [[ADTransitioningDelegate alloc] initWithTransition:transition];
+    }
+    
+    //NOTE:这里设置backBarButtonItem没有用！
+    [self.navigationController pushViewController:pushedViewController animated:YES];
     return pushedViewController;
 }
 
@@ -420,6 +443,8 @@
 }
 - (UIViewController *)presentNormalViewController:(UIViewController *)viewController {
     UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:viewController];
+    _navigationDelegate = [[ADNavigationControllerDelegate alloc] init];
+    navigationController.delegate = _navigationDelegate;//TODO:扩展到category
     navigationController.navigationController.navigationBar.translucent = NO;
     navigationController.interactivePopGestureRecognizer.enabled = YES;
     navigationController.interactivePopGestureRecognizer.delegate = self;

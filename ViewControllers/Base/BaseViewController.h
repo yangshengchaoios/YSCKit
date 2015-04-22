@@ -17,7 +17,7 @@
 
 //第三方库
 #import "UIViewController+ScrollingNavbar.h"
-//#import "UIViewController+ADTransitionController.h" //TODO:为什么在ios下一直没起作用？
+#import "UIViewController+ADTransitionController.h"
 //#import "UINavigationController+CustomAnimations.h" //系统自带的几种常用切换动画
 
 
@@ -45,6 +45,7 @@
 - (UIViewController *)pushViewController:(NSString *)className;
 - (UIViewController *)pushViewController:(NSString *)className withParams:(NSDictionary *)paramDict;
 - (UIViewController *)pushViewController:(NSString *)className withParams:(NSDictionary *)paramDict animated:(BOOL)animated;
+- (UIViewController *)pushViewController:(NSString *)className withParams:(NSDictionary *)paramDict transition:(ADTransition *)transition;
 //返回上一级，最多到根
 - (UIViewController *)popViewController;
 //返回上一级，直到dismiss
