@@ -76,7 +76,9 @@
 	WeakSelfType blockSelf = self;
     [self.contentScrollView addHeaderWithCallback:^{
         [blockSelf refreshWithSuccessed:blockSelf.successBlock failed:blockSelf.failedBlock];
-        [MobClick event:UMEventKeyPullToRefresh attributes:@{NSStringFromClass(self.class) : @"pullDownToRefresh"}];
+        [MobClick event:UMEventKeyPullToRefresh
+             attributes:@{@"ClassName" : NSStringFromClass(self.class),
+                          @"Action" : @"Refresh"}];
     }];
 }
 
@@ -84,7 +86,9 @@
 	WeakSelfType blockSelf = self;
     [self.contentScrollView addFooterWithCallback:^{
         [blockSelf loadMoreWithSuccessed:blockSelf.successBlock failed:blockSelf.failedBlock];
-        [MobClick event:UMEventKeyPullToRefresh attributes:@{NSStringFromClass(self.class) : @"pullUpToLoadMore"}];
+        [MobClick event:UMEventKeyPullToRefresh
+             attributes:@{@"ClassName" : NSStringFromClass(self.class),
+                          @"Action" : @"LoadMore"}];
     }];
 }
 

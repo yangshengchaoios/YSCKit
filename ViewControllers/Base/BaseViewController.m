@@ -370,6 +370,7 @@
  */
 - (UIViewController *)popViewController {
     [self hideKeyboard];
+    [MobClick event:UMEventKeyPopViewController];
 	if (self.navigationController) {     //如果有navigationBar
 		NSInteger index = [self.navigationController.viewControllers indexOfObject:self];
 		UIViewController *previousViewController = [self.navigationController.viewControllers objectAtIndex:MAX(index - 1, 0)];
@@ -388,6 +389,7 @@
  */
 - (UIViewController *)backViewController {
     [self hideKeyboard];
+    [MobClick event:UMEventKeyBackViewController];
 	if (self.navigationController) {            //如果有navigationBar
 		NSInteger index = [self.navigationController.viewControllers indexOfObject:self];
 		if (index > 0) {                        //不是root，就返回上一级
