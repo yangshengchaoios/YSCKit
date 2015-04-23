@@ -409,4 +409,26 @@
     return parameters;
 }
 
+#pragma mark - UIButton添加pop动画
+
++ (void)addPopAnimationToButton:(UIButton *)button {
+    [button bk_addEventHandler:^(id sender) {
+        POPBasicAnimation *scaleAnimation = [POPBasicAnimation animationWithPropertyNamed:kPOPLayerScaleXY];
+        scaleAnimation.toValue = [NSValue valueWithCGSize:CGSizeMake(0.95f, 0.95f)];
+        [button.layer pop_addAnimation:scaleAnimation forKey:@"layerScaleSmallAnimation"];
+    } forControlEvents:UIControlEventTouchDown];
+    [button bk_addEventHandler:^(id sender) {
+        POPSpringAnimation *scaleAnimation = [POPSpringAnimation animationWithPropertyNamed:kPOPLayerScaleXY];
+        scaleAnimation.velocity = [NSValue valueWithCGSize:CGSizeMake(3.f, 3.f)];
+        scaleAnimation.toValue = [NSValue valueWithCGSize:CGSizeMake(1.f, 1.f)];
+        scaleAnimation.springBounciness = 20.0f;
+        [button.layer pop_addAnimation:scaleAnimation forKey:@"layerScaleSpringAnimation"];
+    } forControlEvents:UIControlEventTouchUpInside];
+    [button bk_addEventHandler:^(id sender) {
+        POPBasicAnimation *scaleAnimation = [POPBasicAnimation animationWithPropertyNamed:kPOPLayerScaleXY];
+        scaleAnimation.toValue = [NSValue valueWithCGSize:CGSizeMake(1.f, 1.f)];
+        [button.layer pop_addAnimation:scaleAnimation forKey:@"layerScaleDefaultAnimation"];
+    } forControlEvents:UIControlEventTouchDragExit];
+}
+
 @end

@@ -70,4 +70,8 @@
 + (NSDictionary *)GetParamsInNSURL:(NSURL *)url;
 + (NSDictionary *)GetParamsInQueryString:(NSString *)queryString;
 
+#pragma mark - UIButton添加pop动画
+
++ (void)addPopAnimationToButton:(UIButton *)button;
+
 @end

@@ -419,8 +419,8 @@
     UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:viewController];
     navigationController.customNavigationDelegate = [[ADNavigationControllerDelegate alloc] init];
     navigationController.navigationController.navigationBar.translucent = NO;
-    navigationController.interactivePopGestureRecognizer.enabled = YES;
-    navigationController.interactivePopGestureRecognizer.delegate = self;
+//    navigationController.interactivePopGestureRecognizer.enabled = YES;//NOTE:关闭系统自带的侧边滑动功能，会与MLTransition冲突！
+//    navigationController.interactivePopGestureRecognizer.delegate = self;
     //--------自定义present出来的navigationbar背景图片--------
     [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleDefault];
     [navigationController.navigationBar setTintColor:[UIColor blackColor]];//这个控制返回箭头按钮的颜色
