@@ -19,6 +19,8 @@ typedef enum {
 
 @interface UINavigationController (CustomAnimations)
 
+@property (nonatomic, strong) ADNavigationControllerDelegate *customNavigationDelegate;
+
 /*Push a view controller with a custom transition style*/
 - (void)pushViewController:(UIViewController *)viewController withCustomTransitionStyle:(UINavigationCustomTransitionStyle)transitionStyle;
 

@@ -14,7 +14,7 @@ const char *ObjectTagKey;
 @implementation UITextField (Additions)
 
 - (void)setMaxLength:(NSInteger)maxLength {
-    objc_setAssociatedObject(self, ObjectTagKey, @(maxLength), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    objc_setAssociatedObject(self, ObjectTagKey, @(maxLength), OBJC_ASSOCIATION_ASSIGN);
 }
 
 - (NSInteger)maxLength {

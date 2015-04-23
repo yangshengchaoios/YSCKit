@@ -44,6 +44,8 @@
     #import "NSArray+Addition.h"
     #import "UIScrollView+Additions.h"
     #import "UIImage+Additions.h"
+    #import "UIViewController+ADTransitionController.h"
+    #import "UINavigationController+CustomAnimations.h"//系统自带的几种常用切换动画
 
     //Utils
     #import "FileUtils.h"

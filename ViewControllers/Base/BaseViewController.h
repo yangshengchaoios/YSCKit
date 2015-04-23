@@ -17,9 +17,7 @@
 
 //第三方库
 #import "UIViewController+ScrollingNavbar.h"
-#import "UIViewController+ADTransitionController.h"
-//#import "UINavigationController+CustomAnimations.h" //系统自带的几种常用切换动画
-
+#import "UIViewController+Additions.h"
 
 @interface BaseViewController : UIViewController <UITextFieldDelegate>
 
@@ -41,11 +39,17 @@
 #pragma mark - constraints
 - (void)setupConstraints;
 
-#pragma mark - push & pop & dismiss view controller
+#pragma mark - push view controller
 - (UIViewController *)pushViewController:(NSString *)className;
 - (UIViewController *)pushViewController:(NSString *)className withParams:(NSDictionary *)paramDict;
 - (UIViewController *)pushViewController:(NSString *)className withParams:(NSDictionary *)paramDict animated:(BOOL)animated;
+
+#pragma mark - push with transition
+- (UIViewController *)pushViewController:(NSString *)className transition:(ADTransition *)transition;
 - (UIViewController *)pushViewController:(NSString *)className withParams:(NSDictionary *)paramDict transition:(ADTransition *)transition;
+- (UIViewController *)pushViewController:(NSString *)className withParams:(NSDictionary *)paramDict transition:(ADTransition *)transition animated:(BOOL)animated;
+
+#pragma mark - pop & dismiss
 //返回上一级，最多到根
 - (UIViewController *)popViewController;
 //返回上一级，直到dismiss

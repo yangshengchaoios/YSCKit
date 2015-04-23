@@ -12,16 +12,7 @@
 #define kHudIntervalNormal 1.0f
 #define kHudIntervalLong 2.0f
 
-#pragma mark - BaseViewController
-
 @interface BaseViewController ()
-
-/**
- *  在使用ADTransitionController动画的时候
- *  以下两个delegate必须设置为property！否则在pop的时候会crash
- */
-@property (nonatomic, strong) ADTransitioningDelegate *transitioningDelegate;
-@property (nonatomic, strong) ADNavigationControllerDelegate *navigationDelegate;
 
 @property (nonatomic, strong) UIStoryboard *storyBoard;
 @property (nonatomic, strong) NSString *reachabilityManagerIdentifier;
@@ -39,13 +30,11 @@
 	}
 	return self;
 }
-
 - (void)didReceiveMemoryWarning {
 	[super didReceiveMemoryWarning];
 
 	// TODO:这里需要释放dataModel
 }
-
 - (void)viewWillAppear:(BOOL)animated {
 	[super viewWillAppear:animated];
 
@@ -69,7 +58,6 @@
     }
     self.isAppeared = YES;
 }
-
 - (void)viewDidAppear:(BOOL)animated {
 	[super viewDidAppear:animated];
     [MobClick beginLogPageView:NSStringFromClass([self class])];
@@ -80,7 +68,6 @@
         self.isRunViewDidLoadExtension = YES;
     }
 }
-
 - (void)viewWillDisappear:(BOOL)animated {
     [MobClick endLogPageView:NSStringFromClass([self class])];
     if ([self scrollableView]) {
@@ -88,12 +75,10 @@
     }
     [super viewWillDisappear:animated];
 }
-
 - (void)viewDidDisappear:(BOOL)animated {
 	self.isAppeared = NO;
     [super viewDidDisappear:animated];
 }
-
 - (void)dealloc {
 	NSLog(@"[%@] dealloc......", NSStringFromClass(self.class));
     if ([NSString isNotEmpty:self.reachabilityManagerIdentifier]) {
@@ -102,7 +87,6 @@
 //	[[Login sharedInstance] unregisterLoginObserver:self];
 	[[NSNotificationCenter defaultCenter] removeObserver:self]; //等同于宏定义  removeAllObservers(self);
 }
-
 - (void)updateViewConstraints {
     // Check a flag didSetupConstraints before creating constraints, because this method may be called multiple times, and we
     // only want to create these constraints once. Without this check, the same constraints could be added multiple times,
@@ -249,18 +233,15 @@
 		NSAssert(YES, @"self.backType = [%lu] 不支持该类型！", self.backType);
 	}
 }
-
 - (void)addTapToHideKeyboardGesture {
     UIGestureRecognizer *gestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(singleTapped:)];
 	gestureRecognizer.cancelsTouchesInView = NO;
 //	gestureRecognizer.delegate = self;
 	[self.view addGestureRecognizer:gestureRecognizer];
 }
-
 - (void)singleTapped:(UIGestureRecognizer *)gestureRecognizer {
 	[self performSelector:@selector(hideKeyboard) withObject:nil afterDelay:0.1f];
 }
-
 - (void)keyboardWillShow:(NSNotification *)notification {
 	NSDictionary *userInfo = [notification userInfo];
 	NSValue *aValue = [userInfo objectForKey:UIKeyboardFrameEndUserInfoKey];
@@ -279,7 +260,6 @@
                          [blockSelf didLayoutForKeyboardHeight:keyboardRect.size.height];
                      }];
 }
-
 - (void)keyboardWillHide:(NSNotification *)notification {
 	NSDictionary *userInfo = [notification userInfo];
 	NSValue *animationDurationValue = [userInfo objectForKey:UIKeyboardAnimationDurationUserInfoKey];
@@ -296,7 +276,6 @@
                          [blockSelf didLayoutForKeyboardHeight:0];
                      }];
 }
-
 //递归遍历所有子view中的textfield
 - (void)setDelegateOfAllTextFields:(UIView *)view {
 	for (UIView *subview in view.subviews) {
@@ -322,18 +301,29 @@
 }
 
 #pragma mark - push & pop & dismiss view controller
-
 - (UIViewController *)pushViewController:(NSString *)className {
 	return [self pushViewController:className withParams:nil animated:YES];
 }
-
 - (UIViewController *)pushViewController:(NSString *)className withParams:(NSDictionary *)paramDict {
     return [self pushViewController:className withParams:paramDict animated:YES];
 }
-
 - (UIViewController *)pushViewController:(NSString *)className withParams:(NSDictionary *)paramDict animated:(BOOL)animated {
+    return [self pushViewController:className withParams:paramDict transition:nil animated:animated];
+}
+
+#pragma mark - push with transition
+- (UIViewController *)pushViewController:(NSString *)className transition:(ADTransition *)transition {
+    return [self pushViewController:className withParams:nil transition:transition];
+}
+- (UIViewController *)pushViewController:(NSString *)className withParams:(NSDictionary *)paramDict transition:(ADTransition *)transition {
+    return [self pushViewController:className withParams:paramDict transition:transition animated:YES];
+}
+- (UIViewController *)pushViewController:(NSString *)className withParams:(NSDictionary *)paramDict transition:(ADTransition *)transition animated:(BOOL)animated {
     [self hideKeyboard];
     UIViewController *pushedViewController = [UIResponder createBaseViewController:className];
+    if ([NSObject isNotEmpty:transition]) {
+        pushedViewController.customTransitioningDelegate = [[ADTransitioningDelegate alloc] initWithTransition:transition];
+    }
     NSMutableDictionary *mutableParamDict = [NSMutableDictionary dictionaryWithDictionary:paramDict];
     if ( ! mutableParamDict[kParamBackType]) {
         [mutableParamDict setValue:@(BackTypeImage) forKey:kParamBackType];   //这里设置的返回按钮由即将push出来的viewController负责处理
@@ -344,23 +334,6 @@
     
     //NOTE:这里设置backBarButtonItem没有用！
     [self.navigationController pushViewController:pushedViewController animated:animated];
-    return pushedViewController;
-}
-
-- (UIViewController *)pushViewController:(NSString *)className withParams:(NSDictionary *)paramDict transition:(ADTransition *)transition {
-    [self hideKeyboard];
-    UIViewController *pushedViewController = [UIResponder createBaseViewController:className];
-    NSMutableDictionary *mutableParamDict = [NSMutableDictionary dictionaryWithDictionary:paramDict];
-    if ( ! mutableParamDict[kParamBackType]) {
-        [mutableParamDict setValue:@(BackTypeImage) forKey:kParamBackType];   //这里设置的返回按钮由即将push出来的viewController负责处理
-    }
-    if ([pushedViewController isKindOfClass:[BaseViewController class]]) {
-        [(BaseViewController *)pushedViewController setParams:mutableParamDict];
-        ((BaseViewController *)pushedViewController).transitioningDelegate = [[ADTransitioningDelegate alloc] initWithTransition:transition];
-    }
-    
-    //NOTE:这里设置backBarButtonItem没有用！
-    [self.navigationController pushViewController:pushedViewController animated:YES];
     return pushedViewController;
 }
 
@@ -429,7 +402,6 @@
 - (UIViewController *)presentViewController:(NSString *)className {
 	return [self presentViewController:className withParams:nil];
 }
-
 - (UIViewController *)presentViewController:(NSString *)className withParams:(NSDictionary *)paramDict {
     [self hideKeyboard];
     UIViewController *viewController = [UIResponder createBaseViewController:className];
@@ -445,8 +417,7 @@
 }
 - (UIViewController *)presentNormalViewController:(UIViewController *)viewController {
     UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:viewController];
-    _navigationDelegate = [[ADNavigationControllerDelegate alloc] init];
-    navigationController.delegate = _navigationDelegate;//TODO:扩展到category
+    navigationController.customNavigationDelegate = [[ADNavigationControllerDelegate alloc] init];
     navigationController.navigationController.navigationBar.translucent = NO;
     navigationController.interactivePopGestureRecognizer.enabled = YES;
     navigationController.interactivePopGestureRecognizer.delegate = self;
@@ -463,7 +434,6 @@
     [self presentViewController:navigationController animated:YES completion:nil];
     return navigationController;
 }
-
 //在self上一级viewController调用dismiss（通常情况下使用该方法）
 - (void)dismissOnPresentingViewController {
 	if (self.presentingViewController) {
@@ -473,7 +443,6 @@
         }
 	}
 }
-
 //在self下一级viewController调用dismiss
 - (void)dismissOnPresentedViewController {
 	if (self.presentedViewController) {
@@ -496,18 +465,7 @@
 
 #pragma mark - push & pop with animation
 
-//FIXME:该动画不起作用为什么？
-//- (UIViewController *)pushViewController:(NSString *)className withParams:(NSDictionary *)paramDict withAnimation:(ADTransition *)transition {
-//    [self hideKeyboard];
-//	UIViewController *pushedViewController = [UIResponder createBaseViewController:className];
-//    NSMutableDictionary *mutableParamDict = [NSMutableDictionary dictionaryWithDictionary:paramDict];
-//	if ([pushedViewController isKindOfClass:[BaseViewController class]]) {
-//		[(BaseViewController *)pushedViewController setParams:mutableParamDict];
-//        ((ADTransitioningViewController *)pushedViewController).transition = transition;
-//	}
-//	[self.navigationController pushViewController:pushedViewController animated:YES];
-//	return pushedViewController;
-//}
+
 
 
 #pragma mark -  show & hide HUD
@@ -640,18 +598,15 @@
 - (NSString *)cacheFilePath {
 	return [self cacheFilePath:nil];
 }
-
 - (NSString *)cacheFilePath:(NSString *)suffix {
 	NSString *fileName = [NSString stringWithFormat:@"%@%@.dat",
                           NSStringFromClass(self.class),
                           [NSString isEmpty:suffix] ? @"" :[NSString stringWithFormat:@"_%@",suffix]]; //缓存文件名称
 	return [[[StorageManager sharedInstance] directoryPathOfLibraryCachesCommon] stringByAppendingPathComponent:fileName];
 }
-
 - (id)cachedObjectForKey:(NSString *)cachedKey {
 	return [self cachedObjectForKey:cachedKey withSuffix:nil];
 }
-
 - (id)cachedObjectForKey:(NSString *)cachedKey withSuffix:(NSString *)suffix {
 	NSDictionary *cacheInfo = [[StorageManager sharedInstance] unarchiveDictionaryFromFilePath:[self cacheFilePath:suffix]];
 	if ([cacheInfo objectForKey:cachedKey]) {
@@ -661,11 +616,9 @@
 		return nil;
 	}
 }
-
 - (void)saveObject:(id)object forKey:(NSString *)cachedKey {
 	[self saveObject:object forKey:cachedKey withSuffix:nil];
 }
-
 - (void)saveObject:(id)object forKey:(NSString *)cachedKey withSuffix:(NSString *)suffix {
 	if ([NSString isEmpty:cachedKey]) {
 		return;
@@ -764,24 +717,18 @@
 - (BOOL)showCustomTitleBarView {
 	return NO;
 }
-
 - (void)hideKeyboard {
 	[self.view endEditing:YES];
 }
-
 - (BOOL)willCareKeyboard {
 	return NO;
 }
-
 - (void)willLayoutForKeyboardHeight:(CGFloat)keyboardHeight {
 }
-
 - (void)layoutForKeyboardHeight:(CGFloat)keyboardHeight {
 }
-
 - (void)didLayoutForKeyboardHeight:(CGFloat)keyboardHeight {
 }
-
 - (void)networkReachablityChanged:(BOOL)reachable {
 	if (!reachable) {
 		[self showResultThenHideOnWindow:@"网络断开了"];
@@ -798,7 +745,6 @@
 	[self hideKeyboard];//TODO:在ios8中失效！
 	return YES;
 }
-
 - (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string {
 	if (textField.maxLength > 0) {
 		NSMutableString *newText = [textField.text mutableCopy];
@@ -807,7 +753,6 @@
 	}
 	return YES;
 }
-
 - (void)textFieldChanged:(NSNotification *)note {
 	UITextField *textField = (UITextField *)note.object;
 	if (![textField isKindOfClass:[UITextField class]]) {
@@ -822,3 +767,4 @@
 }
 
 @end
+

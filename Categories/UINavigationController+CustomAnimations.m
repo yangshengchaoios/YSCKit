@@ -6,9 +6,11 @@
 //
 
 #import "UINavigationController+CustomAnimations.h"
-
+#import <objc/runtime.h>
 //QuartzCore
 #import <QuartzCore/QuartzCore.h>
+
+const char *DelegateKey;
 
 #define kDefaultTransitionDuration 1
 
@@ -279,6 +281,14 @@ typedef void(^TransitionBlock)(void);
 		default:
 			return [self transitionForwardSubtypeFromTransitionStyle:transitionStyle];
 	}
+}
+
+- (void)setCustomNavigationDelegate:(ADTransitioningDelegate *)transitioningDelegate {
+    self.delegate = transitioningDelegate;
+    objc_setAssociatedObject(self, DelegateKey, transitioningDelegate, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+- (ADTransitioningDelegate *)customNavigationDelegate {
+    return objc_getAssociatedObject(self, DelegateKey);
 }
 
 @end
