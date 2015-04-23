@@ -56,11 +56,11 @@
             if (VersionCompareResultAscending == [ProductVersion compareWithVersion:versionModel.versionCode]) {
                 [UIView hideHUDLoadingOnWindow];
                 if ([NSString isNotEmpty:versionModel.downloadUrl]) {//TODO:这里可以进一步判断是否是标准的ios更新地址
-                    NSString *title = [NSString stringWithFormat:@"有版本%@需要更新", versionModel.versionCode];
+                    NSString *title = [NSString stringWithFormat:@"发现新版本 %@", versionModel.versionCode];
                     NSString *message = [NSString trimString:versionModel.versionDescription];
                     
                     UIAlertView *alertView = [UIAlertView bk_alertViewWithTitle:title message:message];
-                    [alertView bk_addButtonWithTitle:@"立刻升级" handler:^{
+                    [alertView bk_setCancelButtonWithTitle:@"立即更新" handler:^{
                         [[UIApplication sharedApplication] openURL:[NSURL URLWithString:versionModel.downloadUrl]];
                         exit(0);
                     }];
@@ -69,7 +69,7 @@
                             [[NSUserDefaults standardUserDefaults] setBool:YES forKey:SkipVersion];
                             [[NSUserDefaults standardUserDefaults] synchronize];
                         }];
-                        [alertView bk_setCancelButtonWithTitle:@"取消" handler:nil];//下次启动再次检测
+                        [alertView bk_addButtonWithTitle:@"稍后再说" handler:nil];//下次启动再次检测
                     }
                     [alertView show];
                 }
