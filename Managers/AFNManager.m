@@ -361,8 +361,10 @@
         }
         //去掉key和value的前后空格字符
         NSString *newKey = Trim(key);
-        NSString *newValue = [NSString stringWithFormat:@"%@", [NSObject isEmpty:value] ? @"" : value];
-//        NSString *newUTF8Value = [NSString UTF8Encoded:Trim(newValue)];//对value进行UTF8编码
+        NSString *newValue = [NSString stringWithFormat:@"%@", [NSString isEmpty:value] ? @"" : value];
+        newValue = [NSString replaceString:newValue byRegex:@" +" to:@""];//去掉字符串中间的空格
+        [param removeObjectForKey:key];//移除修改前的key
+        param[newKey] = newValue;
         [joinedString appendFormat:@"%@=%@", newKey, Trim(newValue)];
     }
     

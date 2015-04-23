@@ -133,9 +133,7 @@
     [self refreshWithSuccessed:successed failed:failed withRequestType:RequestTypeGET];
 }
 
-- (void)refreshWithSuccessed:(PullToRefreshSuccessed)successed failed:(PullToRefreshFailed)failed withRequestType:(RequestType)requestType
-{
-    self.isAnimating = YES;
+- (void)refreshWithSuccessed:(PullToRefreshSuccessed)successed failed:(PullToRefreshFailed)failed withRequestType:(RequestType)requestType {
     WeakSelfType blockSelf = self;
     RequestSuccessed requestSuccessedBlock = ^(id responseObject){
         [blockSelf.contentScrollView headerEndRefreshing];
@@ -227,7 +225,6 @@
 }
 
 - (void)loadMoreWithSuccessed:(PullToRefreshSuccessed)successed failed:(PullToRefreshFailed)failed withRequestType:(RequestType)requestType{
-    self.isAnimating = YES;
     WeakSelfType blockSelf = self;
     RequestSuccessed requestSuccessedBlock = ^(id responseObject){
         [blockSelf.contentScrollView footerEndRefreshing];
