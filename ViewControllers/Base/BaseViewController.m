@@ -422,7 +422,9 @@
 //    navigationController.interactivePopGestureRecognizer.enabled = YES;//NOTE:关闭系统自带的侧边滑动功能，会与MLTransition冲突！
 //    navigationController.interactivePopGestureRecognizer.delegate = self;
     //--------自定义present出来的navigationbar背景图片--------
-    [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleDefault];
+#if IsStatusBarChanged
+    [[UIApplication sharedApplication] setStatusBarStyle:![UIApplication sharedApplication].statusBarStyle];
+#endif
     [navigationController.navigationBar setTintColor:[UIColor blackColor]];//这个控制返回箭头按钮的颜色
     //设置Title为白色,Title大小为18
     [navigationController.navigationBar setTitleTextAttributes:@{ NSForegroundColorAttributeName : [UIColor blackColor],
@@ -438,9 +440,11 @@
 - (void)dismissOnPresentingViewController {
 	if (self.presentingViewController) {
 		[self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
+        #if IsStatusBarChanged
         if ([self.presentingViewController isKindOfClass:[UITabBarController class]]) {//恢复statusbar字体颜色
-            [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent];
+            [[UIApplication sharedApplication] setStatusBarStyle:![UIApplication sharedApplication].statusBarStyle];
         }
+        #endif
 	}
 }
 //在self下一级viewController调用dismiss
