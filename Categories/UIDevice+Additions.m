@@ -156,7 +156,7 @@
 //判断是否可用使用摄像头
 + (BOOL)isCanUseCamera {
     AVAuthorizationStatus status = [AVCaptureDevice authorizationStatusForMediaType:AVMediaTypeVideo];
-    return AVAuthorizationStatusAuthorized == status;
+    return (AVAuthorizationStatusAuthorized == status) || (AVAuthorizationStatusNotDetermined == status);
 }
 
 //判断是否可用打电话
