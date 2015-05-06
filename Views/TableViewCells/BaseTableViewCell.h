@@ -11,6 +11,7 @@
 @interface BaseTableViewCell : UITableViewCell
 
 + (CGFloat)HeightOfCell;
++ (CGFloat)HeightOfCellByDataModel:(BaseDataModel *)dataModel;
 + (UINib *)NibNameOfCell;
 - (void)layoutDataModel:(BaseDataModel *)dataModel;
 - (void)layoutDataModels:(NSArray *)dataModelArray;

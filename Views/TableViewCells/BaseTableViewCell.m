@@ -28,6 +28,9 @@
 + (CGFloat)HeightOfCell {
     return AUTOLAYOUT_LENGTH(290);
 }
++ (CGFloat)HeightOfCellByDataModel:(BaseDataModel *)dataModel {
+    return 0;
+}
 + (UINib *)NibNameOfCell {
     return [UINib nibWithNibName:NSStringFromClass(self.class) bundle:nil];
 }
