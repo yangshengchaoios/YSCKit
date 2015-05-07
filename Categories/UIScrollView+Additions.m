@@ -1,6 +1,6 @@
 //
 //  UIScrollView+Additions.m
-//  KQ
+//  YSCKit
 //
 //  Created by yangshengchao on 15/3/6.
 //  Copyright (c) 2015年 yangshengchao. All rights reserved.

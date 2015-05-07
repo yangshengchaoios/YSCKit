@@ -1,6 +1,6 @@
 //
 //  YSCPickerView.h
-//  KQ
+//  YSCKit
 //
 //  Created by YangShengchao on 15/3/28.
 //  Copyright (c) 2015年 yangshengchao. All rights reserved.
