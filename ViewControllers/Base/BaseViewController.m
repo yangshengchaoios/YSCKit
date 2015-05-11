@@ -425,9 +425,9 @@
 #if IsStatusBarChanged
     [[UIApplication sharedApplication] setStatusBarStyle:![UIApplication sharedApplication].statusBarStyle];
 #endif
-    [navigationController.navigationBar setTintColor:[UIColor blackColor]];//这个控制返回箭头按钮的颜色
+    [navigationController.navigationBar setTintColor:PresentNaviBackColor];//这个控制返回箭头按钮的颜色
     //设置Title为白色,Title大小为18
-    [navigationController.navigationBar setTitleTextAttributes:@{ NSForegroundColorAttributeName : [UIColor blackColor],
+    [navigationController.navigationBar setTitleTextAttributes:@{ NSForegroundColorAttributeName : PresentNaviTitleColor,
                                                                   NSFontAttributeName : [UIFont boldSystemFontOfSize:18] }];
     [navigationController.navigationBar setBarStyle:UIBarStyleDefault];
     [navigationController.navigationBar setBackgroundImage:PresentNaviBarImage
