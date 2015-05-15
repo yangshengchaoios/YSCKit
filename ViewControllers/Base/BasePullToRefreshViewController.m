@@ -104,7 +104,7 @@
     if ([self tipsViewEnable]) {
         WeakSelfType blockSelf = self;
         if (nil == self.tipsView) {
-            self.tipsView = [ZDYKTipsView CreateZDYKTipsViewOnView:[self contentScrollView]
+            self.tipsView = [YSCKTipsView CreateYSCTipsViewOnView:[self contentScrollView]
                                                         edgeInsets:[self tipsViewEdgeInsets]
                                                        withMessage:tipText
                                                          iconImage:[UIImage imageNamed:@"icon_failed"]

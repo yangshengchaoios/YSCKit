@@ -9,16 +9,16 @@
 #import "UIViewController+Additions.h"
 #import <objc/runtime.h>
 
-const char *DelegateKey;
+const char *DelegateUIviewControllerKey;
 
 @implementation UIViewController (Additions)
 
 - (void)setCustomTransitioningDelegate:(ADTransitioningDelegate *)transitioningDelegate {
     self.transitioningDelegate = transitioningDelegate;
-    objc_setAssociatedObject(self, DelegateKey, transitioningDelegate, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    objc_setAssociatedObject(self, DelegateUIviewControllerKey, transitioningDelegate, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 - (ADTransitioningDelegate *)customTransitioningDelegate {
-    return objc_getAssociatedObject(self, DelegateKey);
+    return objc_getAssociatedObject(self, DelegateUIviewControllerKey);
 }
 
 @end

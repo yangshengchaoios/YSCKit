@@ -12,7 +12,7 @@
 
 
 //自定义view
-#import "ZDYKTipsView.h"
+#import "YSCKTipsView.h"
 #import "TitleBarView.h"
 
 //第三方库
@@ -23,7 +23,7 @@
 
 #pragma mark - 视图切换
 @property (nonatomic, strong) NSDictionary *params; //显示该视图控制器的时候传入的参数
-@property (nonatomic, strong) ZDYKTipsView *tipsView;   //提示信息，默认隐藏
+@property (nonatomic, strong) YSCKTipsView *tipsView;   //提示信息，默认隐藏
 @property (nonatomic, assign) BOOL isTipsViewHidden;        //设置没有数据的提示view是否隐藏
 @property (nonatomic, strong) TitleBarView *titleBarView;
 @property (nonatomic, strong) UIButton *backButton;
