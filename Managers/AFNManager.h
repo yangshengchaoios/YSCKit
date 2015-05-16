@@ -88,7 +88,25 @@ typedef NS_ENUM (NSInteger, RequestType) {
    requestSuccessed:(RequestSuccessed)requestSuccessed
      requestFailure:(RequestFailure)requestFailure;
 
-#pragma mark - 通用的GET、POST和上传图片（返回BaseModel的所有内容）
+#pragma mark - 通用的GET、POST和上传图片（返回JSONModel的所有内容）
+
++ (void)getDataWithAPI:(NSString *)apiName
+          andDictParam:(NSDictionary *)dictParam
+       customModelName:(Class)modelName
+      requestSuccessed:(RequestSuccessed)requestSuccessed
+        requestFailure:(RequestFailure)requestFailure;
++ (void)postDataWithAPI:(NSString *)apiName
+           andDictParam:(NSDictionary *)dictParam
+        customModelName:(Class)modelName
+       requestSuccessed:(RequestSuccessed)requestSuccessed
+         requestFailure:(RequestFailure)requestFailure;
+
++ (void)requestWithAPI:(NSString *)apiName
+          andDictParam:(NSDictionary *)dictParam
+       customModelName:(Class)modelName
+           requestType:(RequestType)requestType
+      requestSuccessed:(RequestSuccessed)requestSuccessed
+        requestFailure:(RequestFailure)requestFailure;
 
 + (void)requestByUrl:(NSString *)url
              withAPI:(NSString *)apiName
@@ -96,6 +114,7 @@ typedef NS_ENUM (NSInteger, RequestType) {
         andDictParam:(NSDictionary *)dictParam
         andBodyParam:(NSString *)bodyParam
            imageData:(NSData *)imageData
+           modelName:(Class)modelName
          requestType:(RequestType)requestType
     requestSuccessed:(RequestSuccessed)requestSuccessed
       requestFailure:(RequestFailure)requestFailure;

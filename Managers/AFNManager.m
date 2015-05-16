@@ -95,7 +95,7 @@
          requestType:(RequestType)requestType
     requestSuccessed:(RequestSuccessed)requestSuccessed
       requestFailure:(RequestFailure)requestFailure {
-    [self   requestByUrl:url withAPI:apiName andArrayParam:arrayParam andDictParam:dictParam andBodyParam:bodyParam imageData:nil requestType:requestType
+    [self   requestByUrl:url withAPI:apiName andArrayParam:arrayParam andDictParam:dictParam andBodyParam:bodyParam imageData:nil modelName:modelName requestType:requestType
 	    requestSuccessed: ^(id responseObject) {
             BaseModel *baseModel = (BaseModel *)responseObject;
             if (1 == baseModel.state) {  //接口访问成功
@@ -147,6 +147,7 @@
           andDictParam:dictParam
           andBodyParam:nil
              imageData:UIImagePNGRepresentation(image)
+             modelName:ClassOfObject(BaseModel)
            requestType:RequestTypeUploadFile
       requestSuccessed:^(id responseObject) {
           BaseModel *baseModel = (BaseModel *)responseObject;
@@ -176,7 +177,30 @@
       }];
 }
 
-#pragma mark - 通用的GET和POST（返回BaseModel的所有内容）
+#pragma mark - 通用的GET和POST（返回JSONModel的所有内容）
+
++ (void)getDataWithAPI:(NSString *)apiName
+          andDictParam:(NSDictionary *)dictParam
+       customModelName:(Class)modelName
+      requestSuccessed:(RequestSuccessed)requestSuccessed
+        requestFailure:(RequestFailure)requestFailure {
+    [self requestByUrl:kResPathAppBaseUrl withAPI:apiName andArrayParam:nil andDictParam:dictParam andBodyParam:nil imageData:nil modelName:modelName requestType:RequestTypeGET requestSuccessed:requestSuccessed requestFailure:requestFailure];
+}
++ (void)postDataWithAPI:(NSString *)apiName
+          andDictParam:(NSDictionary *)dictParam
+       customModelName:(Class)modelName
+      requestSuccessed:(RequestSuccessed)requestSuccessed
+        requestFailure:(RequestFailure)requestFailure {
+    [self requestByUrl:kResPathAppBaseUrl withAPI:apiName andArrayParam:nil andDictParam:dictParam andBodyParam:nil imageData:nil modelName:modelName requestType:RequestTypePOST requestSuccessed:requestSuccessed requestFailure:requestFailure];
+}
++ (void)requestWithAPI:(NSString *)apiName
+          andDictParam:(NSDictionary *)dictParam
+       customModelName:(Class)modelName
+           requestType:(RequestType)requestType
+      requestSuccessed:(RequestSuccessed)requestSuccessed
+        requestFailure:(RequestFailure)requestFailure {
+    [self requestByUrl:kResPathAppBaseUrl withAPI:apiName andArrayParam:nil andDictParam:dictParam andBodyParam:nil imageData:nil modelName:modelName requestType:requestType requestSuccessed:requestSuccessed requestFailure:requestFailure];
+}
 
 /**
  *  发起get & post & 上传图片 请求
@@ -196,6 +220,7 @@
         andDictParam:(NSDictionary *)dictParam
         andBodyParam:(NSString *)bodyParam
            imageData:(NSData *)imageData
+           modelName:(Class)modelName
          requestType:(RequestType)requestType
     requestSuccessed:(RequestSuccessed)requestSuccessed
       requestFailure:(RequestFailure)requestFailure {
@@ -245,17 +270,17 @@
         responseObject = [NSString replaceString:responseObject byRegex:@"[\r\n\t]" to:@""];
         NSLog(@"request success! \r\noperation=%@\r\nresponseObject=%@", operation, responseObject);
         JSONModelError *initError = nil;
-        BaseModel *baseModel = nil;
+        JSONModel *jsonModel = nil;
         if ([responseObject isKindOfClass:[NSDictionary class]]) {
-            baseModel = [[BaseModel alloc] initWithDictionary:responseObject error:&initError];
+            jsonModel = [[modelName alloc] initWithDictionary:responseObject error:&initError];
         }
         else if ([responseObject isKindOfClass:[NSString class]]) {
-            baseModel = [[BaseModel alloc] initWithString:responseObject error:&initError];
+            jsonModel = [[modelName alloc] initWithString:responseObject error:&initError];
         }
         
-        if ([NSObject isNotEmpty:baseModel]) {
+        if ([NSObject isNotEmpty:jsonModel]) {
             if (requestSuccessed) {
-                requestSuccessed(baseModel);
+                requestSuccessed(jsonModel);
             }
         }
         else {
@@ -263,7 +288,6 @@
                 if (requestFailure) {
                     requestFailure(1001, initError.localizedDescription);
                 }
-                
             }
             else {
                 if (requestFailure) {
