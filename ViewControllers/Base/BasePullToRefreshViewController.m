@@ -189,21 +189,13 @@
             failed();
         }
     };
-    if(requestType == RequestTypeGET){
-        [AFNManager getDataFromUrl:[self prefixOfUrl]
-                           withAPI:[self methodWithPath]
-                      andDictParam:[self dictParamWithPage:kDefaultPageStartIndex]
-                         modelName:[self modelClassOfData]
-                  requestSuccessed:requestSuccessedBlock requestFailure:requestFailureBlock];
-    }else if(requestType == RequestTypePOST){
-        [AFNManager postDataToUrl:[self prefixOfUrl]
-                          withAPI:[self methodWithPath]
-                     andDictParam:[self dictParamWithPage:kDefaultPageStartIndex]
-                        modelName:[self modelClassOfData]
-                 requestSuccessed:requestSuccessedBlock requestFailure:requestFailureBlock];
+    if(requestType == RequestTypeGET) {
+        [self getDataByParam:[self dictParamWithPage:kDefaultPageStartIndex] successed:requestSuccessedBlock failed:requestFailureBlock];
+    }
+    else if(requestType == RequestTypePOST) {
+        [self postDataByParam:[self dictParamWithPage:kDefaultPageStartIndex]  successed:requestSuccessedBlock failed:requestFailureBlock];
     }
 }
-
 - (void)reloadByReplacing:(NSArray *)anArray {
 	[self.dataArray removeAllObjects];
 	[self.dataArray addObjectsFromArray:anArray];
@@ -282,21 +274,30 @@
         }
     };
     
-    
-	if(requestType == RequestTypeGET){
-        [AFNManager getDataFromUrl:[self prefixOfUrl]
-                           withAPI:[self methodWithPath]
-                      andDictParam:[self dictParamWithPage:self.currentPageIndex + 1]
-                         modelName:[self modelClassOfData]
-                  requestSuccessed:requestSuccessedBlock requestFailure:requestFailureBlock];
-    }else if(requestType == RequestTypePOST){
-        [AFNManager postDataToUrl:[self prefixOfUrl]
-                          withAPI:[self methodWithPath]
-                     andDictParam:[self dictParamWithPage:self.currentPageIndex + 1]
-                        modelName:[self modelClassOfData]
-                 requestSuccessed:requestSuccessedBlock requestFailure:requestFailureBlock];
+    if(requestType == RequestTypeGET) {
+        [self getDataByParam:[self dictParamWithPage:self.currentPageIndex + 1] successed:requestSuccessedBlock failed:requestFailureBlock];
+    }
+    else if(requestType == RequestTypePOST) {
+        [self postDataByParam:[self dictParamWithPage:self.currentPageIndex + 1]  successed:requestSuccessedBlock failed:requestFailureBlock];
     }
 }
+
+//以下两个方法是为了兼容返回model不规范的情况，子类可以重写
+- (void)getDataByParam:(NSDictionary *)param successed:(RequestSuccessed)successed failed:(RequestFailure)failed {
+    [AFNManager getDataFromUrl:[self prefixOfUrl]
+                       withAPI:[self methodWithPath]
+                  andDictParam:param
+                     modelName:[self modelClassOfData]
+              requestSuccessed:successed requestFailure:failed];
+}
+- (void)postDataByParam:(NSDictionary *)param successed:(RequestSuccessed)successed failed:(RequestFailure)failed {
+    [AFNManager postDataToUrl:[self prefixOfUrl]
+                      withAPI:[self methodWithPath]
+                 andDictParam:param
+                    modelName:[self modelClassOfData]
+             requestSuccessed:successed requestFailure:failed];
+}
+
 
 - (void)reloadByAdding:(NSArray *)anArray {
 	
