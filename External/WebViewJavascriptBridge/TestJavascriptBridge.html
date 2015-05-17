@@ -12,8 +12,8 @@
         window.onerror = function(err) {
 
         }
-    
-    function connectWebViewJavascriptBridge(callback) {
+    //1. 定义一个连接iOS UIWebView的桥接方法
+    var connectWebViewJavascriptBridge = function(callback) {
         if (window.WebViewJavascriptBridge) {
             callback(WebViewJavascriptBridge)
         } else {
@@ -21,17 +21,18 @@
                                       callback(WebViewJavascriptBridge)
                                       }, false)
         }
-    }
+    };
     
-    connectWebViewJavascriptBridge(function(bridge) {
-                                   var callbackButton = document.getElementById('buttons').appendChild(document.createElement('button'))
-                                   callbackButton.innerHTML = 'goBack'
-                                   callbackButton.onclick = function(e) {
-                                        e.preventDefault()
-                                        //bridge.callHandler('goBack', {'foo': 'bar'}, function(response) {})
-                                        bridge.callHandler('startPlay', {'fileName' : 'fall.wav'}, function(response) {})
-                                        //bridge.callHandler('stopPlay', {'fileName' : ''}, function(response) {})
-                                   }
+    //2. 通过调用上面的方法，传递handlerName(goBack)和json对象到iOS端去解析
+    var i_goBack = function(){
+        connectWebViewJavascriptBridge(function(bridge){
+                                       bridge.callHandler('goBack', {'foo': 'bar'}, function(response) {})
+                                       })
+    };
+    
+    //3. 注册一个handlerName(showAlert)，等待被iOS端调用
+    connectWebViewJavascriptBridge(function(bridge){
+                                   bridge.registerHandler('showAlert', function(data) { alert(data) })
                                    })
         </script>
     <div id='buttons'></div>
