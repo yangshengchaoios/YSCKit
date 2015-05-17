@@ -92,18 +92,18 @@ typedef NS_ENUM (NSInteger, RequestType) {
 
 + (void)getDataWithAPI:(NSString *)apiName
           andDictParam:(NSDictionary *)dictParam
-       customModelName:(Class)modelName
+      customModelClass:(Class)modelClass
       requestSuccessed:(RequestSuccessed)requestSuccessed
         requestFailure:(RequestFailure)requestFailure;
 + (void)postDataWithAPI:(NSString *)apiName
            andDictParam:(NSDictionary *)dictParam
-        customModelName:(Class)modelName
+       customModelClass:(Class)modelClass
        requestSuccessed:(RequestSuccessed)requestSuccessed
          requestFailure:(RequestFailure)requestFailure;
 
 + (void)requestWithAPI:(NSString *)apiName
           andDictParam:(NSDictionary *)dictParam
-       customModelName:(Class)modelName
+      customModelClass:(Class)modelClass
            requestType:(RequestType)requestType
       requestSuccessed:(RequestSuccessed)requestSuccessed
         requestFailure:(RequestFailure)requestFailure;
@@ -114,7 +114,7 @@ typedef NS_ENUM (NSInteger, RequestType) {
         andDictParam:(NSDictionary *)dictParam
         andBodyParam:(NSString *)bodyParam
            imageData:(NSData *)imageData
-           modelName:(Class)modelName
+    customModelClass:(Class)modelClass
          requestType:(RequestType)requestType
     requestSuccessed:(RequestSuccessed)requestSuccessed
       requestFailure:(RequestFailure)requestFailure;

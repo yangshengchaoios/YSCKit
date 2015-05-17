@@ -95,7 +95,7 @@
          requestType:(RequestType)requestType
     requestSuccessed:(RequestSuccessed)requestSuccessed
       requestFailure:(RequestFailure)requestFailure {
-    [self   requestByUrl:url withAPI:apiName andArrayParam:arrayParam andDictParam:dictParam andBodyParam:bodyParam imageData:nil modelName:modelName requestType:requestType
+    [self   requestByUrl:url withAPI:apiName andArrayParam:arrayParam andDictParam:dictParam andBodyParam:bodyParam imageData:nil customModelClass:ClassOfObject(BaseModel) requestType:requestType
 	    requestSuccessed: ^(id responseObject) {
             BaseModel *baseModel = (BaseModel *)responseObject;
             if (1 == baseModel.state) {  //接口访问成功
@@ -147,7 +147,7 @@
           andDictParam:dictParam
           andBodyParam:nil
              imageData:UIImagePNGRepresentation(image)
-             modelName:ClassOfObject(BaseModel)
+      customModelClass:ClassOfObject(BaseModel)
            requestType:RequestTypeUploadFile
       requestSuccessed:^(id responseObject) {
           BaseModel *baseModel = (BaseModel *)responseObject;
@@ -181,25 +181,25 @@
 
 + (void)getDataWithAPI:(NSString *)apiName
           andDictParam:(NSDictionary *)dictParam
-       customModelName:(Class)modelName
+      customModelClass:(Class)modelClass
       requestSuccessed:(RequestSuccessed)requestSuccessed
         requestFailure:(RequestFailure)requestFailure {
-    [self requestByUrl:kResPathAppBaseUrl withAPI:apiName andArrayParam:nil andDictParam:dictParam andBodyParam:nil imageData:nil modelName:modelName requestType:RequestTypeGET requestSuccessed:requestSuccessed requestFailure:requestFailure];
+    [self requestWithAPI:apiName andDictParam:dictParam customModelClass:modelClass requestType:RequestTypeGET requestSuccessed:requestSuccessed requestFailure:requestFailure];
 }
 + (void)postDataWithAPI:(NSString *)apiName
           andDictParam:(NSDictionary *)dictParam
-       customModelName:(Class)modelName
+      customModelClass:(Class)modelClass
       requestSuccessed:(RequestSuccessed)requestSuccessed
         requestFailure:(RequestFailure)requestFailure {
-    [self requestByUrl:kResPathAppBaseUrl withAPI:apiName andArrayParam:nil andDictParam:dictParam andBodyParam:nil imageData:nil modelName:modelName requestType:RequestTypePOST requestSuccessed:requestSuccessed requestFailure:requestFailure];
+    [self requestWithAPI:apiName andDictParam:dictParam customModelClass:modelClass requestType:RequestTypePOST requestSuccessed:requestSuccessed requestFailure:requestFailure];
 }
 + (void)requestWithAPI:(NSString *)apiName
           andDictParam:(NSDictionary *)dictParam
-       customModelName:(Class)modelName
+      customModelClass:(Class)modelClass
            requestType:(RequestType)requestType
       requestSuccessed:(RequestSuccessed)requestSuccessed
         requestFailure:(RequestFailure)requestFailure {
-    [self requestByUrl:kResPathAppBaseUrl withAPI:apiName andArrayParam:nil andDictParam:dictParam andBodyParam:nil imageData:nil modelName:modelName requestType:requestType requestSuccessed:requestSuccessed requestFailure:requestFailure];
+    [self requestByUrl:kResPathAppBaseUrl withAPI:apiName andArrayParam:nil andDictParam:dictParam andBodyParam:nil imageData:nil customModelClass:modelClass requestType:requestType requestSuccessed:requestSuccessed requestFailure:requestFailure];
 }
 
 /**
@@ -220,7 +220,7 @@
         andDictParam:(NSDictionary *)dictParam
         andBodyParam:(NSString *)bodyParam
            imageData:(NSData *)imageData
-           modelName:(Class)modelName
+    customModelClass:(Class)modelClass
          requestType:(RequestType)requestType
     requestSuccessed:(RequestSuccessed)requestSuccessed
       requestFailure:(RequestFailure)requestFailure {
@@ -272,10 +272,10 @@
         JSONModelError *initError = nil;
         JSONModel *jsonModel = nil;
         if ([responseObject isKindOfClass:[NSDictionary class]]) {
-            jsonModel = [[modelName alloc] initWithDictionary:responseObject error:&initError];
+            jsonModel = [[modelClass alloc] initWithDictionary:responseObject error:&initError];
         }
         else if ([responseObject isKindOfClass:[NSString class]]) {
-            jsonModel = [[modelName alloc] initWithString:responseObject error:&initError];
+            jsonModel = [[modelClass alloc] initWithString:responseObject error:&initError];
         }
         
         if ([NSObject isNotEmpty:jsonModel]) {
