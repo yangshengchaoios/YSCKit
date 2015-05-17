@@ -101,7 +101,7 @@
             if (1 == baseModel.state) {  //接口访问成功
                 NSObject *dataModel = baseModel.data;
                 JSONModelError *initError = nil;
-                if ( [NSString isNotEmpty:modelName] && [modelName isSubclassOfClass:[BaseDataModel class]]) {
+                if ( [NSObject isNotEmpty:modelName] && [modelName isSubclassOfClass:[BaseDataModel class]]) {
                     if ([dataModel isKindOfClass:[NSArray class]]) {
                         dataModel = [modelName arrayOfModelsFromDictionaries:(NSArray *)dataModel error:&initError];
                     }
@@ -199,8 +199,18 @@
            requestType:(RequestType)requestType
       requestSuccessed:(RequestSuccessed)requestSuccessed
         requestFailure:(RequestFailure)requestFailure {
-    [self requestByUrl:kResPathAppBaseUrl withAPI:apiName andArrayParam:nil andDictParam:dictParam andBodyParam:nil imageData:nil customModelClass:modelClass requestType:requestType requestSuccessed:requestSuccessed requestFailure:requestFailure];
+    [self requestByUrl:kResPathAppBaseUrl withAPI:apiName andDictParam:dictParam customModelClass:modelClass requestType:requestType requestSuccessed:requestSuccessed requestFailure:requestFailure];
 }
++ (void)requestByUrl:(NSString *)url
+             withAPI:(NSString *)apiName
+          andDictParam:(NSDictionary *)dictParam
+      customModelClass:(Class)modelClass
+           requestType:(RequestType)requestType
+      requestSuccessed:(RequestSuccessed)requestSuccessed
+        requestFailure:(RequestFailure)requestFailure {
+    [self requestByUrl:url withAPI:apiName andArrayParam:nil andDictParam:dictParam andBodyParam:nil imageData:nil customModelClass:modelClass requestType:requestType requestSuccessed:requestSuccessed requestFailure:requestFailure];
+}
+
 
 /**
  *  发起get & post & 上传图片 请求
@@ -271,11 +281,13 @@
         NSLog(@"request success! \r\noperation=%@\r\nresponseObject=%@", operation, responseObject);
         JSONModelError *initError = nil;
         JSONModel *jsonModel = nil;
-        if ([responseObject isKindOfClass:[NSDictionary class]]) {
-            jsonModel = [[modelClass alloc] initWithDictionary:responseObject error:&initError];
-        }
-        else if ([responseObject isKindOfClass:[NSString class]]) {
-            jsonModel = [[modelClass alloc] initWithString:responseObject error:&initError];
+        if ( [NSObject isNotEmpty:modelClass] && [modelClass isSubclassOfClass:[JSONModel class]]) {
+            if ([responseObject isKindOfClass:[NSDictionary class]]) {
+                jsonModel = [[modelClass alloc] initWithDictionary:responseObject error:&initError];
+            }
+            else if ([responseObject isKindOfClass:[NSString class]]) {
+                jsonModel = [[modelClass alloc] initWithString:responseObject error:&initError];
+            }
         }
         
         if ([NSObject isNotEmpty:jsonModel]) {

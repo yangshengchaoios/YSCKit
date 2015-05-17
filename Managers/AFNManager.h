@@ -100,13 +100,19 @@ typedef NS_ENUM (NSInteger, RequestType) {
        customModelClass:(Class)modelClass
        requestSuccessed:(RequestSuccessed)requestSuccessed
          requestFailure:(RequestFailure)requestFailure;
-
 + (void)requestWithAPI:(NSString *)apiName
           andDictParam:(NSDictionary *)dictParam
       customModelClass:(Class)modelClass
            requestType:(RequestType)requestType
       requestSuccessed:(RequestSuccessed)requestSuccessed
         requestFailure:(RequestFailure)requestFailure;
++ (void)requestByUrl:(NSString *)url
+             withAPI:(NSString *)apiName
+        andDictParam:(NSDictionary *)dictParam
+    customModelClass:(Class)modelClass
+         requestType:(RequestType)requestType
+    requestSuccessed:(RequestSuccessed)requestSuccessed
+      requestFailure:(RequestFailure)requestFailure;
 
 + (void)requestByUrl:(NSString *)url
              withAPI:(NSString *)apiName
