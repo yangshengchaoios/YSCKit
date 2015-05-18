@@ -280,7 +280,7 @@
         responseObject = [NSString replaceString:responseObject byRegex:@"[\r\n\t]" to:@""];
         NSLog(@"request success! \r\noperation=%@\r\nresponseObject=%@", operation, responseObject);
         JSONModelError *initError = nil;
-        JSONModel *jsonModel = nil;
+        id jsonModel = nil;
         if ( [NSObject isNotEmpty:modelClass] && [modelClass isSubclassOfClass:[JSONModel class]]) {
             if ([responseObject isKindOfClass:[NSDictionary class]]) {
                 jsonModel = [[modelClass alloc] initWithDictionary:responseObject error:&initError];
@@ -288,6 +288,9 @@
             else if ([responseObject isKindOfClass:[NSString class]]) {
                 jsonModel = [[modelClass alloc] initWithString:responseObject error:&initError];
             }
+        }
+        else {
+            jsonModel = responseObject;
         }
         
         if ([NSObject isNotEmpty:jsonModel]) {
