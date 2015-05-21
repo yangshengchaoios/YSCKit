@@ -290,7 +290,7 @@
             }
         }
         else {
-            jsonModel = responseObject;
+            jsonModel = [NSObject isEmpty:responseObject] ? @"empty" : responseObject;
         }
         
         if ([NSObject isNotEmpty:jsonModel]) {

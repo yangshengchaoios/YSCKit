@@ -7,7 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
-
+@class NewVersionModel;
 /**
  *  全局通用静态类
  *  作用：主要是公用可以独立执行的方法集合
@@ -16,6 +16,7 @@
 
 + (void)checkNewVersionShowMessage:(BOOL)showMessage;
 + (void)checkNewVersionShowMessage:(BOOL)showMessage withParams:(NSDictionary *)params;
++ (void)checkNewVersion:(NewVersionModel *)versionModel showMessage:(BOOL)showMessage;
 + (void)configUmeng;
 + (void)configUmengPushWithOptions:(NSDictionary *)launchOptions;
 + (UIView *)createSearchViewWithWidth:(NSInteger)width withTextField:(UITextField *)textField;
