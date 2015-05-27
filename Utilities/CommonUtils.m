@@ -305,6 +305,21 @@
     return isSuccess;
 }
 
++ (BOOL)SqliteCheckIfExists:(NSString *)sql {
+    return [self SqliteCheckIfExists:sql dbPath:DBRealPath];
+}
++ (BOOL)SqliteCheckIfExists:(NSString *)sql dbPath:(NSString *)dbPath {
+    BOOL isExists = NO;
+    FMDatabase *db = [FMDatabase databaseWithPath:dbPath];
+    if ([db open]) {
+        FMResultSet *resultSet = [db executeQuery:sql];
+        if (resultSet) {
+            isExists = [resultSet next];
+        }
+    }
+    [db close];
+    return isExists;
+}
 
 #pragma mark - 过去了多长时间
 /**

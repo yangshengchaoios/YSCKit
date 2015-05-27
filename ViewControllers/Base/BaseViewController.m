@@ -161,8 +161,10 @@
     }
     
     //相对布局——自动调整约束值和font大小
-    [self.view resetFontSizeOfView];
-    [self.view resetConstraintOfView];
+    if (AUTOLAYOUT_SCALE != 1) {
+        [self.view resetFontSizeOfView];
+        [self.view resetConstraintOfView];
+    }
 }
 
 

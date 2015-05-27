@@ -58,6 +58,8 @@
 
 + (BOOL)SqliteUpdate:(NSString *)sql;
 + (BOOL)SqliteUpdate:(NSString *)sql dbPath:(NSString *)dbPath;
++ (BOOL)SqliteCheckIfExists:(NSString *)sql;
++ (BOOL)SqliteCheckIfExists:(NSString *)sql dbPath:(NSString *)dbPath;
 
 
 #pragma mark - 过去了多长时间 + 还剩多少时间

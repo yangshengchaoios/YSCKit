@@ -9,6 +9,16 @@
 
 #import <Foundation/Foundation.h>
 
+#define RegexEmail          @"^\\w+([-+.]\\w+)*@\\w+([-.]\\w+)*\\.\\w+([-.]\\w+)*$"
+#define RegexMobilePhone    @"(^(01|1))\\d{10}$"
+#define RegexUserName       @"^[A-Za-z0-9]{6,20}+$"
+#define RegexPassword       @"^[a-zA-Z0-9]{6,20}+$"
+#define RegexNickName       @"^[\u4e00-\u9fa5]{4,8}$"
+#define RegexIdentityCard   @"^(\\d{14}|\\d{17})(\\d|[xX])$"
+#define RegexAllNumbers     @"^[0-9]\\d*$"
+#define RegexUrl            @"((http|ftp|https)://)(([a-zA-Z0-9\\._-]+\\.[a-zA-Z]{2,6})|([0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}))(:[0-9]{1,4})*(/[a-zA-Z0-9\\&%_\\./-~-]*)?"
+
+
 /*
  *
  * 注意：本类所有的实例方法都有其对应的静态方法
