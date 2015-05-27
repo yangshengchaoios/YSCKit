@@ -78,6 +78,12 @@
 + (NSString *)replaceString:(NSString *)string byRegex:(NSString *)pattern to:(NSString *)toString options:(NSRegularExpressionOptions)options;
 - (NSString *)replaceByRegex:(NSString *)pattern to:(NSString *)toString options:(NSRegularExpressionOptions)options;
 
+/**
+ * 移除字符串最后一个字符
+ */
++ (NSString *)removeLastCharOfString:(NSString *)string;
+- (NSString *)removeLastChar;
++ (void)removeLastCharOfMutableString:(NSMutableString *)mutableString;
 
 #pragma mark - 汉字转拼音
 + (NSString *)toPinYin:(NSString *)hanzi;

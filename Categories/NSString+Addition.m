@@ -205,6 +205,21 @@
     return [[expression stringByReplacingMatchesInString:self options:0 range:NSMakeRange(0, [self length]) withTemplate:toString] trimString];
 }
 
+/**
+ * 移除字符串最后一个字符
+ */
++ (NSString *)removeLastCharOfString:(NSString *)string {
+    ReturnEmptyWhenObjectIsEmpty(string)
+    return [string removeLastChar];
+}
+- (NSString *)removeLastChar {
+    return [self substringToIndex:[self length] - 1];
+}
++ (void)removeLastCharOfMutableString:(NSMutableString *)mutableString {
+    ReturnWhenObjectIsEmpty(mutableString)
+    [mutableString deleteCharactersInRange:NSMakeRange([mutableString length] - 1, 1)];
+}
+
 #pragma mark - 汉字转拼音
 + (NSString *)toPinYin:(NSString *)hanzi {
     ReturnEmptyWhenObjectIsEmpty(hanzi)
