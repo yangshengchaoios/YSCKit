@@ -12,7 +12,7 @@
 @implementation TitleBarView
 
 - (id)init {
-    return [self initWithFrame:CGRectMake(0, 0, 320.0f, 64.0f)];
+    return [self initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, 64.0f)];
 }
 
 - (id)initWithFrame:(CGRect)frame {
