@@ -41,7 +41,7 @@ typedef void(^PageDidChangedAtIndex)(NSInteger pageIndex);
  */
 @interface InfiniteLoopView : UIView
 
-@property (nonatomic, assign) NSInteger currentPageIndex;                   //当前页码
+@property (nonatomic, assign) NSInteger currentPageIndex;                   //当前页码(可以手动设置改变)
 @property (nonatomic, assign) NSTimeInterval animationDuration;             //默认5秒
 @property (nonatomic, assign) NSInteger totalPageCount;
 @property (nonatomic, strong) SMPageControl *pageControl;
