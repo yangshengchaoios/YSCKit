@@ -8,8 +8,15 @@
 
 #import <Foundation/Foundation.h>
 
-typedef void (^AFOnceBlock) (void);
+#pragma Class AFOnceInfo
+@interface AFOnceBlockInfo : NSObject
+@property (nonatomic, retain) NSString *lastVersion;
+@property (nonatomic, retain) NSDate *lastTime;
+@end
 
+typedef void (^AFOnceBlock) (AFOnceBlockInfo *blockInfo);
+
+#pragma Class AFOnce
 @interface AFOnce : NSObject
 /**
  *  Singleton instance shared for the app session.

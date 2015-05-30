@@ -9,11 +9,6 @@
 #import "AFOnce.h"
 
 #pragma Class AFOnceInfo
-@interface AFOnceBlockInfo : NSObject
-@property (nonatomic, retain) NSString *lastVersion;
-@property (nonatomic, retain) NSDate *lastTime;
-@end
-
 @implementation AFOnceBlockInfo
 - (id)initWithCoder:(NSCoder *)coder{
     if ((self = [super init])){
@@ -115,18 +110,16 @@
 + (void)runOnce:(AFOnceBlock)onceBlock elseRun:(AFOnceBlock)elseRunBlock forKey:(NSString *)blockKey forGroup:(NSString *)group perVersion:(BOOL)checkVersion interval:(NSTimeInterval)interval{
 
     if (onceBlock && blockKey && group) {
-        if ([self blockAlreadyRunForKey:blockKey group:group perVersion:checkVersion interval:interval]) {
-            
+        AFOnceBlockInfo *blockInfo = [AFSharedOnce getBlockInfo:blockKey forGroup:group];
+        if ([self blockAlreadyRunForKey:blockKey group:group perVersion:checkVersion interval:interval]){
             if (elseRunBlock) {
-                elseRunBlock();
+                elseRunBlock(blockInfo);
             }
-            
         }else{
-        
-            if (onceBlock) {
-                onceBlock();
-            }
             [AFSharedOnce saveRunInformationForKey:blockKey forGroup:group];
+            if (onceBlock) {
+                onceBlock(blockInfo);
+            }
         }
     }
 }
@@ -140,27 +133,29 @@
 
 + (BOOL)blockAlreadyRunForKey:(NSString *)blockKey group:(NSString *)groupKey perVersion:(BOOL)checkVersion interval:(NSTimeInterval)interval{
     
-    BOOL executed = NO;
-    
-    /// Get the key dictionary.
-    AFOnceBlockInfo *blockInfo = [AFSharedOnce getBlockInfo:blockKey forGroup:groupKey];
-    if (blockInfo) {
-        executed = YES;
+    @synchronized(AFSharedOnce){
+        BOOL executed = NO;
+        
+        /// Get the key dictionary.
+        AFOnceBlockInfo *blockInfo = [AFSharedOnce getBlockInfo:blockKey forGroup:groupKey];
+        if (blockInfo) {
+            executed = YES;
+        }
+        
+        /// Version.
+        if (checkVersion && blockInfo) {
+            NSString *currentVersion = AFOnceAppVersion;
+            executed = executed && [currentVersion isEqualToString:blockInfo.lastVersion];
+        }
+        
+        /// interval.
+        if (interval && blockInfo) {
+            NSTimeInterval currentInterval = [[NSDate date] timeIntervalSinceDate:blockInfo.lastTime];
+            executed = executed && (currentInterval <= interval);
+        }
+        
+        return executed;
     }
-    
-    /// Version.
-    if (checkVersion && blockInfo) {
-        NSString *currentVersion = AFOnceAppVersion;
-        executed = executed && [currentVersion isEqualToString:blockInfo.lastVersion];
-    }
-    
-    /// interval.
-    if (interval && blockInfo) {
-        NSTimeInterval currentInterval = [[NSDate date] timeIntervalSinceDate:blockInfo.lastTime];
-        executed = executed && (currentInterval <= interval);
-    }
-    
-    return executed;
 }
 
 
@@ -193,13 +188,18 @@
  */
 - (void)setBlockInfo:(AFOnceBlockInfo *)blockInfo forKey:(NSString *)blockKey forGroup:(NSString *)groupKey{
     
-    NSMutableDictionary *groupDictionary = [self getGroupDict:groupKey];
-
-    [groupDictionary setObject:blockInfo forKey:blockKey];
-   
-    [self.dataDict setObject:groupDictionary forKey:groupKey];
-    
-    [self saveDataToUserDefaults];
+    @synchronized(self){
+        NSMutableDictionary *groupDictionary = [self getGroupDict:groupKey];
+        if (!groupDictionary) {
+            groupDictionary = [@{} mutableCopy];
+        }
+        
+        [groupDictionary setObject:blockInfo forKey:blockKey];
+        
+        [self.dataDict setObject:groupDictionary forKey:groupKey];
+        
+        [self saveDataToUserDefaults];
+    }
 }
 
 /**
@@ -212,11 +212,7 @@
 - (NSMutableDictionary *)getGroupDict:(NSString *)groupKey{
     
     NSMutableDictionary *dict = nil;
-    if (groupKey.length) {
-        dict = [self.dataDict objectForKey:groupKey];
-    }else{
-        dict = [@{} mutableCopy];
-    }
+    if (groupKey) dict = [self.dataDict objectForKey:groupKey];
     return dict;
 }
 
