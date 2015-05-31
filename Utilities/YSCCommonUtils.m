@@ -14,10 +14,10 @@
     [self checkNewVersionShowMessage:showMessage withParams:nil];
 }
 + (void)checkNewVersionShowMessage:(BOOL)showMessage withParams:(NSDictionary *)params {
-    if ([@"0" isEqualToString:kCheckNewVersionType]) {
+    if (0 == [kCheckNewVersionType integerValue]) {
         return;
     }
-    else if ([@"1" isEqualToString:kCheckNewVersionType]) {
+    else if (1 == [kCheckNewVersionType integerValue]) {
         if ([NSString isNotUrl:kCheckNewVersionUrl]) {
             return;
         }
@@ -37,7 +37,7 @@
                         }
                     }];
     }
-    else if ([@"2" isEqualToString:kCheckNewVersionType]) {
+    else if (2 == [kCheckNewVersionType integerValue]) {
         NSString *tempModel = kNewVersionModel;
         if ([NSString isNotEmpty:tempModel]) {
             NewVersionModel *versionModel = [[NewVersionModel alloc] initWithString:tempModel error:nil];

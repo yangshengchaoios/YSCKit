@@ -85,8 +85,23 @@
     else if (YSCPickerTypeDateTime == pickerType) {
         self.datePicker.datePickerMode = UIDatePickerModeDateAndTime;
     }
+    else if (YSCPickerTypeCustom == pickerType) {
+        
+    }
 }
+
++ (instancetype)CreateYSCPickerView {
+    YSCPickerView *pickerView = FirstViewInXib(@"YSCPickerView");
+    pickerView.width = SCREEN_WIDTH;
+    pickerView.height = SCREEN_HEIGHT;
+    [KeyWindow addSubview:pickerView];
+    return pickerView;
+}
+
 - (void)showPickerView:(id)initObject {
+    if (nil == self.superview) {
+        [KeyWindow addSubview:self];
+    }
     self.hidden = NO;
     [UIView animateWithDuration:DurationOfAnimation animations:^{
         self.containerBottom.constant = AUTOLAYOUT_LENGTH(0);
@@ -147,6 +162,13 @@
             }
             [self.datePicker setDate:initDate animated:YES];
         }
+        else if (YSCPickerTypeCustom == self.pickerType) {
+            [self.pickerView reloadAllComponents];
+            NSInteger initIndex = [initObject integerValue];
+            if (initIndex >= 0 && initIndex < [self.customDataArray count]) {
+                [self.pickerView selectRow:initIndex inComponent:0 animated:YES];
+            }
+        }
         else {
             //NOTE:other picker type
         }
@@ -169,6 +191,9 @@
     if (YSCPickerTypeAddress == self.pickerType) {
         return 3;
     }
+    else if (YSCPickerTypeCustom == self.pickerType) {
+        return 1;
+    }
     return 0;
 }
 - (NSInteger)pickerView:(UIPickerView *)pickerView numberOfRowsInComponent:(NSInteger)component {
@@ -182,6 +207,9 @@
         else if (2 == component) {
             return [self.currentCityModel.sectionArray count];
         }
+    }
+    else if (YSCPickerTypeCustom == self.pickerType) {
+        return [self.customDataArray count];
     }
     return 0;
 }
@@ -201,6 +229,10 @@
         else if (2 == component) {
             return [(SectionModel *)self.currentCityModel.sectionArray[row] section];
         }
+    }
+    else if (YSCPickerTypeCustom == self.pickerType) {
+        NSString *title = [NSString stringWithFormat:@"%@", self.customDataArray[row]];
+        return title;
     }
     return nil;
 }
@@ -255,6 +287,11 @@
             }
         }
     }
+    else if (YSCPickerTypeCustom == self.pickerType) {
+        if (self.selectingBlock) {
+            self.selectingBlock(@(row));
+        }
+    }
 }
 - (UIView *)pickerView:(UIPickerView *)pickerView viewForRow:(NSInteger)row forComponent:(NSInteger)component reusingView:(UIView *)view {
     UILabel *titleLabel = (UILabel*)view;
@@ -266,17 +303,24 @@
         titleLabel.font = AUTOLAYOUT_FONT(32);
     }
     
-    NSString *titleString = @"";
-    if (0 == component) {
-        titleString = [(ProvinceModel *)self.provinceArray[row] province];
+    if (YSCPickerTypeAddress == self.pickerType) {
+        NSString *titleString = @"";
+        if (0 == component) {
+            titleString = [(ProvinceModel *)self.provinceArray[row] province];
+        }
+        else if (1 == component) {
+            titleString = [(CityModel *)self.currentPovinceModel.cityArray[row] city];
+        }
+        else if (2 == component) {
+            titleString = [(SectionModel *)self.currentCityModel.sectionArray[row] section];
+        }
+        titleLabel.text = titleString;
     }
-    else if (1 == component) {
-        titleString = [(CityModel *)self.currentPovinceModel.cityArray[row] city];
+    else if (YSCPickerTypeCustom == self.pickerType) {
+        NSString *title = [NSString stringWithFormat:@"%@", self.customDataArray[row]];
+        titleLabel.text = title;
     }
-    else if (2 == component) {
-        titleString = [(SectionModel *)self.currentCityModel.sectionArray[row] section];
-    }
-    titleLabel.text = titleString;
+    
     return titleLabel;
 }
 

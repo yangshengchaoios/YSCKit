@@ -98,7 +98,8 @@
     [self   requestByUrl:url withAPI:apiName andArrayParam:arrayParam andDictParam:dictParam andBodyParam:bodyParam imageData:nil customModelClass:ClassOfObject(YSCBaseModel) requestType:requestType
 	    requestSuccessed: ^(id responseObject) {
             YSCBaseModel *baseModel = (YSCBaseModel *)responseObject;
-            if (1 == baseModel.state) {  //接口访问成功
+            [baseModel formatProperties];
+            if (1 == baseModel.stateInteger) {  //接口访问成功
                 NSObject *dataModel = baseModel.data;
                 JSONModelError *initError = nil;
                 if ( [NSObject isNotEmpty:modelName] && [modelName isSubclassOfClass:[BaseDataModel class]]) {
@@ -151,8 +152,9 @@
            requestType:RequestTypeUploadFile
       requestSuccessed:^(id responseObject) {
           YSCBaseModel *baseModel = (YSCBaseModel *)responseObject;
+          [baseModel formatProperties];
           if ([baseModel isKindOfClass:[YSCBaseModel class]]) {
-              if (1 == baseModel.state) {  //接口访问成功
+              if (1 == baseModel.stateInteger) {  //接口访问成功
                   NSLog(@"success message = %@", baseModel.message);
                   if (requestSuccessed) {
                       requestSuccessed(baseModel);

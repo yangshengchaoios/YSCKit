@@ -12,7 +12,8 @@ typedef NS_ENUM(NSInteger, YSCPickerType) {
     YSCPickerTypeDate = 0,
     YSCPickerTypeTime,
     YSCPickerTypeDateTime,
-    YSCPickerTypeAddress ,
+    YSCPickerTypeAddress,
+    YSCPickerTypeCustom,
 };
 
 @interface YSCPickerView : UIView <UIPickerViewDelegate, UIPickerViewDataSource>
@@ -22,13 +23,14 @@ typedef NS_ENUM(NSInteger, YSCPickerType) {
 @property (weak, nonatomic) IBOutlet UIPickerView *pickerView;
 @property (weak, nonatomic) IBOutlet UIButton *doneButton;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *containerBottom;//260
+@property (weak, nonatomic) NSArray *customDataArray;
 
 @property (assign, nonatomic) YSCPickerType pickerType;
 @property (copy, nonatomic) CallBackWithResponseBlock selectingBlock;
 @property (copy, nonatomic) CallBackBlock completionShowBlock;
 @property (copy, nonatomic) CallBackBlock completionHideBlock;
 
-
++ (instancetype)CreateYSCPickerView;
 - (void)showPickerView:(id)initObject;
 - (void)hidePickerView;
 

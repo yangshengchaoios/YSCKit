@@ -11,6 +11,21 @@
 
 @implementation YSCBaseModel
 
+- (void)formatProperties {
+    if (self.stateModel) {
+        if (0 == self.stateModel.code) {
+            self.stateInteger = 1;
+        }
+        else if (1 == self.stateModel.code) {
+            self.stateInteger = 0;
+        }
+        else {
+            self.stateInteger = self.stateModel.code;
+        }
+        self.message = self.stateModel.msg;
+    }
+}
+
 + (BOOL)propertyIsOptional:(NSString *)propertyName {
     return YES;
 }
@@ -21,7 +36,7 @@
  *  @return
  */
 + (NSDictionary *)jsonToModelMapping {
-    return nil;
+    return @{@"state" : @"stateModel"};
 }
 +(JSONKeyMapper*)keyMapper { //将大写首字母转换为小写
     NSDictionary* userToModelMap = [self jsonToModelMapping];
@@ -190,3 +205,16 @@
 }
 
 @end
+
+@implementation StateModel
+
++ (NSDictionary *)jsonToModelMapping {
+    return @{@"Msg" : @"msg"};
+}
+
+@end
+
+
+
+
+

@@ -10,14 +10,17 @@
 #import <JSONModel/JSONModel.h>
 
 #define RegionDbPath       AppProgramPath(@"region.sqlite")
+@class BaseDataModel, StateModel;
 
 @interface YSCBaseModel : JSONModel
 
-@property (assign, nonatomic) NSInteger state;
+@property (assign, nonatomic) NSInteger stateInteger;
 @property (strong, nonatomic) NSString *message;
 @property (strong, nonatomic) NSObject<ConvertOnDemand> *data;
+@property (strong, nonatomic) StateModel *stateModel;
 
 + (NSDictionary *)jsonToModelMapping;
+- (void)formatProperties;
 
 @end
 
@@ -29,4 +32,11 @@
 
 + (NSDictionary *)jsonToModelMapping;
 
+@end
+
+//针对基类数据模型不规则的情况
+@interface StateModel : BaseDataModel
+@property (nonatomic, assign) NSInteger code;
+@property (nonatomic, strong) NSString *msg;
+@property (nonatomic, strong) NSString *debugMsg;
 @end
