@@ -48,9 +48,9 @@
     #import "UINavigationController+CustomAnimations.h"//系统自带的几种常用切换动画
 
     //Utils
-    #import "FileUtils.h"
-    #import "ImageUtils.h"
-    #import "CommonUtils.h"
+    #import "YSCFileUtils.h"
+    #import "YSCImageUtils.h"
+    #import "YSCCommonUtils.h"
 
     //Manager
     #import "PlayAudioManager.h"
@@ -67,12 +67,12 @@
     //业务逻辑相关
     #import "DataModel.h"
     #import "Login.h"
-    #import "BasePullToRefreshTableViewController.h"
-    #import "BasePullToRefreshCollectionViewController.h"
-    #import "BaseTableViewCell.h"
-    #import "BaseCollectionViewCell.h"
-    #import "BaseTableViewHeaderFooterView.h"
-    #import "BaseCollectionHeaderFooterView.h"
+    #import "YSCPullToRefreshTableViewController.h"
+    #import "YSCPullToRefreshCollectionViewController.h"
+    #import "YSCBaseTableViewCell.h"
+    #import "YSCBaseCollectionViewCell.h"
+    #import "YSCBaseTableHeaderFooterView.h"
+    #import "YSCBaseCollectionHeaderFooterView.h"
 #endif
 
 
@@ -142,7 +142,7 @@ return _sharedObject;
 #define SkipVersion                     [NSString stringWithFormat:@"SkipVersion_V%@", ProductVersion]
 #define KeyWindow                       [UIApplication sharedApplication].keyWindow
 #define FileDefaultManager              [NSFileManager defaultManager]
-#define AppProgramPath(x)               [[FileUtils DirectoryPathOfBundle] stringByAppendingPathComponent:x]
+#define AppProgramPath(x)               [[YSCFileUtils DirectoryPathOfBundle] stringByAppendingPathComponent:x]
 
 
 /**

@@ -334,7 +334,7 @@ const NSInteger unionSize = 20;
     {
         return nil;
     }
-    if (path.item >= [self.sectionItemAttributes[path.section] count])
+    if (path.item >= [((NSArray *)self.sectionItemAttributes[path.section]) count])
     {
         return nil;
     }

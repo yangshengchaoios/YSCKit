@@ -95,9 +95,9 @@
          requestType:(RequestType)requestType
     requestSuccessed:(RequestSuccessed)requestSuccessed
       requestFailure:(RequestFailure)requestFailure {
-    [self   requestByUrl:url withAPI:apiName andArrayParam:arrayParam andDictParam:dictParam andBodyParam:bodyParam imageData:nil customModelClass:ClassOfObject(BaseModel) requestType:requestType
+    [self   requestByUrl:url withAPI:apiName andArrayParam:arrayParam andDictParam:dictParam andBodyParam:bodyParam imageData:nil customModelClass:ClassOfObject(YSCBaseModel) requestType:requestType
 	    requestSuccessed: ^(id responseObject) {
-            BaseModel *baseModel = (BaseModel *)responseObject;
+            YSCBaseModel *baseModel = (YSCBaseModel *)responseObject;
             if (1 == baseModel.state) {  //接口访问成功
                 NSObject *dataModel = baseModel.data;
                 JSONModelError *initError = nil;
@@ -147,11 +147,11 @@
           andDictParam:dictParam
           andBodyParam:nil
              imageData:UIImagePNGRepresentation(image)
-      customModelClass:ClassOfObject(BaseModel)
+      customModelClass:ClassOfObject(YSCBaseModel)
            requestType:RequestTypeUploadFile
       requestSuccessed:^(id responseObject) {
-          BaseModel *baseModel = (BaseModel *)responseObject;
-          if ([baseModel isKindOfClass:[BaseModel class]]) {
+          YSCBaseModel *baseModel = (YSCBaseModel *)responseObject;
+          if ([baseModel isKindOfClass:[YSCBaseModel class]]) {
               if (1 == baseModel.state) {  //接口访问成功
                   NSLog(@"success message = %@", baseModel.message);
                   if (requestSuccessed) {

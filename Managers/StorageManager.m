@@ -29,12 +29,12 @@
 - (id)init {
     self = [super init];
     if (self) {
-        self.directoryPathOfHome = [FileUtils DirectoryPathOfHome];
-        self.directoryPathOfDocuments = [FileUtils DirectoryPathOfDocuments];
-        self.directoryPathOfLibrary = [FileUtils DirectoryPathOfLibrary];
-        self.directoryPathOfLibraryCaches = [FileUtils DirectoryPathOfLibraryCaches];
-        self.directoryPathOfLibraryPreferences = [FileUtils DirectoryPathOfLibraryPreferences];
-        self.directoryPathOfTmp = [FileUtils DirectoryPathOfTmp];
+        self.directoryPathOfHome = [YSCFileUtils DirectoryPathOfHome];
+        self.directoryPathOfDocuments = [YSCFileUtils DirectoryPathOfDocuments];
+        self.directoryPathOfLibrary = [YSCFileUtils DirectoryPathOfLibrary];
+        self.directoryPathOfLibraryCaches = [YSCFileUtils DirectoryPathOfLibraryCaches];
+        self.directoryPathOfLibraryPreferences = [YSCFileUtils DirectoryPathOfLibraryPreferences];
+        self.directoryPathOfTmp = [YSCFileUtils DirectoryPathOfTmp];
         
         self.userDir = kCommonDirectoryName;
         [self ensureCommonDirectories];
@@ -343,14 +343,14 @@
  */
 - (void)clearLibraryCaches {
     //Documents
-    [FileUtils clearDirectoryPath:[self directoryPathOfDocumentsCommon]];
-    [FileUtils clearDirectoryPath:self.directoryPathOfDocumentsByUserId];
-    [FileUtils clearDirectoryPath:self.directoryPathOfDocumentsLog];
+    [YSCFileUtils clearDirectoryPath:[self directoryPathOfDocumentsCommon]];
+    [YSCFileUtils clearDirectoryPath:self.directoryPathOfDocumentsByUserId];
+    [YSCFileUtils clearDirectoryPath:self.directoryPathOfDocumentsLog];
     
     //Library/Caches
-    [FileUtils clearDirectoryPath:self.directoryPathOfLibraryCachesByUserId];
-    [FileUtils clearDirectoryPath:self.directoryPathOfLibraryCachesCommon];
-    [FileUtils clearDirectoryPath:self.directoryPathOfLibraryCachesBundleIdentifier];
+    [YSCFileUtils clearDirectoryPath:self.directoryPathOfLibraryCachesByUserId];
+    [YSCFileUtils clearDirectoryPath:self.directoryPathOfLibraryCachesCommon];
+    [YSCFileUtils clearDirectoryPath:self.directoryPathOfLibraryCachesBundleIdentifier];
     
     [self ensureCommonDirectories];
     [self ensureUserDirectories];
@@ -361,19 +361,19 @@
  *  确保公共缓存目录的存在
  */
 - (void)ensureCommonDirectories {
-    [FileUtils ensureDirectory:[self directoryPathOfDocumentsCommon]];
-    [FileUtils ensureDirectory:[self directoryPathOfDocumentsLog]];
-    [FileUtils ensureDirectory:[self directoryPathOfLibraryCachesCommon]];
+    [YSCFileUtils ensureDirectory:[self directoryPathOfDocumentsCommon]];
+    [YSCFileUtils ensureDirectory:[self directoryPathOfDocumentsLog]];
+    [YSCFileUtils ensureDirectory:[self directoryPathOfLibraryCachesCommon]];
 }
 /**
  *  确保用户缓存目录的存在
  */
 - (void)ensureUserDirectories {
-    [FileUtils ensureDirectory:[self directoryPathOfDocumentsByUserId]];
-    [FileUtils ensureDirectory:[self directoryPathOfLibraryCachesByUserId]];
-    [FileUtils ensureDirectory:[self directoryPathOfAudioByUserId]];
-    [FileUtils ensureDirectory:[self directoryPathOfVideoByUserId]];
-    [FileUtils ensureDirectory:[self directoryPathOfPicByUserId]];
+    [YSCFileUtils ensureDirectory:[self directoryPathOfDocumentsByUserId]];
+    [YSCFileUtils ensureDirectory:[self directoryPathOfLibraryCachesByUserId]];
+    [YSCFileUtils ensureDirectory:[self directoryPathOfAudioByUserId]];
+    [YSCFileUtils ensureDirectory:[self directoryPathOfVideoByUserId]];
+    [YSCFileUtils ensureDirectory:[self directoryPathOfPicByUserId]];
 }
 /**
  *  判断字符串是否为空

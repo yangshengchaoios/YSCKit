@@ -6,7 +6,7 @@
 //  Copyright (c) 2014年 yangshengchao. All rights reserved.
 //
 
-#import "BaseTableViewCell.h"
+#import "YSCBaseTableViewCell.h"
 
 typedef NS_ENUM(NSInteger, YSCTableViewCellStyle) {
     YSCTableViewCellStyleTitle              = 1 << 0,        //Default
@@ -19,7 +19,7 @@ typedef NS_ENUM(NSInteger, YSCTableViewCellStyle) {
 
 typedef void (^StateChanged)(BOOL state);
 
-@interface YSCTableViewCell : BaseTableViewCell
+@interface YSCTableViewCell : YSCBaseTableViewCell
 
 @property (weak, nonatomic) IBOutlet UIView *iconContainerView;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *iconContainerWidth;    //66

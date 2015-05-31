@@ -27,7 +27,7 @@
     NSString *soundFileName = [self soundFileNameWithType:type];
     NSString *filePath = AppProgramPath(soundFileName);
     
-	if ([FileUtils isExistsAtPath:filePath]) {
+	if ([YSCFileUtils isExistsAtPath:filePath]) {
         AVAudioSession *audioSession = [AVAudioSession sharedInstance];
         [audioSession setCategory:AVAudioSessionCategoryAmbient withOptions:AVAudioSessionCategoryOptionDefaultToSpeaker error:nil];
         [audioSession setActive:YES error:nil];
@@ -41,7 +41,7 @@
 }
 
 - (void)playWithAudioFile:(NSString *)filePath {
-    if ([FileUtils isExistsAtPath:filePath]) {
+    if ([YSCFileUtils isExistsAtPath:filePath]) {
         AVAudioSession *audioSession = [AVAudioSession sharedInstance];
         [audioSession setCategory:AVAudioSessionCategoryAmbient withOptions:AVAudioSessionCategoryOptionDefaultToSpeaker error:nil];
         [audioSession setActive:YES error:nil];
