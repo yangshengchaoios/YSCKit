@@ -6,8 +6,8 @@
 //  Copyright (c) 2014年 ZhongDaYunKe. All rights reserved.
 //
 
-#import "BaseViewController.h"
 
-@interface YSCWebViewController : BaseViewController
+
+@interface YSCWebViewController : YSCBaseViewController
 
 @end
