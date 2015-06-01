@@ -272,6 +272,20 @@
     [manager.requestSerializer setValue:ProductVersion forHTTPHeaderField:kParamVersion];
     [manager.requestSerializer setValue:[AppConfigManager sharedInstance].udid forHTTPHeaderField:kParamUdid];
     [manager.requestSerializer setValue:kParamFromValue forHTTPHeaderField:kParamFrom];
+#if IsNeedEncryptHTTPHeader
+    NSString *httpHeaderToken = [self encryptHttpHeaderWithParam:@{kParamAppId : kAppId,
+                                                                   kParamVersion : ProductVersion,
+                                                                   kParamUdid : [AppConfigManager sharedInstance].udid,
+                                                                   kParamFrom : kParamFromValue,
+                                                                   kParamLongitude : @"104.0743432",
+                                                                   kParamLatitude : @"30.6287345",
+                                                                   kParamToken : TOKEN,
+                                                                   kParamSignature : Trim(signature),
+                                                                   kParamChannel : kAppChannel
+                                                                   }];
+    NSLog(@"encryptString=%@", httpHeaderToken);
+    [manager.requestSerializer setValue:httpHeaderToken forHTTPHeaderField:kAppHTTPTokenName];
+#endif
     
     //   定义返回成功的block
     void (^requestSuccessed1)(AFHTTPRequestOperation *operation, id responseObject) = ^(AFHTTPRequestOperation *operation, id responseObject) {
@@ -392,7 +406,7 @@
 + (NSString *)signatureWithParam:(NSMutableDictionary *)param {
     NSArray *keys = [[param allKeys] sortedArrayUsingSelector:@selector(compare:)];
     
-    //2. 按照字典顺序拼接url字符串
+    //1. 按照字典顺序拼接url字符串
     NSLog(@"param = %@", param);
     NSMutableString *joinedString = [NSMutableString string];
     for (NSString *key in keys) {
@@ -409,9 +423,23 @@
         [joinedString appendFormat:@"%@=%@", newKey, Trim(newValue)];
     }
     
-    //3. 对参数进行md5加密
+    //2. 对参数进行md5加密
     NSString *newString = [NSString stringWithFormat:@"%@%@", joinedString, kParamSecretKey];
     return [[NSString MD5Encrypt:[NSString UTF8Encoded:newString]] lowercaseString];
+}
+
+//将字典对象转换成json字符串
++ (NSString *)encryptHttpHeaderWithParam:(NSDictionary *)param {
+    NSString *jsonString = @"";
+    NSError *error;
+    NSData *jsonData = [NSJSONSerialization dataWithJSONObject:param
+                                                       options:NSJSONWritingPrettyPrinted
+                                                         error:&error];
+    if (jsonData) {
+        jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+    }
+    NSLog(@"jsonString=%@", jsonString);
+    return [jsonString AESEncryptString];
 }
 
 @end
