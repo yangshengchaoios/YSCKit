@@ -17,6 +17,9 @@
 + (void)checkNewVersionShowMessage:(BOOL)showMessage;
 + (void)checkNewVersionShowMessage:(BOOL)showMessage withParams:(NSDictionary *)params;
 + (void)checkNewVersion:(NewVersionModel *)versionModel showMessage:(BOOL)showMessage;
+
++ (void)configNavigationBar;
+
 + (void)configUmeng;
 + (void)configUmengPushWithOptions:(NSDictionary *)launchOptions;
 + (UIView *)createSearchViewWithWidth:(NSInteger)width withTextField:(UITextField *)textField;
