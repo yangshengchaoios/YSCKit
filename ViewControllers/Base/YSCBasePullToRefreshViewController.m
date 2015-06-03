@@ -45,7 +45,7 @@
         blockSelf.tipsView.iconImageView.image = [UIImage imageNamed:@"icon_failed"];
         [blockSelf.tipsView.actionButton bk_removeEventHandlersForControlEvents:UIControlEventTouchUpInside];
         [blockSelf.tipsView.actionButton bk_addEventHandler:^(id sender) {
-            [blockSelf.contentScrollView headerBeginRefreshing];
+            [blockSelf.contentScrollView.header beginRefreshing];
         } forControlEvents:UIControlEventTouchUpInside];
     };
     
@@ -62,7 +62,7 @@
 		[self addRefreshHeaderView];
 		//判断是否进入的时候就刷新
 		if ([self shouldRefreshWhenEntered]) {
-			[self.contentScrollView headerBeginRefreshing];
+			[self.contentScrollView.header beginRefreshing];
 		}
 	}
     
@@ -74,7 +74,7 @@
 
 - (void)addRefreshHeaderView {
 	WeakSelfType blockSelf = self;
-    [self.contentScrollView addHeaderWithCallback:^{
+    [self.contentScrollView addLegendHeaderWithRefreshingBlock:^{
         [blockSelf refreshWithSuccessed:blockSelf.successBlock failed:blockSelf.failedBlock];
         [MobClick event:UMEventKeyPullToRefresh
              attributes:@{@"ClassName" : NSStringFromClass(self.class),
@@ -84,7 +84,7 @@
 
 - (void)addRefreshFooterView {
 	WeakSelfType blockSelf = self;
-    [self.contentScrollView addFooterWithCallback:^{
+    [self.contentScrollView addLegendFooterWithRefreshingBlock:^{
         [blockSelf loadMoreWithSuccessed:blockSelf.successBlock failed:blockSelf.failedBlock];
         [MobClick event:UMEventKeyPullToRefresh
              attributes:@{@"ClassName" : NSStringFromClass(self.class),
@@ -110,7 +110,7 @@
                                                          iconImage:[UIImage imageNamed:@"icon_failed"]
                                                        buttonTitle:@"重新加载"
                                                       buttonAction:^{
-                                                          [blockSelf.contentScrollView headerBeginRefreshing];
+                                                          [blockSelf.contentScrollView.header beginRefreshing];
                                                       }];
         }
         else {
@@ -136,7 +136,7 @@
 - (void)refreshWithSuccessed:(PullToRefreshSuccessed)successed failed:(PullToRefreshFailed)failed withRequestType:(RequestType)requestType {
     WeakSelfType blockSelf = self;
     RequestSuccessed requestSuccessedBlock = ^(id responseObject){
-        [blockSelf.contentScrollView headerEndRefreshing];
+        [blockSelf.contentScrollView.header endRefreshing];
         [blockSelf hideHUDLoading];
         blockSelf.currentPageIndex = kDefaultPageStartIndex;
         
@@ -173,7 +173,7 @@
     };
     
     RequestFailure requestFailureBlock = ^(NSInteger errorCode, NSString *errorMessage){
-        [blockSelf.contentScrollView headerEndRefreshing];
+        [blockSelf.contentScrollView.header endRefreshing];
         
         //1. 如果没有数据就将错误信息显示在tipsView上
         if ([NSArray isEmpty:blockSelf.dataArray]) {
@@ -219,7 +219,7 @@
 - (void)loadMoreWithSuccessed:(PullToRefreshSuccessed)successed failed:(PullToRefreshFailed)failed withRequestType:(RequestType)requestType{
     WeakSelfType blockSelf = self;
     RequestSuccessed requestSuccessedBlock = ^(id responseObject){
-        [blockSelf.contentScrollView footerEndRefreshing];
+        [blockSelf.contentScrollView.header endRefreshing];
         [blockSelf hideHUDLoading];
         
         //1. 获取结果数组
@@ -257,7 +257,7 @@
     
     
     RequestFailure requestFailureBlock = ^(NSInteger errorCode, NSString *errorMessage){
-        [blockSelf.contentScrollView footerEndRefreshing];
+        [blockSelf.contentScrollView.header endRefreshing];
 
         //1. 如果没有数据就将错误信息显示在tipsView上
         if ([NSArray isEmpty:blockSelf.dataArray]) {

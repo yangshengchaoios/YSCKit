@@ -22,6 +22,7 @@
     #import <POP/POP.h>
     #import <FMDB/FMDB.h>
     #import "PureLayout.h"
+    #import "Masonry.h"
 
     //定义固定常量和公用枚举
     #import "Constants.h"

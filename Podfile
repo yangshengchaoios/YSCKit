@@ -50,3 +50,6 @@ pod 'HPGrowingTextView',  '~>1.1'
 
 pod 'PureLayout', :head
 #UIView+AutoLayout has been deprecated in favor of PureLayout
+
+pod 'Masonry', :head
+#比PureLayout更方便的约束工具
