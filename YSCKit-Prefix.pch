@@ -11,6 +11,9 @@
 #warning "This project uses features only available in iOS SDK 3.0 and later."
 #endif
 
+typedef void (^CallBackBlock)();
+typedef void (^CallBackWithResponseBlock)(id response);
+
 #ifdef __OBJC__
     //常用第三方库
     #import <UIKit/UIKit.h>
@@ -23,12 +26,8 @@
     #import <FMDB/FMDB.h>
     #import "PureLayout.h"
     #import "Masonry.h"
-
-    //定义固定常量和公用枚举
-    #import "Constants.h"
-    #import "UrlConstants.h"
-    #import "UMengConstants.h"
     #import "EnumType.h"
+    #import "UMengConstants.h"
 
     //系统类扩展
     #import "NSObject+Addition.h"
@@ -74,6 +73,10 @@
     #import "YSCBaseCollectionViewCell.h"
     #import "YSCBaseTableHeaderFooterView.h"
     #import "YSCBaseCollectionHeaderFooterView.h"
+
+    //定义固定常量和公用枚举
+    #import "UrlConstants.h"
+    #import "Constants.h"
 #endif
 
 

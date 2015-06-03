@@ -59,9 +59,9 @@
 
 
 #pragma mark - present & dismiss viewcontroller [presentingViewController -> self -> presentedViewController]
-- (UIViewController *)presentViewController:(NSString *)className;
-- (UIViewController *)presentViewController:(NSString *)className withParams:(NSDictionary *)paramDict;
-- (UIViewController *)presentNormalViewController:(UIViewController *)viewController;
+- (UINavigationController *)presentViewController:(NSString *)className;
+- (UINavigationController *)presentViewController:(NSString *)className withParams:(NSDictionary *)paramDict;
+- (UINavigationController *)presentNormalViewController:(UIViewController *)viewController;
 //在self上一级viewController调用dismiss（通常情况下使用该方法）
 - (void)dismissOnPresentingViewController;
 //在self下一级viewController调用dismiss

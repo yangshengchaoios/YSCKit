@@ -401,11 +401,10 @@
 
 #pragma mark - present & dismiss viewcontroller [presentingViewController -> self -> presentedViewController]
 
-- (UIViewController *)presentViewController:(NSString *)className {
+- (UINavigationController *)presentViewController:(NSString *)className {
 	return [self presentViewController:className withParams:nil];
 }
-- (UIViewController *)presentViewController:(NSString *)className withParams:(NSDictionary *)paramDict {
-    [self hideKeyboard];
+- (UINavigationController *)presentViewController:(NSString *)className withParams:(NSDictionary *)paramDict {
     UIViewController *viewController = [UIResponder createBaseViewController:className];
     NSMutableDictionary *mutableParamDict = [NSMutableDictionary dictionaryWithDictionary:paramDict];
     if ( ! mutableParamDict[kParamBackType]) {
@@ -417,24 +416,13 @@
     
     return [self presentNormalViewController:viewController];
 }
-- (UIViewController *)presentNormalViewController:(UIViewController *)viewController {
+- (UINavigationController *)presentNormalViewController:(UIViewController *)viewController {
+    [self hideKeyboard];
     UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:viewController];
     navigationController.customNavigationDelegate = [[ADNavigationControllerDelegate alloc] init];
     navigationController.navigationController.navigationBar.translucent = NO;
 //    navigationController.interactivePopGestureRecognizer.enabled = YES;//NOTE:关闭系统自带的侧边滑动功能，会与MLTransition冲突！
 //    navigationController.interactivePopGestureRecognizer.delegate = self;
-    //--------自定义present出来的navigationbar背景图片--------
-#if IsStatusBarChanged
-    [[UIApplication sharedApplication] setStatusBarStyle:![UIApplication sharedApplication].statusBarStyle];
-#endif
-    [navigationController.navigationBar setTintColor:PresentNaviBackColor];//这个控制返回箭头按钮的颜色
-    //设置Title为白色,Title大小为18
-    [navigationController.navigationBar setTitleTextAttributes:@{ NSForegroundColorAttributeName : PresentNaviTitleColor,
-                                                                  NSFontAttributeName : [UIFont boldSystemFontOfSize:18] }];
-    [navigationController.navigationBar setBarStyle:UIBarStyleDefault];
-    [navigationController.navigationBar setBackgroundImage:PresentNaviBarImage
-                                             forBarMetrics:UIBarMetricsDefault];
-    //---------------------------END-----------------------
     [self presentViewController:navigationController animated:YES completion:nil];
     return navigationController;
 }
@@ -442,11 +430,6 @@
 - (void)dismissOnPresentingViewController {
 	if (self.presentingViewController) {
 		[self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
-        #if IsStatusBarChanged
-        if ([self.presentingViewController isKindOfClass:[UITabBarController class]]) {//恢复statusbar字体颜色
-            [[UIApplication sharedApplication] setStatusBarStyle:![UIApplication sharedApplication].statusBarStyle];
-        }
-        #endif
 	}
 }
 //在self下一级viewController调用dismiss
