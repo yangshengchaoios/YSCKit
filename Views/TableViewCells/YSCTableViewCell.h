@@ -8,6 +8,8 @@
 
 #import "YSCBaseTableViewCell.h"
 
+#define YSCCellIdentifier       @"YSCCellIdentifier"
+
 typedef NS_ENUM(NSInteger, YSCTableViewCellStyle) {
     YSCTableViewCellStyleTitle              = 1 << 0,        //Default
     YSCTableViewCellStyleIcon               = 1 << 1,
