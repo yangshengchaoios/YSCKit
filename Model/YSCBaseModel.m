@@ -36,7 +36,7 @@
  *  @return
  */
 + (NSDictionary *)jsonToModelMapping {
-    return @{@"state" : @"stateModel"};
+    return @{@"state" : @"stateInteger"};
 }
 +(JSONKeyMapper*)keyMapper { //将大写首字母转换为小写
     NSDictionary* userToModelMap = [self jsonToModelMapping];

@@ -313,51 +313,49 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 @implementation NSString (Security)
 
-#define DEFAULTKEY      @"&*^YHGd5"                     //默认秘钥
-#define DEFAULTIV       { 11, 17, 37, 43, 59, 61, 97, 83 }       //默认向量
+#define DEFAULTKEY      @"6yc*2JK?00000000"                     //默认秘钥
 
 #pragma mark - base64加密解密(标准的)
 + (NSString *)Base64Encrypt:(NSString *)string {
     ReturnEmptyWhenObjectIsEmpty(string)
     return [string Base64EncryptString];
 }
-
 - (NSString *)Base64EncryptString {
-    NSData *sourceData = [self dataUsingEncoding:NSUTF8StringEncoding];
-	NSData *encryptData = [sourceData base64EncodedDataWithOptions:NSDataBase64EncodingEndLineWithLineFeed];
-	return [[NSString alloc] initWithData:encryptData encoding:NSUTF8StringEncoding];
+    return [NSString EncodeBase64Data:[self dataUsingEncoding:NSUTF8StringEncoding]];
 }
-
++ (NSString *)EncodeBase64Data:(NSData *)data {
+    NSData *encryptBase64Data = [data base64EncodedDataWithOptions:NSDataBase64EncodingEndLineWithLineFeed];
+    return [[NSString alloc] initWithData:encryptBase64Data encoding:NSUTF8StringEncoding];
+}
 + (NSString *)Base64Decrypt:(NSString *)string {
 	ReturnEmptyWhenObjectIsEmpty(string)
     return [string Base64DecryptString];
 }
-
 - (NSString *)Base64DecryptString {
-    NSData *encryptData = [self dataUsingEncoding:NSUTF8StringEncoding];
-	NSData *decryptData = [[NSData alloc] initWithBase64EncodedData:encryptData options:NSDataBase64DecodingIgnoreUnknownCharacters];
-	return [[NSString alloc] initWithData:decryptData encoding:NSUTF8StringEncoding];
+    return [NSString DecodeBase64Data:[self dataUsingEncoding:NSUTF8StringEncoding]];
+}
++ (NSString *)DecodeBase64Data:(NSData *)data {
+    NSData *decryptData = [[NSData alloc] initWithBase64EncodedData:data options:NSDataBase64DecodingIgnoreUnknownCharacters];
+    return [[NSString alloc] initWithData:decryptData encoding:NSUTF8StringEncoding];
 }
 
 
-#pragma mark - AES加密解密
+#pragma mark - AES加密解密(标准的)
 + (NSString *)AESEncrypt:(NSString *)string {
     if ([NSString isEmpty:string]) {
         return @"";
     }
     return [string AESEncryptString];
 }
-
 - (NSString *)AESEncryptString {
 	return [NSString AESEncrypt:self useKey:DEFAULTKEY];
 }
-
 + (NSString *)AESEncrypt:(NSString *)string useKey:(NSString *)key {
     ReturnEmptyWhenObjectIsEmpty(string)
     ReturnEmptyWhenObjectIsEmpty(key)
 	NSData *sourceData = [string dataUsingEncoding:NSUTF8StringEncoding];
 	NSData *encryptData = [self AESEncryptData:sourceData useKey:key];
-	return [self dataBytesToHexString:encryptData];
+    return [NSString EncodeBase64Data:encryptData];
 }
 //私有方法
 + (NSData *)AESEncryptData:(NSData *)data useKey:(NSString *)key {
@@ -385,20 +383,17 @@
 	free(buffer);
 	return nil;
 }
-
 + (NSString *)AESDecrypt:(NSString *)string {
     ReturnEmptyWhenObjectIsEmpty(string)
 	return [string AESDecryptString];
 }
-
 - (NSString *)AESDecryptString {
     return [NSString AESDecrypt:self useKey:DEFAULTKEY];
 }
-
 + (NSString *)AESDecrypt:(NSString *)string useKey:(NSString *)key {
     ReturnEmptyWhenObjectIsEmpty(string)
     ReturnEmptyWhenObjectIsEmpty(key)
-	NSData *encryptData = [self hexStringToDataBytes:string];
+    NSData *encryptData = [[NSData alloc] initWithBase64EncodedData:[string dataUsingEncoding:NSUTF8StringEncoding] options:NSDataBase64DecodingIgnoreUnknownCharacters];
 	NSData *decryptData = [self AESDecryptData:encryptData useKey:key];
 	return [[NSString alloc] initWithData:decryptData encoding:NSUTF8StringEncoding];
 }
@@ -436,22 +431,18 @@
     ReturnEmptyWhenObjectIsEmpty(string)
 	return [string DESEncryptString];
 }
-
 - (NSString *)DESEncryptString {
     return [NSString DESEncrypt:self useKey:DEFAULTKEY];
 }
-
 + (NSString *)DESEncrypt:(NSString *)string useKey:(NSString *)key {
     ReturnEmptyWhenObjectIsEmpty(string)
     ReturnEmptyWhenObjectIsEmpty(key)
 	NSData *sourceData = [string dataUsingEncoding:NSUTF8StringEncoding];
 	NSData *encryptData = [self DESEncryptData:sourceData useKey:key];
-	return [self dataBytesToHexString:encryptData];
+    return [NSString EncodeBase64Data:encryptData];
 }
 //私有方法
 + (NSData *)DESEncryptData:(NSData *)data useKey:(NSString *)key {
-	static Byte iv[] = DEFAULTIV;
-    
 	NSUInteger dataLength = [data length];
 	size_t bufferSize = dataLength + kCCBlockSizeDES;
 	void *buffer = malloc(bufferSize);
@@ -461,7 +452,7 @@
 	                                      kCCOptionPKCS7Padding | kCCOptionECBMode,
 	                                      [key UTF8String],
 	                                      kCCKeySizeDES,
-	                                      iv,
+	                                      NULL,
 	                                      [data bytes],
 	                                      dataLength,
 	                                      buffer,
@@ -473,27 +464,22 @@
 	free(buffer);
     return nil;
 }
-
 + (NSString *)DESDecrypt:(NSString *)string {
 	ReturnEmptyWhenObjectIsEmpty(string)
 	return [string DESDecryptString];
 }
-
 - (NSString *)DESDecryptString {
     return [NSString DESDecrypt:self useKey:DEFAULTKEY];
 }
-
 + (NSString *)DESDecrypt:(NSString *)string useKey:(NSString *)key {
     ReturnEmptyWhenObjectIsEmpty(string)
     ReturnEmptyWhenObjectIsEmpty(key)
-	NSData *encryptData = [self hexStringToDataBytes:string];
+	NSData *encryptData = [[NSData alloc] initWithBase64EncodedData:[string dataUsingEncoding:NSUTF8StringEncoding] options:NSDataBase64DecodingIgnoreUnknownCharacters];
 	NSData *decryptData = [self DESDecryptData:encryptData useKey:key];
     return [[NSString alloc] initWithData:decryptData encoding:NSUTF8StringEncoding];
 }
 //私有方法
 + (NSData *)DESDecryptData:(NSData *)data useKey:(NSString *)key {
-	static Byte iv[] = DEFAULTIV;
-    
 	NSUInteger dataLength = [data length];
 	size_t bufferSize = dataLength + kCCBlockSizeDES;
 	void *buffer = malloc(bufferSize);
@@ -503,7 +489,7 @@
 	                                      kCCOptionPKCS7Padding | kCCOptionECBMode,
 	                                      [key UTF8String],
 	                                      kCCKeySizeDES,
-	                                      iv,
+	                                      NULL,
 	                                      [data bytes],
 	                                      dataLength,
 	                                      buffer,
@@ -526,7 +512,6 @@
     ReturnEmptyWhenObjectIsEmpty(string)
     return [string MD5EncryptString];
 }
-
 - (NSString*)MD5EncryptString {
     NSData *sourceData = [self dataUsingEncoding:NSUTF8StringEncoding];
 	unsigned char result[CC_MD5_DIGEST_LENGTH];
@@ -545,7 +530,6 @@
     ReturnEmptyWhenObjectIsEmpty(string)
     return [string Sha1HashString];
 }
-
 - (NSString *)Sha1HashString {
     NSData *sourceData = [self dataUsingEncoding:NSUTF8StringEncoding];
 	unsigned char result[CC_SHA1_DIGEST_LENGTH];
@@ -566,7 +550,6 @@
     ReturnEmptyWhenObjectIsEmpty(string)
     return [string UTF8EncodedString];
 }
-
 - (NSString *)UTF8EncodedString {
     return (NSString *)CFBridgingRelease(CFURLCreateStringByAddingPercentEscapes(kCFAllocatorDefault,
                                                                                  (CFStringRef)self,
@@ -574,12 +557,10 @@
                                                                                  CFSTR("!*'();:@&=+$,/?%#[]"),
                                                                                  kCFStringEncodingUTF8));
 }
-
 + (NSString *)UTF8Decoded:(NSString *)string {
     ReturnEmptyWhenObjectIsEmpty(string)
     return [string UTF8DecodedString];
 }
-
 - (NSString *)UTF8DecodedString {
     return (NSString *)CFBridgingRelease(CFURLCreateStringByReplacingPercentEscapesUsingEncoding(kCFAllocatorDefault,
                                                                                                  (CFStringRef)self,
@@ -595,12 +576,10 @@
 - (NSString *)URLEncodeString {
     return [self stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
 }
-
 + (NSString *)URLDecode:(NSString *)string {
     ReturnEmptyWhenObjectIsEmpty(string)
     return [string URLDecodeString];
 }
-
 - (NSString *)URLDecodeString {
     return [self stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
 }

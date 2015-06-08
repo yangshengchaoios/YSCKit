@@ -255,32 +255,29 @@
     
     //4. 对提交的dict添加一个加密的参数'signature'
     NSMutableDictionary *newDictParam = [NSMutableDictionary dictionaryWithDictionary:dictParam];
-#if IsNeedSignParams
-    NSString *signature = [self signatureWithParam:newDictParam];
-    if ([NSString isNotEmpty:signature]) {//当加密字符串不为空的时候就新增一个参数'signature'
-        [newDictParam setValue:signature forKey:kParamSignature];
-    }
-#endif
+    NSString *signature = Trim([self signatureWithParam:newDictParam]);
     
 	//5. 发起网络请求
     AFHTTPRequestOperationManager *manager = [AFHTTPRequestOperationManager manager];   //create new AFHTTPRequestOperationManager
     manager.responseSerializer = [AFHTTPResponseSerializer serializer];//TODO:针对返回数据不规范的情况
+    
     manager.requestSerializer.cachePolicy = NSURLRequestReloadIgnoringLocalCacheData;
     manager.requestSerializer.timeoutInterval = kDefaultAFNTimeOut;//设置POST和GET的超时时间
     //解决返回的Content-Type始终是application/xml问题！
     [manager.requestSerializer setValue:@"application/xml" forHTTPHeaderField:@"Accept"];
+//    [manager.requestSerializer setValue:@"gzip" forHTTPHeaderField:@"Accept-Encoding"];
     [manager.requestSerializer setValue:ProductVersion forHTTPHeaderField:kParamVersion];
     [manager.requestSerializer setValue:[AppConfigManager sharedInstance].udid forHTTPHeaderField:kParamUdid];
     [manager.requestSerializer setValue:kParamFromValue forHTTPHeaderField:kParamFrom];
+    [manager.requestSerializer setValue:signature forHTTPHeaderField:kParamSignature];
 #if IsNeedEncryptHTTPHeader
     NSString *httpHeaderToken = [self encryptHttpHeaderWithParam:@{kParamAppId : kAppId,
                                                                    kParamVersion : ProductVersion,
                                                                    kParamUdid : [AppConfigManager sharedInstance].udid,
                                                                    kParamFrom : kParamFromValue,
-                                                                   kParamLongitude : @"104.0743432",
+                                                                   kParamLongitude : @"翼畅行",
                                                                    kParamLatitude : @"30.6287345",
                                                                    kParamToken : TOKEN,
-                                                                   kParamSignature : Trim(signature),
                                                                    kParamChannel : kAppChannel
                                                                    }];
     NSLog(@"encryptString=%@", httpHeaderToken);
@@ -407,7 +404,7 @@
     NSArray *keys = [[param allKeys] sortedArrayUsingSelector:@selector(compare:)];
     
     //1. 按照字典顺序拼接url字符串
-    NSLog(@"param = %@", param);
+    NSLog(@"signature param = %@", param);
     NSMutableString *joinedString = [NSMutableString string];
     for (NSString *key in keys) {
         NSObject *value = param[key];
@@ -417,19 +414,23 @@
         //去掉key和value的前后空格字符
         NSString *newKey = Trim(key);
         NSString *newValue = [NSString stringWithFormat:@"%@", [NSString isEmpty:value] ? @"" : value];
-        newValue = [NSString replaceString:newValue byRegex:@" +" to:@""];//去掉字符串中间的空格
+        newValue = Trim(newValue);
+        newValue = [NSString replaceString:newValue byRegex:@" +" to:@""];//NOTE:去掉字符串中间的空格
         [param removeObjectForKey:key];//移除修改前的key
         param[newKey] = newValue;
-        [joinedString appendFormat:@"%@=%@", newKey, Trim(newValue)];
+        [joinedString appendFormat:@"%@%@", newKey, newValue];
     }
     
     //2. 对参数进行md5加密
     NSString *newString = [NSString stringWithFormat:@"%@%@", joinedString, kParamSecretKey];
-    return [[NSString MD5Encrypt:[NSString UTF8Encoded:newString]] lowercaseString];
+    NSString *signature = [[NSString MD5Encrypt:newString] lowercaseString];
+    NSLog(@"signature = %@", signature);
+    return signature;
 }
 
 //将字典对象转换成json字符串
 + (NSString *)encryptHttpHeaderWithParam:(NSDictionary *)param {
+    NSLog(@"aes param = %@", param);
     NSString *jsonString = @"";
     NSError *error;
     NSData *jsonData = [NSJSONSerialization dataWithJSONObject:param
@@ -438,8 +439,8 @@
     if (jsonData) {
         jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
     }
-    NSLog(@"jsonString=%@", jsonString);
-    return [jsonString AESEncryptString];
+    NSLog(@"aes jsonString=%@", jsonString);
+    return [NSString AESEncrypt:jsonString useKey:kParamHttpHeaderSecretKey];
 }
 
 @end

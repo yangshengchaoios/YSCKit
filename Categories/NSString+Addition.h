@@ -136,10 +136,12 @@
 #pragma mark - base64加密解密(标准的)
 + (NSString *)Base64Encrypt:(NSString *)string;
 - (NSString *)Base64EncryptString;
++ (NSString *)EncodeBase64Data:(NSData *)data;
 + (NSString *)Base64Decrypt:(NSString *)string;
 - (NSString *)Base64DecryptString;
++ (NSString *)DecodeBase64Data:(NSData *)data;
 
-#pragma mark - AES加密解密
+#pragma mark - AES加密解密(标准的)
 + (NSString *)AESEncrypt:(NSString *)string;
 - (NSString *)AESEncryptString;
 + (NSString *)AESEncrypt:(NSString *)string useKey:(NSString *)key;
