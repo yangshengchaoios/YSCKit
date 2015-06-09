@@ -47,22 +47,22 @@ enum {
 + (BOOL)isCanMakeCall;
 
 // 相册是否可用
-- (BOOL)isPhotoLibraryAvailable;
++ (BOOL)isPhotoLibraryAvailable;
 // 照片流是否可用
-- (BOOL)isPhotoLiabaryAvailable;
++ (BOOL)isPhotoLiabaryAvailable;
 // 闪光灯是否可用
-- (BOOL)isCameraFlashAvailable;
++ (BOOL)isCameraFlashAvailable;
 // 检测陀螺仪是否可用
-- (BOOL)isGyroscopeAvailable;
++ (BOOL)isGyroscopeAvailable;
 // 检测指南针或磁力计
-- (BOOL)isHandingAvailable;
++ (BOOL)isHandingAvailable;
 // 检查摄像头是否支持录像
-- (BOOL)isCameraSupportShootingVideos;
++ (BOOL)isCameraSupportShootingVideos;
 // 检查摄像头是否支持拍照
-- (BOOL)isCameraSupportTakingPhotos;
++ (BOOL)isCameraSupportTakingPhotos;
 // 是否可以在相册中选择视频
-- (BOOL)isCanUserPickVideosFromPhotoLibrary;
++ (BOOL)isCanUserPickVideosFromPhotoLibrary;
 // 是否可以在相册中选择图片
-- (BOOL)isCanUserPickPhotosFromPhotoLibrary;
++ (BOOL)isCanUserPickPhotosFromPhotoLibrary;
 
 @end

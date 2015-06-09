@@ -580,6 +580,11 @@
     return [[self dateFromTimeStamp:timeStamp] stringWithFormat:format];
 }
 
++ (NSString *)ConvertDateString:(NSString *)dataString fromFormat:(NSString *)fromFormat toFormat:(NSString *)toFormat {
+    NSDate *date = [NSDate dateFromString:dataString withFormat:fromFormat];
+    return [date stringWithFormat:toFormat];
+}
+
 + (NSDateComponents *)ComponentsBetweenStartDate:(NSDate *)startDate withEndDate:(NSDate *)endDate withComponents:(NSCalendarUnit)unitFlags {
     //方法一：使用NSDateComponents
     return [[NSCalendar currentCalendar] components:unitFlags fromDate:startDate toDate:endDate options:0];

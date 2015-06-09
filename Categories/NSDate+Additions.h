@@ -97,6 +97,6 @@
 - (NSString *)chineseMonth; //汉语月份
 - (NSString *)constellation;//星座
 + (NSString *)StringFromTimeStamp:(NSString *)timeStamp withFormat:(NSString *)format;
-
++ (NSString *)ConvertDateString:(NSString *)dataString fromFormat:(NSString *)fromFormat toFormat:(NSString *)toFormat;
 
 @end

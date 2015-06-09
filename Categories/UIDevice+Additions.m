@@ -165,57 +165,57 @@
 }
 
 // 相册是否可用
-- (BOOL)isPhotoLibraryAvailable {
++ (BOOL)isPhotoLibraryAvailable {
     return [UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypePhotoLibrary];
 }
 
 // 照片流是否可用
-- (BOOL)isPhotoLiabaryAvailable {
++ (BOOL)isPhotoLiabaryAvailable {
     return [UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeSavedPhotosAlbum];
 }
 
 // 闪光灯是否可用
-- (BOOL)isCameraFlashAvailable {
++ (BOOL)isCameraFlashAvailable {
     return [UIImagePickerController isFlashAvailableForCameraDevice:UIImagePickerControllerCameraDeviceRear];
 }
 
 // 检测陀螺仪是否可用
-- (BOOL)isGyroscopeAvailable {
++ (BOOL)isGyroscopeAvailable {
     CMMotionManager *motionManager = [[CMMotionManager alloc] init];
     return motionManager.gyroAvailable;
 }
 
 // 检测指南针或磁力计
-- (BOOL)isHandingAvailable {
++ (BOOL)isHandingAvailable {
     return [CLLocationManager headingAvailable];
 }
 
 // 检查摄像头是否支持录像
-- (BOOL)isCameraSupportShootingVideos {
++ (BOOL)isCameraSupportShootingVideos {
     return [self isCameraSupportsMedia:(NSString *)kUTTypeMovie
                             sourceType:UIImagePickerControllerSourceTypeCamera];
 }
 
 // 检查摄像头是否支持拍照
-- (BOOL)isCameraSupportTakingPhotos {
++ (BOOL)isCameraSupportTakingPhotos {
     return [self isCameraSupportsMedia:(NSString *)kUTTypeImage
                             sourceType:UIImagePickerControllerSourceTypeCamera];
 }
 
 // 是否可以在相册中选择视频
-- (BOOL)isCanUserPickVideosFromPhotoLibrary {
++ (BOOL)isCanUserPickVideosFromPhotoLibrary {
     return [self isCameraSupportsMedia:(NSString *)kUTTypeMovie
                             sourceType:UIImagePickerControllerSourceTypePhotoLibrary];
 }
 
 // 是否可以在相册中选择图片
-- (BOOL)isCanUserPickPhotosFromPhotoLibrary {
++ (BOOL)isCanUserPickPhotosFromPhotoLibrary {
     return [self isCameraSupportsMedia:(NSString *)kUTTypeImage
                             sourceType:UIImagePickerControllerSourceTypePhotoLibrary];
 }
 
 // 判断是否支持某种多媒体类型：拍照，视频
-- (BOOL)isCameraSupportsMedia:(NSString *)paramMediaType
++ (BOOL)isCameraSupportsMedia:(NSString *)paramMediaType
                    sourceType:(UIImagePickerControllerSourceType)paramSourceType {
     __block BOOL result = NO;
     if ([paramMediaType length] == 0) {

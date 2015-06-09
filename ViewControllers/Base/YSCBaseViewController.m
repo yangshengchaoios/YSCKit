@@ -322,6 +322,7 @@
 }
 - (UIViewController *)pushViewController:(NSString *)className withParams:(NSDictionary *)paramDict transition:(ADTransition *)transition animated:(BOOL)animated {
     [self hideKeyboard];
+    ReturnNilWhenObjectIsEmpty(className);
     UIViewController *pushedViewController = [UIResponder createBaseViewController:className];
     if ([NSObject isNotEmpty:transition]) {
         pushedViewController.customTransitioningDelegate = [[ADTransitioningDelegate alloc] initWithTransition:transition];
@@ -405,6 +406,7 @@
 	return [self presentViewController:className withParams:nil];
 }
 - (UINavigationController *)presentViewController:(NSString *)className withParams:(NSDictionary *)paramDict {
+    ReturnNilWhenObjectIsEmpty(className);
     UIViewController *viewController = [UIResponder createBaseViewController:className];
     NSMutableDictionary *mutableParamDict = [NSMutableDictionary dictionaryWithDictionary:paramDict];
     if ( ! mutableParamDict[kParamBackType]) {
