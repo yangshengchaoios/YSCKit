@@ -128,7 +128,7 @@ return _sharedObject;
 
 #define USERID                          ([Login sharedInstance].user.userId == nil ? @"" : [Login sharedInstance].user.userId)
 #define TOKEN                           ([Login sharedInstance].token == nil ? @"" : [Login sharedInstance].token)
-#define ISLOGGED                        [[BaseEngine currentBaseEngine] isLoggedIn]
+#define ISLOGGED                        [[Login sharedInstance] isLogged]
 #define USER                            [Login sharedInstance].user
 #define RGB(r, g, b)                    [UIColor colorWithRed:r / 255.0f green:g / 255.0f blue:b / 255.0f alpha:1.0f]
 #define RGBA(r, g, b, a)                [UIColor colorWithRed:r / 255.0f green:g / 255.0f blue:b / 255.0f alpha:a]

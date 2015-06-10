@@ -54,7 +54,7 @@
             else if (1334 == size.height) {
                 return DeviceTypeiPhone750x1334;
             }
-            else if (2208 == size.height) {
+            else if (2208 == size.height || [UIScreen mainScreen].scale == 3.0f) {
                 return DeviceTypeiPhone1242x2208;
             }
             else {
