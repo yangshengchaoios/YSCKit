@@ -415,7 +415,7 @@
         NSString *newKey = Trim(key);
         NSString *newValue = [NSString stringWithFormat:@"%@", [NSString isEmpty:value] ? @"" : value];
         newValue = Trim(newValue);
-        newValue = [NSString replaceString:newValue byRegex:@" +" to:@""];//NOTE:去掉字符串中间的空格
+//        newValue = [NSString replaceString:newValue byRegex:@" +" to:@""];//NOTE:去掉字符串中间的空格
         [param removeObjectForKey:key];//移除修改前的key
         param[newKey] = newValue;
         [joinedString appendFormat:@"%@%@", newKey, newValue];

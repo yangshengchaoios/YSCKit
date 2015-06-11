@@ -56,6 +56,8 @@
 - (UIViewController *)backViewController;
 //返回到根
 - (UIViewController *)popToRootViewController;
+//向后回退的步数
+- (UIViewController *)popToViewControllerWithStep:(NSInteger)step;
 
 
 #pragma mark - present & dismiss viewcontroller [presentingViewController -> self -> presentedViewController]

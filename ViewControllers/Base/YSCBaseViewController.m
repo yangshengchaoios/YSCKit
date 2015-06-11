@@ -369,9 +369,7 @@
 	if (self.navigationController) {            //如果有navigationBar
 		NSInteger index = [self.navigationController.viewControllers indexOfObject:self];
 		if (index > 0) {                        //不是root，就返回上一级
-			UIViewController *previousViewController = [self.navigationController.viewControllers objectAtIndex:MAX(index - 1, 0)];
-			[self.navigationController popViewControllerAnimated:YES];
-			return previousViewController;
+            return [self popToViewControllerWithStep:1];
 		}
 		else {
 			[self dismissOnPresentingViewController];
@@ -396,6 +394,18 @@
         return topViewController;
     }
 	else {
+        return nil;
+    }
+}
+//向后回退的步数
+- (UIViewController *)popToViewControllerWithStep:(NSInteger)step {
+    if (self.navigationController) {
+        NSInteger index = [self.navigationController.viewControllers indexOfObject:self];
+        UIViewController *previousViewController = [self.navigationController.viewControllers objectAtIndex:MAX(index - step, 0)];
+        [self.navigationController popToViewController:previousViewController animated:YES];
+        return previousViewController;
+    }
+    else {
         return nil;
     }
 }
