@@ -75,6 +75,9 @@
 #pragma mark - 字符串简单变换
 + (NSString *)trimString:(NSString *)string;
 - (NSString *)trimString;
+//将json字符串转换成dict
++ (NSDictionary *)dictOfString:(NSString *)string;
+- (NSDictionary *)dictOfString;
 /**
  *  把符合pattern正则表达式的字符串替换成toString (默认是大小写敏感的)
  *

@@ -7,6 +7,8 @@
 //
 
 #import "YSCCommonUtils.h"
+#import <CommonCrypto/CommonCrypto.h>
+#import "NSData+CommonCrypto.h"
 
 @implementation YSCCommonUtils
 
@@ -466,6 +468,40 @@
         scaleAnimation.toValue = [NSValue valueWithCGSize:CGSizeMake(1.f, 1.f)];
         [button.layer pop_addAnimation:scaleAnimation forKey:@"layerScaleDefaultAnimation"];
     } forControlEvents:UIControlEventTouchDragExit];
+}
+
+#pragma mark - 加密解密
+
++ (NSString *)AESEncryptString:(NSString *)string byKey:(NSString *)key {
+    CCCryptorStatus status = kCCSuccess;
+    NSData* result = [[string dataUsingEncoding:NSUTF8StringEncoding]
+                      dataEncryptedUsingAlgorithm:kCCAlgorithmAES128
+                      key:key
+                      initializationVector:nil   // ECB加密不会用到iv
+                      options:(kCCOptionPKCS7Padding|kCCOptionECBMode)
+                      error:&status];
+    if (status != kCCSuccess) {
+        NSLog(@"加密失败:%d", status);
+        return nil;
+    }
+    return [NSString EncodeBase64Data:result];
+}
+
++ (NSString *)AESDecryptString:(NSString *)string byKey:(NSString *)key {
+    CCCryptorStatus status = kCCSuccess;
+    NSData *decryptData = [[NSData alloc] initWithBase64EncodedData:[string dataUsingEncoding:NSUTF8StringEncoding]
+                                                            options:NSDataBase64DecodingIgnoreUnknownCharacters];
+    NSData* result = [decryptData
+                      decryptedDataUsingAlgorithm:kCCAlgorithmAES128
+                      key:key
+                      initializationVector:nil   // ECB解密不会用到iv
+                      options:(kCCOptionPKCS7Padding|kCCOptionECBMode)
+                      error:&status];
+    if (status != kCCSuccess) {
+        NSLog(@"解密失败:%d", status);
+        return nil;
+    }
+    return [[NSString alloc] initWithData:result encoding:NSUTF8StringEncoding];
 }
 
 @end

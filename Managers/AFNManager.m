@@ -275,7 +275,7 @@
                                                                    kParamVersion : ProductVersion,
                                                                    kParamUdid : [AppConfigManager sharedInstance].udid,
                                                                    kParamFrom : kParamFromValue,
-                                                                   kParamLongitude : @"翼畅行",
+                                                                   kParamLongitude : @"104.2341090",
                                                                    kParamLatitude : @"30.6287345",
                                                                    kParamToken : TOKEN,
                                                                    kParamChannel : kAppChannel

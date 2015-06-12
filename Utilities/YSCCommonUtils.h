@@ -80,4 +80,9 @@
 
 + (void)addPopAnimationToButton:(UIButton *)button;
 
+#pragma mark - 加密解密
+
++ (NSString *)AESEncryptString:(NSString *)string byKey:(NSString *)key;
++ (NSString *)AESDecryptString:(NSString *)string byKey:(NSString *)key;
+
 @end

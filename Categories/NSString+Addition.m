@@ -168,6 +168,21 @@
 - (NSString *)trimString {
 	return [self stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
 }
+//将json字符串转换成dict
++ (NSDictionary *)dictOfString:(NSString *)string {
+    ReturnNilWhenObjectIsEmpty(string);
+    return [string dictOfString];
+}
+- (NSDictionary *)dictOfString {
+    NSData *data = [self dataUsingEncoding:NSUTF8StringEncoding];
+    NSDictionary *json = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
+    if ([json isKindOfClass:[NSDictionary class]]) {
+        return json;
+    }
+    else {
+        return nil;
+    }
+}
 
 + (NSString *)replaceString:(NSString *)string byRegex:(NSString *)pattern to:(NSString *)toString {
     ReturnEmptyWhenObjectIsEmpty(string)
