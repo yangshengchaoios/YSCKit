@@ -85,4 +85,7 @@
 + (NSString *)AESEncryptString:(NSString *)string byKey:(NSString *)key;
 + (NSString *)AESDecryptString:(NSString *)string byKey:(NSString *)key;
 
+#pragma mark - 获取wifi的mac地址
++ (id)FetchSSIDInfo;
++ (NSString *)CurrentWifiBSSID;
 @end

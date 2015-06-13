@@ -406,7 +406,7 @@
     
     //4. 设置底部间隔线
     self.segmentedBottomLineView = [[UIView alloc] initWithFrame:CGRectZero];
-    self.segmentedBottomLineView.backgroundColor = RGB(170, 170, 170);
+    self.segmentedBottomLineView.backgroundColor = kDefaultBorderColor;
     [self addSubview:self.segmentedBottomLineView];
     [self bringSubviewToFront:self.segmentedControl];
     [self.segmentedBottomLineView autoPinEdgeToSuperviewEdge:ALEdgeLeading];

@@ -275,8 +275,9 @@
                                                                    kParamVersion : ProductVersion,
                                                                    kParamUdid : [AppConfigManager sharedInstance].udid,
                                                                    kParamFrom : kParamFromValue,
-                                                                   kParamLongitude : @"104.2341090",
-                                                                   kParamLatitude : @"30.6287345",
+                                                                   kParamBSSID : Trim(APPCONFIG.wifiBSSID),
+                                                                   kParamLongitude : Trim(APPCONFIG.currentLongitude),
+                                                                   kParamLatitude : Trim(APPCONFIG.currentLatitude),
                                                                    kParamToken : TOKEN,
                                                                    kParamChannel : kAppChannel
                                                                    }];

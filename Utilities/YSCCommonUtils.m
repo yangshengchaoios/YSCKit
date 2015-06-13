@@ -9,6 +9,7 @@
 #import "YSCCommonUtils.h"
 #import <CommonCrypto/CommonCrypto.h>
 #import "NSData+CommonCrypto.h"
+#import <SystemConfiguration/CaptiveNetwork.h>
 
 @implementation YSCCommonUtils
 
@@ -470,7 +471,7 @@
     } forControlEvents:UIControlEventTouchDragExit];
 }
 
-#pragma mark - 加密解密
+#pragma mark - AES加密解密(与java调通)
 
 + (NSString *)AESEncryptString:(NSString *)string byKey:(NSString *)key {
     CCCryptorStatus status = kCCSuccess;
@@ -503,5 +504,49 @@
     }
     return [[NSString alloc] initWithData:result encoding:NSUTF8StringEncoding];
 }
+
+//-----------------------------------
+//
+// 获取当前wifi的网关mac地址
+//
+//-----------------------------------
+//1。全部获取
++ (id)FetchSSIDInfo {
+    NSArray *ifs = (__bridge_transfer id)CNCopySupportedInterfaces();
+    NSLog(@"Supported interfaces: %@", ifs);
+    id info = nil;
+    for (NSString *ifnam in ifs) {
+        info = (__bridge_transfer id)CNCopyCurrentNetworkInfo((__bridge CFStringRef)ifnam);
+        NSLog(@"%@ => %@", ifnam, info);
+        if (info && [info count]) { break; }
+    }
+    return info;
+}
+//打印出的信息为：
+//{
+//    BSSID = "c8:3a:35:57:30:a0";
+//    SSID = ZLDNRJB;
+//    SSIDDATA = ;
+//}
+
+//2。按需求获取
++ (NSString *)CurrentWifiBSSID {
+    //NOTE: Does not work on the simulator.
+    NSString *bssid = nil;
+    NSArray *ifs = (__bridge id)CNCopySupportedInterfaces();
+    NSLog(@"ifs:%@",ifs);
+    for (NSString *ifnam in ifs) {
+        NSDictionary *info = (__bridge id)CNCopyCurrentNetworkInfo((__bridge CFStringRef)ifnam);
+        NSLog(@"dici：%@",[info allKeys]);
+        if (info[@"BSSID"]) {
+            bssid = info[@"BSSID"];
+        }
+    }
+    return bssid;
+}
+//打印出的信息为：（路由器／ 也就是wifi的mac 地址 ）
+//{
+//c8:3a:35:57:30:a0
+//}
 
 @end
