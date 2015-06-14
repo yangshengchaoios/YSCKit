@@ -93,6 +93,7 @@
 + (NSDateComponents *)ComponentsRemainInterval:(NSTimeInterval)remainInterval withComponents:(NSCalendarUnit)unitFlags;
 
 // format the date to string
+- (NSString *)chineseWeekDay;
 - (NSString *)timeStamp;
 - (NSString *)stringWithFormat:(NSString *)format;
 - (NSString *)chineseMonth; //汉语月份

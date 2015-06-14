@@ -361,6 +361,32 @@
 
 
 #pragma mark - format the date to string
+- (NSString *)chineseWeekDay {
+    NSString *weekDay = @"星期一";
+    NSInteger day = self.weekday;
+    if (1 == day) {
+        weekDay = @"星期日";
+    }
+    else if (2 == day) {
+        weekDay = @"星期一";
+    }
+    else if (3 == day) {
+        weekDay = @"星期二";
+    }
+    else if (4 == day) {
+        weekDay = @"星期三";
+    }
+    else if (5 == day) {
+        weekDay = @"星期四";
+    }
+    else if (6 == day) {
+        weekDay = @"星期五";
+    }
+    else {
+        weekDay = @"星期六";
+    }
+    return weekDay;
+}
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 - (NSString *)timeStamp {
     return [NSString stringWithFormat:@"%.0f", [self timeIntervalSince1970]];
