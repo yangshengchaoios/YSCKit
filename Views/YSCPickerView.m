@@ -17,6 +17,7 @@
 @property (nonatomic, weak) ProvinceModel *currentPovinceModel;
 @property (nonatomic, weak) CityModel *currentCityModel;
 @property (nonatomic, weak) SectionModel *currentSectionModel;
+@property (nonatomic, strong) NSMutableArray *selectedIndexArray;
 
 @end
 
@@ -27,6 +28,7 @@
     WeakSelfType blockSelf = self;
     [self resetFontSizeOfView];
     [self resetConstraintOfView];
+    self.selectedIndexArray = [NSMutableArray array];
     
     //初始化
     self.containerBottom.constant = -AUTOLAYOUT_LENGTH(HeightOfContainerView);
@@ -162,15 +164,21 @@
             }
             [self.datePicker setDate:initDate animated:YES];
         }
-        else if (YSCPickerTypeCustom == self.pickerType) {
-            [self.pickerView reloadAllComponents];
-            NSInteger initIndex = [initObject integerValue];
-            if (initIndex >= 0 && initIndex < [self.customDataArray count]) {
-                [self.pickerView selectRow:initIndex inComponent:0 animated:YES];
-            }
-        }
         else {
-            //NOTE:other picker type
+            [self.pickerView reloadAllComponents];
+            [self.selectedIndexArray removeAllObjects];
+            for (int i = 0; i < self.pickerView.numberOfComponents; i++) {
+                [self.selectedIndexArray addObject:@(0)];
+            }
+            
+            NSArray *indexArray = initObject;
+            if ([indexArray isKindOfClass:[NSArray class]]) {
+                for (int i = 0; i < MIN(self.pickerView.numberOfComponents, [indexArray count]); i++) {
+                    NSInteger tempRow = MIN([self.customDataArray[i] count], [indexArray[i] integerValue]);
+                    [self.pickerView selectRow:tempRow inComponent:i animated:YES];
+                    self.selectedIndexArray[i] = @(tempRow);
+                }
+            }
         }
     }];
 }
@@ -192,7 +200,7 @@
         return 3;
     }
     else if (YSCPickerTypeCustom == self.pickerType) {
-        return 1;
+        return [self.customDataArray count];
     }
     return 0;
 }
@@ -209,7 +217,7 @@
         }
     }
     else if (YSCPickerTypeCustom == self.pickerType) {
-        return [self.customDataArray count];
+        return [self.customDataArray[component] count];
     }
     return 0;
 }
@@ -231,7 +239,7 @@
         }
     }
     else if (YSCPickerTypeCustom == self.pickerType) {
-        NSString *title = [NSString stringWithFormat:@"%@", self.customDataArray[row]];
+        NSString *title = [NSString stringWithFormat:@"%@", self.customDataArray[component][row]];
         return title;
     }
     return nil;
@@ -288,8 +296,9 @@
         }
     }
     else if (YSCPickerTypeCustom == self.pickerType) {
+        self.selectedIndexArray[component] = @(row);
         if (self.selectingBlock) {
-            self.selectingBlock(@(row));
+            self.selectingBlock(self.selectedIndexArray);
         }
     }
 }
@@ -317,7 +326,7 @@
         titleLabel.text = titleString;
     }
     else if (YSCPickerTypeCustom == self.pickerType) {
-        NSString *title = [NSString stringWithFormat:@"%@", self.customDataArray[row]];
+        NSString *title = [NSString stringWithFormat:@"%@", self.customDataArray[component][row]];
         titleLabel.text = title;
     }
     
