@@ -275,7 +275,7 @@
                                                                    kParamVersion : ProductVersion,
                                                                    kParamUdid : [AppConfigManager sharedInstance].udid,
                                                                    kParamFrom : kParamFromValue,
-                                                                   kParamBSSID : Trim(APPCONFIG.wifiBSSID),
+                                                                   kParamBSSID : Trim(APPCONFIG.currentBSSID),
                                                                    kParamLongitude : Trim(APPCONFIG.currentLongitude),
                                                                    kParamLatitude : Trim(APPCONFIG.currentLatitude),
                                                                    kParamToken : TOKEN,
