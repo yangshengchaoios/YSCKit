@@ -17,6 +17,7 @@
 #define RegexIdentityCard   @"^(\\d{14}|\\d{17})(\\d|[xX])$"
 #define RegexAllNumbers     @"^[0-9]\\d*$"
 #define RegexUrl            @"((http|ftp|https)://)(([a-zA-Z0-9\\._-]+\\.[a-zA-Z]{2,6})|([0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}))(:[0-9]{1,4})*(/[a-zA-Z0-9\\&%_\\./-~-]*)?"
+#define RegexSimpleChinese  @"^[\u4E00-\u9FA5]+$"
 
 
 /*

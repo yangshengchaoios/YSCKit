@@ -17,6 +17,7 @@
 - (void)awakeFromNib {
     [super awakeFromNib];
     self.backgroundColor = [UIColor clearColor];
+    self.actionButton.backgroundColor = DefaultNaviBarBackColor;
     [self resetConstraintOfView];
     [self resetFontSizeOfView];
     

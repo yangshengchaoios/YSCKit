@@ -104,6 +104,7 @@
     if (nil == self.superview) {
         [KeyWindow addSubview:self];
     }
+    [KeyWindow bringSubviewToFront:self];
     self.hidden = NO;
     [UIView animateWithDuration:DurationOfAnimation animations:^{
         self.containerBottom.constant = AUTOLAYOUT_LENGTH(0);
@@ -174,7 +175,7 @@
             NSArray *indexArray = initObject;
             if ([indexArray isKindOfClass:[NSArray class]]) {
                 for (int i = 0; i < MIN(self.pickerView.numberOfComponents, [indexArray count]); i++) {
-                    NSInteger tempRow = MIN([self.customDataArray[i] count], [indexArray[i] integerValue]);
+                    NSInteger tempRow = MIN([self.customDataArray[i] count] - 1, [indexArray[i] integerValue]);
                     [self.pickerView selectRow:tempRow inComponent:i animated:YES];
                     self.selectedIndexArray[i] = @(tempRow);
                 }

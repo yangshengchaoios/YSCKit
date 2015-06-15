@@ -84,7 +84,6 @@
     if ([NSString isNotEmpty:self.reachabilityManagerIdentifier]) {
         [[ReachabilityManager sharedInstance] bk_removeObserversWithIdentifier:self.reachabilityManagerIdentifier];
     }
-//	[[Login sharedInstance] unregisterLoginObserver:self];
 	[[NSNotificationCenter defaultCenter] removeObserver:self]; //等同于宏定义  removeAllObservers(self);
 }
 - (void)updateViewConstraints {
