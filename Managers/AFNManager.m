@@ -266,13 +266,12 @@
     //解决返回的Content-Type始终是application/xml问题！
     [manager.requestSerializer setValue:@"application/xml" forHTTPHeaderField:@"Accept"];
 //    [manager.requestSerializer setValue:@"gzip" forHTTPHeaderField:@"Accept-Encoding"];
-    [manager.requestSerializer setValue:ProductVersion forHTTPHeaderField:kParamVersion];
-    [manager.requestSerializer setValue:[AppConfigManager sharedInstance].udid forHTTPHeaderField:kParamUdid];
+    [manager.requestSerializer setValue:AppVersion forHTTPHeaderField:kParamVersion];
     [manager.requestSerializer setValue:kParamFromValue forHTTPHeaderField:kParamFrom];
     [manager.requestSerializer setValue:signature forHTTPHeaderField:kParamSignature];
 #if IsNeedEncryptHTTPHeader
     NSString *httpHeaderToken = [self encryptHttpHeaderWithParam:@{kParamAppId : kAppId,
-                                                                   kParamVersion : ProductVersion,
+                                                                   kParamVersion : AppVersion,
                                                                    kParamUdid : [AppConfigManager sharedInstance].udid,
                                                                    kParamFrom : kParamFromValue,
                                                                    kParamBSSID : Trim(APPCONFIG.currentBSSID),

@@ -56,7 +56,7 @@
     if ([versionModel isKindOfClass:[NewVersionModel class]]) {
         BOOL isSkipTheVersion = [[NSUserDefaults standardUserDefaults] boolForKey:SkipVersion];
         if ( ! isSkipTheVersion) {
-            if (VersionCompareResultAscending == [ProductVersion compareWithVersion:versionModel.versionCode]) {
+            if (VersionCompareResultAscending == [AppVersion compareWithVersion:versionModel.versionCode]) {
                 [UIView hideHUDLoadingOnWindow];
                 if ([NSString isNotEmpty:versionModel.appUrl]) {//TODO:这里可以进一步判断是否是标准的ios更新地址
                     NSString *title = [NSString stringWithFormat:@"发现新版本 %@", versionModel.versionCode];
@@ -124,7 +124,7 @@
  */
 + (void)configUmeng {
 #pragma mark - 设置UMeng应用的key
-    [MobClick setAppVersion:ProductVersion];
+    [MobClick setAppVersion:AppVersion];
     [UMSocialData openLog:NO];//是否打开调试日志输出
     [UMFeedback setLogEnabled:NO];
     [MobClick startWithAppkey:kUMAppKey reportPolicy:REALTIME channelId:kAppChannel];//配置统计

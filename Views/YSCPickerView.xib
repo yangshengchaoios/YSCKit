@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="6254" systemVersion="14A389" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="7706" systemVersion="14D136" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6247"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="7703"/>
     </dependencies>
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
@@ -37,11 +37,11 @@
                             </connections>
                         </pickerView>
                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="1LA-tg-kRc">
-                            <rect key="frame" x="527" y="10" width="93" height="44"/>
+                            <rect key="frame" x="527" y="5" width="93" height="55"/>
                             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                             <constraints>
                                 <constraint firstAttribute="width" constant="93" id="5G8-MG-ZfT"/>
-                                <constraint firstAttribute="height" constant="44" id="aIL-Ty-cGA"/>
+                                <constraint firstAttribute="height" constant="55" id="aIL-Ty-cGA"/>
                             </constraints>
                             <fontDescription key="fontDescription" type="system" pointSize="28"/>
                             <state key="normal" title="完成">
@@ -60,7 +60,7 @@
                         <constraint firstAttribute="height" constant="360" id="crm-b8-VrU"/>
                         <constraint firstAttribute="trailing" secondItem="jLI-9I-MBT" secondAttribute="trailing" id="e2W-Wo-z0A"/>
                         <constraint firstItem="wam-fw-Hbg" firstAttribute="leading" secondItem="h0k-gW-f14" secondAttribute="leading" id="iGu-6s-bbT"/>
-                        <constraint firstItem="1LA-tg-kRc" firstAttribute="top" secondItem="h0k-gW-f14" secondAttribute="top" constant="10" id="tYu-XI-dll"/>
+                        <constraint firstItem="1LA-tg-kRc" firstAttribute="top" secondItem="h0k-gW-f14" secondAttribute="top" constant="5" id="tYu-XI-dll"/>
                     </constraints>
                 </view>
             </subviews>

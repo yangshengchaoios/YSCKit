@@ -118,15 +118,22 @@
         tempOnlineValue = UMengParamValue(name, self.udid, @"");//s_udid_param
     }
     
+    NSArray *versionArray = [NSString splitString:AppVersion byRegex:@"."];
+    if ([versionArray count] < 2) {
+        return @"";
+    }
+    NSString *midVersion = [NSString stringWithFormat:@"%@.%@", versionArray[0], versionArray[1]];
+    NSString *mainVersion = [NSString stringWithFormat:@"%@", versionArray[0]];
+    
     //2. 检测带渠道名称的参数
     if ([NSString isEmpty:tempOnlineValue]) {
-        tempOnlineValue = UMengParamValue(name, kAppChannel, ProductVersion);//s_AppStore_1_0_0_param
+        tempOnlineValue = UMengParamValue(name, kAppChannel, AppVersion);//s_AppStore_1_0_0_param
     }
     if ([NSString isEmpty:tempOnlineValue]) {
-        tempOnlineValue = UMengParamValue(name, kAppChannel, AppVersion);//s_AppStore_1_0_param
+        tempOnlineValue = UMengParamValue(name, kAppChannel, midVersion);//s_AppStore_1_0_param
     }
     if ([NSString isEmpty:tempOnlineValue]) {
-        tempOnlineValue = UMengParamValue(name, kAppChannel, MainVersion);//s_AppStore_1_param
+        tempOnlineValue = UMengParamValue(name, kAppChannel, mainVersion);//s_AppStore_1_param
     }
     if ([NSString isEmpty:tempOnlineValue]) {
         tempOnlineValue = UMengParamValue(name, kAppChannel, @"");//s_AppStore_param
@@ -134,13 +141,13 @@
     
     //3. 检测不带渠道名称的参数
     if ([NSString isEmpty:tempOnlineValue]) {
-        tempOnlineValue = UMengParamValue(name, @"", ProductVersion);//s_1_0_0_param
+        tempOnlineValue = UMengParamValue(name, @"", AppVersion);//s_1_0_0_param
     }
     if ([NSString isEmpty:tempOnlineValue]) {
-        tempOnlineValue = UMengParamValue(name, @"", AppVersion);//s_1_0_param
+        tempOnlineValue = UMengParamValue(name, @"", midVersion);//s_1_0_param
     }
     if ([NSString isEmpty:tempOnlineValue]) {
-        tempOnlineValue = UMengParamValue(name, @"", MainVersion);//s_1_param
+        tempOnlineValue = UMengParamValue(name, @"", mainVersion);//s_1_param
     }
     if ([NSString isEmpty:tempOnlineValue]) {
         tempOnlineValue = UMengParamValue(name, @"", @"");//s_param
