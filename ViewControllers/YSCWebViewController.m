@@ -40,6 +40,7 @@
             return;
         }
         self.htmlString = [self cachedObjectForKey:KeyOfCachedHtmlString(self.type)];
+        [self layoutHtmlString];
         [self laodHtmlWithMethod:method andParams:params];
     }
 }
@@ -51,7 +52,9 @@
 
 #pragma mark - 网络访问
 - (void)laodHtmlWithMethod:(NSString *)method andParams:(NSDictionary *)params {
-    [self showHUDLoading:@"正在更新..."];
+    if ([NSString isEmpty:self.htmlString]) {
+        [self showHUDLoading:@"正在更新..."];
+    }
     WeakSelfType blockSelf = self;
     [AFNManager getDataWithAPI:method
                   andDictParam:params
@@ -62,10 +65,12 @@
                   [blockSelf saveObject:responseObject forKey:KeyOfCachedHtmlString(blockSelf.type)];
                   [blockSelf layoutHtmlString];
               } requestFailure:^(NSInteger errorCode, NSString *errorMessage) {
-                  [blockSelf showResultThenHide:errorMessage];
-                  [blockSelf bk_performBlock:^(id obj) {
-                      [blockSelf backViewController];
-                  } afterDelay:1];
+                  if ([NSString isEmpty:blockSelf.htmlString]) {
+                      [blockSelf showResultThenHide:errorMessage];
+                      [blockSelf bk_performBlock:^(id obj) {
+                          [blockSelf backViewController];
+                      } afterDelay:1];
+                  }
               }];
 }
 

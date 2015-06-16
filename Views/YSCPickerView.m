@@ -59,6 +59,9 @@
     //点击完成按钮关闭选择器
     [self.doneButton bk_addEventHandler:^(id sender) {
         [blockSelf hidePickerView];
+        if (blockSelf.selectingBlock) {
+            blockSelf.selectingBlock(blockSelf.selectedIndexArray);
+        }
     } forControlEvents:UIControlEventTouchUpInside];
 }
 - (void)setPickerType:(YSCPickerType)pickerType {
