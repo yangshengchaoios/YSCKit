@@ -57,7 +57,7 @@
 		return [NSString isMatchRegex:RegexEmail withString:self];
 	}
 	else if (regexType == RegexTypeIdentityCard) {
-		return [NSString isMatchRegex:RegexIdentityCard withString:self];
+		return [NSString isMatchRegex:RegexSimpleIdentityCard withString:self];
 	}
 	else if (regexType == RegexTypeMobilePhone) {
 		return [NSString isMatchRegex:RegexMobilePhone withString:self];

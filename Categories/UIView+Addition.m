@@ -443,9 +443,11 @@
 + (UIViewController *)getVisibleViewControllerFrom:(UIViewController *)viewController {
     if ([viewController isKindOfClass:[UINavigationController class]]) {
         return [UIView getVisibleViewControllerFrom:[((UINavigationController *) viewController) visibleViewController]];
-    } else if ([viewController isKindOfClass:[UITabBarController class]]) {
+    }
+    else if ([viewController isKindOfClass:[UITabBarController class]]) {
         return [UIView getVisibleViewControllerFrom:[((UITabBarController *) viewController) selectedViewController]];
-    } else {
+    }
+    else {
         if (viewController.presentedViewController) {
             return [UIView getVisibleViewControllerFrom:viewController.presentedViewController];
         } else {

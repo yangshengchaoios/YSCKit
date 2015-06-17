@@ -57,6 +57,7 @@
          }*/
     }
     self.isAppeared = YES;
+    [AppConfigManager sharedInstance].currentViewController = self;
 }
 - (void)viewDidAppear:(BOOL)animated {
 	[super viewDidAppear:animated];
