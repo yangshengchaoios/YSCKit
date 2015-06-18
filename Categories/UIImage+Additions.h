@@ -24,3 +24,9 @@
 //拉伸图片(被ImageUtils中的stretch代替了)
 + (UIImage *)stretchImage:(UIImage *)image withEdgeInset:(UIEdgeInsets)edgeInset;
 @end
+
+@interface UIImage (Rotate)
+
+- (UIImage*)imageRotatedByDegrees:(CGFloat)degrees;
+
+@end
