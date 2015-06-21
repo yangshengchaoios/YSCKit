@@ -508,7 +508,7 @@ static NSLock *crayolaNameCacheLock;
 	NSScanner *scanner = [NSScanner scannerWithString:stringToConvert];
 	if (![scanner scanString:@"{" intoString:NULL]) return nil;
 	const NSUInteger kMaxComponents = 4;
-	CGFloat c[kMaxComponents];
+	float c[kMaxComponents];
 	NSUInteger i = 0;
 	if (![scanner scanFloat:&c[i++]]) return nil;
 	while (1) {
@@ -543,7 +543,7 @@ static NSLock *crayolaNameCacheLock;
     NSScanner *scanner = [NSScanner scannerWithString:stringToConvert];
 	if (![scanner scanString:@"{" intoString:NULL]) return nil;
 	const NSUInteger kMaxComponents = 4;
-	CGFloat c[kMaxComponents];
+    float c[kMaxComponents];
 	NSUInteger i = 0;
 	if (![scanner scanFloat:&c[i++]]) return nil;
 	while (1) {

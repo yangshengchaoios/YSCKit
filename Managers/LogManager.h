@@ -12,5 +12,8 @@
 @interface LogManager : NSObject
 
 + (void)saveLog:(NSString *)logString;
++ (void)saveTempLog:(NSString *)logString;
++ (void)saveLog:(NSString *)logString intoFileName:(NSString *)fileName;
++ (void)saveLog:(NSString *)logString intoFilePath:(NSString *)logFilePath overWrite:(BOOL)overwrite;
 
 @end
