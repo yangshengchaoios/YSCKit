@@ -105,6 +105,7 @@
     if ([NSString isNotUrl:newUrlString]) {
         return;
     }
+    newUrlString = newUrlString.URLEncodeString;
 
     //采用SDWebImage的缓存方案
     if ([[ReachabilityManager sharedInstance].reachability isReachableViaWiFi] ||
