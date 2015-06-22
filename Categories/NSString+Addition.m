@@ -162,19 +162,14 @@
 	return [self stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
 }
 //将json字符串转换成dict
-+ (NSDictionary *)dictOfString:(NSString *)string {
++ (NSObject *)jsonObjectOfString:(NSString *)string {
     ReturnNilWhenObjectIsEmpty(string);
-    return [string dictOfString];
+    return [string jsonObjectOfString];
 }
-- (NSDictionary *)dictOfString {
+- (NSObject *)jsonObjectOfString {
     NSData *data = [self dataUsingEncoding:NSUTF8StringEncoding];
-    NSDictionary *json = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
-    if ([json isKindOfClass:[NSDictionary class]]) {
-        return json;
-    }
-    else {
-        return nil;
-    }
+    NSObject *json = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
+    return json;
 }
 
 + (NSString *)replaceString:(NSString *)string byRegex:(NSString *)pattern to:(NSString *)toString {
