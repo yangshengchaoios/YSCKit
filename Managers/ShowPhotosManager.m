@@ -61,7 +61,8 @@
     [showPhotosManager.browser.view bk_whenTapped:^{
         [showPhotosManager.browser dismissViewControllerAnimated:NO completion:nil];
     }];
-    [[UIView currentViewController] presentViewController:showPhotosManager.browser animated:NO completion:nil];
+    
+    [[AppConfigManager sharedInstance].currentViewController presentViewController:showPhotosManager.browser animated:NO completion:nil];
     return showPhotosManager.browser;
 }
 
