@@ -16,6 +16,7 @@
 #define DateFormat3 @"yyyy-MM-dd"
 #define DateFormat4 @"yyyy.MM.dd"
 #define DateFormat5 @"yyyy年MM月dd日"
+#define DateFormat6 @"yyyy-MM-dd HH:mm"
 
 #define D_MINUTE    60
 #define D_HOUR      3600
