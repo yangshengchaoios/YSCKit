@@ -401,7 +401,7 @@
 - (UIViewController *)popToViewControllerWithStep:(NSInteger)step {
     if (self.navigationController) {
         NSInteger index = [self.navigationController.viewControllers indexOfObject:self];
-        UIViewController *previousViewController = [self.navigationController.viewControllers objectAtIndex:MAX(index - step, 0)];
+        UIViewController *previousViewController = [self.navigationController.viewControllers objectAtIndex:MIN([self.navigationController.viewControllers count] - 1, MAX(index - step, 0))];
         [self.navigationController popToViewController:previousViewController animated:YES];
         return previousViewController;
     }
