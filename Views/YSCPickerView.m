@@ -33,8 +33,6 @@
     //初始化
     self.containerBottom.constant = -AUTOLAYOUT_LENGTH(HeightOfContainerView);
     self.hidden = YES;
-    [UIView makeRoundForView:self.doneButton withRadius:5];
-    [UIView makeBorderForView:self.doneButton withColor:[UIColor blackColor] borderWidth:1];
     [self.datePicker bk_addEventHandler:^(id sender) {
         if (blockSelf.pickerType < YSCPickerTypeAddress) {
             if (blockSelf.selectingBlock) {
@@ -56,10 +54,19 @@
     }];
     [self addGestureRecognizer:tapGesture];
     
+    //点击取消按钮关闭选择器
+    [UIView makeRoundForView:self.cancelButton withRadius:5];
+    [UIView makeBorderForView:self.cancelButton withColor:[UIColor blackColor] borderWidth:1];
+    [self.cancelButton bk_addEventHandler:^(id sender) {
+        [blockSelf hidePickerView];
+    } forControlEvents:UIControlEventTouchUpInside];
+    
     //点击完成按钮关闭选择器
+    [UIView makeRoundForView:self.doneButton withRadius:5];
+    [UIView makeBorderForView:self.doneButton withColor:[UIColor blackColor] borderWidth:1];
     [self.doneButton bk_addEventHandler:^(id sender) {
         [blockSelf hidePickerView];
-        if (blockSelf.selectingBlock) {
+        if (YSCPickerTypeCustom == self.pickerType && blockSelf.selectingBlock) {
             blockSelf.selectingBlock(blockSelf.selectedIndexArray);
         }
     } forControlEvents:UIControlEventTouchUpInside];

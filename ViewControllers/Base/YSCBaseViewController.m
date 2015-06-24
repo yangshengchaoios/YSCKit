@@ -747,6 +747,9 @@
 	return YES;
 }
 - (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string {
+    if ([NSString isEmptyConsiderWhitespace:string]) {//永远放开删除功能
+        return YES;
+    }
 	if (textField.maxLength > 0) {
 		NSMutableString *newText = [textField.text mutableCopy];
 		[newText replaceCharactersInRange:range withString:string]; //兼容从中间插入内容的情况！

@@ -134,16 +134,16 @@
 #pragma mark - 分享相关设置
     
     //设置支持没有客户端情况下是否支持单独授权
-    [UMSocialQQHandler setSupportWebView:YES];
+//    [UMSocialQQHandler setSupportWebView:YES];
     
     //设置微信AppId，设置分享url，默认使用友盟的网址
     [UMSocialWechatHandler setWXAppId:AppKeyWeiXin appSecret:AppSecretWeiXin url:AppRedirectUrlOfWeibo];
     
     //打开新浪微博的SSO开关
-    [UMSocialSinaHandler openSSOWithRedirectURL:AppRedirectUrlOfWeibo];
+//    [UMSocialSinaHandler openSSOWithRedirectURL:AppRedirectUrlOfWeibo];
     
     //设置分享到QQ/Qzone的应用Id，和分享url 链接
-    [UMSocialQQHandler setQQWithAppId:AppKeyQQ appKey:AppSecretQQ url:AppRedirectUrlOfWeibo];
+//    [UMSocialQQHandler setQQWithAppId:AppKeyQQ appKey:AppSecretQQ url:AppRedirectUrlOfWeibo];
     
     //NOTE:打开腾讯微博SSO开关，设置回调地址 只支持32位
 //    [UMSocialTencentWeiboHandler openSSOWithRedirectUrl:AppRedirectUrlOfWeibo];

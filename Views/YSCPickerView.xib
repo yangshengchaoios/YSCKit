@@ -49,6 +49,19 @@
                                 <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                             </state>
                         </button>
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="uAa-9j-6BJ">
+                            <rect key="frame" x="20" y="5" width="93" height="55"/>
+                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                            <constraints>
+                                <constraint firstAttribute="width" constant="93" id="Fm1-mH-09j"/>
+                                <constraint firstAttribute="height" constant="55" id="qXv-T1-5tk"/>
+                            </constraints>
+                            <fontDescription key="fontDescription" type="system" pointSize="28"/>
+                            <state key="normal" title="取消">
+                                <color key="titleColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
+                                <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                            </state>
+                        </button>
                     </subviews>
                     <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                     <constraints>
@@ -56,6 +69,8 @@
                         <constraint firstItem="jLI-9I-MBT" firstAttribute="leading" secondItem="h0k-gW-f14" secondAttribute="leading" id="C1l-UQ-Z9n"/>
                         <constraint firstAttribute="trailing" secondItem="wam-fw-Hbg" secondAttribute="trailing" id="IOW-xl-nX2"/>
                         <constraint firstAttribute="bottom" secondItem="jLI-9I-MBT" secondAttribute="bottom" id="NUY-Hv-Hom"/>
+                        <constraint firstItem="uAa-9j-6BJ" firstAttribute="leading" secondItem="h0k-gW-f14" secondAttribute="leading" constant="20" id="Oe0-FO-az7"/>
+                        <constraint firstItem="uAa-9j-6BJ" firstAttribute="top" secondItem="h0k-gW-f14" secondAttribute="top" constant="5" id="RAW-UP-2Rp"/>
                         <constraint firstAttribute="trailing" secondItem="1LA-tg-kRc" secondAttribute="trailing" constant="20" id="YJh-0O-odv"/>
                         <constraint firstAttribute="height" constant="360" id="crm-b8-VrU"/>
                         <constraint firstAttribute="trailing" secondItem="jLI-9I-MBT" secondAttribute="trailing" id="e2W-Wo-z0A"/>
@@ -73,6 +88,7 @@
             <nil key="simulatedStatusBarMetrics"/>
             <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
             <connections>
+                <outlet property="cancelButton" destination="uAa-9j-6BJ" id="hl1-fj-bEn"/>
                 <outlet property="containerBottom" destination="487-zC-frb" id="XHD-wS-JYh"/>
                 <outlet property="containerView" destination="h0k-gW-f14" id="jdQ-yU-V9W"/>
                 <outlet property="datePicker" destination="jLI-9I-MBT" id="1Qi-7A-HSj"/>
