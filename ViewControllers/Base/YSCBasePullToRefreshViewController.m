@@ -219,7 +219,7 @@
 - (void)loadMoreWithSuccessed:(PullToRefreshSuccessed)successed failed:(PullToRefreshFailed)failed withRequestType:(RequestType)requestType{
     WeakSelfType blockSelf = self;
     RequestSuccessed requestSuccessedBlock = ^(id responseObject){
-        [blockSelf.contentScrollView.header endRefreshing];
+        [blockSelf.contentScrollView.footer endRefreshing];
         [blockSelf hideHUDLoading];
         
         //1. 获取结果数组
@@ -257,7 +257,7 @@
     
     
     RequestFailure requestFailureBlock = ^(NSInteger errorCode, NSString *errorMessage){
-        [blockSelf.contentScrollView.header endRefreshing];
+        [blockSelf.contentScrollView.footer endRefreshing];
 
         //1. 如果没有数据就将错误信息显示在tipsView上
         if ([NSArray isEmpty:blockSelf.dataArray]) {

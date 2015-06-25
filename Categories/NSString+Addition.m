@@ -707,7 +707,7 @@
     NSLog(@"%@: W: %.f, H: %.f", self, size.width, size.height);
     return size.width;
 }
-//判断是否包含表情符号
+//判断是否包含表情符号(有问题)
 + (BOOL)isContainsEmoji:(NSString *)string {
     __block BOOL isEomji = NO;
     [string enumerateSubstringsInRange:NSMakeRange(0, [string length]) options:NSStringEnumerationByComposedCharacterSequences usingBlock:

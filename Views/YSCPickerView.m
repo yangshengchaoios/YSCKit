@@ -66,8 +66,13 @@
     [UIView makeBorderForView:self.doneButton withColor:[UIColor blackColor] borderWidth:1];
     [self.doneButton bk_addEventHandler:^(id sender) {
         [blockSelf hidePickerView];
-        if (YSCPickerTypeCustom == self.pickerType && blockSelf.selectingBlock) {
-            blockSelf.selectingBlock(blockSelf.selectedIndexArray);
+        if (blockSelf.selectingBlock) {
+            if (YSCPickerTypeCustom == blockSelf.pickerType) {
+                blockSelf.selectingBlock(blockSelf.selectedIndexArray);
+            }
+            else if (blockSelf.pickerType <= YSCPickerTypeDateTime) {
+                blockSelf.selectingBlock([blockSelf.datePicker date]);
+            }
         }
     } forControlEvents:UIControlEventTouchUpInside];
 }

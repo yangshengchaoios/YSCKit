@@ -584,10 +584,10 @@
         [blockSelf hideHUDLoading];
         BOOL isPullToRefresh = (kDefaultPageStartIndex == pageIndex); //是否下拉刷新
         if (isPullToRefresh) {
-            [[blockSelf contentViewAtIndex:index] headerEndRefreshing];
+            [[blockSelf contentViewAtIndex:index].header endRefreshing];
         }
         else {
-            [[blockSelf contentViewAtIndex:index] footerEndRefreshing];
+            [[blockSelf contentViewAtIndex:index].footer endRefreshing];
         }
         
         //1. 获取结果数组
@@ -640,10 +640,10 @@
     RequestFailure requestFailureBlock = ^(NSInteger errorCode, NSString *errorMessage) {
         [blockSelf showResultThenHide:errorMessage];
         if (kDefaultPageStartIndex == pageIndex) {
-            [[blockSelf contentViewAtIndex:index] headerEndRefreshing];
+            [[blockSelf contentViewAtIndex:index].header endRefreshing];
         }
         else {
-            [[blockSelf contentViewAtIndex:index] footerEndRefreshing];
+            [[blockSelf contentViewAtIndex:index].footer endRefreshing];
         }
         if (blockSelf.failedAtIndex) {
             blockSelf.failedAtIndex(index);

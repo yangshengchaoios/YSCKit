@@ -67,9 +67,6 @@
               } requestFailure:^(NSInteger errorCode, NSString *errorMessage) {
                   if ([NSString isEmpty:blockSelf.htmlString]) {
                       [blockSelf showResultThenHide:errorMessage];
-                      [blockSelf bk_performBlock:^(id obj) {
-                          [blockSelf backViewController];
-                      } afterDelay:1];
                   }
               }];
 }
