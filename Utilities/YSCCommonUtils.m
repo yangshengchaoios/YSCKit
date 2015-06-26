@@ -531,15 +531,19 @@
 
 //2。按需求获取
 + (NSString *)CurrentWifiBSSID {
-    //NOTE: Does not work on the simulator.
+    //NOTE: Does not work on the simulator.    
+//    if ([UIDevice isRunningOnSimulator]) {
+//        return @"";
+//    }
     NSString *bssid = nil;
     NSArray *ifs = (__bridge id)CNCopySupportedInterfaces();
     NSLog(@"ifs:%@",ifs);
     for (NSString *ifnam in ifs) {
         NSDictionary *info = (__bridge id)CNCopyCurrentNetworkInfo((__bridge CFStringRef)ifnam);
-        NSLog(@"dici：%@",[info allKeys]);
+        NSLog(@"dici：%@", info);
         if (info[@"BSSID"]) {
-            bssid = info[@"BSSID"];
+            bssid = [NSString stringWithFormat:@"%@", info[@"BSSID"]];
+            bssid = bssid.uppercaseString;
         }
     }
     return bssid;
