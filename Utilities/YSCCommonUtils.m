@@ -296,6 +296,10 @@
 #pragma mark 打电话
 
 + (void)MakeCall:(NSString *)phoneNumber {
+    [self MakeCall:phoneNumber success:nil];
+}
+
++ (void)MakeCall:(NSString *)phoneNumber success:(void (^)(void))block {
     if ([self isEmpty:phoneNumber]) {
         return;
     }
@@ -308,6 +312,9 @@
     UIAlertView *alertView = [UIAlertView bk_alertViewWithTitle:@"提示"
                                                         message:[NSString stringWithFormat:@"确定要拨打电话：%@？", phoneNumber]];
     [alertView bk_addButtonWithTitle:@"确定" handler:^{
+        if (block) {
+            block();
+        }
         [[UIApplication sharedApplication] openURL:phoneURL];
     }];
     [alertView bk_setCancelButtonWithTitle:@"取消" handler:nil];
