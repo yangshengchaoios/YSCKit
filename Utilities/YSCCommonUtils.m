@@ -115,7 +115,7 @@
     
     //设置Title为白色,Title大小为18
     [[UINavigationBar appearance] setTitleTextAttributes:@{ NSForegroundColorAttributeName : DefaultNaviBarTitleColor,
-                                                            NSFontAttributeName : [UIFont boldSystemFontOfSize:22] }];
+                                                            NSFontAttributeName : [UIFont boldSystemFontOfSize:AUTOLAYOUT_LENGTH(34)] }];
     [[UINavigationBar appearance] setBarStyle:UIBarStyleBlackTranslucent];
 }
 
