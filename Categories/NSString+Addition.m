@@ -637,8 +637,8 @@
     // 1. 获取本地表情 Dictionary
     // 默认相同名字的图片
     
-    // 2. 正则匹配获取 parsedOutput 中符合表情代码的 range，图片代码暂时使用 ![图片名称]
-    NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@"\\!\\[[A-Za-z0-9]*\\]" options:0 error:nil];
+    // 2. 正则匹配获取 parsedOutput 中符合表情代码的 range，图片代码暂时使用 [[[图片名称]]]
+    NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@"\\[\\[\\[[A-Za-z0-9_]+\\]\\]\\]" options:0 error:nil];
     NSArray* matches = [regex matchesInString:[parsedOutput string]
                                       options:NSMatchingWithoutAnchoringBounds
                                         range:NSMakeRange(0, parsedOutput.length)];
@@ -658,6 +658,8 @@
         NSTextAttachment* textAttachment = [NSTextAttachment new];
         // 5. 通过图片代码找到图片
         NSString *imageName = [parsedOutput.string substringWithRange:captureRange];
+        imageName = [NSString replaceString:imageName byRegex:@"\\[\\[\\[" to:@""];
+        imageName = [NSString replaceString:imageName byRegex:@"\\]\\]\\]" to:@""];
         UIImage *emojiImage = [UIImage imageNamed:imageName];
         // 6. 将图片 Size 修改为符合字体的大小
         textAttachment.image = [YSCImageUtils resizeImage:emojiImage toSize:CGSizeMake(emojiSize,emojiSize)];
