@@ -635,7 +635,7 @@
     NSMutableAttributedString *parsedOutput = [[NSMutableAttributedString alloc]initWithString:string
                                                                                     attributes:@{NSFontAttributeName : font}];
     // 1. 获取本地表情 Dictionary
-    NSDictionary *emojiPlistDic = [[NSDictionary alloc]initWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"Emoji" ofType:@"plist"]];
+    // 默认相同名字的图片
     
     // 2. 正则匹配获取 parsedOutput 中符合表情代码的 range，图片代码暂时使用 ![图片名称]
     NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@"\\!\\[[A-Za-z0-9]*\\]" options:0 error:nil];
@@ -657,7 +657,8 @@
         NSRange captureRange = [result rangeAtIndex:0];
         NSTextAttachment* textAttachment = [NSTextAttachment new];
         // 5. 通过图片代码找到图片
-        UIImage *emojiImage = [UIImage imageNamed:emojiPlistDic[[parsedOutput.string substringWithRange:captureRange]]];
+        NSString *imageName = [parsedOutput.string substringWithRange:captureRange];
+        UIImage *emojiImage = [UIImage imageNamed:imageName];
         // 6. 将图片 Size 修改为符合字体的大小
         textAttachment.image = [YSCImageUtils resizeImage:emojiImage toSize:CGSizeMake(emojiSize,emojiSize)];
         // 7. 将之前 match 到的图片代码替换为含有 Emoji 表情的 NSAttributeString

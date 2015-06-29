@@ -102,7 +102,7 @@
  *  @return 公共日志文件目录
  */
 - (NSString *)directoryPathOfDocumentsLog {
-    return [self.directoryPathOfDocuments stringByAppendingPathComponent:@"Log/"];
+    return [self.directoryPathOfDocuments stringByAppendingPathComponent:@"YSCLog/"];
 }
 
 
