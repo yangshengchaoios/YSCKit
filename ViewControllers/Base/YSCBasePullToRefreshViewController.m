@@ -121,7 +121,7 @@
     }
 }
 - (UIEdgeInsets)tipsViewEdgeInsets {
-    return UIEdgeInsetsZero;
+    return AUTOLAYOUT_EDGEINSETS(0, 0, 60, 0);
 }
 
 /**
