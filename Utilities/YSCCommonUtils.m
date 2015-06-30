@@ -126,10 +126,10 @@
 #pragma mark - 设置UMeng应用的key
     [MobClick setAppVersion:AppVersion];
     [UMSocialData openLog:NO];//是否打开调试日志输出
-    [UMFeedback setLogEnabled:NO];
+//    [UMFeedback setLogEnabled:NO];
     [MobClick startWithAppkey:kUMAppKey reportPolicy:REALTIME channelId:kAppChannel];//配置统计
     [UMSocialData setAppKey:kUMAppKey];//设置友盟社会化组件
-    [UMFeedback checkWithAppkey:kUMAppKey];//配置用户反馈
+//    [UMFeedback checkWithAppkey:kUMAppKey];//配置用户反馈
     
 #pragma mark - 分享相关设置
     
@@ -152,43 +152,43 @@
  *  配置Umeng的推送功能
  */
 + (void)configUmengPushWithOptions:(NSDictionary *)launchOptions {
-    [UMessage startWithAppkey:kUMAppKey launchOptions:launchOptions];
-    [UMessage setLogEnabled:NO];
-    
-#if __IPHONE_OS_VERSION_MAX_ALLOWED >= _IPHONE80_
-    if(IOS8_OR_LATER) { //register remoteNotification types
-        UIMutableUserNotificationAction *action1 = [[UIMutableUserNotificationAction alloc] init];
-        action1.identifier = @"identifier_accept";
-        action1.title = @"打开";
-        action1.activationMode = UIUserNotificationActivationModeForeground;//当点击的时候启动程序
-        
-        UIMutableUserNotificationAction *action2 = [[UIMutableUserNotificationAction alloc] init];  //第二按钮
-        action2.identifier = @"identifier_reject";
-        action2.title = @"拒绝";
-        action2.activationMode = UIUserNotificationActivationModeBackground;//当点击的时候不启动程序，在后台处理
-        action2.authenticationRequired = YES;//需要解锁才能处理，如果action.activationMode = UIUserNotificationActivationModeForeground;则这个属性被忽略；
-        action2.destructive = YES;
-        
-        UIMutableUserNotificationCategory *categorys = [[UIMutableUserNotificationCategory alloc] init];
-        categorys.identifier = @"category1";//这组动作的唯一标示
-        [categorys setActions:@[action1,action2] forContext:(UIUserNotificationActionContextDefault)];
-        
-        UIUserNotificationSettings *userSettings = [UIUserNotificationSettings settingsForTypes:UIUserNotificationTypeBadge|UIUserNotificationTypeSound|UIUserNotificationTypeAlert
-                                                                                     categories:[NSSet setWithObject:categorys]];
-        [UMessage registerRemoteNotificationAndUserNotificationSettings:userSettings];
-    }
-    else { //register remoteNotification types
-        [UMessage registerForRemoteNotificationTypes:UIRemoteNotificationTypeBadge
-         |UIRemoteNotificationTypeSound
-         |UIRemoteNotificationTypeAlert];
-    }
-#else
-    //register remoteNotification types
-    [UMessage registerForRemoteNotificationTypes:UIRemoteNotificationTypeBadge
-     |UIRemoteNotificationTypeSound
-     |UIRemoteNotificationTypeAlert];
-    
-#endif
+//    [UMessage startWithAppkey:kUMAppKey launchOptions:launchOptions];
+//    [UMessage setLogEnabled:NO];
+//    
+//#if __IPHONE_OS_VERSION_MAX_ALLOWED >= _IPHONE80_
+//    if(IOS8_OR_LATER) { //register remoteNotification types
+//        UIMutableUserNotificationAction *action1 = [[UIMutableUserNotificationAction alloc] init];
+//        action1.identifier = @"identifier_accept";
+//        action1.title = @"打开";
+//        action1.activationMode = UIUserNotificationActivationModeForeground;//当点击的时候启动程序
+//        
+//        UIMutableUserNotificationAction *action2 = [[UIMutableUserNotificationAction alloc] init];  //第二按钮
+//        action2.identifier = @"identifier_reject";
+//        action2.title = @"拒绝";
+//        action2.activationMode = UIUserNotificationActivationModeBackground;//当点击的时候不启动程序，在后台处理
+//        action2.authenticationRequired = YES;//需要解锁才能处理，如果action.activationMode = UIUserNotificationActivationModeForeground;则这个属性被忽略；
+//        action2.destructive = YES;
+//        
+//        UIMutableUserNotificationCategory *categorys = [[UIMutableUserNotificationCategory alloc] init];
+//        categorys.identifier = @"category1";//这组动作的唯一标示
+//        [categorys setActions:@[action1,action2] forContext:(UIUserNotificationActionContextDefault)];
+//        
+//        UIUserNotificationSettings *userSettings = [UIUserNotificationSettings settingsForTypes:UIUserNotificationTypeBadge|UIUserNotificationTypeSound|UIUserNotificationTypeAlert
+//                                                                                     categories:[NSSet setWithObject:categorys]];
+//        [UMessage registerRemoteNotificationAndUserNotificationSettings:userSettings];
+//    }
+//    else { //register remoteNotification types
+//        [UMessage registerForRemoteNotificationTypes:UIRemoteNotificationTypeBadge
+//         |UIRemoteNotificationTypeSound
+//         |UIRemoteNotificationTypeAlert];
+//    }
+//#else
+//    //register remoteNotification types
+//    [UMessage registerForRemoteNotificationTypes:UIRemoteNotificationTypeBadge
+//     |UIRemoteNotificationTypeSound
+//     |UIRemoteNotificationTypeAlert];
+//    
+//#endif
 }
 
 /**
@@ -199,41 +199,41 @@
  *
  *  @return
  */
-+ (UIView *)createSearchViewWithWidth:(NSInteger)width withTextField:(UITextField *)textField {
-    if (width <= 0) {
-        width = NSIntegerMax;
-    }
-    UIView *searchBoxContainerView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, AUTOLAYOUT_LENGTH(width), AUTOLAYOUT_LENGTH(60))];
-    searchBoxContainerView.backgroundColor = RGBA(10, 10, 10, 0.3);
-    [UIView makeRoundForView:searchBoxContainerView withRadius:AUTOLAYOUT_LENGTH(60) / 2];
-    
-    //1. 设置搜索框背景图片
-//    UIImageView *searchBoxImageView = [[UIImageView alloc] initWithFrame:CGRectZero];
-//    searchBoxImageView.image = [UIImage imageNamed:@"bg_searchBlack"];
-//    [searchBoxContainerView addSubview:searchBoxImageView];
-//    [searchBoxImageView autoPinEdgeToSuperviewEdge:ALEdgeTop];
-//    [searchBoxImageView autoPinEdgeToSuperviewEdge:ALEdgeLeading];
-//    [searchBoxImageView autoPinEdgeToSuperviewEdge:ALEdgeBottom];
-//    [searchBoxImageView autoPinEdgeToSuperviewEdge:ALEdgeTrailing];
-    
-    //2. 设置搜索图标icon
-    UIImageView *searchIconImageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"icon_search"]];
-    [searchBoxContainerView addSubview:searchIconImageView];
-    [searchIconImageView autoPinEdgeToSuperviewEdge:ALEdgeLeading withInset:AUTOLAYOUT_LENGTH(15)];
-    [searchIconImageView autoAlignAxisToSuperviewAxis:ALAxisHorizontal];
-    
-    //3. 设置关键词输入框
-    textField.font = AUTOLAYOUT_FONT(28);
-    textField.textColor = [UIColor whiteColor];
-    [textField setValue:[UIColor whiteColor] forKeyPath:@"_placeholderLabel.textColor"];
-    [searchBoxContainerView addSubview:textField];
-    [textField autoPinEdgeToSuperviewEdge:ALEdgeLeading withInset:AUTOLAYOUT_LENGTH(60)];
-    [textField autoPinEdgeToSuperviewEdge:ALEdgeTop];
-    [textField autoPinEdgeToSuperviewEdge:ALEdgeBottom];
-    [textField autoPinEdgeToSuperviewEdge:ALEdgeTrailing withInset:AUTOLAYOUT_LENGTH(10)];
-    
-    return searchBoxContainerView;
-}
+//+ (UIView *)createSearchViewWithWidth:(NSInteger)width withTextField:(UITextField *)textField {
+//    if (width <= 0) {
+//        width = NSIntegerMax;
+//    }
+//    UIView *searchBoxContainerView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, AUTOLAYOUT_LENGTH(width), AUTOLAYOUT_LENGTH(60))];
+//    searchBoxContainerView.backgroundColor = RGBA(10, 10, 10, 0.3);
+//    [UIView makeRoundForView:searchBoxContainerView withRadius:AUTOLAYOUT_LENGTH(60) / 2];
+//    
+//    //1. 设置搜索框背景图片
+////    UIImageView *searchBoxImageView = [[UIImageView alloc] initWithFrame:CGRectZero];
+////    searchBoxImageView.image = [UIImage imageNamed:@"bg_searchBlack"];
+////    [searchBoxContainerView addSubview:searchBoxImageView];
+////    [searchBoxImageView autoPinEdgeToSuperviewEdge:ALEdgeTop];
+////    [searchBoxImageView autoPinEdgeToSuperviewEdge:ALEdgeLeading];
+////    [searchBoxImageView autoPinEdgeToSuperviewEdge:ALEdgeBottom];
+////    [searchBoxImageView autoPinEdgeToSuperviewEdge:ALEdgeTrailing];
+//    
+//    //2. 设置搜索图标icon
+//    UIImageView *searchIconImageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"icon_search"]];
+//    [searchBoxContainerView addSubview:searchIconImageView];
+//    [searchIconImageView autoPinEdgeToSuperviewEdge:ALEdgeLeading withInset:AUTOLAYOUT_LENGTH(15)];
+//    [searchIconImageView autoAlignAxisToSuperviewAxis:ALAxisHorizontal];
+//    
+//    //3. 设置关键词输入框
+//    textField.font = AUTOLAYOUT_FONT(28);
+//    textField.textColor = [UIColor whiteColor];
+//    [textField setValue:[UIColor whiteColor] forKeyPath:@"_placeholderLabel.textColor"];
+//    [searchBoxContainerView addSubview:textField];
+//    [textField autoPinEdgeToSuperviewEdge:ALEdgeLeading withInset:AUTOLAYOUT_LENGTH(60)];
+//    [textField autoPinEdgeToSuperviewEdge:ALEdgeTop];
+//    [textField autoPinEdgeToSuperviewEdge:ALEdgeBottom];
+//    [textField autoPinEdgeToSuperviewEdge:ALEdgeTrailing withInset:AUTOLAYOUT_LENGTH(10)];
+//    
+//    return searchBoxContainerView;
+//}
 
 
 #pragma mark 格式化金额

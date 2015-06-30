@@ -16,7 +16,7 @@
 #import "YSCTitleBarView.h"
 
 //第三方库
-#import "UIViewController+ScrollingNavbar.h"
+//#import "UIViewController+ScrollingNavbar.h"
 #import "UIViewController+Additions.h"
 
 @interface YSCBaseViewController : UIViewController <UITextFieldDelegate>

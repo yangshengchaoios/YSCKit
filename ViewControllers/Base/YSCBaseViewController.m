@@ -72,7 +72,7 @@
 - (void)viewWillDisappear:(BOOL)animated {
     [MobClick endLogPageView:NSStringFromClass([self class])];
     if ([self scrollableView]) {
-        [self showNavBarAnimated:NO];
+//        [self showNavBarAnimated:NO];
     }
     [super viewWillDisappear:animated];
 }
@@ -157,7 +157,7 @@
     
     //设置NavBar跟随的scrollview
     if ([self scrollableView]) {
-        [self followScrollView:[self scrollableView]];
+//        [self followScrollView:[self scrollableView]];
     }
     
     //相对布局——自动调整约束值和font大小

@@ -54,10 +54,10 @@
 	self.scrollView.pagingEnabled = YES;
     self.scrollView.scrollsToTop = NO;
 	[self addSubview:self.scrollView];
-    [self.scrollView autoPinEdgeToSuperviewEdge:ALEdgeTop withInset:0];
-    [self.scrollView autoPinEdgeToSuperviewEdge:ALEdgeLeft withInset:0];
-    [self.scrollView autoPinEdgeToSuperviewEdge:ALEdgeBottom withInset:0];
-    [self.scrollView autoPinEdgeToSuperviewEdge:ALEdgeRight withInset:0];
+//    [self.scrollView autoPinEdgeToSuperviewEdge:ALEdgeTop withInset:0];
+//    [self.scrollView autoPinEdgeToSuperviewEdge:ALEdgeLeft withInset:0];
+//    [self.scrollView autoPinEdgeToSuperviewEdge:ALEdgeBottom withInset:0];
+//    [self.scrollView autoPinEdgeToSuperviewEdge:ALEdgeRight withInset:0];
     
     //2. 创建pagecontrol
     self.pageControl = [[SMPageControl alloc] init];
@@ -67,13 +67,13 @@
                                                                   toSize:AUTOLAYOUT_SIZE_WH(HeightOfPageControl, HeightOfPageControl)];
     self.pageControl.userInteractionEnabled = NO;
     [self addSubview:self.pageControl];
-    [self.pageControl autoPinEdgeToSuperviewEdge:ALEdgeLeft withInset:0];
-    [self.pageControl autoPinEdgeToSuperviewEdge:ALEdgeBottom withInset:AUTOLAYOUT_LENGTH(8)];
-    [self.pageControl autoPinEdgeToSuperviewEdge:ALEdgeRight withInset:0];
-    [self.pageControl autoMatchDimension:ALDimensionHeight
-                             toDimension:ALDimensionWidth
-                                  ofView:self.pageControl
-                          withMultiplier:(HeightOfPageControl / self.width)];
+//    [self.pageControl autoPinEdgeToSuperviewEdge:ALEdgeLeft withInset:0];
+//    [self.pageControl autoPinEdgeToSuperviewEdge:ALEdgeBottom withInset:AUTOLAYOUT_LENGTH(8)];
+//    [self.pageControl autoPinEdgeToSuperviewEdge:ALEdgeRight withInset:0];
+//    [self.pageControl autoMatchDimension:ALDimensionHeight
+//                             toDimension:ALDimensionWidth
+//                                  ofView:self.pageControl
+//                          withMultiplier:(HeightOfPageControl / self.width)];
     
     //4. 初始化参数设置
     self.pageControl.currentPage = 0;

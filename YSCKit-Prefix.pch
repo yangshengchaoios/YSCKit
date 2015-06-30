@@ -24,7 +24,7 @@ typedef void (^CallBackWithResponseBlock)(id response);
     #import <MBProgressHUD/MBProgressHUD.h>
     #import <POP/POP.h>
     #import <FMDB/FMDB.h>
-    #import "PureLayout.h"
+//    #import "PureLayout.h"
     #import "Masonry.h"
     #import "EnumType.h"
     #import "UMengConstants.h"
