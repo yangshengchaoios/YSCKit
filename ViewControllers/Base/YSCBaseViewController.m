@@ -459,7 +459,7 @@
 }
 - (BOOL)scrollViewShouldScrollToTop:(UIScrollView *)scrollView {
 	// This enables the user to scroll down the navbar by tapping the status bar.
-	[self performSelector:@selector(showNavbar) withObject:nil afterDelay:0.1];
+//	[self performSelector:@selector(showNavbar) withObject:nil afterDelay:0.1];
 	return YES;
 }
 
