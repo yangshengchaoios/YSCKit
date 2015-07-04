@@ -22,7 +22,6 @@
 	NSString *url = kResPathAppBaseUrl;
     [self requestByUrl:url withAPI:apiName andArrayParam:nil andDictParam:dictParam andBodyParam:nil modelName:modelName requestType:RequestTypeGET requestSuccessed:requestSuccessed requestFailure:requestFailure];
 }
-
 + (void)postDataWithAPI:(NSString *)apiName
            andDictParam:(NSDictionary *)dictParam
               modelName:(Class)modelName
@@ -32,15 +31,6 @@
     [self requestByUrl:url withAPI:apiName andArrayParam:nil andDictParam:dictParam andBodyParam:nil modelName:modelName requestType:RequestTypePOST requestSuccessed:requestSuccessed requestFailure:requestFailure];
 }
 
-+ (void)postBodyDataWithAPI:(NSString *)apiName
-               andDictParam:(NSDictionary *)dictParam
-               andBodyParam:(NSString *)bodyParam
-                  modelName:(Class)modelName
-           requestSuccessed:(RequestSuccessed)requestSuccessed
-             requestFailure:(RequestFailure)requestFailure {
-	NSString *url = kResPathAppBaseUrl;
-    [self requestByUrl:url withAPI:apiName andArrayParam:nil andDictParam:dictParam andBodyParam:bodyParam modelName:modelName requestType:RequestTypePostBodyData requestSuccessed:requestSuccessed requestFailure:requestFailure];
-}
 
 #pragma mark - 自定义url前缀的GET和POST
 
@@ -52,7 +42,6 @@
         requestFailure:(RequestFailure)requestFailure {
 	[self requestByUrl:url withAPI:apiName andArrayParam:nil andDictParam:dictParam andBodyParam:nil modelName:modelName requestType:RequestTypeGET requestSuccessed:requestSuccessed requestFailure:requestFailure];
 }
-
 + (void)postDataToUrl:(NSString *)url
               withAPI:(NSString *)apiName
          andDictParam:(NSDictionary *)dictParam
@@ -62,15 +51,6 @@
     [self requestByUrl:url withAPI:apiName andArrayParam:nil andDictParam:dictParam andBodyParam:nil modelName:modelName requestType:RequestTypePOST requestSuccessed:requestSuccessed requestFailure:requestFailure];
 }
 
-+ (void)postBodyDataToUrl:(NSString *)url
-                  withAPI:(NSString *)apiName
-             andDictParam:(NSDictionary *)dictParam
-             andBodyParam:(NSString *)bodyParam
-                modelName:(Class)modelName
-         requestSuccessed:(RequestSuccessed)requestSuccessed
-           requestFailure:(RequestFailure)requestFailure {
-    [self requestByUrl:url withAPI:apiName andArrayParam:nil andDictParam:dictParam andBodyParam:bodyParam modelName:modelName requestType:RequestTypePostBodyData requestSuccessed:requestSuccessed requestFailure:requestFailure];
-}
 
 #pragma mark - 通用的GET和POST（只返回BaseModel的Data内容）
 
@@ -186,22 +166,14 @@
       customModelClass:(Class)modelClass
       requestSuccessed:(RequestSuccessed)requestSuccessed
         requestFailure:(RequestFailure)requestFailure {
-    [self requestWithAPI:apiName andDictParam:dictParam customModelClass:modelClass requestType:RequestTypeGET requestSuccessed:requestSuccessed requestFailure:requestFailure];
+     [self requestByUrl:kResPathAppBaseUrl withAPI:apiName andDictParam:dictParam customModelClass:modelClass requestType:RequestTypeGET requestSuccessed:requestSuccessed requestFailure:requestFailure];
 }
 + (void)postDataWithAPI:(NSString *)apiName
           andDictParam:(NSDictionary *)dictParam
       customModelClass:(Class)modelClass
       requestSuccessed:(RequestSuccessed)requestSuccessed
         requestFailure:(RequestFailure)requestFailure {
-    [self requestWithAPI:apiName andDictParam:dictParam customModelClass:modelClass requestType:RequestTypePOST requestSuccessed:requestSuccessed requestFailure:requestFailure];
-}
-+ (void)requestWithAPI:(NSString *)apiName
-          andDictParam:(NSDictionary *)dictParam
-      customModelClass:(Class)modelClass
-           requestType:(RequestType)requestType
-      requestSuccessed:(RequestSuccessed)requestSuccessed
-        requestFailure:(RequestFailure)requestFailure {
-    [self requestByUrl:kResPathAppBaseUrl withAPI:apiName andDictParam:dictParam customModelClass:modelClass requestType:requestType requestSuccessed:requestSuccessed requestFailure:requestFailure];
+    [self requestByUrl:kResPathAppBaseUrl withAPI:apiName andDictParam:dictParam customModelClass:modelClass requestType:RequestTypePOST requestSuccessed:requestSuccessed requestFailure:requestFailure];
 }
 + (void)requestByUrl:(NSString *)url
              withAPI:(NSString *)apiName
@@ -255,7 +227,7 @@
     
     //4. 对提交的dict添加一个加密的参数'signature'
     NSMutableDictionary *newDictParam = [NSMutableDictionary dictionaryWithDictionary:dictParam];
-    NSString *signature = Trim([self signatureWithParam:newDictParam]);
+    NSString *signature = [self signatureWithParam:newDictParam];
     
 	//5. 发起网络请求
     AFHTTPRequestOperationManager *manager = [AFHTTPRequestOperationManager manager];   //create new AFHTTPRequestOperationManager
@@ -356,8 +328,6 @@
     //
     //        return [mutablePairs componentsJoinedByString:@"&"];
     //    }];
-    
-	NSLog(@"requestType = %ld, newDictParam = %@", requestType, newDictParam);
 	if (RequestTypeGET == requestType) {
 		NSLog(@"getting data...");
 		[manager   GET:newUrlString
@@ -391,6 +361,36 @@
         AFHTTPRequestOperation *operation = [manager HTTPRequestOperationWithRequest:mutableRequest success:requestSuccessed1 failure:requestFailure1];
         [manager.operationQueue addOperation:operation];
     }
+}
+
+- (void)downloadFileFromUrl:(NSString *)url
+                 saveToPath:(NSString *)destPath
+           requestSuccessed:(RequestSuccessed)requestSuccessed
+             requestFailure:(RequestFailure)requestFailure {
+        NSLog(@"downloading file");
+        NSURLSessionConfiguration *configuration = [NSURLSessionConfiguration defaultSessionConfiguration];
+        AFURLSessionManager *manager = [[AFURLSessionManager alloc] initWithSessionConfiguration:configuration];
+        NSURL *URL = [NSURL URLWithString:url];
+        NSURLRequest *request = [NSURLRequest requestWithURL:URL];
+        NSURLSessionDownloadTask *downloadTask = [manager downloadTaskWithRequest:request progress:nil destination:^NSURL *(NSURL *targetPath, NSURLResponse *response) {
+            NSURL *documentsDirectoryURL = [[NSFileManager defaultManager] URLForDirectory:NSDocumentDirectory inDomain:NSUserDomainMask appropriateForURL:nil create:NO error:nil];
+            return [documentsDirectoryURL URLByAppendingPathComponent:[[NSUUID UUID] UUIDString]];//放在临时目录里的文件
+        } completionHandler:^(NSURLResponse *response, NSURL *filePath, NSError *error) {
+            NSLog(@"File downloaded to: %@", filePath);
+            if (error) {
+                if (requestFailure) {
+                    requestFailure(@"1001", error.description);
+                }
+            }
+            else {
+                [YSCFileUtils deleteFileOrDirectory:destPath];
+                [YSCFileUtils copyFileFromPath:filePath.absoluteString toPath:destPath];
+                if (requestSuccessed) {
+                    requestSuccessed(@"下载成功");
+                }
+            }
+        }];
+        [downloadTask resume];
 }
 
 /**

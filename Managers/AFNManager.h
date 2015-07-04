@@ -18,6 +18,7 @@ typedef NS_ENUM (NSInteger, RequestType) {
 	RequestTypeGET = 0,
 	RequestTypePOST,
     RequestTypeUploadFile,
+    RequestTypeDownloadFile,
     RequestTypePostBodyData
 };
 
@@ -36,12 +37,6 @@ typedef NS_ENUM (NSInteger, RequestType) {
               modelName:(Class)modelName
        requestSuccessed:(RequestSuccessed)requestSuccessed
          requestFailure:(RequestFailure)requestFailure;
-+ (void)postBodyDataWithAPI:(NSString *)apiName
-               andDictParam:(NSDictionary *)dictParam
-               andBodyParam:(NSString *)bodyParam
-                  modelName:(Class)modelName
-           requestSuccessed:(RequestSuccessed)requestSuccessed
-             requestFailure:(RequestFailure)requestFailure;
 
 #pragma mark - 自定义url前缀的GET和POST
 
@@ -57,13 +52,6 @@ typedef NS_ENUM (NSInteger, RequestType) {
             modelName:(Class)modelName
      requestSuccessed:(RequestSuccessed)requestSuccessed
        requestFailure:(RequestFailure)requestFailure;
-+ (void)postBodyDataToUrl:(NSString *)url
-                  withAPI:(NSString *)apiName
-             andDictParam:(NSDictionary *)dictParam
-             andBodyParam:(NSString *)bodyParam
-                modelName:(Class)modelName
-         requestSuccessed:(RequestSuccessed)requestSuccessed
-           requestFailure:(RequestFailure)requestFailure;
 
 
 #pragma mark - 通用的GET和POST（只返回BaseModel的Data内容）
@@ -100,12 +88,6 @@ typedef NS_ENUM (NSInteger, RequestType) {
        customModelClass:(Class)modelClass
        requestSuccessed:(RequestSuccessed)requestSuccessed
          requestFailure:(RequestFailure)requestFailure;
-+ (void)requestWithAPI:(NSString *)apiName
-          andDictParam:(NSDictionary *)dictParam
-      customModelClass:(Class)modelClass
-           requestType:(RequestType)requestType
-      requestSuccessed:(RequestSuccessed)requestSuccessed
-        requestFailure:(RequestFailure)requestFailure;
 + (void)requestByUrl:(NSString *)url
              withAPI:(NSString *)apiName
         andDictParam:(NSDictionary *)dictParam
@@ -114,6 +96,7 @@ typedef NS_ENUM (NSInteger, RequestType) {
     requestSuccessed:(RequestSuccessed)requestSuccessed
       requestFailure:(RequestFailure)requestFailure;
 
+// 发起get & post & 上传图片 请求
 + (void)requestByUrl:(NSString *)url
              withAPI:(NSString *)apiName
        andArrayParam:(NSArray *)arrayParam
@@ -126,7 +109,10 @@ typedef NS_ENUM (NSInteger, RequestType) {
       requestFailure:(RequestFailure)requestFailure;
 
 
-//TODO:测试参数加密字符串
-+ (NSString *)signatureWithParam:(NSDictionary *)param;
+//下载文件
+- (void)downloadFileFromUrl:(NSString *)url
+                 saveToPath:(NSString *)destPath
+           requestSuccessed:(RequestSuccessed)requestSuccessed
+             requestFailure:(RequestFailure)requestFailure;
 
 @end
