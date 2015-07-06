@@ -110,7 +110,7 @@ typedef NS_ENUM (NSInteger, RequestType) {
 
 
 //下载文件
-- (void)downloadFileFromUrl:(NSString *)url
++ (void)downloadFileFromUrl:(NSString *)url
                  saveToPath:(NSString *)destPath
            requestSuccessed:(RequestSuccessed)requestSuccessed
              requestFailure:(RequestFailure)requestFailure;

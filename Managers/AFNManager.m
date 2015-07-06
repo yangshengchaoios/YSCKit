@@ -363,7 +363,7 @@
     }
 }
 
-- (void)downloadFileFromUrl:(NSString *)url
++ (void)downloadFileFromUrl:(NSString *)url
                  saveToPath:(NSString *)destPath
            requestSuccessed:(RequestSuccessed)requestSuccessed
              requestFailure:(RequestFailure)requestFailure {
