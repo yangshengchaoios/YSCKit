@@ -91,7 +91,7 @@
 + (BOOL)copyFileFromPath:(NSString *)sourceFilePath toPath:(NSString *)targetFilePath {
 	NSError *error = nil;
 	BOOL isSucces = NO;
-	if (![FileDefaultManager fileExistsAtPath:sourceFilePath]) {
+	if (NO == [FileDefaultManager fileExistsAtPath:sourceFilePath]) {
 		NSLog(@"The source file is not exists!sourceFilePath=%@", sourceFilePath);
 		return NO;
 	}

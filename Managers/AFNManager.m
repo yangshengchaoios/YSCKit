@@ -300,8 +300,6 @@
     void (^requestFailure1)(AFHTTPRequestOperation *operation, NSError *error) = ^(AFHTTPRequestOperation *operation, NSError *error) {
         NSLog(@"request failed! \r\noperation=%@\r\nerror=%@", operation, error);
         if (200 != operation.response.statusCode) {
-            [LogManager saveLog:[NSString stringWithFormat:@"请求参数%@", newDictParam]];
-            [LogManager saveLog:error.localizedDescription];
             if (401 == operation.response.statusCode) {
                 if (requestFailure) {
                     requestFailure(1003, @"您还未登录呢！");
@@ -370,23 +368,31 @@
         NSLog(@"downloading file");
         NSURLSessionConfiguration *configuration = [NSURLSessionConfiguration defaultSessionConfiguration];
         AFURLSessionManager *manager = [[AFURLSessionManager alloc] initWithSessionConfiguration:configuration];
-        NSURL *URL = [NSURL URLWithString:url];
-        NSURLRequest *request = [NSURLRequest requestWithURL:URL];
+    NSString *fileName = [NSString stringWithFormat:@"%@.sqlite", [[NSUUID UUID] UUIDString]];
+    NSString *downloadToFilePath = [[YSCFileUtils DirectoryPathOfDocuments] stringByAppendingPathComponent:fileName];
+        NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:url]];
         NSURLSessionDownloadTask *downloadTask = [manager downloadTaskWithRequest:request progress:nil destination:^NSURL *(NSURL *targetPath, NSURLResponse *response) {
             NSURL *documentsDirectoryURL = [[NSFileManager defaultManager] URLForDirectory:NSDocumentDirectory inDomain:NSUserDomainMask appropriateForURL:nil create:NO error:nil];
-            return [documentsDirectoryURL URLByAppendingPathComponent:[[NSUUID UUID] UUIDString]];//放在临时目录里的文件
+            return [documentsDirectoryURL URLByAppendingPathComponent:fileName];//放在临时目录里的文件
         } completionHandler:^(NSURLResponse *response, NSURL *filePath, NSError *error) {
             NSLog(@"File downloaded to: %@", filePath);
             if (error) {
                 if (requestFailure) {
-                    requestFailure(@"1001", error.description);
+                    requestFailure(1001, error.description);
                 }
             }
             else {
-                [YSCFileUtils deleteFileOrDirectory:destPath];
-                [YSCFileUtils copyFileFromPath:filePath.absoluteString toPath:destPath];
-                if (requestSuccessed) {
-                    requestSuccessed(@"下载成功");
+                BOOL isSuccess = [YSCFileUtils copyFileFromPath:downloadToFilePath toPath:destPath];
+                if (isSuccess) {
+                    [YSCFileUtils deleteFileOrDirectory:downloadToFilePath];
+                    if (requestSuccessed) {
+                        requestSuccessed(@"下载成功");
+                    }
+                }
+                else {
+                    if (requestFailure) {
+                        requestFailure(1002, @"文件拷贝失败");
+                    }
                 }
             }
         }];
