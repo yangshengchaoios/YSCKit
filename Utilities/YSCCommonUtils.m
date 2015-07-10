@@ -191,6 +191,22 @@
 //#endif
 }
 
++ (void)configLeanCloudPushWithOptions:(NSDictionary *)launchOptions withAppliction:(UIApplication *)application {
+#if __IPHONE_OS_VERSION_MAX_ALLOWED >= _IPHONE80_
+    UIUserNotificationSettings *settings = [UIUserNotificationSettings settingsForTypes:UIUserNotificationTypeAlert
+                                            | UIUserNotificationTypeBadge
+                                            | UIUserNotificationTypeSound
+                                                                             categories:nil];
+    [application registerUserNotificationSettings:settings];
+    [application registerForRemoteNotifications];
+#else
+    [application registerForRemoteNotificationTypes:
+     UIRemoteNotificationTypeBadge |
+     UIRemoteNotificationTypeAlert |
+     UIRemoteNotificationTypeSound];
+#endif
+}
+
 /**
  *  创建搜索框
  *

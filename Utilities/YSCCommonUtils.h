@@ -22,6 +22,7 @@
 
 + (void)configUmeng;
 + (void)configUmengPushWithOptions:(NSDictionary *)launchOptions;
++ (void)configLeanCloudPushWithOptions:(NSDictionary *)launchOptions withAppliction:(UIApplication *)application;
 + (UIView *)createSearchViewWithWidth:(NSInteger)width withTextField:(UITextField *)textField;
 
 #pragma mark - 格式化金额
