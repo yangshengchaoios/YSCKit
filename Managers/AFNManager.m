@@ -105,7 +105,7 @@
             }
             else {
                 if (requestFailure) {
-                    requestFailure(1103, baseModel.message);
+                    requestFailure(baseModel.stateInteger, baseModel.message);
                 }
             }
         } requestFailure:requestFailure];
@@ -135,14 +135,13 @@
           [baseModel formatProperties];
           if ([baseModel isKindOfClass:[YSCBaseModel class]]) {
               if (1 == baseModel.stateInteger) {  //接口访问成功
-                  NSLog(@"success message = %@", baseModel.message);
                   if (requestSuccessed) {
                       requestSuccessed(baseModel);
                   }
               }
               else {
                   if (requestFailure) {
-                      requestFailure(1101, baseModel.message);
+                      requestFailure(baseModel.stateInteger, baseModel.message);
                   }
               }
           }
@@ -185,7 +184,6 @@
     [self requestByUrl:url withAPI:apiName andArrayParam:nil andDictParam:dictParam andBodyParam:nil imageData:nil customModelClass:modelClass requestType:requestType requestSuccessed:requestSuccessed requestFailure:requestFailure];
 }
 
-
 /**
  *  发起get & post & 上传图片 请求
  *
@@ -208,6 +206,11 @@
          requestType:(RequestType)requestType
     requestSuccessed:(RequestSuccessed)requestSuccessed
       requestFailure:(RequestFailure)requestFailure {
+    if (NO == [ReachabilityManager sharedInstance].reachable) {
+        requestFailure(-1, @"网络错误！");
+        return;
+    }
+    
 	//1. url合法性判断
 	if (![NSString isUrl:url]) {
 		requestFailure(1005, [NSString stringWithFormat:@"传递的url[%@]不合法！", url]);
@@ -313,7 +316,7 @@
         }
         else {
             if (requestFailure) {
-                requestFailure(operation.response.statusCode, error.localizedDescription);
+                requestFailure(200, error.localizedDescription);
             }
         }
     };
