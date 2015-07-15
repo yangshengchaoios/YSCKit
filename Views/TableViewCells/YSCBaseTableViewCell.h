@@ -10,6 +10,11 @@
 
 @interface YSCBaseTableViewCell : UITableViewCell
 
+
++ (YSCBaseTableViewCell *)dequeueOrCreateCellByTableView:(UITableView *)tableView;
++ (void)registerCellToTableView:(UITableView *)tableView;
++ (NSString *)identifier;
+
 + (CGFloat)HeightOfCell;
 + (CGFloat)HeightOfCellByDataModel:(BaseDataModel *)dataModel;
 + (UINib *)NibNameOfCell;

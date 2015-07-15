@@ -25,6 +25,22 @@
     // Configure the view for the selected state
 }
 
++ (YSCBaseTableViewCell *)dequeueOrCreateCellByTableView :(UITableView *)tableView {
+    YSCBaseTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:[self.class identifier]];
+    if (cell == nil) {
+        cell = [[YSCBaseTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:[self.class identifier]];
+    }
+    return cell;
+}
+
++ (void)registerCellToTableView: (UITableView *)tableView {
+    [tableView registerClass:self.class forCellReuseIdentifier:[self.class identifier]];
+}
+
++ (NSString *)identifier {
+    return NSStringFromClass(self.class);
+}
+
 + (CGFloat)HeightOfCell {
     return AUTOLAYOUT_LENGTH(290);
 }
