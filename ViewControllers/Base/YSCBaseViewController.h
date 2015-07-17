@@ -17,7 +17,7 @@
 
 //第三方库
 //#import "UIViewController+ScrollingNavbar.h"
-#import "UIViewController+Additions.h"
+//#import "UIViewController+Additions.h"
 
 @interface YSCBaseViewController : UIViewController <UITextFieldDelegate>
 
@@ -45,9 +45,9 @@
 - (UIViewController *)pushViewController:(NSString *)className withParams:(NSDictionary *)paramDict animated:(BOOL)animated;
 
 #pragma mark - push with transition
-- (UIViewController *)pushViewController:(NSString *)className transition:(ADTransition *)transition;
-- (UIViewController *)pushViewController:(NSString *)className withParams:(NSDictionary *)paramDict transition:(ADTransition *)transition;
-- (UIViewController *)pushViewController:(NSString *)className withParams:(NSDictionary *)paramDict transition:(ADTransition *)transition animated:(BOOL)animated;
+//- (UIViewController *)pushViewController:(NSString *)className transition:(ADTransition *)transition;
+//- (UIViewController *)pushViewController:(NSString *)className withParams:(NSDictionary *)paramDict transition:(ADTransition *)transition;
+//- (UIViewController *)pushViewController:(NSString *)className withParams:(NSDictionary *)paramDict transition:(ADTransition *)transition animated:(BOOL)animated;
 
 #pragma mark - pop & dismiss
 //返回上一级，最多到根

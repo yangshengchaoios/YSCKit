@@ -49,6 +49,12 @@
     }
     return _udid;
 }
+- (NSString *)deviceToken {
+    if (nil == _deviceToken) {
+        _deviceToken = [[NSUserDefaults standardUserDefaults] stringForKey:@"DeviceToken"];
+    }
+    return Trim(_deviceToken);
+}
 
 #pragma mark - AppConfig.plist管理
 

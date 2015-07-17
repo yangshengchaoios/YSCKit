@@ -191,20 +191,21 @@
 //#endif
 }
 
-+ (void)configLeanCloudPushWithOptions:(NSDictionary *)launchOptions withAppliction:(UIApplication *)application {
-#if __IPHONE_OS_VERSION_MAX_ALLOWED >= _IPHONE80_
-    UIUserNotificationSettings *settings = [UIUserNotificationSettings settingsForTypes:UIUserNotificationTypeAlert
-                                            | UIUserNotificationTypeBadge
-                                            | UIUserNotificationTypeSound
-                                                                             categories:nil];
-    [application registerUserNotificationSettings:settings];
-    [application registerForRemoteNotifications];
-#else
-    [application registerForRemoteNotificationTypes:
-     UIRemoteNotificationTypeBadge |
-     UIRemoteNotificationTypeAlert |
-     UIRemoteNotificationTypeSound];
-#endif
++ (void)registerForRemoteNotification {
+    UIApplication *application = [UIApplication sharedApplication];
+    if ([application respondsToSelector:@selector(registerForRemoteNotifications)]) {
+        UIUserNotificationSettings *settings = [UIUserNotificationSettings settingsForTypes:UIUserNotificationTypeAlert |
+                                                UIUserNotificationTypeBadge |
+                                                UIUserNotificationTypeSound
+                                                                                 categories:nil];
+        [application registerUserNotificationSettings:settings];
+        [application registerForRemoteNotifications];
+    } else {
+        [application registerForRemoteNotificationTypes:
+         UIRemoteNotificationTypeBadge |
+         UIRemoteNotificationTypeAlert |
+         UIRemoteNotificationTypeSound];
+    }
 }
 
 /**
@@ -475,23 +476,23 @@
 #pragma mark - UIButton添加pop动画
 
 + (void)addPopAnimationToButton:(UIButton *)button {
-    [button bk_addEventHandler:^(id sender) {
-        POPBasicAnimation *scaleAnimation = [POPBasicAnimation animationWithPropertyNamed:kPOPLayerScaleXY];
-        scaleAnimation.toValue = [NSValue valueWithCGSize:CGSizeMake(0.95f, 0.95f)];
-        [button.layer pop_addAnimation:scaleAnimation forKey:@"layerScaleSmallAnimation"];
-    } forControlEvents:UIControlEventTouchDown];
-    [button bk_addEventHandler:^(id sender) {
-        POPSpringAnimation *scaleAnimation = [POPSpringAnimation animationWithPropertyNamed:kPOPLayerScaleXY];
-        scaleAnimation.velocity = [NSValue valueWithCGSize:CGSizeMake(3.f, 3.f)];
-        scaleAnimation.toValue = [NSValue valueWithCGSize:CGSizeMake(1.f, 1.f)];
-        scaleAnimation.springBounciness = 20.0f;
-        [button.layer pop_addAnimation:scaleAnimation forKey:@"layerScaleSpringAnimation"];
-    } forControlEvents:UIControlEventTouchUpInside];
-    [button bk_addEventHandler:^(id sender) {
-        POPBasicAnimation *scaleAnimation = [POPBasicAnimation animationWithPropertyNamed:kPOPLayerScaleXY];
-        scaleAnimation.toValue = [NSValue valueWithCGSize:CGSizeMake(1.f, 1.f)];
-        [button.layer pop_addAnimation:scaleAnimation forKey:@"layerScaleDefaultAnimation"];
-    } forControlEvents:UIControlEventTouchDragExit];
+//    [button bk_addEventHandler:^(id sender) {
+//        POPBasicAnimation *scaleAnimation = [POPBasicAnimation animationWithPropertyNamed:kPOPLayerScaleXY];
+//        scaleAnimation.toValue = [NSValue valueWithCGSize:CGSizeMake(0.95f, 0.95f)];
+//        [button.layer pop_addAnimation:scaleAnimation forKey:@"layerScaleSmallAnimation"];
+//    } forControlEvents:UIControlEventTouchDown];
+//    [button bk_addEventHandler:^(id sender) {
+//        POPSpringAnimation *scaleAnimation = [POPSpringAnimation animationWithPropertyNamed:kPOPLayerScaleXY];
+//        scaleAnimation.velocity = [NSValue valueWithCGSize:CGSizeMake(3.f, 3.f)];
+//        scaleAnimation.toValue = [NSValue valueWithCGSize:CGSizeMake(1.f, 1.f)];
+//        scaleAnimation.springBounciness = 20.0f;
+//        [button.layer pop_addAnimation:scaleAnimation forKey:@"layerScaleSpringAnimation"];
+//    } forControlEvents:UIControlEventTouchUpInside];
+//    [button bk_addEventHandler:^(id sender) {
+//        POPBasicAnimation *scaleAnimation = [POPBasicAnimation animationWithPropertyNamed:kPOPLayerScaleXY];
+//        scaleAnimation.toValue = [NSValue valueWithCGSize:CGSizeMake(1.f, 1.f)];
+//        [button.layer pop_addAnimation:scaleAnimation forKey:@"layerScaleDefaultAnimation"];
+//    } forControlEvents:UIControlEventTouchDragExit];
 }
 
 #pragma mark - AES加密解密(与java调通)

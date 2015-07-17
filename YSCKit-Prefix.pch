@@ -22,7 +22,7 @@ typedef void (^CallBackWithResponseBlock)(id response);
     #import <BlocksKit+UIKit.h>
     #import <BlocksKit+MessageUI.h>
     #import <MBProgressHUD/MBProgressHUD.h>
-    #import <POP/POP.h>
+//    #import <POP/POP.h>
     #import <FMDB/FMDB.h>
 //    #import "PureLayout.h"
     #import "Masonry.h"
@@ -44,8 +44,8 @@ typedef void (^CallBackWithResponseBlock)(id response);
     #import "NSArray+Addition.h"
     #import "UIScrollView+Additions.h"
     #import "UIImage+Additions.h"
-    #import "UIViewController+ADTransitionController.h"
-    #import "UINavigationController+CustomAnimations.h"//系统自带的几种常用切换动画
+//    #import "UIViewController+ADTransitionController.h"
+//    #import "UINavigationController+CustomAnimations.h"//系统自带的几种常用切换动画
 
     //Utils
     #import "YSCFileUtils.h"

@@ -310,23 +310,10 @@
     return [self pushViewController:className withParams:paramDict animated:YES];
 }
 - (UIViewController *)pushViewController:(NSString *)className withParams:(NSDictionary *)paramDict animated:(BOOL)animated {
-    return [self pushViewController:className withParams:paramDict transition:nil animated:animated];
-}
-
-#pragma mark - push with transition
-- (UIViewController *)pushViewController:(NSString *)className transition:(ADTransition *)transition {
-    return [self pushViewController:className withParams:nil transition:transition];
-}
-- (UIViewController *)pushViewController:(NSString *)className withParams:(NSDictionary *)paramDict transition:(ADTransition *)transition {
-    return [self pushViewController:className withParams:paramDict transition:transition animated:YES];
-}
-- (UIViewController *)pushViewController:(NSString *)className withParams:(NSDictionary *)paramDict transition:(ADTransition *)transition animated:(BOOL)animated {
+//    return [self pushViewController:className withParams:paramDict transition:nil animated:animated];
     [self hideKeyboard];
     ReturnNilWhenObjectIsEmpty(className);
     UIViewController *pushedViewController = [UIResponder createBaseViewController:className];
-    if ([NSObject isNotEmpty:transition]) {
-        pushedViewController.customTransitioningDelegate = [[ADTransitioningDelegate alloc] initWithTransition:transition];
-    }
     NSMutableDictionary *mutableParamDict = [NSMutableDictionary dictionaryWithDictionary:paramDict];
     if ( ! mutableParamDict[kParamBackType]) {
         [mutableParamDict setValue:@(BackTypeImage) forKey:kParamBackType];   //这里设置的返回按钮由即将push出来的viewController负责处理
@@ -339,6 +326,33 @@
     [self.navigationController pushViewController:pushedViewController animated:animated];
     return pushedViewController;
 }
+
+#pragma mark - push with transition
+//- (UIViewController *)pushViewController:(NSString *)className transition:(ADTransition *)transition {
+//    return [self pushViewController:className withParams:nil transition:transition];
+//}
+//- (UIViewController *)pushViewController:(NSString *)className withParams:(NSDictionary *)paramDict transition:(ADTransition *)transition {
+//    return [self pushViewController:className withParams:paramDict transition:transition animated:YES];
+//}
+//- (UIViewController *)pushViewController:(NSString *)className withParams:(NSDictionary *)paramDict transition:(ADTransition *)transition animated:(BOOL)animated {
+//    [self hideKeyboard];
+//    ReturnNilWhenObjectIsEmpty(className);
+//    UIViewController *pushedViewController = [UIResponder createBaseViewController:className];
+//    if ([NSObject isNotEmpty:transition]) {
+//        pushedViewController.customTransitioningDelegate = [[ADTransitioningDelegate alloc] initWithTransition:transition];
+//    }
+//    NSMutableDictionary *mutableParamDict = [NSMutableDictionary dictionaryWithDictionary:paramDict];
+//    if ( ! mutableParamDict[kParamBackType]) {
+//        [mutableParamDict setValue:@(BackTypeImage) forKey:kParamBackType];   //这里设置的返回按钮由即将push出来的viewController负责处理
+//    }
+//    if ([pushedViewController isKindOfClass:[YSCBaseViewController class]]) {
+//        [(YSCBaseViewController *)pushedViewController setParams:mutableParamDict];
+//    }
+//    
+//    //NOTE:这里设置backBarButtonItem没有用！
+//    [self.navigationController pushViewController:pushedViewController animated:animated];
+//    return pushedViewController;
+//}
 
 /*
  * 返回上一层(最多到根)
@@ -431,7 +445,7 @@
 - (UINavigationController *)presentNormalViewController:(UIViewController *)viewController {
     [self hideKeyboard];
     UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:viewController];
-    navigationController.customNavigationDelegate = [[ADNavigationControllerDelegate alloc] init];
+//    navigationController.customNavigationDelegate = [[ADNavigationControllerDelegate alloc] init];
     navigationController.navigationController.navigationBar.translucent = NO;
 //    navigationController.interactivePopGestureRecognizer.enabled = YES;//NOTE:关闭系统自带的侧边滑动功能，会与MLTransition冲突！
 //    navigationController.interactivePopGestureRecognizer.delegate = self;

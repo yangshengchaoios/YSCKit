@@ -81,6 +81,8 @@
 //将json字符串转换成dict
 + (NSObject *)jsonObjectOfString:(NSString *)string;
 - (NSObject *)jsonObjectOfString;
+//将id对象转换成json字符串
++ (NSString *)jsonStringWithObject:(id)object;
 /**
  *  把符合pattern正则表达式的字符串替换成toString (默认是大小写敏感的)
  *

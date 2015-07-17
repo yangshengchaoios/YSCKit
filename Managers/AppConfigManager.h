@@ -13,7 +13,8 @@
 
 @property (nonatomic, strong) NSMutableDictionary *appTempParams;       //优先级最高
 @property (nonatomic, strong) NSMutableDictionary *umengTempParams;     //优先级次之
-@property (nonatomic, strong) NSString *udid;                   //设备唯一编号
+@property (nonatomic, strong) NSString *udid;                           //设备唯一编号
+@property (nonatomic, strong) NSString *deviceToken;                    //推送通知的token
 @property (nonatomic, weak) UIViewController *currentViewController;
 
 + (instancetype)sharedInstance;

@@ -171,6 +171,19 @@
     NSObject *json = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
     return json;
 }
+//将id对象转换成json字符串
++ (NSString *)jsonStringWithObject:(id)object {
+    NSError *error = nil;
+    NSData *jsonData = [NSJSONSerialization dataWithJSONObject:object
+                                                       options:NSJSONWritingPrettyPrinted
+                                                         error:&error];
+    
+    if ([jsonData length] > 0  || error == nil){
+        return [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+    }else{
+        return @"";
+    }
+}
 
 + (NSString *)replaceString:(NSString *)string byRegex:(NSString *)pattern to:(NSString *)toString {
     ReturnEmptyWhenObjectIsEmpty(string)
