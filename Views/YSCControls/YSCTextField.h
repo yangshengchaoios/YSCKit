@@ -12,24 +12,15 @@
 //  2. 正则表达式只判断内容合法性，不判断长度
 //  3. IBInspectable暂时只支持的类型为：Int、CGFloat、Double、String、Bool、CGPoint、CGSize、CGRect、UIColor、UIImage
 
-//符号的正则表达式特殊表示
-//大写 P 表示 Unicode 字符集七个字符属性之一：标点字符。
-//其他六个是
-//L：字母；
-//M：标记符号（一般不会单独出现）；
-//Z：分隔符（比如空格、换行等）；
-//S：符号（比如数学符号、货币符号等）；
-//N：数字（比如阿拉伯数字、罗马数字等）；
-//C：其他字符
+//.              匹配除换行符以外的任意字符
+//\d             与[0-9]相同
+//\D             与[^0-9]相同
+//\w             与[A-Za-z0-9\u4E00-\u9FA5_]相同
+//\W             与[^A-Za-z0-9\u4E00-\u9FA5_]相同
+//\s             匹配任何空白字符，与[ \n\t\r\v\f]相同
+//\S             与[^ \n\t\r\v\f]相同
+//\| \. \\ \* \^ \$ \+ \? \[ \] \- \( \) \{ \}    取消字符的特殊含义，按字面匹配
 typedef NS_ENUM(NSInteger, YSCTextType) {
-    //常规内容(通过property组合设置来实现)
-//    YSCTextTypeLetterAndNumber  = 0,    //只能是字母和数字(如用户名、密码)  ^[A-Za-z0-9]+$
-//    YSCTextTypeNumberAndChinese = 1,    //只能是数字、汉字(如姓名)
-//    YSCTextTypeLetterNumberChinese  = 2,//只能是字母、数字、汉字(如昵称、姓名)
-//    YSCTextTypeLetter           = 3,    //只能是字母
-//    YSCTextTypeNumber           = 4,    //只能是数字
-//    YSCTextTypeChinese          = 5,    //只能是汉字
-
     //特殊内容
     YSCTextTypePhone            = 10,   //电话号码(包括座机、手机号)
     YSCTextTypeMobilePhone      = 11,   //手机号
@@ -40,26 +31,33 @@ typedef NS_ENUM(NSInteger, YSCTextType) {
     YSCTextTypeUrl              = 16,   //超链接
     
     //自定义
-    YSCTextTypeProperty         = 98,   //完全根据property的设置来校验
-    YSCTextTypeCustom           = 99,   //自定义正则表达式
+    YSCTextTypeProperty         = 99,   //完全根据property的设置来校验
 };
 
+
+//三个难点：
+//1. 校验不通过有文字提示
+//2. err - >ok 必须延迟校验；ok -> err 可以实时校验
+//3. 智能化设置键盘类型
 @interface YSCTextField : UITextField
 
 @property (nonatomic, assign) IBInspectable YSCTextType textType;       //default YSCTextTypeProperty
 
-@property (nonatomic, assign) IBInspectable NSInteger minLength;        //default 0
 @property (nonatomic, assign) IBInspectable NSInteger maxLength;        //default 20, -1 means no limit
-@property (nonatomic, strong) IBInspectable NSString *customRegex;      //default nil means no limit
-@property (nonatomic, assign) IBInspectable BOOL allowsEmpty;           //default NO
+@property (nonatomic, strong) IBInspectable NSString *customRegex;      //default nil
 @property (nonatomic, assign) IBInspectable BOOL allowsEmoji;           //default NO
+@property (nonatomic, assign) IBInspectable BOOL allowsPunctuation;     //default NO 标点符号
+@property (nonatomic, assign) IBInspectable BOOL allowsEmpty;           //default NO
 @property (nonatomic, assign) IBInspectable BOOL allowsChinese;         //default NO
-@property (nonatomic, assign) IBInspectable BOOL allowsPunctuation;     //default NO
+@property (nonatomic, assign) IBInspectable BOOL allowsKeyboardDone;    //default YES 是否响应键盘的done按钮
 @property (nonatomic, assign) IBInspectable BOOL allowsLetter;          //default YES
 @property (nonatomic, assign) IBInspectable BOOL allowsNumber;          //default YES
 
+@property (nonatomic, strong) NSString *errorString;//校验出错的提示语
+
+- (BOOL)isValid;            //检测输入内容是否有效
 - (NSString *)textString;   //返回去掉首位空格后的字符串
 - (NSInteger)textLength;    //返回去掉首位空格后的字符串的长度
-- (BOOL)isValid;            //检测输入内容是否有效
+- (void)filterText:(NSString *)text;//TODO:输入text的时候过滤非法内容
 
 @end

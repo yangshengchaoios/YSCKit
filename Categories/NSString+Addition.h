@@ -13,7 +13,7 @@
 #define RegexMobilePhone    @"(^(01|1))\\d{10}$"
 #define RegexUserName       @"^[A-Za-z0-9]{6,20}+$"
 #define RegexPassword       @"^[a-zA-Z0-9]{6,20}+$"
-#define RegexRealName       @"^[a-zA-Z0-9\u4E00-\u9FA5 ]{1,10}+$"
+#define RegexRealName       @"^[a-zA-Z0-9\u4E00-\u9FA5 ]{1,10}+$" //@"^[^\W]$"
 #define RegexNickName       @"^[\u4e00-\u9fa5]{4,8}$"
 #define RegexSimpleIdentityCard     @"^(\\d{14}|\\d{17})(\\d|[xX])$"//简单身份证合法性判断
 #define RegexComplexIdentityCard    @"^(\\d{14}|\\d{17})(\\d|[xX])$"//TODO:复杂身份证合法性判断

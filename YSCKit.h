@@ -9,6 +9,9 @@
 #ifndef EZGoal_YSCKit_h
 #define EZGoal_YSCKit_h
 
+#import "YSCTextField.h"
+#import "YSCTextView.h"
+
 typedef void (^YSCResultBlock)(NSError *error);
 typedef void (^YSCBooleanResultBlock)(BOOL succeeded, NSError *error);
 typedef void (^YSCIntegerResultBlock)(NSInteger number, NSError *error);
@@ -21,5 +24,14 @@ typedef void (^YSCStringResultBlock)(NSString *string, NSError *error);
 typedef void (^YSCIdResultBlock)(id object, NSError *error);
 typedef void (^YSCProgressBlock)(NSInteger percentDone);
 typedef void (^YSCDictionaryResultBlock)(NSDictionary * dict, NSError *error);
+
+
+
+
+//代码段简写
+#define isEmpty(object) (object == nil \
+|| [object isKindOfClass:[NSNull class]] \
+|| ([object respondsToSelector:@selector(length)] && [(NSData *)object length] == 0) \
+|| ([object respondsToSelector:@selector(count)]  && [(NSArray *)object count] == 0))
 
 #endif

@@ -71,9 +71,6 @@
 }
 - (void)viewWillDisappear:(BOOL)animated {
     [MobClick endLogPageView:NSStringFromClass([self class])];
-    if ([self scrollableView]) {
-//        [self showNavBarAnimated:NO];
-    }
     [super viewWillDisappear:animated];
 }
 - (void)viewDidDisappear:(BOOL)animated {
@@ -86,16 +83,6 @@
         [[ReachabilityManager sharedInstance] bk_removeObserversWithIdentifier:self.reachabilityManagerIdentifier];
     }
 	[[NSNotificationCenter defaultCenter] removeObserver:self]; //等同于宏定义  removeAllObservers(self);
-}
-- (void)updateViewConstraints {
-    // Check a flag didSetupConstraints before creating constraints, because this method may be called multiple times, and we
-    // only want to create these constraints once. Without this check, the same constraints could be added multiple times,
-    // which can hurt performance and cause other issues. See Demo 7 (Animation) for an example of code that runs every time.
-    if (!self.isSetupConstraints) {
-        [self setupConstraints];
-        self.isSetupConstraints = YES;
-    }
-    [super updateViewConstraints];
 }
 
 /**
@@ -115,14 +102,6 @@
         [self setEdgesForExtendedLayout:UIRectEdgeBottom | UIRectEdgeLeft | UIRectEdgeRight];
     }
     self.view.backgroundColor = kDefaultViewColor; //设置默认背景颜色
-    
-    //单击隐藏键盘(这里会和tableviewcell的单击事件相冲突)
-//    [self.view bk_whenTapped:^{
-//        [blockSelf performSelector:@selector(hideKeyboard) withObject:nil afterDelay:0.1f];
-//    }];
-    
-    //在输入框聚焦的情况下按键盘的return键要隐藏键盘
-    [self setDelegateOfAllTextFields:self.view];
     
     //设置键盘显示和隐藏时，需要调整的内容
 	if ([self willCareKeyboard]) {
@@ -154,11 +133,6 @@
  
     //设置返回按钮类型
     [self configBackButton];
-    
-    //设置NavBar跟随的scrollview
-    if ([self scrollableView]) {
-//        [self followScrollView:[self scrollableView]];
-    }
     
     //相对布局——自动调整约束值和font大小
     if (AUTOLAYOUT_SCALE != 1) {
@@ -297,20 +271,15 @@
 
 }
 
-#pragma mark - constraints
-- (void)setupConstraints {
-    
-}
 
 #pragma mark - push & pop & dismiss view controller
 - (UIViewController *)pushViewController:(NSString *)className {
-	return [self pushViewController:className withParams:nil animated:YES];
+	return [self pushViewController:className withParams:nil];
 }
 - (UIViewController *)pushViewController:(NSString *)className withParams:(NSDictionary *)paramDict {
     return [self pushViewController:className withParams:paramDict animated:YES];
 }
 - (UIViewController *)pushViewController:(NSString *)className withParams:(NSDictionary *)paramDict animated:(BOOL)animated {
-//    return [self pushViewController:className withParams:paramDict transition:nil animated:animated];
     [self hideKeyboard];
     ReturnNilWhenObjectIsEmpty(className);
     UIViewController *pushedViewController = [UIResponder createBaseViewController:className];
@@ -327,33 +296,7 @@
     return pushedViewController;
 }
 
-#pragma mark - push with transition
-//- (UIViewController *)pushViewController:(NSString *)className transition:(ADTransition *)transition {
-//    return [self pushViewController:className withParams:nil transition:transition];
-//}
-//- (UIViewController *)pushViewController:(NSString *)className withParams:(NSDictionary *)paramDict transition:(ADTransition *)transition {
-//    return [self pushViewController:className withParams:paramDict transition:transition animated:YES];
-//}
-//- (UIViewController *)pushViewController:(NSString *)className withParams:(NSDictionary *)paramDict transition:(ADTransition *)transition animated:(BOOL)animated {
-//    [self hideKeyboard];
-//    ReturnNilWhenObjectIsEmpty(className);
-//    UIViewController *pushedViewController = [UIResponder createBaseViewController:className];
-//    if ([NSObject isNotEmpty:transition]) {
-//        pushedViewController.customTransitioningDelegate = [[ADTransitioningDelegate alloc] initWithTransition:transition];
-//    }
-//    NSMutableDictionary *mutableParamDict = [NSMutableDictionary dictionaryWithDictionary:paramDict];
-//    if ( ! mutableParamDict[kParamBackType]) {
-//        [mutableParamDict setValue:@(BackTypeImage) forKey:kParamBackType];   //这里设置的返回按钮由即将push出来的viewController负责处理
-//    }
-//    if ([pushedViewController isKindOfClass:[YSCBaseViewController class]]) {
-//        [(YSCBaseViewController *)pushedViewController setParams:mutableParamDict];
-//    }
-//    
-//    //NOTE:这里设置backBarButtonItem没有用！
-//    [self.navigationController pushViewController:pushedViewController animated:animated];
-//    return pushedViewController;
-//}
-
+#pragma mark - pop & dismiss
 /*
  * 返回上一层(最多到根)
  * 如果没有NavigationController就直接dismiss
@@ -397,8 +340,6 @@
 }
 
 /**
- *  返回到顶层
- *
  *  @return 最顶层的viewController
  */
 - (UIViewController *)popToRootViewController {
@@ -430,22 +371,24 @@
 	return [self presentViewController:className withParams:nil];
 }
 - (UINavigationController *)presentViewController:(NSString *)className withParams:(NSDictionary *)paramDict {
+    return [self presentViewController:className withParams:paramDict animated:YES];
+}
+- (UINavigationController *)presentViewController:(NSString *)className withParams:(NSDictionary *)paramDict animated:(BOOL)animated {
     ReturnNilWhenObjectIsEmpty(className);
     UIViewController *viewController = [UIResponder createBaseViewController:className];
     NSMutableDictionary *mutableParamDict = [NSMutableDictionary dictionaryWithDictionary:paramDict];
     if ( ! mutableParamDict[kParamBackType]) {
-        [mutableParamDict setValue:@(BackTypeImage) forKey:kParamBackType];//这里设置的返回按钮由即将presented出来的viewController负责处理
+        [mutableParamDict setValue:@(BackTypeImage) forKey:kParamBackType];   //这里设置的返回按钮由即将push出来的viewController负责处理
     }
-	if ([viewController isKindOfClass:[YSCBaseViewController class]]) {
-		[(YSCBaseViewController *)viewController setParams:mutableParamDict];
-	}
+    if ([viewController isKindOfClass:[YSCBaseViewController class]]) {
+        [(YSCBaseViewController *)viewController setParams:mutableParamDict];
+    }
     
     return [self presentNormalViewController:viewController];
 }
 - (UINavigationController *)presentNormalViewController:(UIViewController *)viewController {
     [self hideKeyboard];
     UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:viewController];
-//    navigationController.customNavigationDelegate = [[ADNavigationControllerDelegate alloc] init];
     navigationController.navigationController.navigationBar.translucent = NO;
 //    navigationController.interactivePopGestureRecognizer.enabled = YES;//NOTE:关闭系统自带的侧边滑动功能，会与MLTransition冲突！
 //    navigationController.interactivePopGestureRecognizer.delegate = self;
@@ -464,23 +407,6 @@
 		[self.presentedViewController dismissViewControllerAnimated:YES completion:nil];
 	}
 }
-
-
-#pragma mark - ScrollingNavbar
-
-- (UIView *)scrollableView {
-    return nil;
-}
-- (BOOL)scrollViewShouldScrollToTop:(UIScrollView *)scrollView {
-	// This enables the user to scroll down the navbar by tapping the status bar.
-//	[self performSelector:@selector(showNavbar) withObject:nil afterDelay:0.1];
-	return YES;
-}
-
-
-#pragma mark - push & pop with animation
-
-
 
 
 #pragma mark -  show & hide HUD
@@ -600,7 +526,6 @@
 - (UIAlertView *)showAlertVieWithMessage:(NSString *)message {
 	return [self showAlertViewWithTitle:@"提示" andMessage:message];
 }
-
 - (UIAlertView *)showAlertViewWithTitle:(NSString *)title andMessage:(NSString *)message {
 	UIAlertView *alertView = [UIAlertView bk_alertViewWithTitle:title message:message];
 	[alertView bk_setCancelButtonWithTitle:@"确定" handler:nil];

@@ -72,7 +72,7 @@
 }
 + (BOOL)isMatchRegex:(NSString*)pattern withString:(NSString *)string {
     ReturnNOWhenObjectIsEmpty(string)
-    return [string isMatchRegex:pattern options:NSRegularExpressionCaseInsensitive];
+    return [string isMatchRegex:pattern options:NSRegularExpressionAnchorsMatchLines];
 }
 + (BOOL)isMatchRegex:(NSString*)pattern withString:(NSString *)string options:(NSRegularExpressionOptions)options {
     ReturnNOWhenObjectIsEmpty(string)
