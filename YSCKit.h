@@ -9,6 +9,7 @@
 #ifndef EZGoal_YSCKit_h
 #define EZGoal_YSCKit_h
 
+#import "YSCEmoji.h"
 #import "YSCTextField.h"
 #import "YSCTextView.h"
 
@@ -26,6 +27,9 @@ typedef void (^YSCProgressBlock)(NSInteger percentDone);
 typedef void (^YSCDictionaryResultBlock)(NSDictionary * dict, NSError *error);
 
 
+//设置默认颜色
+#define DefaultBorderColor          RGB(216, 216, 216)
+#define DefaultPlaceholderColor     RGB(216, 216, 216)
 
 
 //代码段简写

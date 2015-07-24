@@ -21,7 +21,7 @@
     return YES;//NOTE:主要是为了放开删除按钮
 }
 - (BOOL)textFieldShouldReturn:(UITextField *)textField {
-    if(((YSCTextField *)textField).allowsKeyboardDone) {
+    if(((YSCTextField *)textField).allowsKeyboardDone) {//NOTE:放开键盘done按钮
         [textField resignFirstResponder];
     }
     return YES;
@@ -30,11 +30,7 @@
 #pragma mark - UITextViewDelegate
 - (BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text {
     if ([textView isFirstResponder]) {
-        //1. 判断是否表情键盘
-        if ([[[textView textInputMode] primaryLanguage] isEqualToString:@"emoji"] || ![[textView textInputMode] primaryLanguage]) {
-            return ((YSCTextField *)textView).allowsEmoji;
-        }
-        //2. 点击回车隐藏键盘
+        //NOTE:点击回车隐藏键盘
         if(((YSCTextField *)textView).allowsKeyboardDone && [text isEqualToString:@"\n"]) {
             [textView resignFirstResponder];
             return NO;

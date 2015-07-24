@@ -27,8 +27,7 @@ typedef NS_ENUM(NSInteger, YSCTextType) {
     YSCTextTypeIdentityNum      = 12,   //身份证号码
     YSCTextTypeEmail            = 13,   //email地址
     YSCTextTypeCarNumber        = 14,   //车牌号至少一位数字
-    YSCTextTypeVehicleNumber    = 15,   //车架号后6位
-    YSCTextTypeUrl              = 16,   //超链接
+    YSCTextTypeUrl              = 15,   //超链接
     
     //自定义
     YSCTextTypeProperty         = 99,   //完全根据property的设置来校验
@@ -36,24 +35,26 @@ typedef NS_ENUM(NSInteger, YSCTextType) {
 
 
 //三个难点：
-//1. 校验不通过有文字提示
-//2. err - >ok 必须延迟校验；ok -> err 可以实时校验
+//1. 校验不通过有文字提示 (应用层处理)
+//2. err - >ok 必须延迟校验；ok -> err 可以实时校验 √
 //3. 智能化设置键盘类型
 @interface YSCTextField : UITextField
 
 @property (nonatomic, assign) IBInspectable YSCTextType textType;       //default YSCTextTypeProperty
-
+//控制内容
 @property (nonatomic, assign) IBInspectable NSInteger maxLength;        //default 20, -1 means no limit
 @property (nonatomic, strong) IBInspectable NSString *customRegex;      //default nil
-@property (nonatomic, assign) IBInspectable BOOL allowsEmoji;           //default NO
-@property (nonatomic, assign) IBInspectable BOOL allowsPunctuation;     //default NO 标点符号
 @property (nonatomic, assign) IBInspectable BOOL allowsEmpty;           //default NO
+@property (nonatomic, assign) IBInspectable BOOL allowsEmoji;           //default NO 所有的emoji
+@property (nonatomic, assign) IBInspectable BOOL allowsSimpleEmoji;     //default NO 常用的emoji
 @property (nonatomic, assign) IBInspectable BOOL allowsChinese;         //default NO
+@property (nonatomic, assign) IBInspectable BOOL allowsPunctuation;     //default NO 标点符号(全)
 @property (nonatomic, assign) IBInspectable BOOL allowsKeyboardDone;    //default YES 是否响应键盘的done按钮
 @property (nonatomic, assign) IBInspectable BOOL allowsLetter;          //default YES
 @property (nonatomic, assign) IBInspectable BOOL allowsNumber;          //default YES
-
-@property (nonatomic, strong) NSString *errorString;//校验出错的提示语
+//控制UI样式
+@property (nonatomic, assign) IBInspectable CGFloat cornerRadius;       //圆角弧度
+@property (nonatomic, strong) IBInspectable UIColor *borderColor;       //边框颜色
 
 - (BOOL)isValid;            //检测输入内容是否有效
 - (NSString *)textString;   //返回去掉首位空格后的字符串

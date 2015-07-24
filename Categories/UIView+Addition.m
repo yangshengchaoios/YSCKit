@@ -310,11 +310,11 @@
 }
 - (void)resetFontSizeOfView {
     for (UIView *subview in self.subviews) {
-        if ([subview isKindOfClass:[UILabel class]]) {
+        if ([subview isMemberOfClass:[UILabel class]]) {
             UILabel *label = (UILabel *)subview;
             label.font = AUTOLAYOUT_FONT(label.font.pointSize);
         }
-        else if ([subview isKindOfClass:[UIButton class]]) {
+        else if ([subview isMemberOfClass:[UIButton class]]) {
             UIButton *button = (UIButton *)subview;
             button.titleLabel.font = AUTOLAYOUT_FONT(button.titleLabel.font.pointSize);
         }
