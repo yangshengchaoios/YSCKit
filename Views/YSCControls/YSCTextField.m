@@ -47,9 +47,10 @@
     self.allowsKeyboardDone = YES;
     self.allowsLetter = YES;
     self.allowsNumber = YES;
-    self.cornerRadius = 5;
+    self.cornerRadius = 8;
     self.borderColor = DefaultBorderColor;
     
+    self.borderStyle = UITextBorderStyleNone;
     self.clearButtonMode = UITextFieldViewModeWhileEditing;
     self.backgroundColor = [UIColor whiteColor];
     self.delegate = [YSCTextDelegate sharedInstance];

@@ -97,6 +97,34 @@
     }
 }
 
+- (void)checkNewVersionByAppleId:(NSString *)appleId {
+    NSMutableURLRequest *request = [[NSMutableURLRequest alloc] init];
+    [request setURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://itunes.apple.com/lookup?id=%@", appleId]]];
+    [request setHTTPMethod:@"POST"];
+    NSHTTPURLResponse *urlResponse = nil;
+    NSError *error = nil;
+    NSData *recervedData = [NSURLConnection sendSynchronousRequest:request returningResponse:&urlResponse error:&error];
+    
+    NSString *results = [[NSString alloc] initWithBytes:[recervedData bytes] length:[recervedData length] encoding:NSUTF8StringEncoding];
+    NSDictionary *dic = (NSDictionary *)[NSString jsonObjectOfString:results];
+    NSArray *infoArray = [dic objectForKey:@"results"];
+    if ([infoArray count]) {
+        NSDictionary *releaseInfo = [infoArray objectAtIndex:0];
+        NSString *onlineVersion = [releaseInfo objectForKey:@"version"];
+        NSString *currentVersion = AppVersion;
+        if (VersionCompareResultAscending == [currentVersion compareWithVersion:onlineVersion]) {
+            NSString *showMsg = [NSString stringWithFormat:@"发现新版本%@，是否前往更新？", onlineVersion];
+            UIAlertView *alertView = [[UIAlertView alloc] bk_initWithTitle:@"提示" message:showMsg];
+            [alertView bk_addButtonWithTitle:@"更新" handler:^{
+                NSString *openUrl = [NSString stringWithFormat:@"https://itunes.apple.com/cn/app/qu-ting/id%@", appleId];
+                [[UIApplication sharedApplication] openURL:[NSURL URLWithString:openUrl]];
+            }];
+            [alertView bk_setCancelButtonWithTitle:@"关闭" handler:nil];
+            [alertView show];
+        }
+    }
+}
+
 //设置App样式
 + (void)configNavigationBar {
     //将状态栏字体改为白色（前提是要设置[View controller-based status bar appearance]为NO）

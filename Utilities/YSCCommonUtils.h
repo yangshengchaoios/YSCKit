@@ -17,6 +17,7 @@
 + (void)checkNewVersionShowMessage:(BOOL)showMessage;
 + (void)checkNewVersionShowMessage:(BOOL)showMessage withParams:(NSDictionary *)params;
 + (void)checkNewVersion:(NewVersionModel *)versionModel showMessage:(BOOL)showMessage;
++ (void)checkNewVersionByAppleId:(NSString *)appleId;
 
 + (void)configNavigationBar;
 

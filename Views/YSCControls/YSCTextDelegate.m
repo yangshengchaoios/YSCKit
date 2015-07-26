@@ -31,7 +31,7 @@
 - (BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text {
     if ([textView isFirstResponder]) {
         //NOTE:点击回车隐藏键盘
-        if(((YSCTextField *)textView).allowsKeyboardDone && [text isEqualToString:@"\n"]) {
+        if(((YSCTextView *)textView).allowsKeyboardDone && [text isEqualToString:@"\n"]) {
             [textView resignFirstResponder];
             return NO;
         }
