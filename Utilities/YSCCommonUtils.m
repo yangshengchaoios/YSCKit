@@ -366,6 +366,18 @@
     [alertView show];
 }
 
+#pragma mark - 打开APP的设置并进入隐私界面
+
++ (void)OpenPrivacyOfSetting {
+    UIAlertView *alertView = [UIAlertView bk_alertViewWithTitle:@"位置服务不可用"
+                                                        message:@"请在设置页面打开位置服务，否则在本应用中与定位相关的功能将不可用。"];
+    [alertView bk_addButtonWithTitle:@"设置" handler:^{
+        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]];
+    }];
+    [alertView bk_setCancelButtonWithTitle:@"取消" handler:nil];
+    [alertView show];
+}
+
 #pragma makr - Sqlite操作
 
 + (BOOL)SqliteUpdate:(NSString *)sql {

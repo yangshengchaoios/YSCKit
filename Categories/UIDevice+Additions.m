@@ -164,6 +164,14 @@
     return [[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:@"tel://"]];
 }
 
+//判断定位是否可用(包括已经授权和没有决定)
++ (BOOL)isLocationAvaible {
+    CLAuthorizationStatus status = [CLLocationManager authorizationStatus];
+    return (kCLAuthorizationStatusAuthorizedWhenInUse == status ||
+            kCLAuthorizationStatusAuthorizedAlways == status ||
+            kCLAuthorizationStatusNotDetermined == status);
+}
+
 // 相册是否可用
 + (BOOL)isPhotoLibraryAvailable {
     return [UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypePhotoLibrary];

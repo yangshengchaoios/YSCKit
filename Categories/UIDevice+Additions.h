@@ -42,10 +42,10 @@ enum {
 
 //判断是否可用使用摄像头
 + (BOOL)isCanUseCamera;
-
 //判断是否可用打电话
 + (BOOL)isCanMakeCall;
-
+//判断定位是否可用(包括已经授权和没有决定)
++ (BOOL)isLocationAvaible;
 // 相册是否可用
 + (BOOL)isPhotoLibraryAvailable;
 // 照片流是否可用

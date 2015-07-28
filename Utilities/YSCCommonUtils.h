@@ -60,6 +60,10 @@
 + (void)MakeCall:(NSString *)phoneNumber;
 + (void)MakeCall:(NSString *)phoneNumber success:(void (^)(void))block;
 
+#pragma mark - 打开APP的设置并进入隐私界面
+
++ (void)OpenPrivacyOfSetting;
+
 #pragma mark - 更新Sqlite操作
 
 + (BOOL)SqliteUpdate:(NSString *)sql;
