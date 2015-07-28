@@ -10,11 +10,15 @@
 
 #define KeyOfCachedHtmlString(type)       [NSString stringWithFormat:@"KeyOfCachedHtmlString_%@", (type)]
 
-@interface YSCWebViewController () <UIWebViewDelegate>
+@interface YSCWebViewController () <UIWebViewDelegate, NSURLConnectionDelegate>
 
 @property (weak, nonatomic) IBOutlet UIWebView *webView;
 @property (strong, nonatomic) NSString *htmlString;
 @property (strong, nonatomic) NSString *type;
+
+@property (strong, nonatomic) NSURLConnection *urlConnection;
+@property (strong, nonatomic) NSURLRequest *request;
+@property (assign, nonatomic) BOOL authenticated;
 
 @end
 
@@ -72,12 +76,50 @@
 }
 
 #pragma mark - UIWebViewDelegate
-
+// Note: This method is particularly important. As the server is using a self signed certificate,
+// we cannot use just UIWebView - as it doesn't allow for using self-certs. Instead, we stop the
+// request in this method below, create an NSURLConnection (which can allow self-certs via the delegate methods
+// which UIWebView does not have), authenticate using NSURLConnection, then use another UIWebView to complete
+// the loading and viewing of the page. See connection:didReceiveAuthenticationChallenge to see how this works.
+- (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType; {
+    NSString *scheme = [[request URL] scheme];
+    if ([scheme isEqualToString:@"https"]) {
+        //如果是https:的话，那么就用NSURLConnection来重发请求。从而在请求的过程当中吧要请求的URL做信任处理。
+        if (NO == self.authenticated) {
+            self.request = request;
+            NSURLConnection* conn = [[NSURLConnection alloc] initWithRequest:request delegate:self];
+            [conn start];
+            [self.webView stopLoading];
+            return NO;
+        }
+    }
+    return YES;
+}
 - (void)webViewDidFinishLoad:(UIWebView *)webView {
+    [self hideHUDLoadingOnView:self.webView];
     [self.view layoutIfNeeded];
 }
 - (void)webView:(UIWebView *)webView didFailLoadWithError:(NSError *)error {
+    [self hideHUDLoadingOnView:self.webView];
     [self.view layoutIfNeeded];
 }
+
+#pragma mark - NURLConnection delegate
+-(void)connection:(NSURLConnection *)connection willSendRequestForAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge {
+    if ([challenge.protectionSpace.authenticationMethod isEqualToString:NSURLAuthenticationMethodServerTrust]) {
+        NSURL *baseURL = [self.request URL];
+        if ([challenge.protectionSpace.host isEqualToString:baseURL.host]) {
+            [challenge.sender useCredential:[NSURLCredential credentialForTrust:challenge.protectionSpace.serverTrust] forAuthenticationChallenge:challenge];
+        }
+    }
+    [challenge.sender continueWithoutCredentialForAuthenticationChallenge:challenge];
+}
+- (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response; {
+    [connection cancel];
+    self.authenticated = YES;
+    [self showHUDLoading:@"网页加载中" onView:self.webView];
+    [self.webView loadRequest:self.request];
+}
+
 
 @end
