@@ -77,7 +77,7 @@
     [self.contentScrollView addLegendHeaderWithRefreshingBlock:^{
         [blockSelf refreshWithSuccessed:blockSelf.successBlock failed:blockSelf.failedBlock];
         [MobClick event:UMEventKeyPullToRefresh
-             attributes:@{@"ClassName" : NSStringFromClass(self.class),
+             attributes:@{@"ClassName" : NSStringFromClass(blockSelf.class),
                           @"Action" : @"Refresh"}];
     }];
 }
@@ -87,7 +87,7 @@
     MJRefreshLegendFooter *footer = [self.contentScrollView addLegendFooterWithRefreshingBlock:^{
         [blockSelf loadMoreWithSuccessed:blockSelf.successBlock failed:blockSelf.failedBlock];
         [MobClick event:UMEventKeyPullToRefresh
-             attributes:@{@"ClassName" : NSStringFromClass(self.class),
+             attributes:@{@"ClassName" : NSStringFromClass(blockSelf.class),
                           @"Action" : @"LoadMore"}];
     }];
     [footer setTitle:@"" forState:MJRefreshFooterStateIdle];//闲置状态文本为空
