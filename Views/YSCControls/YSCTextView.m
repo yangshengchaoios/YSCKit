@@ -57,12 +57,14 @@
     
     //创建placeholerLabel
     self.placeholderLabel = [[UILabel alloc] initWithFrame:CGRectZero];
+    self.placeholderLabel.numberOfLines = 0;
     [self addSubview:self.placeholderLabel];
     self.placeholderLabel.text = self.placeholderString;
     self.placeholderLabel.font = self.font;
     [self.placeholderLabel mas_makeConstraints:^(MASConstraintMaker *make) {
         make.left.equalTo(self.mas_left).offset(8);
-        make.top.equalTo(self.mas_top).offset(8);
+        make.top.equalTo(self.mas_top).offset(13);
+        make.width.equalTo(self.mas_width).offset(0);
     }];
     
     //TODO:创建remainingLabel
