@@ -130,6 +130,8 @@
 			self.titleBarView.hidden = YES;
 		}
 	}
+    
+    [self setDelegateOfAllTextFields:self.view];
  
     //设置返回按钮类型
     [self configBackButton];
