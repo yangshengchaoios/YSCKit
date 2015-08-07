@@ -12,28 +12,12 @@
 
 #pragma mark - define blocks
 
-/**
- *  返回页面的显示内容
- *
- *  @param pageIndex
- *
- *  @return
- */
+//返回页面的显示内容
 typedef UIView *(^PageViewAtIndex)(NSInteger pageIndex);
-/**
- *  点击页面执行操作
- *
- *  @param pageIndex
- */
+//点击页面执行操作
 typedef void(^TapPageAtIndex)(NSInteger pageIndex, UIView *contentView);
-/**
- *  当页面切换到pageIndex时执行操作
- *
- *  @param pageIndex
- */
+//当页面切换到pageIndex时执行操作
 typedef void(^PageDidChangedAtIndex)(NSInteger pageIndex);
-
-
 
 
 /**
@@ -50,5 +34,6 @@ typedef void(^PageDidChangedAtIndex)(NSInteger pageIndex);
 @property (nonatomic, copy) PageDidChangedAtIndex pageDidChanged;           //如果外边需要处理页面切换事件的话，就用该回调即可
 
 - (void)reloadData;
+- (void)stopLoop;//NOTE:该方法必须调用，否则无法释放timer
 
 @end

@@ -81,6 +81,7 @@ typedef void (^CallBackWithResponseBlock)(id response);
 
 
 #define WeakSelfType __weak __typeof(&*self)
+#define WEAKSELF  WeakSelfType weakSelf = self;
 
 /**
  *  重新定义NSLog

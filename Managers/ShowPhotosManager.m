@@ -59,10 +59,10 @@
     showPhotosManager.browser = [[CXPhotoBrowser alloc] initWithDataSource:showPhotosManager delegate:showPhotosManager];
     [showPhotosManager.browser setInitialPageIndex:index];
     [showPhotosManager.browser.view bk_whenTapped:^{
-        [showPhotosManager.browser dismissViewControllerAnimated:NO completion:nil];
+        [showPhotosManager.browser dismissViewControllerAnimated:YES completion:nil];
     }];
     
-    [[AppConfigManager sharedInstance].currentViewController presentViewController:showPhotosManager.browser animated:NO completion:nil];
+    [[AppConfigManager sharedInstance].currentViewController presentViewController:showPhotosManager.browser animated:YES completion:nil];
     return showPhotosManager.browser;
 }
 

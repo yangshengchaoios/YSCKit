@@ -56,7 +56,8 @@
     if ([versionModel isKindOfClass:[NewVersionModel class]]) {
         BOOL isSkipTheVersion = [[NSUserDefaults standardUserDefaults] boolForKey:SkipVersion];
         if ( ! isSkipTheVersion) {
-            if (VersionCompareResultAscending == [AppVersion compareWithVersion:versionModel.appVersion]) {
+            if (NSOrderedAscending == [AppVersion compare:versionModel.appVersion options:NSNumericSearch]) {
+//            if (VersionCompareResultAscending == [AppVersion compareWithVersion:versionModel.appVersion]) {
                 [UIView hideHUDLoadingOnWindow];
                 if ([NSString isNotEmpty:versionModel.appDownloadUrl]) {//TODO:这里可以进一步判断是否是标准的ios更新地址
                     NSString *title = [NSString stringWithFormat:@"发现新版本 %@", versionModel.appVersion];

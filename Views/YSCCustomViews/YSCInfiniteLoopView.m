@@ -24,24 +24,18 @@
 - (id)initWithFrame:(CGRect)frame {
 	self = [super initWithFrame:frame];
 	if (self) {
-		// Initialization code
+		[self _setup];
 	}
 	return self;
 }
-
 - (id)initWithCoder:(NSCoder *)aDecoder {
 	self = [super initWithCoder:aDecoder];
 	if (self) {
+        [self _setup];
 	}
 	return self;
 }
-
-- (void)awakeFromNib {
-    [super awakeFromNib];
-	[self initSubviews];
-}
-
-- (void)initSubviews {
+- (void)_setup {
     self.lastFireDate = [NSDate distantPast];
     //1. 添加scrollview
 	self.scrollView = [[UIScrollView alloc] init];
@@ -54,10 +48,6 @@
 	self.scrollView.pagingEnabled = YES;
     self.scrollView.scrollsToTop = NO;
 	[self addSubview:self.scrollView];
-//    [self.scrollView autoPinEdgeToSuperviewEdge:ALEdgeTop withInset:0];
-//    [self.scrollView autoPinEdgeToSuperviewEdge:ALEdgeLeft withInset:0];
-//    [self.scrollView autoPinEdgeToSuperviewEdge:ALEdgeBottom withInset:0];
-//    [self.scrollView autoPinEdgeToSuperviewEdge:ALEdgeRight withInset:0];
     
     //2. 创建pagecontrol
     self.pageControl = [[SMPageControl alloc] init];
@@ -67,71 +57,21 @@
                                                                   toSize:AUTOLAYOUT_SIZE_WH(HeightOfPageControl, HeightOfPageControl)];
     self.pageControl.userInteractionEnabled = NO;
     [self addSubview:self.pageControl];
-//    [self.pageControl autoPinEdgeToSuperviewEdge:ALEdgeLeft withInset:0];
-//    [self.pageControl autoPinEdgeToSuperviewEdge:ALEdgeBottom withInset:AUTOLAYOUT_LENGTH(8)];
-//    [self.pageControl autoPinEdgeToSuperviewEdge:ALEdgeRight withInset:0];
-//    [self.pageControl autoMatchDimension:ALDimensionHeight
-//                             toDimension:ALDimensionWidth
-//                                  ofView:self.pageControl
-//                          withMultiplier:(HeightOfPageControl / self.width)];
     
     //4. 初始化参数设置
-    self.pageControl.currentPage = 0;
     self.animationDuration = 5;
     self.autoresizesSubviews = YES;
 }
-
-#pragma mark - 设置属性
-
-- (void)setCurrentPageIndex:(NSInteger)pageIndex {
-    if (pageIndex < 0) {
-        return;
-    }
+- (void)layoutSubviews {
+    [super layoutSubviews];
     
-    _currentPageIndex = pageIndex;
-    self.pageControl.currentPage = pageIndex;
-    if (self.pageDidChanged) {
-        self.pageDidChanged(pageIndex);
-    }
+    //重新计算self所有子view的坐标
+    self.scrollView.frame = self.bounds;
+    self.pageControl.frame = CGRectMake(0, CGRectGetHeight(self.bounds) - HeightOfPageControl, CGRectGetWidth(self.bounds), HeightOfPageControl);
     
-    self.lastFireDate = [NSDate date];//暂停自动滑动
-    
-    //计算出需要的偏移量
-    CGPoint newOffset = CGPointMake(0, 0);
-    for (UIView *subview in self.scrollView.subviews) {
-        if (TagOfContentViewStart + pageIndex == subview.tag) {
-            newOffset = CGPointMake(subview.left, 0);
-            break;
-        }
-    }
-    [self.scrollView setContentOffset:newOffset animated:NO];
+    //重新计算scrollView所有子view坐标
+    [self resetFrameOfSubviews];//这里仅仅是为了在viewDidLoad方法内调用便于获取真实的frame大小
 }
-
-- (void)setAnimationDuration:(NSTimeInterval)animationDuration {
-    if (animationDuration <= 0) {
-        return;
-    }
-    
-    _animationDuration = animationDuration;
-    if ([self.timer isValid]) {
-        [self.timer invalidate];
-        self.timer = nil;
-    }
-    self.timer = [NSTimer scheduledTimerWithTimeInterval:animationDuration
-                                                  target:self
-                                                selector:@selector(animationTimerDidFired:)
-                                                userInfo:nil
-                                                 repeats:YES];
-}
-
-- (void)setTotalPageCount:(NSInteger)totalPageCount {
-    if (totalPageCount <= 0) {
-        return;
-    }
-    _totalPageCount = totalPageCount;
-    _pageControl.numberOfPages = totalPageCount;
-}
-
 - (void)reloadData {
     if (self.totalPageCount == 0) {
         return;
@@ -164,22 +104,83 @@
             contentView.tag = TagOfContentViewStart + i;
         }
         
-		contentView.userInteractionEnabled = YES;
-		UITapGestureRecognizer *tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(contentViewTapAction:)];
-		[contentView addGestureRecognizer:tapGesture];
-		CGRect rightRect = contentView.frame;
-		rightRect.origin = CGPointMake(CGRectGetWidth(self.scrollView.frame) * i, 0);
-		contentView.frame = rightRect;
-		[self.scrollView addSubview:contentView];
+        contentView.userInteractionEnabled = YES;
+        UITapGestureRecognizer *tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(contentViewTapAction:)];
+        [contentView addGestureRecognizer:tapGesture];
+        [self.scrollView addSubview:contentView];
     }
-    self.scrollView.contentSize = CGSizeMake(scrollPages * CGRectGetWidth(self.scrollView.frame),
-                                             CGRectGetHeight(self.scrollView.frame));
-    self.scrollView.contentOffset = CGPointMake(0, 0);
-    self.pageControl.currentPage = 0;
+    [self resetFrameOfSubviews];//在viewDidAppear之后调用就获取的是真实的frame大小
+}
+- (void)stopLoop {
+    if ([self.timer isValid]) {
+        [self.timer invalidate];
+        self.timer = nil;
+    }
+}
+
+#pragma mark - 设置属性
+- (void)setCurrentPageIndex:(NSInteger)pageIndex {
+    if (pageIndex < 0) {
+        return;
+    }
+    
+    self.pageControl.currentPage = pageIndex;
+    _currentPageIndex = self.pageControl.currentPage;
+    if (self.pageDidChanged) {
+        self.pageDidChanged(pageIndex);
+    }
+    
+    self.lastFireDate = [NSDate date];//暂停自动滑动
+    
+    //计算出需要的偏移量
+    CGPoint newOffset = CGPointMake(0, 0);
+    for (UIView *subview in self.scrollView.subviews) {
+        if (TagOfContentViewStart + pageIndex == subview.tag) {
+            newOffset = CGPointMake(subview.left, 0);
+            break;
+        }
+    }
+    [self.scrollView setContentOffset:newOffset animated:NO];
+}
+- (void)setAnimationDuration:(NSTimeInterval)animationDuration {
+    if (animationDuration <= 0) {
+        return;
+    }
+    
+    _animationDuration = animationDuration;
+    if ([self.timer isValid]) {
+        [self.timer invalidate];
+        self.timer = nil;
+    }
+    self.timer = [NSTimer scheduledTimerWithTimeInterval:animationDuration
+                                                  target:self
+                                                selector:@selector(animationTimerDidFired:)
+                                                userInfo:nil
+                                                 repeats:YES];
+}
+- (void)setTotalPageCount:(NSInteger)totalPageCount {
+    if (totalPageCount <= 0) {
+        return;
+    }
+    _totalPageCount = totalPageCount;
+    _pageControl.numberOfPages = totalPageCount;
 }
 
 #pragma mark - 私有函数
-
+- (void)resetFrameOfSubviews {
+    NSInteger scrollPages = MAX(3, self.totalPageCount);
+    if (self.totalPageCount % 2 == 0) {
+        scrollPages = MAX(4, self.totalPageCount);
+    }
+    self.scrollView.contentSize = CGSizeMake(scrollPages * CGRectGetWidth(self.scrollView.frame),
+                                             CGRectGetHeight(self.scrollView.frame));
+    [self.scrollView.subviews enumerateObjectsUsingBlock:^(UIView *subview, NSUInteger idx, BOOL *stop) {
+        subview.frame = CGRectMake(idx * CGRectGetWidth(self.scrollView.frame), 0, CGRectGetWidth(self.scrollView.frame), CGRectGetHeight(self.scrollView.frame));
+    }];
+    [self.scrollView setContentOffset:CGPointMake(0, 0) animated:NO];
+    self.pageControl.currentPage = 0;
+    _currentPageIndex = self.pageControl.currentPage;
+}
 - (UIView *)getPageViewAtIndex:(NSInteger)pageIndex {
     if (self.pageViewAtIndex) {
         UIView *view = self.pageViewAtIndex(pageIndex);
@@ -192,7 +193,6 @@
     emptyView.backgroundColor = [UIColor redColor];
     return emptyView;
 }
-
 - (void)animationTimerDidFired:(NSTimer *)timer {
     if ([NSDate date].timeIntervalSince1970 - self.lastFireDate.timeIntervalSince1970 >= self.animationDuration) {
 //        self.currentPageIndex = (self.pageControl.currentPage + 1) % self.pageControl.numberOfPages;
@@ -201,18 +201,15 @@
         [self.scrollView setContentOffset:newOffset animated:YES];//NOTE:这里会自动回调scrollViewDidEndScrollingAnimation
     }
 }
-
-/**
- *  重置scrollview里的所有子view的位置
- */
+//重置scrollview里的所有子view的位置
 - (void)resetContentViews {
-    int contentOffsetX = self.scrollView.contentOffset.x;
+    CGFloat contentOffsetX = self.scrollView.contentOffset.x;
     BOOL isMoveToRight = YES;
     if (contentOffsetX >= self.scrollView.contentSize.width - CGRectGetWidth(self.scrollView.frame)) {
-        isMoveToRight = YES;
+        //到达最右边了，要留一个页面出来
         self.scrollView.contentOffset = CGPointMake(self.scrollView.contentSize.width - 2 * CGRectGetWidth(self.scrollView.frame), 0);
     }
-    else if (contentOffsetX <= 0) {
+    else if (contentOffsetX <= 0) {//到达最左边了，但是要留一个页面出来
         isMoveToRight = NO;
         self.scrollView.contentOffset = CGPointMake(CGRectGetWidth(self.scrollView.frame), 0);
     }
@@ -220,6 +217,8 @@
         for (UIView *contentView in self.scrollView.subviews) {
             if (contentView.frame.origin.x == self.scrollView.contentOffset.x) {
                 self.pageControl.currentPage = contentView.tag - TagOfContentViewStart;
+                _currentPageIndex = self.pageControl.currentPage;
+                break;
             }
         }
         return;
@@ -249,10 +248,10 @@
         //设置当前页码
         if (contentView.frame.origin.x == self.scrollView.contentOffset.x) {
             self.pageControl.currentPage = contentView.tag - TagOfContentViewStart;
+            _currentPageIndex = self.pageControl.currentPage;
         }
     }
 }
-
 - (void)contentViewTapAction:(UITapGestureRecognizer *)tap {
     UIView *contentView = tap.view;
     NSInteger tapIndex = contentView.tag - TagOfContentViewStart;
@@ -262,37 +261,29 @@
 }
 
 #pragma mark - UIScrollViewDelegate
-
 - (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView {
 	[self pauseTimer:self.timer];
 }
-
 - (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate {
     [self resumeTimer:self.timer afterInterval:self.animationDuration];
 }
-
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView {
-    //    NSLog(@"scrollViewDidScroll");
     
 }
-
 - (void)scrollViewDidEndScrollingAnimation:(UIScrollView *)scrollView {
     [self resetContentViews];
 }
-
 - (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView {
     [self resetContentViews];
 }
 
 #pragma mark - NSTimer暂停/恢复
-
 - (void)pauseTimer:(NSTimer *)timer {
 	if (![timer isValid]) {
 		return;
 	}
 	[timer setFireDate:[NSDate distantFuture]];
 }
-
 - (void)resumeTimer:(NSTimer *)timer afterInterval:(NSTimeInterval)interval {
 	if (![timer isValid]) {
 		return;
