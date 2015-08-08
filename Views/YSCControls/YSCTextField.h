@@ -28,6 +28,7 @@ typedef NS_ENUM(NSInteger, YSCTextType) {
     YSCTextTypeEmail            = 13,   //email地址
     YSCTextTypeCarNumber        = 14,   //车牌号至少一位数字
     YSCTextTypeUrl              = 15,   //超链接
+    YSCTextTypeDecimal          = 16,   //带小数点的数字
     
     //自定义
     YSCTextTypeProperty         = 99,   //完全根据property的设置来校验

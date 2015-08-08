@@ -215,6 +215,9 @@
     else if (YSCTextTypeIdentityNum == textType) {
         self.keyboardType = UIKeyboardTypeNumbersAndPunctuation;
     }
+    else if (YSCTextTypeDecimal == textType) {
+        self.keyboardType = UIKeyboardTypeDecimalPad;
+    }
     else {
         if (self.allowsNumber) {
             self.keyboardType = UIKeyboardTypeNumberPad;
