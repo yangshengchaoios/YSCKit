@@ -10,6 +10,10 @@
 
 @interface YSCBaseTableHeaderFooterView : UITableViewHeaderFooterView
 
++ (instancetype)dequeueHeaderByTableView:(UITableView *)tableView;
++ (void)registerHeaderToTableView:(UITableView *)tableView;
++ (NSString *)identifier;
+
 + (CGFloat)HeightOfView;
 + (UINib *)NibNameOfView;
 - (void)layoutDataModel:(BaseDataModel *)dataModel;
