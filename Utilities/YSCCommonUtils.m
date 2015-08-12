@@ -153,11 +153,11 @@
  */
 + (void)configUmeng {
 #pragma mark - 设置UMeng应用的key
-    [MobClick setAppVersion:AppVersion];
-    [UMSocialData openLog:NO];//是否打开调试日志输出
+//    [MobClick setAppVersion:AppVersion];
+//    [UMSocialData openLog:NO];//是否打开调试日志输出
 //    [UMFeedback setLogEnabled:NO];
-    [MobClick startWithAppkey:kUMAppKey reportPolicy:REALTIME channelId:kAppChannel];//配置统计
-    [UMSocialData setAppKey:kUMAppKey];//设置友盟社会化组件
+//    [MobClick startWithAppkey:kUMAppKey reportPolicy:REALTIME channelId:kAppChannel];//配置统计
+//    [UMSocialData setAppKey:kUMAppKey];//设置友盟社会化组件
 //    [UMFeedback checkWithAppkey:kUMAppKey];//配置用户反馈
     
 #pragma mark - 分享相关设置
@@ -166,7 +166,7 @@
 //    [UMSocialQQHandler setSupportWebView:YES];
     
     //设置微信AppId，设置分享url，默认使用友盟的网址
-    [UMSocialWechatHandler setWXAppId:AppKeyWeiXin appSecret:AppSecretWeiXin url:AppRedirectUrlOfWeibo];
+//    [UMSocialWechatHandler setWXAppId:AppKeyWeiXin appSecret:AppSecretWeiXin url:AppRedirectUrlOfWeibo];
     
     //打开新浪微博的SSO开关
 //    [UMSocialSinaHandler openSSOWithRedirectURL:AppRedirectUrlOfWeibo];

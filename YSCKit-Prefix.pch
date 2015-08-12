@@ -47,22 +47,8 @@ typedef void (^CallBackWithResponseBlock)(id response);
 //    #import "UIViewController+ADTransitionController.h"
 //    #import "UINavigationController+CustomAnimations.h"//系统自带的几种常用切换动画
 
-    //Utils
-    #import "YSCFileUtils.h"
-    #import "YSCImageUtils.h"
-    #import "YSCCommonUtils.h"
-
-    //Manager
-    #import "PlayAudioManager.h"
-    #import "ReachabilityManager.h"
-    #import "AppConfigManager.h"
-    #import "StorageManager.h"
-    #import "LogManager.h"
-    #import "AFNManager.h"
-    #import "SNSShareManager.h"
-    #import "ShowPhotosManager.h"
-
-    //自定义view(对于全局需要使用的自定义view放这里)
+    
+    #import "YSCKit.h"
 
     //业务逻辑相关
     #import "DataModel.h"
@@ -97,9 +83,6 @@ NSString *logString = [NSString stringWithFormat:@"[%@(%d)] %@",[[NSString strin
     } \
     else { \
         NSLog(@"%@", logString); \
-        if ([@"1" isEqualToString:kLogManageType]) { \
-            [LogManager saveLog:logString]; \
-        } \
     } \
 } while (0)
 

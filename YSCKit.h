@@ -12,6 +12,17 @@
 #import "YSCEmoji.h"
 #import "YSCTextField.h"
 #import "YSCTextView.h"
+//Utils
+#import "YSCFileUtils.h"
+#import "YSCImageUtils.h"
+#import "YSCCommonUtils.h"
+
+//Manager
+#import "PlayAudioManager.h"
+#import "ReachabilityManager.h"
+#import "StorageManager.h"
+#import "LogManager.h"
+#import "AFNManager.h"
 
 typedef void (^YSCResultBlock)(NSError *error);
 typedef void (^YSCBooleanResultBlock)(BOOL succeeded, NSError *error);

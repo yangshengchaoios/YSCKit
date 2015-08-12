@@ -57,11 +57,9 @@
          }*/
     }
     self.isAppeared = YES;
-    [AppConfigManager sharedInstance].currentViewController = self;
 }
 - (void)viewDidAppear:(BOOL)animated {
 	[super viewDidAppear:animated];
-    [MobClick beginLogPageView:NSStringFromClass([self class])];
     
     //控制只执行一次的方法
     if (!self.isRunViewDidLoadExtension) {
@@ -70,7 +68,6 @@
     }
 }
 - (void)viewWillDisappear:(BOOL)animated {
-    [MobClick endLogPageView:NSStringFromClass([self class])];
     [super viewWillDisappear:animated];
 }
 - (void)viewDidDisappear:(BOOL)animated {
@@ -305,7 +302,6 @@
  */
 - (UIViewController *)popViewController {
     [self hideKeyboard];
-    [MobClick event:UMEventKeyPopViewController];
 	if (self.navigationController) {     //如果有navigationBar
 		NSInteger index = [self.navigationController.viewControllers indexOfObject:self];
 		UIViewController *previousViewController = [self.navigationController.viewControllers objectAtIndex:MAX(index - 1, 0)];
@@ -324,7 +320,6 @@
  */
 - (UIViewController *)backViewController {
     [self hideKeyboard];
-    [MobClick event:UMEventKeyBackViewController];
 	if (self.navigationController) {            //如果有navigationBar
 		NSInteger index = [self.navigationController.viewControllers indexOfObject:self];
 		if (index > 0) {                        //不是root，就返回上一级
