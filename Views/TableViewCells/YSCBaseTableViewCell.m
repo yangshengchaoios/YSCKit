@@ -18,7 +18,7 @@
     [self resetFontSizeOfView];         //递归缩放label和button的字体大小
     [self resetConstraintOfView];
 }
-+ (YSCBaseTableViewCell *)dequeueCellByTableView :(UITableView *)tableView {
++ (instancetype)dequeueCellByTableView :(UITableView *)tableView {
     YSCBaseTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:[[self class] identifier]];
     return cell;
 }

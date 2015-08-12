@@ -100,7 +100,7 @@
 - (CGFloat)minimumLineSpacingForSectionAtIndex:(NSInteger)section {
     return AUTOLAYOUT_LENGTH(20);
 }
-//cell的最小列间距
+//cell的最小同行的item之间的间距
 - (CGFloat)minimumInteritemSpacingForSectionAtIndex:(NSInteger)section {
     return 0;
 }

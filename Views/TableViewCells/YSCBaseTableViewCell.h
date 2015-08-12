@@ -11,7 +11,7 @@
 @interface YSCBaseTableViewCell : UITableViewCell
 
 
-+ (YSCBaseTableViewCell *)dequeueCellByTableView:(UITableView *)tableView;
++ (instancetype)dequeueCellByTableView:(UITableView *)tableView;
 + (void)registerCellToTableView:(UITableView *)tableView;
 + (NSString *)identifier;
 
