@@ -230,6 +230,13 @@
     self.layer.cornerRadius = radius;
     self.layer.masksToBounds = YES;
 }
+
++ (void)makeBorderForView:(UIView *)view {
+    [self makeBorderForView:view withColor:kDefaultBorderColor borderWidth:1];
+}
+- (void)makeBorderLine {
+    [self makeBorderWithColor:kDefaultBorderColor borderWidth:1];
+}
 + (void)makeBorderForView:(UIView *)view withColor:(UIColor *)color borderWidth:(CGFloat)width {
     ReturnWhenObjectIsEmpty(view);
     [view makeBorderWithColor:color borderWidth:width];

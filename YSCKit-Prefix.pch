@@ -11,9 +11,6 @@
 #warning "This project uses features only available in iOS SDK 3.0 and later."
 #endif
 
-typedef void (^CallBackBlock)();
-typedef void (^CallBackWithResponseBlock)(id response);
-
 #ifdef __OBJC__
     //常用pod中第三方库
     #import <UIKit/UIKit.h>
@@ -27,5 +24,4 @@ typedef void (^CallBackWithResponseBlock)(id response);
 
     #import "Constants.h"   //项目全局header文件
     #import "YSCKit.h"      //基础框架库
-
 #endif
