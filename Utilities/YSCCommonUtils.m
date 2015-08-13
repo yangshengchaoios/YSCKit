@@ -127,10 +127,7 @@
 }
 
 //设置App样式
-+ (void)configNavigationBar {
-    //将状态栏字体改为白色（前提是要设置[View controller-based status bar appearance]为NO）
-    [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent];
-    
++ (void)configNavigationBar {    
     //改变Navibar的颜色和背景图片
     if (DefaultNaviBarBackImage) {
         [[UINavigationBar appearance] setBackgroundImage:DefaultNaviBarBackImage forBarMetrics:UIBarMetricsDefault];

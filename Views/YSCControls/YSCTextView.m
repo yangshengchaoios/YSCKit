@@ -202,22 +202,36 @@
     //1.2 根据property属性校验
     return [self isValidByProperty];
 }
+- (void)setBorderColor:(UIColor *)borderColor {
+    _borderColor = borderColor;
+    self.layer.borderColor = borderColor.CGColor;
+    self.layer.borderWidth = AUTOLAYOUT_LENGTH(1);
+}
+- (void)setCornerRadius:(CGFloat)cornerRadius {
+    _cornerRadius = cornerRadius;
+    self.layer.cornerRadius = AUTOLAYOUT_LENGTH(cornerRadius);
+    self.layer.masksToBounds = YES;
+}
+- (void)setPlaceholderColor:(UIColor *)placeholderColor {
+    _placeholderColor = placeholderColor;
+    self.placeholderLabel.textColor = placeholderColor;
+}
+- (void)setPlaceholderString:(NSString *)placeholderString {
+    _placeholderString = placeholderString;
+    self.placeholderLabel.text = placeholderString;
+}
+- (void)setRemainingTextColor:(UIColor *)remainingTextColor {
+    _remainingTextColor = remainingTextColor;
+    self.remainingLabel.textColor = remainingTextColor;
+}
+- (void)setShowsRemainingCount:(BOOL)showsRemainingCount {
+    _showsRemainingCount = showsRemainingCount;
+    self.remainingLabel.hidden = ! showsRemainingCount;
+}
 //NOTE:xib中修改了某些属性，需要重新设置参数
 - (void)layoutSubviews {
     [super layoutSubviews];
     [self resetKeyboardType];
-    //设置圆角弧度
-    self.layer.cornerRadius = AUTOLAYOUT_LENGTH(self.cornerRadius);
-    self.layer.masksToBounds = YES;
-    //设置边框颜色
-    self.layer.borderColor = self.borderColor.CGColor;
-    self.layer.borderWidth = AUTOLAYOUT_LENGTH(1);
-    //设置提示label
-    self.placeholderLabel.text = _placeholderString;
-    self.placeholderLabel.textColor = _placeholderColor;
-    //设置是否显示剩余字符数
-    self.remainingLabel.textColor = _remainingTextColor;
-    self.remainingLabel.hidden = ! _showsRemainingCount;
 }
 
 //定义弹出键盘类型
