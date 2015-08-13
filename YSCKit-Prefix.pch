@@ -11,72 +11,19 @@
 #warning "This project uses features only available in iOS SDK 3.0 and later."
 #endif
 
-typedef void (^CallBackBlock)();
-typedef void (^CallBackWithResponseBlock)(id response);
-
 #ifdef __OBJC__
-    //常用第三方库
+    //常用pod中第三方库
     #import <UIKit/UIKit.h>
     #import <Foundation/Foundation.h>
     #import <BlocksKit/BlocksKit.h>
     #import <BlocksKit+UIKit.h>
     #import <BlocksKit+MessageUI.h>
     #import <MBProgressHUD/MBProgressHUD.h>
-//    #import <POP/POP.h>
     #import <FMDB/FMDB.h>
-//    #import "PureLayout.h"
     #import "Masonry.h"
-    #import "EnumType.h"
-    #import "UMengConstants.h"
 
-    //系统类扩展
-    #import "NSObject+Addition.h"
-    #import "UITextField+Additions.h"
-    #import "UIView+Addition.h"
-    #import "NSDate+Additions.h"
-    #import "NSTimer+Addition.h"
-    #import "UIColor+Expanded.h"
-    #import "NSString+Addition.h"
-    #import "UIImageView+Additions.h"
-    #import "UIDevice+Additions.h"
-    #import "UIResponder+Additions.h"
-    #import "NSLayoutConstraint+Additions.h"
-    #import "NSArray+Addition.h"
-    #import "UIScrollView+Additions.h"
-    #import "UIImage+Additions.h"
-//    #import "UIViewController+ADTransitionController.h"
-//    #import "UINavigationController+CustomAnimations.h"//系统自带的几种常用切换动画
-
-    //Utils
-    #import "YSCFileUtils.h"
-    #import "YSCImageUtils.h"
-    #import "YSCCommonUtils.h"
-
-    //Manager
-    #import "PlayAudioManager.h"
-    #import "ReachabilityManager.h"
-    #import "AppConfigManager.h"
-    #import "StorageManager.h"
-    #import "LogManager.h"
-    #import "AFNManager.h"
-    #import "SNSShareManager.h"
-    #import "ShowPhotosManager.h"
-
-    //自定义view(对于全局需要使用的自定义view放这里)
-
-    //业务逻辑相关
-    #import "DataModel.h"
-    #import "Login.h"
-    #import "YSCPullToRefreshTableViewController.h"
-    #import "YSCPullToRefreshCollectionViewController.h"
-    #import "YSCBaseTableViewCell.h"
-    #import "YSCBaseCollectionViewCell.h"
-    #import "YSCBaseTableHeaderFooterView.h"
-    #import "YSCBaseCollectionHeaderFooterView.h"
-
-    //定义固定常量和公用枚举
-    #import "UrlConstants.h"
-    #import "Constants.h"
+    #import "Constants.h"   //项目全局header文件
+    #import "YSCKit.h"      //基础框架库
 #endif
 
 

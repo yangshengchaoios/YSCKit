@@ -1,6 +1,6 @@
 //
 //  YSCEmoji.h
-//  EZGoal
+//  YSCKit
 //
 //  Created by yangshengchao on 15/7/24.
 //  Copyright (c) 2015年 Builder. All rights reserved.

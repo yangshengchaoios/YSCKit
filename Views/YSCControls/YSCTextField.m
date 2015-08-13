@@ -52,7 +52,9 @@
     
     self.borderStyle = UITextBorderStyleNone;
     self.clearButtonMode = UITextFieldViewModeWhileEditing;
-    self.backgroundColor = [UIColor whiteColor];
+    if (nil == self.backgroundColor) {
+        self.backgroundColor = [UIColor whiteColor];
+    }
     self.delegate = [YSCTextDelegate sharedInstance];
     self.oldString = @"";
     addNObserverWithObj(@selector(textFieldChanged:), UITextFieldTextDidChangeNotification, self);

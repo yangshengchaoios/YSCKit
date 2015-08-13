@@ -36,7 +36,7 @@
     [self.datePicker bk_addEventHandler:^(id sender) {
         if (blockSelf.pickerType < YSCPickerTypeAddress) {
             if (blockSelf.selectingBlock) {
-                blockSelf.selectingBlock([blockSelf.datePicker date]);
+                blockSelf.selectingBlock([blockSelf.datePicker date], nil);
             }
         }
     } forControlEvents:UIControlEventValueChanged];
@@ -68,10 +68,10 @@
         [blockSelf hidePickerView];
         if (blockSelf.selectingBlock) {
             if (YSCPickerTypeCustom == blockSelf.pickerType) {
-                blockSelf.selectingBlock(blockSelf.selectedIndexArray);
+                blockSelf.selectingBlock(blockSelf.selectedIndexArray, nil);
             }
             else if (blockSelf.pickerType <= YSCPickerTypeDateTime) {
-                blockSelf.selectingBlock([blockSelf.datePicker date]);
+                blockSelf.selectingBlock([blockSelf.datePicker date], nil);
             }
         }
     } forControlEvents:UIControlEventTouchUpInside];
@@ -302,19 +302,19 @@
             regionModel.sid = self.currentSectionModel.sid;
             regionModel.section = self.currentSectionModel.section;
             if (self.selectingBlock) {
-                self.selectingBlock(regionModel);
+                self.selectingBlock(regionModel, nil);
             }
         }
         else {
             if (self.selectingBlock) {
-                self.selectingBlock(nil);
+                self.selectingBlock(nil, nil);
             }
         }
     }
     else if (YSCPickerTypeCustom == self.pickerType) {
         self.selectedIndexArray[component] = @(row);
         if (self.selectingBlock) {
-            self.selectingBlock(self.selectedIndexArray);
+            self.selectingBlock(self.selectedIndexArray, nil);
         }
     }
 }
