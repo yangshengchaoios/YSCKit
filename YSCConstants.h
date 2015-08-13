@@ -23,6 +23,12 @@ typedef void (^YSCDataResultBlock)(NSData *data, NSError *error);
 typedef void (^YSCImageResultBlock)(UIImage * image, NSError *error);
 typedef void (^YSCDictionaryResultBlock)(NSDictionary * dict, NSError *error);
 
+//常量
+#ifndef kLogManageType
+    #define kLogManageType  @"1"
+#endif
+
+
 /**
  *  重新定义NSLog
  */
