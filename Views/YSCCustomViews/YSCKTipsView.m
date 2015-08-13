@@ -29,7 +29,7 @@
                              withMessage:(NSString *)message
                                 iconImage:(UIImage *)image
                              buttonTitle:(NSString *)buttonTitle
-                            buttonAction:(CallBackBlock)buttonAction {
+                            buttonAction:(YSCBlock)buttonAction {
     YSCKTipsView *tipsView = FirstViewInXib(@"YSCKTipsView");
     tipsView.iconImageView.image = image;
     tipsView.messageLabel.text = message;

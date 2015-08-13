@@ -17,6 +17,6 @@
                              withMessage:(NSString *)message
                                 iconImage:(UIImage *)image
                              buttonTitle:(NSString *)buttonTitle
-                            buttonAction:(CallBackBlock)buttonAction;
+                            buttonAction:(YSCBlock)buttonAction;
 
 @end

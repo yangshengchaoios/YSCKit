@@ -27,9 +27,9 @@ typedef NS_ENUM(NSInteger, YSCPickerType) {
 @property (weak, nonatomic) NSArray *customDataArray;
 
 @property (assign, nonatomic) YSCPickerType pickerType;
-@property (copy, nonatomic) CallBackWithResponseBlock selectingBlock;
-@property (copy, nonatomic) CallBackBlock completionShowBlock;
-@property (copy, nonatomic) CallBackBlock completionHideBlock;
+@property (copy, nonatomic) YSCIdResultBlock selectingBlock;
+@property (copy, nonatomic) YSCBlock completionShowBlock;
+@property (copy, nonatomic) YSCBlock completionHideBlock;
 
 + (instancetype)CreateYSCPickerView;
 - (void)showPickerView:(id)initObject;
