@@ -40,9 +40,9 @@
 #import "StorageManager.h"
 #import "LogManager.h"
 #import "AFNManager.h"
-#import "AppConfigManager.h"
-#import "ShowPhotosManager.h"
-#import "SNSShareManager.h"
+//#import "AppConfigManager.h"
+//#import "ShowPhotosManager.h"
+//#import "SNSShareManager.h"
 
 //常用自定义控件
 #import "YSCTextField.h"

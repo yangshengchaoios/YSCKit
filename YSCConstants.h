@@ -23,6 +23,11 @@ typedef void (^YSCDataResultBlock)(NSData *data, NSError *error);
 typedef void (^YSCImageResultBlock)(UIImage * image, NSError *error);
 typedef void (^YSCDictionaryResultBlock)(NSDictionary * dict, NSError *error);
 
+//常量
+#ifndef kLogManageType
+    #define kLogManageType  @"1"
+#endif
+
 /**
  *  重新定义NSLog
  */
@@ -66,7 +71,6 @@ return _sharedObject;
 #ifndef kDefaultPlaceholderColor
     #define kDefaultPlaceholderColor     RGB(216, 216, 216)
 #endif
-
 
 //代码段简写
 #ifndef isEmpty
