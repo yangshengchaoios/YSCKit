@@ -50,9 +50,9 @@
     self.allowsLetter = YES;
     self.allowsNumber = YES;
     self.cornerRadius = 8;
-    self.borderColor = DefaultBorderColor;
+    self.borderColor = kDefaultBorderColor;
     self.placeholderString = @"";
-    self.placeholderColor = DefaultPlaceholderColor;
+    self.placeholderColor = kDefaultPlaceholderColor;
     self.remainingTextColor = [UIColor redColor];
     
     //创建placeholerLabel

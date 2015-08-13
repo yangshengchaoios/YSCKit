@@ -47,6 +47,7 @@
     self.tableView.dataSource = self;
     self.tableView.delegate = self;
     self.tableView.backgroundColor = kDefaultViewColor;
+    self.tableView.separatorColor = kDefaultBorderColor;
 }
 
 #pragma mark - 私有方法子类无需重写

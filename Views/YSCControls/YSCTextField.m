@@ -48,7 +48,7 @@
     self.allowsLetter = YES;
     self.allowsNumber = YES;
     self.cornerRadius = 8;
-    self.borderColor = DefaultBorderColor;
+    self.borderColor = kDefaultBorderColor;
     
     self.borderStyle = UITextBorderStyleNone;
     self.clearButtonMode = UITextFieldViewModeWhileEditing;
