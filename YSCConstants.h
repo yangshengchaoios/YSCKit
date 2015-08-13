@@ -72,7 +72,9 @@ return _sharedObject;
 #ifndef kDefaultPlaceholderColor
     #define kDefaultPlaceholderColor     RGB(216, 216, 216)
 #endif
-
+#ifndef kDefaultTipViewButtonColor
+    #define kDefaultTipViewButtonColor   [UIColor redColor]
+#endif
 
 //代码段简写
 #ifndef isEmpty
