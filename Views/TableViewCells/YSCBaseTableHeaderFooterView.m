@@ -27,7 +27,7 @@
     return NSStringFromClass(self.class);
 }
 + (CGFloat)HeightOfView {
-    return AUTOLAYOUT_LENGTH(100);
+    return AUTOLAYOUT_LENGTH(70);
 }
 + (UINib *)NibNameOfView {
     return [UINib nibWithNibName:NSStringFromClass(self.class) bundle:nil];
