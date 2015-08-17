@@ -84,6 +84,10 @@ return _sharedObject;
     || ([object respondsToSelector:@selector(count)]  && [(NSArray *)object count] == 0))
 #endif
 
+#ifndef isNotEmpty
+    #define isNotEmpty(object) (! isEmpty(object))
+#endif
+
 #ifndef WeakSelfType
     #define WeakSelfType __weak __typeof(&*self)
     #define WEAKSELF  WeakSelfType weakSelf = self;
