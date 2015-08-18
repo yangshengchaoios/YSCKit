@@ -13,19 +13,24 @@
 - (void)setup {
     [super setup];
     self.collectionView.pagingEnabled = YES;
-    self.itemSeperator = 20;
+}
+- (void)refreshCollectionViewByItemArray:(NSArray *)itemArray {
+    [super refreshCollectionViewByItemArray:itemArray];
+    if (self.scrollAtIndex) {
+        self.scrollAtIndex(0, nil);
+    }
 }
 - (void)layoutSubviews {
     [super layoutSubviews];
     if (self.isScrollHor) {
-        self.collectionView.frame = CGRectMake(-AUTOLAYOUT_LENGTH(self.itemSeperator / 2), 0,
-                                               CGRectGetWidth(self.bounds) + AUTOLAYOUT_LENGTH(self.itemSeperator),
+        self.collectionView.frame = CGRectMake(-AUTOLAYOUT_LENGTH(self.minimumLineSpacing / 2), 0,
+                                               CGRectGetWidth(self.bounds) + AUTOLAYOUT_LENGTH(self.minimumLineSpacing),
                                                CGRectGetHeight(self.bounds));
     }
     else {
-        self.collectionView.frame = CGRectMake(0, -AUTOLAYOUT_LENGTH(self.itemSeperator / 2),
+        self.collectionView.frame = CGRectMake(0, -AUTOLAYOUT_LENGTH(self.minimumLineSpacing / 2),
                                                CGRectGetWidth(self.bounds),
-                                               CGRectGetHeight(self.bounds) + AUTOLAYOUT_LENGTH(self.itemSeperator));
+                                               CGRectGetHeight(self.bounds) + AUTOLAYOUT_LENGTH(self.minimumLineSpacing));
     }
 }
 
@@ -37,17 +42,26 @@
 }
 - (UIEdgeInsets)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout insetForSectionAtIndex:(NSInteger)section {
     if (self.isScrollHor) {
-        return AUTOLAYOUT_EDGEINSETS(0, self.itemSeperator / 2, 0, self.itemSeperator / 2);
+        return AUTOLAYOUT_EDGEINSETS(0, self.minimumLineSpacing / 2, 0, self.minimumLineSpacing / 2);
     }
     else {
-        return AUTOLAYOUT_EDGEINSETS(self.itemSeperator / 2, 0, self.itemSeperator / 2, 0);
+        return AUTOLAYOUT_EDGEINSETS(self.minimumLineSpacing / 2, 0, self.minimumLineSpacing / 2, 0);
     }
 }
-//cell的最小行间距
-- (CGFloat)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout minimumLineSpacingForSectionAtIndex:(NSInteger)section {
-    return AUTOLAYOUT_LENGTH(self.itemSeperator);
-}
 
-#pragma mark - UICollectionViewDelegate
+#pragma mark - UIScrollViewDelegate
+- (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView {
+    [self didWhenScrollViewEnded:scrollView];
+}
+- (void)didWhenScrollViewEnded:(UIScrollView *)scrollView {
+    if (scrollView != self.collectionView) {//屏蔽contentView回调该方法
+        return;
+    }
+    CGFloat pageWidth = scrollView.width;
+    int pageIndex = floor((scrollView.contentOffset.x - pageWidth / 2) / pageWidth) + 1;
+    if (self.scrollAtIndex) {
+        self.scrollAtIndex(pageIndex, nil);
+    }
+}
 
 @end

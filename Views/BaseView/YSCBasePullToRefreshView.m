@@ -379,8 +379,8 @@
         self.segmentedTitleArray = [NSMutableArray array];
     }
     WeakSelfType blockSelf = self;
-    self.segmentedControl.textColor = kDefaultTextColor;
-    self.segmentedControl.selectedTextColor = kDefaultTextColor;
+    self.segmentedControl.textColor = kDefaultTextColorBlack1;
+    self.segmentedControl.selectedTextColor = kDefaultTextColorBlack1;
     self.segmentedControl.selectionIndicatorColor = [UIColor redColor];
     self.segmentedControl.font = AUTOLAYOUT_FONT(28);
     self.segmentedControl.sectionTitles = self.segmentedTitleArray;
