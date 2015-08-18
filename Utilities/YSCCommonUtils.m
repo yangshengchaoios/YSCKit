@@ -133,14 +133,14 @@
         [[UINavigationBar appearance] setBackgroundImage:DefaultNaviBarBackImage forBarMetrics:UIBarMetricsDefault];
     }
     else {
-        [[UINavigationBar appearance] setBarTintColor:DefaultNaviBarBackColor];
+        [[UINavigationBar appearance] setBarTintColor:kDefaultNaviBarBackColor];
     }
     
     //控制返回箭头按钮的颜色
-    [[UINavigationBar appearance] setTintColor:DefaultNaviBarArrowBackColor];
+    [[UINavigationBar appearance] setTintColor:kDefaultNaviBarArrowBackColor];
     
     //设置Title为白色,Title大小为18
-    [[UINavigationBar appearance] setTitleTextAttributes:@{ NSForegroundColorAttributeName : DefaultNaviBarTitleColor,
+    [[UINavigationBar appearance] setTitleTextAttributes:@{ NSForegroundColorAttributeName : kDefaultNaviBarTitleColor,
                                                             NSFontAttributeName : [UIFont boldSystemFontOfSize:AUTOLAYOUT_LENGTH(34)] }];
     [[UINavigationBar appearance] setBarStyle:UIBarStyleBlackTranslucent];
 }

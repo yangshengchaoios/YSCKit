@@ -79,7 +79,12 @@
 - (UIView *)layoutCellWithData:(id)object atIndexPath:(NSIndexPath *)indexPath {
 	YSCBaseTableViewCell *cell = [self.tableView dequeueReusableCellWithIdentifier:kCellIdentifier];
     if ([cell isKindOfClass:[YSCBaseTableViewCell class]]) {
-        [(YSCBaseTableViewCell *)cell layoutDataModel:object];//简单设置cell显示内容，如果需要处理cell的特殊点击事件就必须重写该方法
+        if ([object isKindOfClass:[NSArray class]]) {
+            [cell layoutDataModels:(NSArray *)object];
+        }
+        else {
+            [cell layoutDataModel:object];
+        }
     }
     
     cell.selectionStyle = UITableViewCellSelectionStyleNone;
