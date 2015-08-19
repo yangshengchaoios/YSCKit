@@ -433,13 +433,11 @@
     //2. 对参数进行md5加密
     NSString *newString = [NSString stringWithFormat:@"%@%@", joinedString, kParamSecretKey];
     NSString *signature = [[NSString MD5Encrypt:newString] lowercaseString];
-    NSLog(@"signature = %@", signature);
     return signature;
 }
 
 //将字典对象转换成json字符串
 + (NSString *)encryptHttpHeaderWithParam:(NSDictionary *)param {
-    NSLog(@"aes param = %@", param);
     NSString *jsonString = @"";
     NSError *error;
     NSData *jsonData = [NSJSONSerialization dataWithJSONObject:param
@@ -448,7 +446,6 @@
     if (jsonData) {
         jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
     }
-    NSLog(@"aes jsonString=%@", jsonString);
     return [NSString AESEncrypt:jsonString useKey:kParamHttpHeaderSecretKey];
 }
 

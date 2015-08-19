@@ -16,7 +16,7 @@
 }
 - (void)refreshCollectionViewByItemArray:(NSArray *)itemArray {
     [super refreshCollectionViewByItemArray:itemArray];
-    if (self.scrollAtIndex) {
+    if (self.scrollAtIndex && isNotEmpty(itemArray)) {
         self.scrollAtIndex(0, nil);
     }
 }
