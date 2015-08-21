@@ -75,6 +75,39 @@ return _sharedObject;
 #ifndef kDefaultTipViewButtonColor
     #define kDefaultTipViewButtonColor   [UIColor redColor]
 #endif
+#ifndef kDefaultViewColor
+    #define kDefaultViewColor               RGB(238, 238, 238)      //self.view的默认背景颜色
+#endif
+#ifndef kDefaultImageBackColor
+    #define kDefaultImageBackColor          RGB(243, 243, 243)      //图片的默认背景色
+#endif
+#ifndef kDefaultNaviBarTintColor
+    #define kDefaultNaviBarTintColor        RGB(47, 152, 233)       //导航栏默认文字、icon的颜色
+#endif
+#ifndef kDefaultNaviBarTitleColor
+    #define kDefaultNaviBarTitleColor       RGB(68, 68, 68)         //导航栏标题颜色
+#endif
+#ifndef kDefaultNaviBarItemColor
+    #define kDefaultNaviBarItemColor        kDefaultNaviBarTintColor//导航栏左右文字颜色
+#endif
+#ifndef kDefaultNaviTintColor
+    #define kDefaultNaviTintColor           [UIColor whiteColor]    //系统导航栏背景颜色(包括了StatusBar)
+#endif
+#ifndef kDefaultCustomNaviTintColor
+    #define kDefaultCustomNaviTintColor     RGB(234, 106, 84)       //自定义导航栏背景颜色(包括了StatusBar)
+#endif
+#ifndef kDefaultNaviBarTitleFont
+    #define kDefaultNaviBarTitleFont        [UIFont boldSystemFontOfSize:AUTOLAYOUT_LENGTH(34)]    //导航栏标题字体大小
+#endif
+#ifndef kDefaultNaviBarItemFont
+    #define kDefaultNaviBarItemFont         AUTOLAYOUT_FONT(26)     //导航栏左右文字大小
+#endif
+#ifndef kDefaultNaviBarSubTitleFont
+    #define kDefaultNaviBarSubTitleFont     AUTOLAYOUT_FONT(26)    //导航栏副标题字体大小
+#endif
+#ifndef kDefaultNaviBarSubTitleColor
+    #define kDefaultNaviBarSubTitleColor    kDefaultNaviBarTitleColor     //导航栏副标题字体颜色
+#endif
 
 //代码段简写
 #ifndef isEmpty

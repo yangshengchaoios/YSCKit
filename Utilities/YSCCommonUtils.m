@@ -97,7 +97,6 @@
         }
     }
 }
-
 - (void)checkNewVersionByAppleId:(NSString *)appleId {
     NSMutableURLRequest *request = [[NSMutableURLRequest alloc] init];
     [request setURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://itunes.apple.com/lookup?id=%@", appleId]]];
@@ -125,29 +124,28 @@
         }
     }
 }
-
-//设置App样式
 + (void)configNavigationBar {    
     //改变Navibar的颜色和背景图片
     if (DefaultNaviBarBackImage) {
         [[UINavigationBar appearance] setBackgroundImage:DefaultNaviBarBackImage forBarMetrics:UIBarMetricsDefault];
     }
     else {
-        [[UINavigationBar appearance] setBarTintColor:kDefaultNaviBarBackColor];
+        [[UINavigationBar appearance] setBarTintColor:kDefaultNaviTintColor];
     }
     
-    //控制返回箭头按钮的颜色
-    [[UINavigationBar appearance] setTintColor:kDefaultNaviBarArrowBackColor];
+    //影响范围：icon颜色、left、right文字颜色
+    [[UINavigationBar appearance] setTintColor:kDefaultNaviBarTintColor];
     
-    //设置Title为白色,Title大小为18
-    [[UINavigationBar appearance] setTitleTextAttributes:@{ NSForegroundColorAttributeName : kDefaultNaviBarTitleColor,
-                                                            NSFontAttributeName : [UIFont boldSystemFontOfSize:AUTOLAYOUT_LENGTH(34)] }];
-    [[UINavigationBar appearance] setBarStyle:UIBarStyleBlackTranslucent];
+    //设置Title字体大小和颜色(如果不设置将按默认显示whiteColor)
+    [[UINavigationBar appearance] setTitleTextAttributes:@{NSForegroundColorAttributeName : kDefaultNaviBarTitleColor,
+                                                           NSFontAttributeName : kDefaultNaviBarTitleFont}];
+    [[UINavigationBar appearance] setBarStyle:UIBarStyleDefault];//TODO:用处不大？
+    
+    //设置BarButtonItem字体大小和颜色(如果不设置将按默认的tintColor显示)
+    [[UIBarButtonItem appearance] setTitleTextAttributes:@{NSForegroundColorAttributeName : kDefaultNaviBarItemColor,
+                                                           NSFontAttributeName : kDefaultNaviBarItemFont}
+                                                forState:UIControlStateNormal];
 }
-
-/**
- *  配置Umeng参数
- */
 + (void)configUmeng {
 #pragma mark - 设置UMeng应用的key
     [MobClick setAppVersion:AppVersion];
@@ -174,9 +172,6 @@
     //NOTE:打开腾讯微博SSO开关，设置回调地址 只支持32位
 //    [UMSocialTencentWeiboHandler openSSOWithRedirectUrl:AppRedirectUrlOfWeibo];
 }
-/**
- *  配置Umeng的推送功能
- */
 + (void)configUmengPushWithOptions:(NSDictionary *)launchOptions {
 //    [UMessage startWithAppkey:kUMAppKey launchOptions:launchOptions];
 //    [UMessage setLogEnabled:NO];
@@ -216,7 +211,6 @@
 //    
 //#endif
 }
-
 + (void)registerForRemoteNotification {
     UIApplication *application = [UIApplication sharedApplication];
     if ([application respondsToSelector:@selector(registerForRemoteNotifications)]) {
@@ -341,7 +335,6 @@
 + (void)MakeCall:(NSString *)phoneNumber {
     [self MakeCall:phoneNumber success:nil];
 }
-
 + (void)MakeCall:(NSString *)phoneNumber success:(void (^)(void))block {
     if ([self isEmpty:phoneNumber]) {
         return;
@@ -381,7 +374,6 @@
 + (BOOL)SqliteUpdate:(NSString *)sql {
     return [self SqliteUpdate:sql dbPath:DBRealPath];
 }
-
 + (BOOL)SqliteUpdate:(NSString *)sql dbPath:(NSString *)dbPath {
     BOOL isSuccess = NO;
     FMDatabase *db = [FMDatabase databaseWithPath:dbPath];
@@ -391,7 +383,6 @@
     [db close];
     return isSuccess;
 }
-
 + (BOOL)SqliteCheckIfExists:(NSString *)sql {
     return [self SqliteCheckIfExists:sql dbPath:DBRealPath];
 }
@@ -489,7 +480,6 @@
     ReturnNilWhenObjectIsEmpty(url)
     return [self GetParamsInQueryString:url.query];
 }
-
 + (NSDictionary *)GetParamsInQueryString:(NSString *)queryString {
     ReturnNilWhenObjectIsEmpty(queryString)
     NSScanner *scanner = [NSScanner scannerWithString:queryString];
@@ -549,7 +539,6 @@
     }
     return [NSString EncodeBase64Data:result];
 }
-
 + (NSString *)AESDecryptString:(NSString *)string byKey:(NSString *)key {
     CCCryptorStatus status = kCCSuccess;
     NSData *decryptData = [[NSData alloc] initWithBase64EncodedData:[string dataUsingEncoding:NSUTF8StringEncoding]
