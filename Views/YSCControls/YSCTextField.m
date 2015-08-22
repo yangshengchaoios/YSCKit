@@ -80,6 +80,11 @@
     [self layoutSubviews];
 }
 
+//NOTE:xib中修改了某些属性，需要重新设置参数
+- (void)layoutSubviews {
+    [super layoutSubviews];
+    self.textType = _textType;
+}
 //当输入框内容改变时触发
 //NOTE:彻底解决中文输入高亮超过限制会crash的问题！
 - (void)textFieldChanged:(NSNotification *)notification {

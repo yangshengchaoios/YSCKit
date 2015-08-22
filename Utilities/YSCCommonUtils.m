@@ -604,4 +604,39 @@
 //c8:3a:35:57:30:a0
 //}
 
+
+#pragma mark - 缓存数据
++ (BOOL)SaveCacheObject:(NSObject *)object forKey:(NSString *)key fileName:(NSString *)fileName {
+    if (isEmpty(key)) {
+        return NO;
+    }
+    BOOL isSuccess = NO;
+    @try {
+        NSString *filePath = [[[StorageManager sharedInstance] directoryPathOfLibraryCachesCommon] stringByAppendingPathComponent:fileName];
+        isSuccess = [[StorageManager sharedInstance] archiveDictionary:@{ key : object }
+                                                            toFilePath:filePath
+                                                                  overwrite:NO];
+    }
+    @catch (NSException *exception)
+    {
+        NSLog(@"将数组保存至本地缓存时出错！%@", exception); //可能是没有在对象里做序列号和反序列化！
+        isSuccess = NO;
+    }
+    @finally
+    {
+        
+    }
+    return isSuccess;
+}
++ (id)GetCachedObjectForKey:(NSString *)key fileName:(NSString *)fileName {
+    NSString *filePath = [[[StorageManager sharedInstance] directoryPathOfLibraryCachesCommon] stringByAppendingPathComponent:fileName];
+    NSDictionary *cacheInfo = [[StorageManager sharedInstance] unarchiveDictionaryFromFilePath:filePath];
+    if ([cacheInfo objectForKey:key]) {
+        return cacheInfo[key];
+    }
+    else {
+        return nil;
+    }
+}
+
 @end

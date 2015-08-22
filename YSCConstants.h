@@ -27,6 +27,7 @@ typedef void (^YSCDictionaryResultBlock)(NSDictionary * dict, NSError *error);
 #ifndef kLogManageType
     #define kLogManageType  @"1"
 #endif
+#define NSDetailedErrorsKey     @"NSDetailedErrorsKey"
 
 
 /**
@@ -66,26 +67,29 @@ return _sharedObject;
 
 
 //设置默认颜色
-#ifndef kDefaultBorderColor
-    #define kDefaultBorderColor          RGB(216, 216, 216)
-#endif
-#ifndef kDefaultPlaceholderColor
-    #define kDefaultPlaceholderColor     RGB(216, 216, 216)
-#endif
-#ifndef kDefaultTipViewButtonColor
-    #define kDefaultTipViewButtonColor   [UIColor redColor]
-#endif
 #ifndef kDefaultViewColor
     #define kDefaultViewColor               RGB(238, 238, 238)      //self.view的默认背景颜色
 #endif
+#ifndef kDefaultColor
+    #define kDefaultColor                   RGB(47, 152, 233)       //app默认主色(普通按钮+文本)
+#endif
+#ifndef kDefaultBorderColor
+    #define kDefaultBorderColor             RGB(218, 218, 218)      //默认边框颜色
+#endif
+#ifndef kDefaultPlaceholderColor
+    #define kDefaultPlaceholderColor        RGB(218, 218, 218)      //默认占位字符颜色
+#endif
+#ifndef kDefaultTipViewButtonColor
+    #define kDefaultTipViewButtonColor      [UIColor redColor]      //默认【重新加载】按钮背景色
+#endif
 #ifndef kDefaultImageBackColor
-    #define kDefaultImageBackColor          RGB(243, 243, 243)      //图片的默认背景色
+    #define kDefaultImageBackColor          RGB(240, 240, 240)      //默认图片背景色
 #endif
 #ifndef kDefaultNaviBarTintColor
     #define kDefaultNaviBarTintColor        RGB(47, 152, 233)       //导航栏默认文字、icon的颜色
 #endif
 #ifndef kDefaultNaviBarTitleColor
-    #define kDefaultNaviBarTitleColor       RGB(68, 68, 68)         //导航栏标题颜色
+    #define kDefaultNaviBarTitleColor       RGB(10, 10, 10)         //导航栏标题颜色
 #endif
 #ifndef kDefaultNaviBarItemColor
     #define kDefaultNaviBarItemColor        kDefaultNaviBarTintColor//导航栏左右文字颜色
@@ -148,6 +152,7 @@ return _sharedObject;
 #define ReturnZeroWhenObjectIsEmpty(object)         if ([NSObject isEmpty:object]) { return 0;  }
 #define Trim(x)                                     [NSString trimString:x]
 #define RandomInt(from,to)                          ((int)((from) + arc4random() % ((to)-(from) + 1)))  //随机数 [from,to] 之间
+#define CreateNSError(error)                        [NSError errorWithDomain:nil code:0 userInfo:@{NSDetailedErrorsKey : Trim(error)}]
 
 /**
  *  版本相关

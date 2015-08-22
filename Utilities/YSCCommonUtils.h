@@ -95,4 +95,9 @@
 #pragma mark - 获取wifi的mac地址
 + (id)FetchSSIDInfo;
 + (NSString *)CurrentWifiBSSID;
+
+#pragma mark - 缓存数据
++ (BOOL)SaveCacheObject:(NSObject *)object forKey:(NSString *)key fileName:(NSString *)fileName;
++ (id)GetCachedObjectForKey:(NSString *)key fileName:(NSString *)fileName;
+
 @end
