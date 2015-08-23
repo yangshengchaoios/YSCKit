@@ -90,7 +90,8 @@
 #pragma mark - alert view
 - (UIAlertView *)showAlertVieWithMessage:(NSString *)message;
 - (UIAlertView *)showAlertViewWithTitle:(NSString *)title andMessage:(NSString *)message;
-
+- (UIAlertView *)showAlertVieWithMessage:(NSString *)message block:(YSCResultBlock)block;
+- (UIAlertView *)showAlertViewWithTitle:(NSString *)title andMessage:(NSString *)message block:(YSCResultBlock)block;
 
 #pragma mark - Overridden methods 缓存相关
 //- (NSString *)cacheFilePath;

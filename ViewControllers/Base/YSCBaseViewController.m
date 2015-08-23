@@ -526,13 +526,23 @@
 #pragma mark - alert view
 
 - (UIAlertView *)showAlertVieWithMessage:(NSString *)message {
-	return [self showAlertViewWithTitle:@"提示" andMessage:message];
+    return [self showAlertViewWithTitle:@"提示" andMessage:message block:nil];
 }
 - (UIAlertView *)showAlertViewWithTitle:(NSString *)title andMessage:(NSString *)message {
-	UIAlertView *alertView = [UIAlertView bk_alertViewWithTitle:title message:message];
-	[alertView bk_setCancelButtonWithTitle:@"确定" handler:nil];
-	[alertView show];
-	return alertView;
+	return [self showAlertViewWithTitle:title andMessage:message block:nil];
+}
+- (UIAlertView *)showAlertVieWithMessage:(NSString *)message block:(YSCResultBlock)block {
+    return [self showAlertViewWithTitle:@"提示" andMessage:message block:block];
+}
+- (UIAlertView *)showAlertViewWithTitle:(NSString *)title andMessage:(NSString *)message block:(YSCResultBlock)block {
+    UIAlertView *alertView = [UIAlertView bk_alertViewWithTitle:title message:message];
+    [alertView bk_setCancelButtonWithTitle:@"确定" handler:^{
+        if (block) {
+            block(nil);
+        }
+    }];
+    [alertView show];
+    return alertView;
 }
 
 #pragma mark - Overridden methods 缓存相关
