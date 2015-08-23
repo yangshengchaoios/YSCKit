@@ -18,4 +18,6 @@
 
 @property (nonatomic, copy) YSCIntegerResultBlock scrollAtIndex;
 
+- (void)resetCurrentIndex:(NSInteger)index;
+
 @end

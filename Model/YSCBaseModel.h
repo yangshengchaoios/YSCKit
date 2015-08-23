@@ -40,3 +40,10 @@
 @property (nonatomic, strong) NSString *msg;
 @property (nonatomic, strong) NSString *debugMsg;
 @end
+
+//YSCKit中用到的model
+@interface YSCPhotoBrowseCellModel : BaseDataModel
+@property (nonatomic, strong) NSString *imageUrl;
+@property (nonatomic, strong) UIImage *image;
++ (instancetype)CreateModelByImageUrl:(NSString *)imageUrl image:(UIImage *)image;
+@end

@@ -22,6 +22,7 @@
 @property (nonatomic, copy) YSCIntegerResultBlock tapPageAtIndex;//点击某个图片后回调
 
 @property (nonatomic, strong) UICollectionView *collectionView;
+@property (nonatomic, weak) NSArray *dataArray;
 
 - (void)setup;
 - (void)refreshCollectionViewByItemArray:(NSArray *)itemArray;

@@ -33,6 +33,17 @@
                                                CGRectGetHeight(self.bounds) + AUTOLAYOUT_LENGTH(self.minimumLineSpacing));
     }
 }
+- (void)resetCurrentIndex:(NSInteger)index {
+    if (index >= [self.dataArray count] || index < 0) {
+        return;
+    }
+    if (self.isScrollHor) {
+        [self.collectionView setContentOffset:CGPointMake(index * self.collectionView.width, 0) animated:NO];
+    }
+    else {
+        [self.collectionView setContentOffset:CGPointMake(0, index * self.collectionView.height) animated:NO];
+    }
+}
 
 #pragma mark - UICollectionViewDataSource
 

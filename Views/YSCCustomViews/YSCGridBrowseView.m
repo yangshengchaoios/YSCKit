@@ -10,7 +10,7 @@
 
 @interface YSCGridBrowseView () <UICollectionViewDataSource, UICollectionViewDelegate,
 UICollectionViewDelegateFlowLayout>
-@property (nonatomic, weak) NSArray *dataArray;
+
 @end
 
 @implementation YSCGridBrowseView

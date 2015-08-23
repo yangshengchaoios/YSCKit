@@ -215,6 +215,15 @@
 @end
 
 
+@implementation YSCPhotoBrowseCellModel
++ (instancetype)CreateModelByImageUrl:(NSString *)imageUrl image:(UIImage *)image {
+    YSCPhotoBrowseCellModel *model = [YSCPhotoBrowseCellModel new];
+    model.imageUrl = imageUrl;
+    model.image = image;
+    return model;
+}
+@end
+
 
 
 

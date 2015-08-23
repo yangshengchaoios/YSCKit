@@ -12,7 +12,7 @@
 
 #pragma mark - TODO:showPhotoViewController
 
-+ (UIViewController *)showPhotosWithImageUrls:(NSArray *)imageUrls atIndex:(NSInteger)index fromImageView:(UIImageView *)imageView;
-+ (UIViewController *)showPhotosWithImages:(NSArray *)images atIndex:(NSInteger)index fromImageView:(UIImageView *)imageView;
++ (void)showPhotosWithImageUrls:(NSArray *)imageUrls atIndex:(NSInteger)index fromImageView:(UIImageView *)imageView;
++ (void)showPhotosWithImages:(NSArray *)images atIndex:(NSInteger)index fromImageView:(UIImageView *)imageView;
 
 @end
