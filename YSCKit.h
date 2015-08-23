@@ -47,6 +47,8 @@
 //常用自定义控件
 #import "YSCTextField.h"
 #import "YSCTextView.h"
+#import "YSCPickerView.h"
+#import "YSCTableViewCell.h"
 
 //基类
 #import "YSCBaseModel.h"

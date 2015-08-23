@@ -152,7 +152,7 @@ return _sharedObject;
 #define ReturnZeroWhenObjectIsEmpty(object)         if ([NSObject isEmpty:object]) { return 0;  }
 #define Trim(x)                                     [NSString trimString:x]
 #define RandomInt(from,to)                          ((int)((from) + arc4random() % ((to)-(from) + 1)))  //随机数 [from,to] 之间
-#define CreateNSError(error)                        [NSError errorWithDomain:nil code:0 userInfo:@{NSDetailedErrorsKey : Trim(error)}]
+#define CreateNSError(error)                        [NSError errorWithDomain:@"" code:0 userInfo:@{NSDetailedErrorsKey : Trim(error)}]
 
 /**
  *  版本相关
