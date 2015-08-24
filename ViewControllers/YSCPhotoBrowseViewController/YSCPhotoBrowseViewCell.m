@@ -19,7 +19,9 @@
 - (void)layoutDataModel:(YSCPhotoBrowseCellModel *)dataModel {
     if (isNotEmpty(dataModel.imageUrl)) {
         WEAKSELF
+        self.photoImageView.hidden = YES;
         [self.photoImageView setImageWithURLString:dataModel.imageUrl completed:^(UIImage *image, NSError *error) {
+            weakSelf.photoImageView.hidden = NO;
             weakSelf.photoImageView.contentMode = UIViewContentModeScaleAspectFit;
             weakSelf.savedImage = image;
         }];
@@ -27,6 +29,7 @@
     else {
         self.photoImageView.image = dataModel.image;
         self.savedImage = dataModel.image;
+        self.photoImageView.contentMode = UIViewContentModeScaleAspectFit;
     }
     
     self.photoImageView.transform = CGAffineTransformMakeScale(1, 1);
