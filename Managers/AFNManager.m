@@ -265,7 +265,9 @@
         if ([responseObject isKindOfClass:[NSData class]]) {
             responseObject = [[NSString alloc] initWithData:responseObject encoding:NSUTF8StringEncoding];
         }
-        responseObject = [NSString replaceString:responseObject byRegex:@"[\r\n\t]" to:@""];
+        if ([responseObject isKindOfClass:[NSString class]]) {
+            responseObject = [NSString replaceString:responseObject byRegex:@"[\r\n\t]" to:@""];
+        }
         NSLog(@"request success! \r\noperation=%@\r\nresponseObject=%@", operation, responseObject);
         JSONModelError *initError = nil;
         id jsonModel = nil;
@@ -359,6 +361,7 @@
         NSLog(@"posting bodydata...");
         NSMutableURLRequest *mutableRequest = [manager.requestSerializer requestWithMethod:@"POST" URLString:newUrlString parameters:nil error:nil];
         mutableRequest.HTTPBody = [bodyParam dataUsingEncoding:manager.requestSerializer.stringEncoding];
+        [mutableRequest setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
         AFHTTPRequestOperation *operation = [manager HTTPRequestOperationWithRequest:mutableRequest success:requestSuccessed1 failure:requestFailure1];
         [manager.operationQueue addOperation:operation];
     }
