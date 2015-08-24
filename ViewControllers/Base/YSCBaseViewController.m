@@ -61,6 +61,7 @@
 }
 - (void)viewDidAppear:(BOOL)animated {
 	[super viewDidAppear:animated];
+    self.isClicked = NO;
     [MobClick beginLogPageView:NSStringFromClass([self class])];
     
     //控制只执行一次的方法

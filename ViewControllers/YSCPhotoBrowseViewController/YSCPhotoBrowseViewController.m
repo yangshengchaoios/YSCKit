@@ -29,10 +29,10 @@
 }
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
-    [[UIApplication sharedApplication] setStatusBarHidden:YES withAnimation:UIStatusBarAnimationFade];
+    [[UIApplication sharedApplication] setStatusBarHidden:YES withAnimation:UIStatusBarAnimationSlide];
 }
 - (void)viewDidDisappear:(BOOL)animated {
-    [[UIApplication sharedApplication] setStatusBarHidden:NO withAnimation:UIStatusBarAnimationFade];
+    [[UIApplication sharedApplication] setStatusBarHidden:NO withAnimation:UIStatusBarAnimationSlide];
     [super viewDidDisappear:animated];
 }
 - (void)viewDidLoad {
@@ -65,7 +65,7 @@
         [self bk_performBlock:^(id obj) {
             weakSelf.photoBrowseView.hidden = NO;
             [weakSelf.photoBrowseView resetCurrentIndex:[weakSelf.params[kParamIndex] integerValue]];
-        } afterDelay:0.5];
+        } afterDelay:0.3];
         self.currentIndex = [self.params[kParamIndex] integerValue];
     }
     else {
