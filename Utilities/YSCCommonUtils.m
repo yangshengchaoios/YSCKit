@@ -328,6 +328,15 @@
     
     return formatedPrice;
 }
+//规范化floatValue：如果有小数点才显示两位，否则就不显示小数点
++ (NSString *)formatFloatValue:(CGFloat)value {
+    if (value == floorf(value)) {
+        return [NSString stringWithFormat:@"%.0f", value];
+    }
+    else {
+        return [NSString stringWithFormat:@"%.2f", value];
+    }
+}
 
 
 #pragma mark 打电话

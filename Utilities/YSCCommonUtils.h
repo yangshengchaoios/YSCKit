@@ -54,6 +54,8 @@
  *  @return 组装好的字符串
  */
 + (NSString *)formatPrice:(NSNumber *)price showMoneyTag:(BOOL)isTagUsed showDecimalPoint:(BOOL) isDecimal useUnit:(BOOL)isUnitUsed;
+//规范化floatValue：如果有小数点才显示两位，否则就不显示小数点
++ (NSString *)formatFloatValue:(CGFloat)value;
 
 #pragma mark - 打电话
 
