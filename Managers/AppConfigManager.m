@@ -37,13 +37,12 @@
 
 - (NSString *)udid {
     if (nil == _udid) {
-        NSString *tempUdid = @"";//保证只获取一次udid就保存在内存中！
-        NSDictionary *tempDict = [[NSUserDefaults standardUserDefaults] dictionaryForKey:@"OpenUDID"];
-        if ([NSDictionary isNotEmpty:tempDict] && [NSString isNotEmpty:tempDict[@"OpenUDID"]]) {
-            tempUdid = Trim(tempDict[@"OpenUDID"]);
-        }
+        NSString *tempUdid = GetObject(@"OpenUDID");
         if ([NSString isEmpty:tempUdid]) {
-            tempUdid = [UIDevice openUdid];
+            tempUdid = [UIDevice openUdid];//保证只获取一次udid就保存在内存中！
+            if (isNotEmpty(tempUdid)) {
+                SaveObject(tempUdid, @"OpenUDID");
+            }
         }
         _udid = tempUdid;
     }
@@ -51,7 +50,7 @@
 }
 - (NSString *)deviceToken {
     if (nil == _deviceToken) {
-        _deviceToken = [[NSUserDefaults standardUserDefaults] stringForKey:@"DeviceToken"];
+        _deviceToken = GetObject(@"DeviceToken");
     }
     return Trim(_deviceToken);
 }

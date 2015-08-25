@@ -54,7 +54,7 @@
 //具体检测新版本的业务逻辑
 + (void)checkNewVersion:(NewVersionModel *)versionModel showMessage:(BOOL)showMessage {
     if ([versionModel isKindOfClass:[NewVersionModel class]]) {
-        BOOL isSkipTheVersion = [[NSUserDefaults standardUserDefaults] boolForKey:SkipVersion];
+        BOOL isSkipTheVersion = [GetCacheObject(Trim(versionModel.appVersion)) boolValue];
         if ( ! isSkipTheVersion) {
             if (NSOrderedAscending == [AppVersion compare:versionModel.appVersion options:NSNumericSearch]) {
 //            if (VersionCompareResultAscending == [AppVersion compareWithVersion:versionModel.appVersion]) {
@@ -70,8 +70,7 @@
                     }];
                     if (NO == versionModel.isForcedUpdate ) {   //非强制更新的话才显示更多选项
                         [alertView bk_addButtonWithTitle:@"忽略此版本" handler:^{
-                            [[NSUserDefaults standardUserDefaults] setBool:YES forKey:SkipVersion];
-                            [[NSUserDefaults standardUserDefaults] synchronize];
+                            SaveCacheObject(@(YES), Trim(versionModel.appVersion));
                         }];
                         [alertView bk_addButtonWithTitle:@"稍后再说" handler:nil];//下次启动再次检测
                     }
