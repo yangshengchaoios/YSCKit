@@ -34,45 +34,38 @@
 
 #pragma mark - Documents目录下的文件和目录路径
 /**
- *  /Documents/UserId/
+ *  /Documents/YSCKit_Storage/UserId/
  *
  *  @return 用户目录
  */
 - (NSString *)directoryPathOfDocumentsByUserId;
 
 /**
- *  /Documents/UserId/UserSettings.archive
+ *  /Documents/YSCKit_Storage/UserId/UserSettings.archive
  *
  *  @return 用户配置信息文件路径
  */
 - (NSString *)filePathOfUserSettings;
 
 /**
- *  /Documents/Common/
+ *  /Documents/YSCKit_Storage/
  *
  *  @return 公共根目录
  */
 - (NSString *)directoryPathOfDocumentsCommon;
 
 /**
- *  /Documents/Common/CommonSettings.archive
+ *  /Documents/YSCKit_Storage/CommonSettings.archive
  *
  *  @return 公共配置信息文件路径
  */
 - (NSString *)filePathOfCommonSettings;
 
-/**
- *  /Documents/Log/
- *
- *  @return 公共日志文件目录
- */
-- (NSString *)directoryPathOfDocumentsLog;
-
 
 
 #pragma mark - Library目录下的文件和目录路径
 /**
- *  /Library/Caches/UserId/
+ *  /Library/Caches/YSCKit_Storage/UserId/
  *
  *  @return 用户的缓存目录
  */
@@ -86,32 +79,39 @@
 - (NSString *)directoryPathOfLibraryCachesBundleIdentifier;
 
 /**
- *  /Library/Caches/UserId/Pics/
+ *  /Library/Caches/YSCKit_Storage/UserId/Pics/
  *
  *  @return 用户图片目录
  */
 - (NSString *)directoryPathOfPicByUserId;
 
 /**
- *  /Library/Caches/UserId/Audioes/
+ *  /Library/Caches/YSCKit_Storage/UserId/Audioes/
  *
  *  @return 用户音频目录
  */
 - (NSString *)directoryPathOfAudioByUserId;
 
 /**
- *  /Library/Caches/UserId/Videoes/
+ *  /Library/Caches/YSCKit_Storage/UserId/Videoes/
  *
  *  @return 用户视频目录
  */
 - (NSString *)directoryPathOfVideoByUserId;
 
 /**
- *  /Library/Caches/Common/
+ *  /Library/Caches/YSCKit_Storage/
  *
  *  @return 公共缓存目录
  */
 - (NSString *)directoryPathOfLibraryCachesCommon;
+
+/**
+ *  /Library/Caches/YSCKit_Storage/YSCLog/
+ *
+ *  @return 公共日志文件目录
+ */
+- (NSString *)directoryPathOfDocumentsLog;
 
 
 #pragma mark - 公共配置文件存取

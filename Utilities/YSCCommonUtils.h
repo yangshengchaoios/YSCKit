@@ -7,6 +7,20 @@
 //
 
 #import <Foundation/Foundation.h>
+
+/**
+ *  本地缓存(对象的序列化与反序列化)
+ */
+#define SaveObject(obj,key)                         [YSCCommonUtils SaveObject:obj forKey:key fileName:nil subFolder:nil]
+#define SaveObjectByFile(obj,key,file)              [YSCCommonUtils SaveObject:obj forKey:key fileName:file subFolder:nil]
+#define SaveCacheObject(obj,key)                    [YSCCommonUtils SaveCacheObject:obj forKey:key fileName:nil subFolder:nil]
+#define SaveCacheObjectByFile(obj,key,file)         [YSCCommonUtils SaveCacheObject:obj forKey:key fileName:file subFolder:nil]
+
+#define GetObject(key)                              [YSCCommonUtils GetObjectForKey:key fileName:nil subFolder:nil]
+#define GetObjectByFile(key,file)                   [YSCCommonUtils GetObjectForKey:key fileName:file subFolder:nil]
+#define GetCacheObject(key)                         [YSCCommonUtils GetCacheObjectForKey:key fileName:nil subFolder:nil]
+#define GetCacheObjectByFile(key,file)              [YSCCommonUtils GetCacheObjectForKey:key fileName:file subFolder:nil]
+
 @class NewVersionModel;
 /**
  *  全局通用静态类
@@ -100,6 +114,13 @@
 
 #pragma mark - 缓存数据
 + (BOOL)SaveCacheObject:(NSObject *)object forKey:(NSString *)key fileName:(NSString *)fileName;
-+ (id)GetCachedObjectForKey:(NSString *)key fileName:(NSString *)fileName;
++ (id)GetCacheObjectForKey:(NSString *)key fileName:(NSString *)fileName;
+
+
++ (BOOL)SaveObject:(NSObject *)object forKey:(NSString *)key fileName:(NSString *)fileName subFolder:(NSString *)subFoler;
++ (BOOL)SaveCacheObject:(NSObject *)object forKey:(NSString *)key fileName:(NSString *)fileName subFolder:(NSString *)subFoler;
+
++ (id)GetObjectForKey:(NSString *)key fileName:(NSString *)fileName subFolder:(NSString *)subFoler;
++ (id)GetCacheObjectForKey:(NSString *)key fileName:(NSString *)fileName subFolder:(NSString *)subFoler;
 
 @end

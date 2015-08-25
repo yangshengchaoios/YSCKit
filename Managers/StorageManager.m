@@ -8,7 +8,7 @@
 
 #import "StorageManager.h"
 
-#define kCommonDirectoryName    @"Common/"
+#define kCommonDirectoryName    @"YSCKit_Storage/"
 
 @interface StorageManager ()
 
@@ -49,6 +49,7 @@
 - (void)setUserId:(NSString *)userId {
     if ([NSString isNotEmpty:userId]) {
         self.userDir = [userId stringByAppendingString:([userId hasSuffix:@"/"] ? @"" : @"/")];//确保最后一个字符是'/'
+        self.userDir = [self.userDir stringByAppendingString:kCommonDirectoryName];//保证用户目录在公共目录下面
     }
     else {
         self.userDir = kCommonDirectoryName;
@@ -61,7 +62,7 @@
 #pragma mark - Documents目录下的文件和目录路径
 
 /**
- *  /Documents/UserId/
+ *  /Documents/YSCKit_Storage/UserId/
  *
  *  @return 用户目录
  */
@@ -70,7 +71,7 @@
 }
 
 /**
- *  /Documents/UserId/UserSettings.archive
+ *  /Documents/YSCKit_Storage/UserId/UserSettings.archive
  *
  *  @return 用户配置信息文件路径
  */
@@ -79,7 +80,7 @@
 }
 
 /**
- *  /Documents/Common/
+ *  /Documents/YSCKit_Storage/
  *
  *  @return 公共根目录
  */
@@ -88,7 +89,7 @@
 }
 
 /**
- *  /Documents/Common/CommonSettings.archive
+ *  /Documents/YSCKit_Storage/CommonSettings.archive
  *
  *  @return 公共配置信息文件路径
  */
@@ -96,21 +97,12 @@
     return [[self directoryPathOfDocumentsCommon] stringByAppendingPathComponent:@"CommonSettings.archive"];
 }
 
-/**
- *  /Documents/Log/
- *
- *  @return 公共日志文件目录
- */
-- (NSString *)directoryPathOfDocumentsLog {
-    return [self.directoryPathOfDocuments stringByAppendingPathComponent:@"YSCLog/"];
-}
-
 
 
 #pragma mark - Library目录下的文件和目录路径
 
 /**
- *  /Library/Caches/UserId/
+ *  /Library/Caches/YSCKit_Storage/UserId/
  *
  *  @return 用户的缓存目录
  */
@@ -128,7 +120,7 @@
 }
 
 /**
- *  /Library/Caches/UserId/Pics/
+ *  /Library/Caches/YSCKit_Storage/UserId/Pics/
  *
  *  @return 用户图片目录
  */
@@ -137,7 +129,7 @@
 }
 
 /**
- *  /Library/Caches/UserId/Audioes/
+ *  /Library/Caches/YSCKit_Storage/UserId/Audioes/
  *
  *  @return 用户图片目录
  */
@@ -146,7 +138,7 @@
 }
 
 /**
- *  /Library/Caches/UserId/Videoes/
+ *  /Library/Caches/YSCKit_Storage/UserId/Videoes/
  *
  *  @return 用户图片目录
  */
@@ -155,12 +147,21 @@
 }
 
 /**
- *  /Library/Caches/Common/
+ *  /Library/Caches/YSCKit_Storage/
  *
  *  @return 公共缓存目录
  */
 - (NSString *)directoryPathOfLibraryCachesCommon {
     return [self.directoryPathOfLibraryCaches stringByAppendingPathComponent:kCommonDirectoryName];
+}
+
+/**
+ *  /Library/Caches/YSCKit_Storage/YSCLog/
+ *
+ *  @return 公共日志文件目录
+ */
+- (NSString *)directoryPathOfDocumentsLog {
+    return [[self directoryPathOfLibraryCachesCommon] stringByAppendingPathComponent:@"YSCLog/"];
 }
 
 

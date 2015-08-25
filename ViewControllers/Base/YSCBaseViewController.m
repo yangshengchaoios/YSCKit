@@ -547,55 +547,24 @@
 }
 
 #pragma mark - Overridden methods 缓存相关
-
-- (NSString *)cacheFilePath {
-	return [self cacheFilePath:nil];
-}
-- (NSString *)cacheFilePath:(NSString *)suffix {
-	NSString *fileName = [NSString stringWithFormat:@"%@%@.dat",
-                          NSStringFromClass(self.class),
-                          [NSString isEmpty:suffix] ? @"" :[NSString stringWithFormat:@"_%@",suffix]]; //缓存文件名称
-	return [[[StorageManager sharedInstance] directoryPathOfLibraryCachesCommon] stringByAppendingPathComponent:fileName];
-}
 - (id)cachedObjectForKey:(NSString *)cachedKey {
 	return [self cachedObjectForKey:cachedKey withSuffix:nil];
 }
 - (id)cachedObjectForKey:(NSString *)cachedKey withSuffix:(NSString *)suffix {
-	NSDictionary *cacheInfo = [[StorageManager sharedInstance] unarchiveDictionaryFromFilePath:[self cacheFilePath:suffix]];
-	if ([cacheInfo objectForKey:cachedKey]) {
-		return cacheInfo[cachedKey];
-	}
-	else {
-		return nil;
-	}
+    NSString *fileName = [NSString stringWithFormat:@"%@%@.dat",
+                          NSStringFromClass(self.class),
+                          [NSString isEmpty:suffix] ? @"" :[NSString stringWithFormat:@"_%@",suffix]]; //缓存文件名称
+    return GetCacheObjectByFile(cachedKey, fileName);
 }
 - (void)saveObject:(id)object forKey:(NSString *)cachedKey {
 	[self saveObject:object forKey:cachedKey withSuffix:nil];
 }
 - (void)saveObject:(id)object forKey:(NSString *)cachedKey withSuffix:(NSString *)suffix {
-	if ([NSString isEmpty:cachedKey]) {
-		return;
-	}
+    NSString *fileName = [NSString stringWithFormat:@"%@%@.dat",
+                          NSStringFromClass(self.class),
+                          [NSString isEmpty:suffix] ? @"" :[NSString stringWithFormat:@"_%@",suffix]]; //缓存文件名称
     
-	@try {
-		BOOL isSuccess = [[StorageManager sharedInstance] archiveDictionary:@{ cachedKey : object }
-                                                                 toFilePath:[self cacheFilePath:suffix]
-                                                                  overwrite:NO];
-		if (isSuccess) {
-			NSLog(@"缓存成功！");
-		}
-		else {
-			NSLog(@"缓存失败！");
-		}
-	}
-	@catch (NSException *exception)
-	{
-		NSLog(@"将数组保存至本地缓存时出错！%@",
-		      exception); //可能是没有在对象里做序列号和反序列化！
-	}
-	@finally
-	{
-	}
+    SaveCacheObjectByFile(object, cachedKey, fileName);
 }
 
 /**

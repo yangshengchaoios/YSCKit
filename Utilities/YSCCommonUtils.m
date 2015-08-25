@@ -615,33 +615,116 @@
 
 
 #pragma mark - 缓存数据
+//------------------------------------
+//Document/YSCKit_Storage
+//该目录下的数据与业务逻辑相关，删除会影响逻辑
+//overwrite = NO
+//------------------------------------
++ (BOOL)SaveObject:(NSObject *)object forKey:(NSString *)key {
+    return [self SaveObject:object forKey:key fileName:nil subFolder:nil];
+}
++ (BOOL)SaveObject:(NSObject *)object forKey:(NSString *)key fileName:(NSString *)fileName {
+    return [self SaveObject:object forKey:key fileName:fileName subFolder:nil];
+}
++ (BOOL)SaveObject:(NSObject *)object forKey:(NSString *)key fileName:(NSString *)fileName subFolder:(NSString *)subFoler {
+    return [self SaveObject:object forKey:key fileName:fileName subFolder:subFoler folder:STORAGEMANAGER.directoryPathOfDocuments];
+}
+
+//------------------------------------
+//Library/Caches/YSCKit_Storage
+//该目录下的数据随时都可以被清除，与用户无关
+//overwrite = NO
+//------------------------------------
++ (BOOL)SaveCacheObject:(NSObject *)object forKey:(NSString *)key {
+    return [self SaveCacheObject:object forKey:key fileName:nil subFolder:nil];
+}
 + (BOOL)SaveCacheObject:(NSObject *)object forKey:(NSString *)key fileName:(NSString *)fileName {
-    if (isEmpty(key)) {
-        return NO;
+    return [self SaveCacheObject:object forKey:key fileName:fileName subFolder:nil];
+}
++ (BOOL)SaveCacheObject:(NSObject *)object forKey:(NSString *)key fileName:(NSString *)fileName subFolder:(NSString *)subFoler {
+    return [self SaveObject:object forKey:key fileName:fileName subFolder:subFoler folder:STORAGEMANAGER.directoryPathOfLibraryCaches];
+}
+
+
+//------------------------------------
+//
+// Document/YSCKit_Storage
+//
+//------------------------------------
++ (id)GetObjectForKey:(NSString *)key {
+    return [self GetObjectForKey:key fileName:nil subFolder:nil];
+}
++ (id)GetObjectForKey:(NSString *)key fileName:(NSString *)fileName {
+    return [self GetObjectForKey:key fileName:fileName subFolder:nil];
+}
++ (id)GetObjectForKey:(NSString *)key fileName:(NSString *)fileName subFolder:(NSString *)subFoler {
+    return [self GetObjectForKey:key fileName:fileName subFolder:subFoler folder:STORAGEMANAGER.directoryPathOfDocuments];
+}
+
+//------------------------------------
+//
+// Library/Caches/YSCKit_Storage
+//
+//------------------------------------
++ (id)GetCacheObjectForKey:(NSString *)key {
+    return [self GetCacheObjectForKey:key fileName:nil subFolder:nil];
+}
++ (id)GetCacheObjectForKey:(NSString *)key fileName:(NSString *)fileName {
+    return [self GetCacheObjectForKey:key fileName:fileName subFolder:nil];
+}
++ (id)GetCacheObjectForKey:(NSString *)key fileName:(NSString *)fileName subFolder:(NSString *)subFoler {
+    return [self GetObjectForKey:key fileName:fileName subFolder:subFoler folder:STORAGEMANAGER.directoryPathOfLibraryCaches];
+}
+
+//------------------------------------
+//
+// 两个通用方法：存储数据、获取数据
+//
+//------------------------------------
+//存数据的通用方法
++ (BOOL)SaveObject:(NSObject *)object forKey:(NSString *)key fileName:(NSString *)fileName subFolder:(NSString *)subFolerName folder:(NSString *)folderPath {
+    ReturnNOWhenObjectIsEmpty(key)
+    ReturnNOWhenObjectIsEmpty(folderPath)
+    if (nil == object) {
+        object = [NSNull null];
     }
+    //TODO:object is empty???
+    
+    if (isNotEmpty(subFolerName)) {
+        folderPath = [folderPath stringByAppendingPathComponent:subFolerName];
+    }
+    if (isEmpty(fileName)) {
+        fileName = @"CommonSettings";
+    }
+    NSString *filePath = [folderPath stringByAppendingPathComponent:fileName];
     BOOL isSuccess = NO;
     @try {
-        NSString *filePath = [[[StorageManager sharedInstance] directoryPathOfLibraryCachesCommon] stringByAppendingPathComponent:fileName];
-        isSuccess = [[StorageManager sharedInstance] archiveDictionary:@{ key : object }
-                                                            toFilePath:filePath
-                                                                  overwrite:NO];
+        isSuccess = [STORAGEMANAGER archiveDictionary:@{ key : object }
+                                           toFilePath:filePath
+                                            overwrite:NO];
     }
-    @catch (NSException *exception)
-    {
+    @catch (NSException *exception){
         NSLog(@"将数组保存至本地缓存时出错！%@", exception); //可能是没有在对象里做序列号和反序列化！
         isSuccess = NO;
     }
-    @finally
-    {
-        
-    }
     return isSuccess;
 }
-+ (id)GetCachedObjectForKey:(NSString *)key fileName:(NSString *)fileName {
-    NSString *filePath = [[[StorageManager sharedInstance] directoryPathOfLibraryCachesCommon] stringByAppendingPathComponent:fileName];
-    NSDictionary *cacheInfo = [[StorageManager sharedInstance] unarchiveDictionaryFromFilePath:filePath];
-    if ([cacheInfo objectForKey:key]) {
-        return cacheInfo[key];
+//获取缓存数据通用方法
++ (id)GetObjectForKey:(NSString *)key fileName:(NSString *)fileName subFolder:(NSString *)subFolerName folder:(NSString *)folderPath {
+    ReturnNilWhenObjectIsEmpty(key)
+    ReturnNilWhenObjectIsEmpty(folderPath)
+    
+    if (isNotEmpty(subFolerName)) {
+        folderPath = [folderPath stringByAppendingPathComponent:subFolerName];
+    }
+    if (isEmpty(fileName)) {
+        fileName = @"CommonSettings";
+    }
+    NSString *filePath = [folderPath stringByAppendingPathComponent:fileName];
+    NSDictionary *cacheInfo = [STORAGEMANAGER unarchiveDictionaryFromFilePath:filePath];
+    NSObject *value = cacheInfo[key];
+    if (nil != value && NO == [value isKindOfClass:[NSNull class]]) {
+        return value;
     }
     else {
         return nil;

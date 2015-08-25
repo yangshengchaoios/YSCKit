@@ -34,7 +34,8 @@
 - (id)init {
 	self = [super init];
 	if (self) {
-        self.interval = [[self loadCachedInterval] doubleValue];   //从缓存中读取默认值
+        [[NSUserDefaults standardUserDefaults] setDouble:-0.5 forKey:CachedKeyOfInterval];
+        self.interval = -0.5;
         self.currentTimeInterval = [[NSDate dateWithTimeIntervalSinceNow:self.interval / ScaleOfResponseTime] timeStamp];
         self.theLock = [[NSLock alloc] init];
         
@@ -66,7 +67,7 @@
 
 //刷新服务器时间
 - (void)refreshServerTime {
-    self.interval = [[self loadCachedInterval] doubleValue];   //从缓存中读取默认值
+    self.interval =  [[NSUserDefaults standardUserDefaults] doubleForKey:CachedKeyOfInterval];   //从缓存中读取默认值
     
 	WeakSelfType blockSelf = self;
     NSDate *date = [NSDate date];
@@ -90,9 +91,7 @@
                       NSTimeInterval serverTime = [oldServerTime doubleValue] + httpWaste * ScaleOfResponseTime / 2.0f;
                       NSTimeInterval localTime = [nowDate timeIntervalSince1970] * ScaleOfResponseTime;
                       blockSelf.interval = serverTime - localTime;
-                      [[StorageManager sharedInstance] archiveDictionary:@{ CachedKeyOfInterval : [NSString stringWithFormat:@"%lf", blockSelf.interval] }
-                                                              toFilePath:[blockSelf cacheFilePath:nil]
-                                                               overwrite:YES];
+                      [[NSUserDefaults standardUserDefaults] setDouble:blockSelf.interval forKey:CachedKeyOfInterval];
                   }
               }
                 requestFailure:^(NSInteger errorCode, NSString *errorMessage) {
@@ -115,23 +114,4 @@
                                              selector:@selector(refreshServerTime)
                                                object:nil];
 }
-
-#pragma mark - 缓存相关
-
-- (NSString *)loadCachedInterval {
-    NSDictionary *cacheInfo = [[StorageManager sharedInstance] unarchiveDictionaryFromFilePath:[self cacheFilePath:nil]];
-    if ([cacheInfo objectForKey:CachedKeyOfInterval]) {
-        return [NSString stringWithFormat:@"%@", cacheInfo[CachedKeyOfInterval]];
-    }
-    else {
-        return @"-0.5";
-    }
-}
-- (NSString *)cacheFilePath:(NSString *)suffix {
-	NSString *fileName = [NSString stringWithFormat:@"%@%@.dat",
-                          NSStringFromClass(self.class),
-                          [NSString isEmpty:suffix] ? @"" :[NSString stringWithFormat:@"_%@",suffix]]; //缓存文件名称
-	return [[[StorageManager sharedInstance] directoryPathOfLibraryCachesCommon] stringByAppendingPathComponent:fileName];
-}
-
 @end

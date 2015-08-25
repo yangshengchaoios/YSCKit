@@ -98,8 +98,6 @@
 - (UIAlertView *)showAlertViewWithTitle:(NSString *)title andMessage:(NSString *)message block:(YSCResultBlock)block;
 
 #pragma mark - Overridden methods 缓存相关
-//- (NSString *)cacheFilePath;
-//- (NSString *)cacheFilePath:(NSString *)suffix;
 - (id)cachedObjectForKey:(NSString *)cachedKey;
 - (id)cachedObjectForKey:(NSString *)cachedKey withSuffix:(NSString *)suffix;
 - (void)saveObject:(id)object forKey:(NSString *)cachedKey;

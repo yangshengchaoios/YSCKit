@@ -580,7 +580,8 @@
             shouldCacheData = self.shouldCacheDataAtIndex(i);
         }
         if (shouldCacheData) {
-            NSArray *cacheArray = [self cachedObjectForKey:KeyOfCachedData atIndex:i];
+            NSString *fileName = [NSString stringWithFormat:@"%@_%ld.dat", self.viewControllerClassName, (long)i];
+            NSArray *cacheArray = GetCacheObjectByFile(KeyOfCachedData, fileName);
             if ([cacheArray isKindOfClass:[NSArray class]] && [NSArray isNotEmpty:cacheArray]) {
                 [[self dataArrayAtIndex:i] addObjectsFromArray:cacheArray];
             }
@@ -711,7 +712,8 @@
         shouldCacheData = self.shouldCacheDataAtIndex(index);
     }
     if (shouldCacheData) {
-        [self saveObject:array forKey:KeyOfCachedData atIndex:index];
+        NSString *fileName = [NSString stringWithFormat:@"%@_%ld.dat", self.viewControllerClassName, index];
+        SaveCacheObjectByFile(array, KeyOfCachedData, fileName);
     }
 }
 //加载更多
@@ -728,46 +730,6 @@
         [UIView insertCollectionViewCell:(UICollectionView *)contentView oldCount:oldCount addCount:[array count]];
     }
 }
-//获取缓存数组
-- (NSArray *)cachedObjectForKey:(NSString *)cachedKey atIndex:(NSInteger)index {
-    NSString *fileName = [NSString stringWithFormat:@"%@_%ld.dat", self.viewControllerClassName, index];
-    NSString *filePath = [[[StorageManager sharedInstance] directoryPathOfLibraryCachesCommon] stringByAppendingPathComponent:fileName];
-    NSDictionary *cacheInfo = [[StorageManager sharedInstance] unarchiveDictionaryFromFilePath:filePath];
-    if ([cacheInfo objectForKey:cachedKey]) {
-        return cacheInfo[cachedKey];
-    }
-    else {
-        return nil;
-    }
-}
-//缓存数组
-- (void)saveObject:(NSArray *)object forKey:(NSString *)cachedKey atIndex:(NSInteger)index {
-    ReturnWhenObjectIsEmpty(object);
-    ReturnWhenObjectIsEmpty(cachedKey);
-    
-    @try {
-        NSString *fileName = [NSString stringWithFormat:@"%@_%ld.dat", self.viewControllerClassName, index];
-        NSString *filePath = [[[StorageManager sharedInstance] directoryPathOfLibraryCachesCommon] stringByAppendingPathComponent:fileName];
-        BOOL isSuccess = [[StorageManager sharedInstance] archiveDictionary:@{cachedKey : object}
-                                                                 toFilePath:filePath
-                                                                  overwrite:NO];
-        if (isSuccess) {
-            NSLog(@"缓存成功！");
-        }
-        else {
-            NSLog(@"缓存失败！");
-        }
-    }
-    @catch (NSException *exception)
-    {
-        NSLog(@"将数组保存至本地缓存时出错！%@",
-              exception); //可能是没有在对象里做序列号和反序列化！
-    }
-    @finally
-    {
-    }
-}
-
 
 //-------------------------------------------------------------------------------------------
 //

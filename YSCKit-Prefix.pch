@@ -22,6 +22,9 @@
     #import <FMDB/FMDB.h>
     #import "Masonry.h"
 
-    #import "Constants.h"   //项目全局header文件
+    #import "EnumType.h"
+    #import "UMengConstants.h"
     #import "YSCKit.h"      //基础框架库
+
+    #import "Constants.h"   //项目全局header文件
 #endif
