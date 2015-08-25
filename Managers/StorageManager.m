@@ -344,12 +344,9 @@
  */
 - (void)clearLibraryCaches {
     //Documents
-    [YSCFileUtils clearDirectoryPath:[self directoryPathOfDocumentsCommon]];
-    [YSCFileUtils clearDirectoryPath:self.directoryPathOfDocumentsByUserId];
     [YSCFileUtils clearDirectoryPath:self.directoryPathOfDocumentsLog];
     
     //Library/Caches
-    [YSCFileUtils clearDirectoryPath:self.directoryPathOfLibraryCachesByUserId];
     [YSCFileUtils clearDirectoryPath:self.directoryPathOfLibraryCachesCommon];
     [YSCFileUtils clearDirectoryPath:self.directoryPathOfLibraryCachesBundleIdentifier];
     

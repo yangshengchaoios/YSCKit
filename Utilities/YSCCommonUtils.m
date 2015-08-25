@@ -336,6 +336,23 @@
         return [NSString stringWithFormat:@"%.2f", value];
     }
 }
+//规范化mac地址
++ (NSString *)formatMacAddress:(NSString *)macAddress {
+    NSMutableString *newMacAddress = [NSMutableString string];
+    NSArray *array = [NSString splitString:macAddress byRegex:@":"];
+    for (NSString *str in array) {
+        NSScanner *scanner = [NSScanner scannerWithString:str];
+        unsigned int intValue;
+        [scanner scanHexInt:&intValue];
+        [newMacAddress appendFormat:@"%02x:", intValue];
+    }
+    if ([newMacAddress length] > 0) {
+        return [newMacAddress removeLastChar];
+    }
+    else {
+        return macAddress;
+    }
+}
 
 
 #pragma mark 打电话
@@ -602,10 +619,10 @@
         NSLog(@"dici：%@", info);
         if (info[@"BSSID"]) {
             bssid = [NSString stringWithFormat:@"%@", info[@"BSSID"]];
-            bssid = bssid.uppercaseString;
+            bssid = bssid.lowercaseString;
         }
     }
-    return bssid;
+    return [self formatMacAddress:bssid];
 }
 //打印出的信息为：（路由器／ 也就是wifi的mac 地址 ）
 //{
@@ -626,7 +643,7 @@
     return [self SaveObject:object forKey:key fileName:fileName subFolder:nil];
 }
 + (BOOL)SaveObject:(NSObject *)object forKey:(NSString *)key fileName:(NSString *)fileName subFolder:(NSString *)subFoler {
-    return [self SaveObject:object forKey:key fileName:fileName subFolder:subFoler folder:STORAGEMANAGER.directoryPathOfDocuments];
+    return [self SaveObject:object forKey:key fileName:fileName subFolder:subFoler folder:[STORAGEMANAGER directoryPathOfDocumentsCommon]];
 }
 
 //------------------------------------
@@ -641,7 +658,7 @@
     return [self SaveCacheObject:object forKey:key fileName:fileName subFolder:nil];
 }
 + (BOOL)SaveCacheObject:(NSObject *)object forKey:(NSString *)key fileName:(NSString *)fileName subFolder:(NSString *)subFoler {
-    return [self SaveObject:object forKey:key fileName:fileName subFolder:subFoler folder:STORAGEMANAGER.directoryPathOfLibraryCaches];
+    return [self SaveObject:object forKey:key fileName:fileName subFolder:subFoler folder:[STORAGEMANAGER directoryPathOfLibraryCachesCommon]];
 }
 
 
@@ -657,7 +674,7 @@
     return [self GetObjectForKey:key fileName:fileName subFolder:nil];
 }
 + (id)GetObjectForKey:(NSString *)key fileName:(NSString *)fileName subFolder:(NSString *)subFoler {
-    return [self GetObjectForKey:key fileName:fileName subFolder:subFoler folder:STORAGEMANAGER.directoryPathOfDocuments];
+    return [self GetObjectForKey:key fileName:fileName subFolder:subFoler folder:[STORAGEMANAGER directoryPathOfDocumentsCommon]];
 }
 
 //------------------------------------
@@ -672,7 +689,7 @@
     return [self GetCacheObjectForKey:key fileName:fileName subFolder:nil];
 }
 + (id)GetCacheObjectForKey:(NSString *)key fileName:(NSString *)fileName subFolder:(NSString *)subFoler {
-    return [self GetObjectForKey:key fileName:fileName subFolder:subFoler folder:STORAGEMANAGER.directoryPathOfLibraryCaches];
+    return [self GetObjectForKey:key fileName:fileName subFolder:subFoler folder:[STORAGEMANAGER directoryPathOfLibraryCachesCommon]];
 }
 
 //------------------------------------
@@ -687,7 +704,6 @@
     if (nil == object) {
         object = [NSNull null];
     }
-    //TODO:object is empty???
     
     if (isNotEmpty(subFolerName)) {
         folderPath = [folderPath stringByAppendingPathComponent:subFolerName];
