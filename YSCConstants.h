@@ -29,12 +29,16 @@ typedef void (^YSCDictionaryResultBlock)(NSDictionary * dict, NSError *error);
 #endif
 #define NSDetailedErrorsKey     @"NSDetailedErrorsKey"
 
+//方法或属性过期标志
+//#define YSCDeprecated(instead) NS_DEPRECATED(2_0, 2_0, 2_0, 2_0, instead)
+#define YSCDeprecated(explain) __attribute__((deprecated(explain)))
+
 
 /**
  *  重新定义NSLog
  */
 //控制调试信息的输出
-#define DEBUGMODEL      [[NSUserDefaults standardUserDefaults] boolForKey:@"DEBUG"]
+#define DEBUGMODEL      [GetObject(@"DEBUG") boolValue]
 
 #define __NSLog(s, ...) do { \
 NSString *logString = [NSString stringWithFormat:@"[%@(%d)] %@",[[NSString stringWithUTF8String:__FILE__] lastPathComponent],__LINE__,[NSString stringWithFormat:(s), ##__VA_ARGS__]]; \

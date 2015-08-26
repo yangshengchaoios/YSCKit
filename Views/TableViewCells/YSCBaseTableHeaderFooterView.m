@@ -26,12 +26,20 @@
 + (NSString *)identifier {
     return NSStringFromClass(self.class);
 }
-+ (CGFloat)HeightOfView {
-    return AUTOLAYOUT_LENGTH(75);
-}
 + (UINib *)NibNameOfView {
     return [UINib nibWithNibName:NSStringFromClass(self.class) bundle:nil];
 }
+
++ (CGFloat)HeightOfView {
+    return AUTOLAYOUT_LENGTH(75);
+}
++ (CGFloat)HeightOfViewByObject:(NSObject *)object {
+    return AUTOLAYOUT_LENGTH(75);
+}
+- (void)layoutObject:(NSObject *)object {
+
+}
+
 - (void)layoutDataModel:(BaseDataModel *)dataModel {
     
 }

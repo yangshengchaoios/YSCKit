@@ -8,6 +8,7 @@
 
 #import "ServerTimeSynchronizer.h"
 
+#define ScaleOfResponseTime     1000                    //返回的服务器时间：1000-毫秒  1-秒
 #define CachedKeyOfInterval     @"CachedKeyOfInterval"
 
 @interface ServerTimeSynchronizer ()

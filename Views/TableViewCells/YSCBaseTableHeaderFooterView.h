@@ -13,10 +13,13 @@
 + (instancetype)dequeueHeaderByTableView:(UITableView *)tableView;
 + (void)registerHeaderToTableView:(UITableView *)tableView;
 + (NSString *)identifier;
-
-+ (CGFloat)HeightOfView;
 + (UINib *)NibNameOfView;
-- (void)layoutDataModel:(BaseDataModel *)dataModel;
-- (void)layoutDataModels:(NSArray *)dataModelArray;
+
++ (CGFloat)HeightOfView DEPRECATED_ATTRIBUTE;
++ (CGFloat)HeightOfViewByObject:(NSObject *)object;
+
+- (void)layoutObject:(NSObject *)object;
+- (void)layoutDataModel:(BaseDataModel *)dataModel DEPRECATED_ATTRIBUTE;
+- (void)layoutDataModels:(NSArray *)dataModelArray DEPRECATED_ATTRIBUTE;
 
 @end
