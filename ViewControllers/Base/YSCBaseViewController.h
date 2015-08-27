@@ -8,12 +8,6 @@
 //
 
 #import <UIKit/UIKit.h>
-//静态类
-
-
-//自定义view
-#import "YSCKTipsView.h"
-#import "YSCTitleBarView.h"
 
 //第三方库
 //#import "UIViewController+ScrollingNavbar.h"

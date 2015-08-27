@@ -46,10 +46,13 @@
 #import "SNSShareManager.h"
 
 //常用自定义控件
+#import "YSCKTipsView.h"
+#import "YSCTitleBarView.h"
 #import "YSCTextField.h"
 #import "YSCTextView.h"
 #import "YSCPickerView.h"
 #import "YSCTableViewCell.h"
+#import "YSCTableView.h"
 
 //基类
 #import "YSCBaseModel.h"

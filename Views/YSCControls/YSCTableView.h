@@ -29,7 +29,7 @@ typedef NSDictionary *(^YSCDictionarySetBlock)(NSInteger pageIndex);
 //      3. 列表为空的提示信息
 //      4. cell左右边界设置
 //      5. 对数据进行缓存
-//  不支持的功能：多种header 或 多种cell
+//  不支持的功能：多种header 或 多种cell 或 多数据源
 //
 //------------------------------------
 @interface YSCTableView : UITableView
