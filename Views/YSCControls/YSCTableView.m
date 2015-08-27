@@ -9,8 +9,13 @@
 #import "YSCTableView.h"
 #import "MJRefresh.h"
 
-@interface YSCTableView () <UITableViewDataSource, UITableViewDelegate>
+#define KeyOfHeaderData         @"KeyOfHeaderData"
+#define KeyOfCellData           @"KeyOfCellData"
+#define KeyOfFooterData         @"KeyOfFooterData"
+#define KeyOfSectionKey         @"KeyOfSectionKey"
 
+@interface YSCTableView () <UITableViewDataSource, UITableViewDelegate>
+@property (nonatomic, strong) NSMutableArray *sectionKeyArray;//用于存储分组的判断依据
 @end
 
 @implementation YSCTableView
@@ -32,32 +37,70 @@
 
 //初始化配置参数
 - (void)setup {
-    WEAKSELF
-    //设置参数默认值
-    self.sectionDataArray = [NSMutableArray array];
+    //基本属性
+    self.sectionKeyArray = [NSMutableArray array];
+    self.headerDataArray = [NSMutableArray array];
+    self.footerDataArray = [NSMutableArray array];
     self.cellDataArray = [NSMutableArray array];
     self.currentPageIndex = kDefaultPageStartIndex;
     self.requestType = RequestTypeGET;
+    
+    //必要的属性
+    self.dictParamBlock = ^NSDictionary *(NSInteger pageIndex) {
+        return @{kParamPageIndex : @(pageIndex),
+                 kParamPageSize : @(kDefaultPageSize)};
+    };
+    self.methodName = @"";
+    self.modelName = @"";
+    self.cellName = @"";
+    
+    //设置默认属性
+    self.headerName = @"";
+    self.footerName = @"";
     self.enableCache = NO;
     self.enableLoadMore = YES;
     self.enableRefresh = YES;
     self.enableTips = YES;
     self.prefixOfUrl = kResPathAppBaseUrl;
-    self.tipsMessageWhenEmpty = kDefaultTipText;
-    self.tipsSuccessIcon = @"icon_empty";
-    self.tipsFailedIcon = @"icon_failed";
+    self.tipsEmptyText = kDefaultTipsEmptyText;
+    self.tipsEmptyIcon = kDefaultTipsEmptyIcon;
+    self.tipsFailedIcon = kDefaultTipsFailedIcon;
+    self.tipsButtonTitle = kDefaultTipsButtonTitle;
     self.cellSeperatorLeft = 0;
     self.cellSeperatorRight = 0;
-    self.headerHeight = self.footerHeight = 0.01;
     
-    self.tipsView = [YSCKTipsView CreateYSCTipsViewOnView:self
-                                               edgeInsets:UIEdgeInsetsZero
-                                              withMessage:self.tipsMessageWhenEmpty
-                                                iconImage:[UIImage imageNamed:self.tipsSuccessIcon]
-                                              buttonTitle:@"重新加载" buttonAction:^{
-                                                  [weakSelf.header beginRefreshing];
-                                              }];
-    [self initTableView];
+    //blocks
+    self.successBlock = ^{};
+    self.failedBlock = ^{};
+    self.preProcessBlock = ^NSArray *(NSArray *array) {
+        return array;
+    };
+    self.clickHeaderBlock = ^(NSObject *object, NSInteger section) {};
+    self.clickCellBlock = ^(NSObject *object, NSIndexPath *indexPath) {};
+    self.clickFooterBlock = ^(NSObject *object, NSInteger section) {};
+    
+    [self loadCacheArray];//加载缓存
+    [self initTableView];//初始化tableView
+}
+- (void)loadCacheArray {
+    if (self.enableCache) {
+        NSArray *array = GetCacheObjectByFile(KeyOfSectionKey, self.cacheFileName);
+        if (isNotEmpty(array)) {
+            [self.sectionKeyArray addObjectsFromArray:array];
+        }
+        array = GetCacheObjectByFile(KeyOfHeaderData, self.cacheFileName);
+        if (isNotEmpty(array)) {
+            [self.headerDataArray addObjectsFromArray:array];
+        }
+        array = GetCacheObjectByFile(KeyOfCellData, self.cacheFileName);
+        if (isNotEmpty(array)) {
+            [self.cellDataArray addObjectsFromArray:array];
+        }
+        array = GetCacheObjectByFile(KeyOfFooterData, self.cacheFileName);
+        if (isNotEmpty(array)) {
+            [self.footerDataArray addObjectsFromArray:array];
+        }
+    }
 }
 - (void)initTableView {
     //1. 注册cell、header、footer
@@ -65,10 +108,10 @@
         [NSClassFromString(self.cellName) registerCellToTableView:self];
     }
     if (isNotEmpty(self.headerName)) {
-        [NSClassFromString(self.headerName) registerHeaderToTableView:self];
+        [NSClassFromString(self.headerName) registerHeaderFooterToTableView:self];
     }
     if (isNotEmpty(self.footerName)) {
-        [NSClassFromString(self.footerName) registerHeaderToTableView:self];
+        [NSClassFromString(self.footerName) registerHeaderFooterToTableView:self];
     }
     
     //2. 设置cell的分割线
@@ -79,8 +122,28 @@
     self.tableFooterView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 0, 0.01)];
     self.dataSource = self;
     self.delegate = self;
-    self.backgroundColor = kDefaultViewColor;
-    self.separatorColor = kDefaultBorderColor;
+    self.backgroundColor = [UIColor clearColor];
+    self.separatorColor = kDefaultBorderColor;//TODO:test on xib
+}
+- (void)setEnableTips:(BOOL)enableTips {
+    _enableTips = enableTips;
+    if (enableTips && isEmpty(self.tipsView)) {
+        WEAKSELF
+        self.tipsView = [YSCKTipsView CreateYSCTipsViewOnView:self
+                                                   edgeInsets:UIEdgeInsetsZero//TODO:
+                                                  withMessage:self.tipsEmptyText
+                                                    iconImage:[UIImage imageNamed:self.tipsEmptyIcon]
+                                                  buttonTitle:self.tipsButtonTitle
+                                                 buttonAction:^{
+                                                     [weakSelf.header beginRefreshing];
+                                                 }];
+    }
+    else {
+        if (self.tipsView) {
+            [self.tipsView removeFromSuperview];
+            self.tipsView = nil;
+        }
+    }
 }
 
 //兼容下拉刷新和上拉加载更多
@@ -91,8 +154,15 @@
         isPullToRefresh ? [weakSelf.header endRefreshing] : [weakSelf.footer endRefreshing];
         //处理返回结果
         if (error) {
-            [UIView showAlertVieWithMessage:@""];
-            //TODO:call failed block
+            NSString *errMsg = @"";
+            [UIView showAlertVieWithMessage:errMsg];
+            
+            //数据加载失败的tips
+            if (weakSelf.tipsView) {
+                weakSelf.tipsView.iconImageView.image = [UIImage imageNamed:weakSelf.tipsFailedIcon];
+                weakSelf.tipsView.messageLabel.text = errMsg;
+            }
+            weakSelf.failedBlock();
         }
         else {
             //1. 获取结果数组
@@ -100,7 +170,7 @@
             if ([responseObject isKindOfClass:[NSArray class]]) {
                 dataArray = (NSArray *)responseObject;
             }
-            else if([responseObject isKindOfClass:[BaseDataModel class]]){
+            else if([responseObject isKindOfClass:[BaseDataModel class]]) {
                 dataArray = @[responseObject];
             }
             
@@ -108,32 +178,41 @@
             NSArray *newDataArray = nil;
             if ([dataArray count] > 0) {
                 weakSelf.currentPageIndex = pageIndex;  //只要接口成功返回了数据，就把当前请求的页码保存起来
-                if (weakSelf.preProcessBlock) { newDataArray = weakSelf.preProcessBlock(dataArray); }
+                newDataArray = weakSelf.preProcessBlock(dataArray);
             }
             
-            //3. 根据新数组刷新界面显示
+            
+            //-----------开始对tableView进行操作-----------
+            if (isPullToRefresh) {
+                [weakSelf.sectionKeyArray removeAllObjects];
+                [weakSelf.headerDataArray removeAllObjects];
+                [weakSelf.footerDataArray removeAllObjects];
+                [weakSelf.cellDataArray removeAllObjects];
+            }
+            else {
+                [weakSelf beginUpdates];
+            }
+            
+            //3. 根据新数组刷新界面显示(包括下拉刷新、上拉加载更多、并且支持多section)
             if ([newDataArray count] > 0) {
-                if (isPullToRefresh) {
-                    [weakSelf.sectionDataArray removeAllObjects];
-                    [weakSelf.cellDataArray removeAllObjects];
-                }
-                else {
-                    [weakSelf beginUpdates];
-                }
                 //-----------------多section的刷新--------------
                 NSMutableArray *insertedIndexPaths = [NSMutableArray array];
-                for (S4StaffModel *model in newDataArray) {
+                for (BaseDataModel *model in newDataArray) {
                     NSInteger row = 0, section = 0;
-                    if ([weakSelf.sectionDataArray containsObject:Trim(model.brandName)]) {
-                        section = [weakSelf.sectionDataArray indexOfObject:Trim(model.brandName)];
+                    
+                    if ([weakSelf.sectionKeyArray containsObject:Trim(model.sectionKey)]) {
+                        section = [weakSelf.sectionKeyArray indexOfObject:Trim(model.sectionKey)];
                         NSMutableArray *tempArray = weakSelf.cellDataArray[section];
                         [tempArray addObject:model];
                         row = [tempArray count] - 1;
                     }
                     else {
                         row = 0;
-                        section = [weakSelf.sectionDataArray count];
-                        [weakSelf.sectionDataArray addObject:Trim(model.brandName)];
+                        section = [weakSelf.sectionKeyArray count];
+                        [weakSelf.sectionKeyArray addObject:Trim(model.sectionKey)];
+                        
+                        //处理section header model(直接保存原始的model，在具体显示的时候再确定显示哪个属性)
+                        [weakSelf.headerDataArray addObject:model];
                         
                         NSMutableArray *tempArray = [NSMutableArray array];
                         [tempArray addObject:model];
@@ -144,32 +223,45 @@
                                     withRowAnimation:UITableViewRowAnimationNone];
                         }
                     }
-                    //insert row
+                    //add new row
                     if (NO == isPullToRefresh) {
                         [insertedIndexPaths addObject:[NSIndexPath indexPathForRow:row inSection:section]];
                     }
                 }
                 //--------------------------------------------
-                //刷新TableView
-                if (isPullToRefresh) {
-                    [weakSelf reloadData];
-                }
-                else {//insert rows
+                
+                if (NO == isPullToRefresh) {//insert rows
                     [weakSelf insertRowsAtIndexPaths:insertedIndexPaths withRowAnimation:UITableViewRowAnimationAutomatic];
-                    [weakSelf endUpdates];
                 }
             }
             else {
-                if (isPullToRefresh) {
-                    [weakSelf.sectionDataArray removeAllObjects];
-                    [weakSelf.cellDataArray removeAllObjects];
-                    if (weakSelf.reloadBlock) {
-                        weakSelf.reloadBlock();
-                    }
-                }
-                else {
+                if (NO == isPullToRefresh) {
                     [UIView showResultThenHideOnWindow:@"没有更多了"];
                 }
+            }
+            
+            //---------结束对tableView的操作-----------
+            if (isPullToRefresh) {
+                [weakSelf reloadData];
+            }
+            else {
+                [weakSelf endUpdates];
+            }
+            
+            
+            //4. 数据为空的tips
+            if (weakSelf.tipsView) {
+                weakSelf.tipsView.iconImageView.image = [UIImage imageNamed:weakSelf.tipsEmptyIcon];
+                weakSelf.tipsView.messageLabel.text = weakSelf.tipsEmptyText;
+            }
+            weakSelf.successBlock();
+            
+            //5. 缓存数据
+            if (weakSelf.enableCache) {
+                SaveCacheObjectByFile(weakSelf.sectionKeyArray, KeyOfSectionKey, weakSelf.cacheFileName);
+                SaveCacheObjectByFile(weakSelf.headerDataArray, KeyOfHeaderData, weakSelf.cacheFileName);
+                SaveCacheObjectByFile(weakSelf.cellDataArray, KeyOfCellData, weakSelf.cacheFileName);
+                SaveCacheObjectByFile(weakSelf.footerDataArray, KeyOfFooterData, weakSelf.cacheFileName);
             }
         }
         weakSelf.tipsView.hidden = [NSArray isNotEmpty:weakSelf.cellDataArray];
@@ -179,7 +271,7 @@
     if(RequestTypeGET == self.requestType) {
         [AFNManager getDataFromUrl:self.prefixOfUrl
                            withAPI:self.methodName
-                      andDictParam:self.dictParam
+                      andDictParam:self.dictParamBlock(pageIndex)
                          modelName:NSClassFromString(self.modelName)
                   requestSuccessed:^(id responseObjec) {
                       resultBlock(responseObjec, nil);
@@ -191,7 +283,7 @@
     else if(RequestTypePOST == self.requestType) {
         [AFNManager postDataToUrl:self.prefixOfUrl
                           withAPI:self.methodName
-                     andDictParam:self.dictParam
+                     andDictParam:self.dictParamBlock(pageIndex)
                         modelName:NSClassFromString(self.modelName)
                  requestSuccessed:^(id responseObjec) {
                      resultBlock(responseObjec, nil);
@@ -202,44 +294,38 @@
     }
 }
 
-#pragma mark - UITableViewDataSource
+#pragma mark - UITableViewDataSource & UITableViewDelegate
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    return [self.sectionDataArray count];
+    return [self.cellDataArray count];
 }
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     NSArray *array = self.cellDataArray[section];
     return [array count];
 }
+//HEADER
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
-    return AUTOLAYOUT_LENGTH(self.headerHeight);
+    if (isNotEmpty(self.headerName) && (section >= 0 && section < [self.headerDataArray count])) {
+        return [NSClassFromString(self.headerName) HeightOfViewByObject:self.headerDataArray[section]];
+    }
+    else {
+        return 0.01;
+    }
 }
 - (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
     YSCBaseTableHeaderFooterView *header = nil;
-    if (isNotEmpty(self.headerName)) {
-        header = [NSClassFromString(self.headerName) dequeueHeaderByTableView:tableView];
+    if (isNotEmpty(self.headerName) && (section >= 0 && section < [self.headerDataArray count])) {
+        header = [NSClassFromString(self.headerName) dequeueHeaderFooterByTableView:tableView];
+        [header layoutObject:self.headerDataArray[section]];
         
+        WEAKSELF
+        [header removeAllGestureRecognizers];
+        [header bk_whenTapped:^{
+            weakSelf.clickHeaderBlock(weakSelf.headerDataArray[section], section);
+        }];
     }
     return header;
 }
-
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    YSCBaseTableViewCell *cell = [NSClassFromString(self.cellName) dequeueCellByTableView:tableView];
-    NSArray *array = self.cellDataArray[indexPath.section];
-    BaseDataModel *object = array[indexPath.row];
-    if ([cell isKindOfClass:[YSCBaseTableViewCell class]]) {
-        if ([object isKindOfClass:[NSArray class]]) {
-            [cell layoutDataModels:(NSArray *)object];
-        }
-        else {
-            [cell layoutDataModel:object];
-        }
-    }
-    cell.selectionStyle = UITableViewCellSelectionStyleNone;
-    return cell;
-}
-
-#pragma mark - UITableViewDelegate
-
+//CELL
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
     NSArray *array = self.cellDataArray[indexPath.section];
     if ([NSClassFromString(self.cellName) isKindOfClass:[YSCBaseTableViewCell class]]) {
@@ -249,17 +335,50 @@
         return 44;
     }
 }
-
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+    YSCBaseTableViewCell *cell = [NSClassFromString(self.cellName) dequeueCellByTableView:tableView];
+    NSArray *array = self.cellDataArray[indexPath.section];
+    BaseDataModel *object = array[indexPath.row];
+    if ([cell isKindOfClass:[YSCBaseTableViewCell class]]) {
+        [cell layoutObject:object];
+    }
+    cell.selectionStyle = UITableViewCellSelectionStyleNone;
+    return cell;
+}
+//FOOTER
+- (CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section {
+    if (isNotEmpty(self.footerName) && (section >= 0 && section < [self.footerDataArray count])) {
+        return [NSClassFromString(self.footerName) HeightOfViewByObject:self.footerDataArray[section]];
+    }
+    else {
+        return 0.01;
+    }
+}
+- (UIView *)tableView:(UITableView *)tableView viewForFooterInSection:(NSInteger)section {
+    YSCBaseTableHeaderFooterView *footer = nil;
+    if (isNotEmpty(self.footerName) && (section >= 0 && section < [self.footerDataArray count])) {
+        footer = [NSClassFromString(self.footerName) dequeueHeaderFooterByTableView:tableView];
+        [footer layoutObject:self.footerDataArray[section]];
+        
+        WEAKSELF
+        [footer removeAllGestureRecognizers];
+        [footer bk_whenTapped:^{
+            weakSelf.clickHeaderBlock(weakSelf.footerDataArray[section], section);
+        }];
+    }
+    return footer;
+}
+//选择cell
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    NSArray *array = self.cellDataArray[indexPath.section];
+    self.clickCellBlock(array[indexPath.row], indexPath);
+}
+//
 - (BOOL)tableView:(UITableView *)tableView shouldHighlightRowAtIndexPath:(NSIndexPath *)indexPath {
     return YES;
-}
-
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    
 }
 - (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath {
     self.layoutMargins = UIEdgeInsetsMake(0, self.cellSeperatorLeft, 0, self.cellSeperatorRight);
 }
-
 
 @end

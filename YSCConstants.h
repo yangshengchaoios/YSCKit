@@ -25,9 +25,21 @@ typedef void (^YSCDictionaryResultBlock)(NSDictionary * dict, NSError *error);
 
 //常量
 #ifndef kLogManageType
-    #define kLogManageType  @"1"
+    #define kLogManageType              @"1"
 #endif
 #define NSDetailedErrorsKey     @"NSDetailedErrorsKey"
+#ifndef kDefaultTipsEmptyText
+    #define kDefaultTipsEmptyText       @"暂无数据"
+#endif
+#ifndef kDefaultTipsEmptyIcon
+    #define kDefaultTipsEmptyIcon       @"icon_empty"//列表为空时的默认icon名称
+#endif
+#ifndef kDefaultTipsFailedIcon
+    #define kDefaultTipsFailedIcon      @"icon_failed"//列表加载失败时的默认icon名称
+#endif
+#ifndef kDefaultTipsButtonTitle
+    #define kDefaultTipsButtonTitle     @"重新加载"//列表加载失败、为空时的按钮名称
+#endif
 
 //方法或属性过期标志
 //#define YSCDeprecated(instead) NS_DEPRECATED(2_0, 2_0, 2_0, 2_0, instead)

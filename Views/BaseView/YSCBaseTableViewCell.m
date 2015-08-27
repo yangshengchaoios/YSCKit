@@ -15,32 +15,38 @@
     
     self.clipsToBounds = YES;
     self.selectionStyle = UITableViewCellSelectionStyleNone;
-    [self resetFontSizeOfView];         //递归缩放label和button的字体大小
+    [self resetFontSizeOfView];
     [self resetConstraintOfView];
+}
+
+#pragma mark - 注册与重用
++ (void)registerCellToTableView: (UITableView *)tableView {
+    [tableView registerNib:[[self class] NibNameOfCell] forCellReuseIdentifier:[[self class] identifier]];
 }
 + (instancetype)dequeueCellByTableView :(UITableView *)tableView {
     YSCBaseTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:[[self class] identifier]];
     return cell;
 }
-+ (void)registerCellToTableView: (UITableView *)tableView {
-    [tableView registerNib:[[self class] NibNameOfCell] forCellReuseIdentifier:[[self class] identifier]];
-}
 + (NSString *)identifier {
     return NSStringFromClass(self.class);
-}
-+ (CGFloat)HeightOfCell {
-    return AUTOLAYOUT_LENGTH(290);
-}
-+ (CGFloat)HeightOfCellByDataModel:(BaseDataModel *)dataModel {
-    return 0;
 }
 + (UINib *)NibNameOfCell {
     return [UINib nibWithNibName:NSStringFromClass(self.class) bundle:nil];
 }
-- (void)layoutDataModel:(BaseDataModel *)dataModel {
-    
+
+#pragma mark - 计算高度
++ (CGFloat)HeightOfCellByObject:(NSObject *)object {
+    return 44;
 }
-- (void)layoutDataModels:(NSArray *)dataModelArray {
-    
++ (CGFloat)HeightOfCell {
+    return 44;
 }
++ (CGFloat)HeightOfCellByDataModel:(BaseDataModel *)dataModel {
+    return 44;
+}
+
+#pragma mark - 呈现数据
+- (void)layoutObject:(NSObject *)object {}
+- (void)layoutDataModel:(BaseDataModel *)dataModel { [self layoutObject:dataModel]; }
+- (void)layoutDataModels:(NSArray *)dataModelArray { [self layoutObject:dataModelArray]; }
 @end

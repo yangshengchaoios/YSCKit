@@ -10,14 +10,17 @@
 
 @interface YSCBaseTableHeaderFooterView : UITableViewHeaderFooterView
 
-+ (instancetype)dequeueHeaderByTableView:(UITableView *)tableView;
-+ (void)registerHeaderToTableView:(UITableView *)tableView;
+#pragma mark - 注册与重用
++ (void)registerHeaderFooterToTableView:(UITableView *)tableView;
++ (instancetype)dequeueHeaderFooterByTableView:(UITableView *)tableView;
 + (NSString *)identifier;
 + (UINib *)NibNameOfView;
 
-+ (CGFloat)HeightOfView DEPRECATED_ATTRIBUTE;
+#pragma mark - 计算高度
 + (CGFloat)HeightOfViewByObject:(NSObject *)object;
++ (CGFloat)HeightOfView DEPRECATED_ATTRIBUTE;
 
+#pragma mark - 呈现数据
 - (void)layoutObject:(NSObject *)object;
 - (void)layoutDataModel:(BaseDataModel *)dataModel DEPRECATED_ATTRIBUTE;
 - (void)layoutDataModels:(NSArray *)dataModelArray DEPRECATED_ATTRIBUTE;

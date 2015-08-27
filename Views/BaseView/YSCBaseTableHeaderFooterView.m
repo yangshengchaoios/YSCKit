@@ -13,15 +13,18 @@
 - (void)awakeFromNib {
     [super awakeFromNib];
     
-    [self resetFontSizeOfView];         //递归缩放label和button的字体大小
+    self.clipsToBounds = YES;
+    [self resetFontSizeOfView];
     [self resetConstraintOfView];
 }
-+ (instancetype)dequeueHeaderByTableView:(UITableView *)tableView {
+
+#pragma mark - 注册与重用
++ (void)registerHeaderFooterToTableView:(UITableView *)tableView {
+    [tableView registerNib:[[self class] NibNameOfView] forHeaderFooterViewReuseIdentifier:[[self class] identifier]];
+}
++ (instancetype)dequeueHeaderFooterByTableView:(UITableView *)tableView {
     YSCBaseTableHeaderFooterView *header = [tableView dequeueReusableHeaderFooterViewWithIdentifier:[[self class] identifier]];
     return header;
-}
-+ (void)registerHeaderToTableView:(UITableView *)tableView {
-    [tableView registerNib:[[self class] NibNameOfView] forHeaderFooterViewReuseIdentifier:[[self class] identifier]];
 }
 + (NSString *)identifier {
     return NSStringFromClass(self.class);
@@ -30,22 +33,17 @@
     return [UINib nibWithNibName:NSStringFromClass(self.class) bundle:nil];
 }
 
-+ (CGFloat)HeightOfView {
-    return AUTOLAYOUT_LENGTH(75);
-}
+#pragma mark - 计算高度
 + (CGFloat)HeightOfViewByObject:(NSObject *)object {
-    return AUTOLAYOUT_LENGTH(75);
+    return 0.01;
 }
-- (void)layoutObject:(NSObject *)object {
-
-}
-
-- (void)layoutDataModel:(BaseDataModel *)dataModel {
-    
++ (CGFloat)HeightOfView {
+    return 0.01;
 }
 
-- (void)layoutDataModels:(NSArray *)dataModelArray {
-    
-}
+#pragma mark - 呈现数据
+- (void)layoutObject:(NSObject *)object {}
+- (void)layoutDataModel:(BaseDataModel *)dataModel {}
+- (void)layoutDataModels:(NSArray *)dataModelArray {}
 
 @end

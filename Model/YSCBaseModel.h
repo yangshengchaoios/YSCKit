@@ -30,6 +30,8 @@
  */
 @interface BaseDataModel : JSONModel
 
+@property (nonatomic, strong) NSString *sectionKey;//用于多section的TableView封装
+
 + (NSDictionary *)jsonToModelMapping;
 
 @end

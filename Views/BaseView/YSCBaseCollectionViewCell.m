@@ -13,22 +13,37 @@
 - (void)awakeFromNib {
     [super awakeFromNib];
     
-    [self resetFontSizeOfView];         //递归缩放label和button的字体大小
+    self.clipsToBounds = YES;
+    [self resetFontSizeOfView];
     [self resetConstraintOfView];
 }
 
-+ (CGSize)SizeOfCell {
-    return AUTOLAYOUT_SIZE_WH(290, 290);
+#pragma mark - 注册与重用
++ (void)registerCellToCollectionView:(UICollectionView *)collectionView {
+    [collectionView registerNib:[[self class] NibNameOfView] forCellWithReuseIdentifier:[[self class] identifier]];
+}
++ (instancetype)dequeueCellByCollectionView:(UICollectionView *)collectionView forIndexPath:(NSIndexPath*)indexPath {
+    YSCBaseCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:[[self class] identifier] forIndexPath:indexPath];
+    return cell;
+}
++ (NSString *)identifier {
+    return NSStringFromClass(self.class);
 }
 + (UINib *)NibNameOfCell {
     return [UINib nibWithNibName:NSStringFromClass(self.class) bundle:nil];
 }
 
-- (void)layoutDataModel:(BaseDataModel *)dataModel {
-
+#pragma mark - 计算大小
++ (CGSize)SizeOfCell {
+    return CGSizeMake(145, 145);
 }
-- (void)layoutDataModels:(NSArray *)dataModelArray {
-
++ (CGSize)SizeOfCellByObject:(NSObject *)object {
+    return CGSizeMake(145, 145);
 }
+
+#pragma mark - 呈现数据
+- (void)layoutObject:(NSObject *)object {}
+- (void)layoutDataModel:(BaseDataModel *)dataModel {}
+- (void)layoutDataModels:(NSArray *)dataModelArray {}
 
 @end

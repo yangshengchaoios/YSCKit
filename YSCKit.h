@@ -10,6 +10,7 @@
 #define EZGoal_YSCKit_h
 
 //常量
+#import "YSCEnum.h"
 #import "YSCConstants.h"
 #import "YSCEmoji.h"
 
