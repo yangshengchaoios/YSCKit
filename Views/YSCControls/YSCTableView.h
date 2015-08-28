@@ -9,17 +9,12 @@
 #import <UIKit/UIKit.h>
 
 //-------------定义block类型-------------
-//typedef NSString *(^YSCStringSetBlock)(NSInteger index);
-//typedef BOOL (^YSCBooleanSetBlock)(NSInteger index);
-//typedef NSInteger *(^YSCIntegerSetBlock)(NSInteger index);
 typedef NSArray *(^YSCArraySetBlock)(NSArray *array);
 typedef void (^YSCObjectIndexPathResultBlock)(NSObject *object, NSIndexPath *indexPath);
 typedef void (^YSCObjectIndexResultBlock)(NSObject *object, NSInteger section);
 typedef NSDictionary *(^YSCDictionarySetBlock)(NSInteger pageIndex);
-//typedef UIEdgeInsets *(^YSCEdgeInsetsSetBlock)(NSInteger index);
-//typedef UIColor *(^YSCColorSetBlock)(NSInteger index);
-//typedef CGSize (^YSCSizeSetBlock)(NSInteger index);
-//typedef CGFloat (^YSCFloatSetBlock)(NSInteger index);
+typedef void (^YSCViewObjectResultBlock)(UIView *view, NSObject *object);
+typedef CGFloat (^YSCFloatSetBlock)(NSIndexPath *indexPath);
 
 
 //------------------------------------
@@ -29,10 +24,14 @@ typedef NSDictionary *(^YSCDictionarySetBlock)(NSInteger pageIndex);
 //      3. 列表为空的提示信息
 //      4. cell左右边界设置
 //      5. 对数据进行缓存
+//      6. 自定义任意单一确定的数据源
+//      7. 动态设置header、cell、footer的高度
 //  不支持的功能：多种header 或 多种cell 或 多数据源
 //
 //------------------------------------
 @interface YSCTableView : UITableView
+
+@property (nonatomic, assign) BOOL closeResetFontAndConstraint;//关闭YSCBaseViewController中对该view进行缩放
 
 #pragma mark - 基本属性
 @property (nonatomic, strong) NSMutableArray *headerDataArray;
@@ -71,6 +70,14 @@ typedef NSDictionary *(^YSCDictionarySetBlock)(NSInteger pageIndex);
 @property (nonatomic, copy) YSCObjectIndexResultBlock clickHeaderBlock;
 @property (nonatomic, copy) YSCObjectIndexResultBlock clickFooterBlock;
 @property (nonatomic, copy) YSCObjectIndexPathResultBlock clickCellBlock;
+@property (nonatomic, copy) YSCViewObjectResultBlock layoutHeader;
+@property (nonatomic, copy) YSCViewObjectResultBlock layoutFooter;
+@property (nonatomic, copy) YSCFloatSetBlock headerHeightBlock;
+@property (nonatomic, copy) YSCFloatSetBlock cellHeightBlock;
+@property (nonatomic, copy) YSCFloatSetBlock footerHeightBlock;
+
+//创建对象，不用xib布局时使用
++ (instancetype)CreateYSCTableViewOnView:(UIView *)view;
 
 //启动刷新(能加载一次缓存)
 - (void)beginRefreshing;
@@ -80,6 +87,7 @@ typedef NSDictionary *(^YSCDictionarySetBlock)(NSInteger pageIndex);
 - (void)enableCacheWithFileName:(NSString *)fileName;
 
 //下载数据(可重写)
-- (void)downloadAtIndex:(NSInteger)pageIndex;
+- (void)refreshAtPageIndex:(NSInteger)pageIndex;
+- (void)refreshAtPageIndex:(NSInteger)pageIndex response:(NSObject *)responseObject error:(NSString *)errMsg;
 
 @end

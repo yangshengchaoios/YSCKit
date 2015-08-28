@@ -24,7 +24,8 @@ typedef NS_ENUM (NSInteger, RequestType) {
     RequestTypePOST,
     RequestTypeUploadFile,
     RequestTypeDownloadFile,
-    RequestTypePostBodyData
+    RequestTypePostBodyData,
+    RequestTypeCustomResponse       //数据来源不是AFNManger
 };
 
 typedef NS_ENUM(NSInteger, AudioType) {

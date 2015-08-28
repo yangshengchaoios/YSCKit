@@ -18,7 +18,7 @@
 @property (nonatomic, strong) NSMutableArray *sectionKeyArray;//用于存储分组的判断依据
 @property (nonatomic, assign) BOOL isLoadedCache;//控制缓存只加载一次
 
-@property (nonatomic, assign) BOOL enableCache;//是否启用缓存(NO)TODO:
+@property (nonatomic, assign) BOOL enableCache;//是否启用缓存(NO)
 @property (nonatomic, strong) NSString *cacheFileName;//缓存数据保存的文件名称
 @end
 
@@ -76,6 +76,8 @@
     self.clickHeaderBlock = ^(NSObject *object, NSInteger section) {};
     self.clickCellBlock = ^(NSObject *object, NSIndexPath *indexPath) {};
     self.clickFooterBlock = ^(NSObject *object, NSInteger section) {};
+    self.layoutHeader = ^(UIView *view, NSObject *object) {};
+    self.layoutFooter = ^(UIView *view, NSObject *object) {};
     
     [self initTableView];//初始化tableView
 }
@@ -100,7 +102,7 @@
     self.dataSource = self;
     self.delegate = self;
     self.backgroundColor = [UIColor clearColor];
-    self.separatorColor = kDefaultBorderColor;//TODO:test on xib
+    self.separatorColor = kDefaultBorderColor;//NOTE:xib < this
 }
 
 #pragma mark - 属性设置
@@ -123,42 +125,39 @@
     }
 }
 - (void)setCellSeperatorLeft:(CGFloat)cellSeperatorLeft {
-    _cellSeperatorLeft = cellSeperatorLeft;
+    _cellSeperatorLeft = AUTOLAYOUT_LENGTH(cellSeperatorLeft);
     self.separatorInset = UIEdgeInsetsMake(0, self.cellSeperatorLeft, 0, self.cellSeperatorRight);
     self.layoutMargins = UIEdgeInsetsMake(0, self.cellSeperatorLeft, 0, self.cellSeperatorRight);
 }
 - (void)setCellSeperatorRight:(CGFloat)cellSeperatorRight {
-    _cellSeperatorRight = cellSeperatorRight;
+    _cellSeperatorRight = AUTOLAYOUT_LENGTH(cellSeperatorRight);
     self.separatorInset = UIEdgeInsetsMake(0, self.cellSeperatorLeft, 0, self.cellSeperatorRight);
     self.layoutMargins = UIEdgeInsetsMake(0, self.cellSeperatorLeft, 0, self.cellSeperatorRight);
 }
 - (void)setEnableRefresh:(BOOL)enableRefresh {
     _enableRefresh = enableRefresh;
-    if (enableRefresh) {
-        WEAKSELF
-        [self addLegendHeaderWithRefreshingBlock:^{
-            [weakSelf downloadAtIndex:kDefaultPageStartIndex];
-        }];
-    }
-    else {
-        if (self.header.refreshingBlock) {
-            self.header.refreshingBlock = nil;
+    WEAKSELF
+    [self addLegendHeaderWithRefreshingBlock:^{
+        if (enableRefresh) {
+            [weakSelf refreshAtPageIndex:kDefaultPageStartIndex];
         }
-    }
+        else {
+            [weakSelf.header endRefreshing];
+        }
+    }];
 }
 - (void)setEnableLoadMore:(BOOL)enableLoadMore {
     _enableLoadMore = enableLoadMore;
-    if (enableLoadMore) {
-        WEAKSELF
-        [self addLegendFooterWithRefreshingBlock:^{
-            [weakSelf downloadAtIndex:weakSelf.currentPageIndex + 1];
-        }];
-    }
-    else {
-        if (self.footer.refreshingBlock) {
-            self.footer.refreshingBlock = nil;
+    WEAKSELF
+    [self addLegendFooterWithRefreshingBlock:^{
+        if (enableLoadMore) {
+            [weakSelf refreshAtPageIndex:weakSelf.currentPageIndex + 1];
         }
-    }
+        else {
+            [weakSelf.footer endRefreshing];
+        }
+        
+    }];
 }
 - (void)setEnableTips:(BOOL)enableTips {
     _enableTips = enableTips;
@@ -172,6 +171,7 @@
                                                  buttonAction:^{
                                                      [weakSelf.header beginRefreshing];
                                                  }];
+        self.tipsView.hidden = YES;
     }
     else {
         if (self.tipsView) {
@@ -182,8 +182,19 @@
 }
 
 
-
 #pragma mark - 外部可调用的方法
+//创建对象，不用xib布局时使用
++ (instancetype)CreateYSCTableViewOnView:(UIView *)view {
+    YSCTableView *tableView = [[YSCTableView alloc] initWithFrame:view.bounds];
+    [view addSubview:tableView];
+    [tableView mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.top.equalTo(view.mas_top);
+        make.left.equalTo(view.mas_left);
+        make.bottom.equalTo(view.mas_bottom);
+        make.right.equalTo(view.mas_right);
+    }];
+    return tableView;
+}
 //启动刷新(能加载一次缓存)
 - (void)beginRefreshing {
     [self beginRefreshingByAnimation:YES];
@@ -194,7 +205,7 @@
         [self.header beginRefreshing];
     }
     else {
-        [self downloadAtIndex:kDefaultPageStartIndex];
+        [self refreshAtPageIndex:kDefaultPageStartIndex];
     }
 }
 //开启缓存模式
@@ -205,7 +216,10 @@
 }
 
 //下载数据(可重写)
-- (void)downloadAtIndex:(NSInteger)pageIndex {
+- (void)refreshAtPageIndex:(NSInteger)pageIndex {
+    [self refreshAtPageIndex:pageIndex response:nil error:nil];
+}
+- (void)refreshAtPageIndex:(NSInteger)pageIndex response:(NSObject *)responseObject error:(NSString *)errMsg {
     WEAKSELF
     YSCIdResultBlock resultBlock = ^(id responseObject, NSError *error) {
         BOOL isPullToRefresh = (kDefaultPageStartIndex == pageIndex); //是否下拉刷新
@@ -217,7 +231,9 @@
                 weakSelf.tipsView.iconImageView.image = [UIImage imageNamed:weakSelf.tipsFailedIcon];
                 weakSelf.tipsView.messageLabel.text = error.localizedDescription;
             }
-            weakSelf.failedBlock();
+            if (weakSelf.failedBlock) {
+                weakSelf.failedBlock();
+            }
         }
         else {
             //1. 获取结果数组
@@ -233,7 +249,9 @@
             NSArray *newDataArray = nil;
             if ([dataArray count] > 0) {
                 weakSelf.currentPageIndex = pageIndex;  //只要接口成功返回了数据，就把当前请求的页码保存起来
-                newDataArray = weakSelf.preProcessBlock(dataArray);
+                if (weakSelf.preProcessBlock) {
+                    newDataArray = weakSelf.preProcessBlock(dataArray);
+                }
             }
             
             
@@ -313,7 +331,9 @@
                 weakSelf.tipsView.iconImageView.image = [UIImage imageNamed:weakSelf.tipsEmptyIcon];
                 weakSelf.tipsView.messageLabel.text = weakSelf.tipsEmptyText;
             }
-            weakSelf.successBlock();
+            if (weakSelf.successBlock) {
+                weakSelf.successBlock();
+            }
             
             //5. 缓存数据
             if (weakSelf.enableCache && isNotEmpty(weakSelf.cacheFileName)) {
@@ -350,6 +370,14 @@
                    requestFailure:^(NSInteger errorCode, NSString *errorMessage) {
                        resultBlock(nil, CreateNSError(errorMessage));
                    }];
+    }
+    else if (RequestTypeCustomResponse == self.requestType) {
+        if (isEmpty(errMsg)) {
+            resultBlock(responseObject, nil);
+        }
+        else {
+            resultBlock(responseObject, CreateNSError(errMsg));
+        }
     }
 }
 
@@ -398,6 +426,9 @@
 }
 //HEADER
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
+    if (self.headerHeightBlock) {
+        return self.headerHeightBlock([NSIndexPath indexPathForRow:0 inSection:section]);
+    }
     if (isNotEmpty(self.headerName) && (section >= 0 && section < [self.headerDataArray count])) {
         return [NSClassFromString(self.headerName) HeightOfViewByObject:self.headerDataArray[section]];
     }
@@ -409,20 +440,31 @@
     YSCBaseTableHeaderFooterView *header = nil;
     if (isNotEmpty(self.headerName) && (section >= 0 && section < [self.headerDataArray count])) {
         header = [NSClassFromString(self.headerName) dequeueHeaderFooterByTableView:tableView];
-        [header layoutObject:self.headerDataArray[section]];
+        NSObject *object = self.headerDataArray[section];
+        [header layoutObject:object];
+        if (self.layoutHeader) {
+            self.layoutHeader(header, object);
+        }
         
         WEAKSELF
         [header removeAllGestureRecognizers];
         [header bk_whenTapped:^{
-            weakSelf.clickHeaderBlock(weakSelf.headerDataArray[section], section);
+            if (weakSelf.clickHeaderBlock) {
+                weakSelf.clickHeaderBlock(weakSelf.headerDataArray[section], section);
+            }
         }];
     }
     return header;
 }
 //CELL
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
+    //1. 屏蔽通用cell的高度
+    if (self.cellHeightBlock) {
+        return self.cellHeightBlock(indexPath);
+    }
+    //2. 单个情况下的高度
     NSArray *array = self.cellDataArray[indexPath.section];
-    if ([NSClassFromString(self.cellName) isKindOfClass:[YSCBaseTableViewCell class]]) {
+    if ([NSClassFromString(self.cellName) isSubclassOfClass:[YSCBaseTableViewCell class]]) {
         return [NSClassFromString(self.cellName) HeightOfCellByObject:array[indexPath.row]];
     }
     else {
@@ -441,6 +483,9 @@
 }
 //FOOTER
 - (CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section {
+    if (self.footerHeightBlock) {
+        return self.footerHeightBlock([NSIndexPath indexPathForRow:0 inSection:section]);
+    }
     if (isNotEmpty(self.footerName) && (section >= 0 && section < [self.footerDataArray count])) {
         return [NSClassFromString(self.footerName) HeightOfViewByObject:self.footerDataArray[section]];
     }
@@ -452,12 +497,18 @@
     YSCBaseTableHeaderFooterView *footer = nil;
     if (isNotEmpty(self.footerName) && (section >= 0 && section < [self.footerDataArray count])) {
         footer = [NSClassFromString(self.footerName) dequeueHeaderFooterByTableView:tableView];
-        [footer layoutObject:self.footerDataArray[section]];
+        NSObject *object = self.footerDataArray[section];
+        [footer layoutObject:object];
+        if (self.layoutFooter) {
+            self.layoutFooter(footer, object);
+        }
         
         WEAKSELF
         [footer removeAllGestureRecognizers];
         [footer bk_whenTapped:^{
-            weakSelf.clickHeaderBlock(weakSelf.footerDataArray[section], section);
+            if (weakSelf.clickFooterBlock) {
+                weakSelf.clickFooterBlock(weakSelf.footerDataArray[section], section);
+            }
         }];
     }
     return footer;
@@ -465,7 +516,9 @@
 //选择cell
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     NSArray *array = self.cellDataArray[indexPath.section];
-    self.clickCellBlock(array[indexPath.row], indexPath);
+    if (self.clickCellBlock) {
+        self.clickCellBlock(array[indexPath.row], indexPath);
+    }
 }
 //
 - (BOOL)tableView:(UITableView *)tableView shouldHighlightRowAtIndexPath:(NSIndexPath *)indexPath {
