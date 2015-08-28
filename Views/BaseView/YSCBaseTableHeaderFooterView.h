@@ -17,8 +17,8 @@
 + (UINib *)NibNameOfView;
 
 #pragma mark - 计算高度
-+ (CGFloat)HeightOfViewByObject:(NSObject *)object;
-+ (CGFloat)HeightOfView DEPRECATED_ATTRIBUTE;
++ (CGFloat)HeightOfViewByObject:(NSObject *)object;//NOTE:子类只能实现这个
++ (CGFloat)HeightOfView DEPRECATED_ATTRIBUTE;//NOTE:子类不能实现该方法，但业务层可以调用该方法
 
 #pragma mark - 呈现数据
 - (void)layoutObject:(NSObject *)object;

@@ -49,11 +49,11 @@
 }
 
 #pragma mark - 计算大小
-+ (CGSize)SizeOfView {
-    return CGSizeMake(SCREEN_WIDTH, 40);
-}
 + (CGSize)SizeOfViewByObject:(NSObject *)object {
-    return CGSizeMake(SCREEN_WIDTH, 40);
+    return CGSizeMake(SCREEN_WIDTH, 35.0f);
+}
++ (CGSize)SizeOfView {
+    return [self SizeOfViewByObject:nil];
 }
 
 #pragma mark - 呈现数据

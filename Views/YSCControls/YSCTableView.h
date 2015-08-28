@@ -40,29 +40,29 @@ typedef NSDictionary *(^YSCDictionarySetBlock)(NSInteger pageIndex);
 @property (nonatomic, strong) NSMutableArray *cellDataArray;
 @property (nonatomic, assign) NSInteger currentPageIndex;
 @property (nonatomic, assign) RequestType requestType;
+@property (nonatomic, strong) YSCKTipsView *tipsView;   //提示信息，默认隐藏
 
 #pragma mark - 必要的属性
 @property (nonatomic, copy) YSCDictionarySetBlock dictParamBlock;
 @property (nonatomic, strong) IBInspectable NSString *methodName;
 @property (nonatomic, strong) IBInspectable NSString *modelName;
 @property (nonatomic, strong) IBInspectable NSString *cellName;
-@property (nonatomic, strong) IBInspectable NSString *cacheFileName;//缓存数据保存的文件名称
 
 #pragma mark - 已有默认定义的属性
-@property (nonatomic, assign) IBInspectable BOOL enableCache;//是否启用缓存(NO)TODO:
-@property (nonatomic, assign) IBInspectable BOOL enableRefresh;//是否启用下拉刷新(YES)
-@property (nonatomic, assign) IBInspectable BOOL enableLoadMore;//是否启用上拉加载更多(YES)
-@property (nonatomic, assign) IBInspectable BOOL enableTips;//当列表为空时，是否显示tipsView(YES)
-@property (nonatomic, strong) IBInspectable NSString *headerName;//默认为空
-@property (nonatomic, strong) IBInspectable NSString *footerName;//默认为空
 @property (nonatomic, strong) IBInspectable NSString *prefixOfUrl;//接口地址前缀(kResPathBaseUrl)
 @property (nonatomic, strong) IBInspectable NSString *tipsEmptyText;//内容为空时提示文本()
 @property (nonatomic, strong) IBInspectable NSString *tipsEmptyIcon;//
 @property (nonatomic, strong) IBInspectable NSString *tipsFailedIcon;//
 @property (nonatomic, strong) IBInspectable NSString *tipsButtonTitle;//
+
+@property (nonatomic, strong) IBInspectable NSString *headerName;//默认为空
+@property (nonatomic, strong) IBInspectable NSString *footerName;//默认为空
 @property (nonatomic, assign) IBInspectable CGFloat cellSeperatorLeft;
 @property (nonatomic, assign) IBInspectable CGFloat cellSeperatorRight;
-@property (nonatomic, strong) YSCKTipsView *tipsView;   //提示信息，默认隐藏
+
+@property (nonatomic, assign) IBInspectable BOOL enableRefresh;//是否启用下拉刷新(YES)
+@property (nonatomic, assign) IBInspectable BOOL enableLoadMore;//是否启用上拉加载更多(YES)
+@property (nonatomic, assign) IBInspectable BOOL enableTips;//当列表为空时，是否显示tipsView(YES)
 
 #pragma mark - 设置和回传
 @property (nonatomic, copy) YSCBlock successBlock;
@@ -72,7 +72,14 @@ typedef NSDictionary *(^YSCDictionarySetBlock)(NSInteger pageIndex);
 @property (nonatomic, copy) YSCObjectIndexResultBlock clickFooterBlock;
 @property (nonatomic, copy) YSCObjectIndexPathResultBlock clickCellBlock;
 
-//兼容下拉刷新和上拉加载更多
+//启动刷新(能加载一次缓存)
+- (void)beginRefreshing;
+- (void)beginRefreshingByAnimation:(BOOL)animation;
+
+//开启缓存模式
+- (void)enableCacheWithFileName:(NSString *)fileName;
+
+//下载数据(可重写)
 - (void)downloadAtIndex:(NSInteger)pageIndex;
 
 @end

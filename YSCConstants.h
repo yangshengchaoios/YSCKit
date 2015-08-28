@@ -27,7 +27,6 @@ typedef void (^YSCDictionaryResultBlock)(NSDictionary * dict, NSError *error);
 #ifndef kLogManageType
     #define kLogManageType              @"1"
 #endif
-#define NSDetailedErrorsKey     @"NSDetailedErrorsKey"
 #ifndef kDefaultTipsEmptyText
     #define kDefaultTipsEmptyText       @"暂无数据"
 #endif
@@ -168,7 +167,9 @@ return _sharedObject;
 #define ReturnZeroWhenObjectIsEmpty(object)         if ([NSObject isEmpty:object]) { return 0;  }
 #define Trim(x)                                     [NSString trimString:x]
 #define RandomInt(from,to)                          ((int)((from) + arc4random() % ((to)-(from) + 1)))  //随机数 [from,to] 之间
-#define CreateNSError(error)                        [NSError errorWithDomain:@"" code:0 userInfo:@{NSDetailedErrorsKey : Trim(error)}]
+#define CreateNSError(errMsg)                       [NSError errorWithDomain:@"" code:0 userInfo:@{NSLocalizedDescriptionKey : Trim(errMsg)}]
+#define CreateNSErrorCode(errMsg)                   [NSError errorWithDomain:@"" code:Code userInfo:@{NSLocalizedDescriptionKey : Trim(errMsg)}]
+#define GetNSErrorMsg(error)                        ((NSError *)error).userInfo[NSLocalizedDescriptionKey]  //=error.localizedDescription
 #define STORAGEMANAGER                              [StorageManager sharedInstance]
 
 /**

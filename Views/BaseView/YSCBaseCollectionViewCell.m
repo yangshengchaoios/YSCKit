@@ -34,16 +34,16 @@
 }
 
 #pragma mark - 计算大小
-+ (CGSize)SizeOfCell {
-    return CGSizeMake(145, 145);
-}
 + (CGSize)SizeOfCellByObject:(NSObject *)object {
     return CGSizeMake(145, 145);
+}
++ (CGSize)SizeOfCell {
+    return [self SizeOfCellByObject:nil];
 }
 
 #pragma mark - 呈现数据
 - (void)layoutObject:(NSObject *)object {}
-- (void)layoutDataModel:(BaseDataModel *)dataModel {}
-- (void)layoutDataModels:(NSArray *)dataModelArray {}
+- (void)layoutDataModel:(BaseDataModel *)dataModel { [self layoutObject:dataModel]; }
+- (void)layoutDataModels:(NSArray *)dataModelArray { [self layoutObject:dataModelArray]; }
 
 @end

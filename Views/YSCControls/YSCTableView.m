@@ -16,6 +16,10 @@
 
 @interface YSCTableView () <UITableViewDataSource, UITableViewDelegate>
 @property (nonatomic, strong) NSMutableArray *sectionKeyArray;//用于存储分组的判断依据
+@property (nonatomic, assign) BOOL isLoadedCache;//控制缓存只加载一次
+
+@property (nonatomic, assign) BOOL enableCache;//是否启用缓存(NO)TODO:
+@property (nonatomic, strong) NSString *cacheFileName;//缓存数据保存的文件名称
 @end
 
 @implementation YSCTableView
@@ -50,24 +54,18 @@
         return @{kParamPageIndex : @(pageIndex),
                  kParamPageSize : @(kDefaultPageSize)};
     };
-    self.methodName = @"";
-    self.modelName = @"";
-    self.cellName = @"";
     
     //设置默认属性
-    self.headerName = @"";
-    self.footerName = @"";
-    self.enableCache = NO;
-    self.enableLoadMore = YES;
-    self.enableRefresh = YES;
-    self.enableTips = YES;
     self.prefixOfUrl = kResPathAppBaseUrl;
     self.tipsEmptyText = kDefaultTipsEmptyText;
     self.tipsEmptyIcon = kDefaultTipsEmptyIcon;
     self.tipsFailedIcon = kDefaultTipsFailedIcon;
     self.tipsButtonTitle = kDefaultTipsButtonTitle;
-    self.cellSeperatorLeft = 0;
-    self.cellSeperatorRight = 0;
+    
+    self.enableCache = NO;
+    self.enableRefresh = YES;
+    self.enableLoadMore = YES;
+    self.enableTips = YES;
     
     //blocks
     self.successBlock = ^{};
@@ -79,28 +77,7 @@
     self.clickCellBlock = ^(NSObject *object, NSIndexPath *indexPath) {};
     self.clickFooterBlock = ^(NSObject *object, NSInteger section) {};
     
-    [self loadCacheArray];//加载缓存
     [self initTableView];//初始化tableView
-}
-- (void)loadCacheArray {
-    if (self.enableCache) {
-        NSArray *array = GetCacheObjectByFile(KeyOfSectionKey, self.cacheFileName);
-        if (isNotEmpty(array)) {
-            [self.sectionKeyArray addObjectsFromArray:array];
-        }
-        array = GetCacheObjectByFile(KeyOfHeaderData, self.cacheFileName);
-        if (isNotEmpty(array)) {
-            [self.headerDataArray addObjectsFromArray:array];
-        }
-        array = GetCacheObjectByFile(KeyOfCellData, self.cacheFileName);
-        if (isNotEmpty(array)) {
-            [self.cellDataArray addObjectsFromArray:array];
-        }
-        array = GetCacheObjectByFile(KeyOfFooterData, self.cacheFileName);
-        if (isNotEmpty(array)) {
-            [self.footerDataArray addObjectsFromArray:array];
-        }
-    }
 }
 - (void)initTableView {
     //1. 注册cell、header、footer
@@ -125,6 +102,64 @@
     self.backgroundColor = [UIColor clearColor];
     self.separatorColor = kDefaultBorderColor;//TODO:test on xib
 }
+
+#pragma mark - 属性设置
+- (void)setCellName:(NSString *)cellName {
+    _cellName = cellName;
+    if (isNotEmpty(cellName)) {
+        [NSClassFromString(self.cellName) registerCellToTableView:self];
+    }
+}
+- (void)setHeaderName:(NSString *)headerName {
+    _headerName = headerName;
+    if (isNotEmpty(headerName)) {
+        [NSClassFromString(self.headerName) registerHeaderFooterToTableView:self];
+    }
+}
+- (void)setFooterName:(NSString *)footerName {
+    _footerName = footerName;
+    if (isNotEmpty(footerName)) {
+        [NSClassFromString(self.footerName) registerHeaderFooterToTableView:self];
+    }
+}
+- (void)setCellSeperatorLeft:(CGFloat)cellSeperatorLeft {
+    _cellSeperatorLeft = cellSeperatorLeft;
+    self.separatorInset = UIEdgeInsetsMake(0, self.cellSeperatorLeft, 0, self.cellSeperatorRight);
+    self.layoutMargins = UIEdgeInsetsMake(0, self.cellSeperatorLeft, 0, self.cellSeperatorRight);
+}
+- (void)setCellSeperatorRight:(CGFloat)cellSeperatorRight {
+    _cellSeperatorRight = cellSeperatorRight;
+    self.separatorInset = UIEdgeInsetsMake(0, self.cellSeperatorLeft, 0, self.cellSeperatorRight);
+    self.layoutMargins = UIEdgeInsetsMake(0, self.cellSeperatorLeft, 0, self.cellSeperatorRight);
+}
+- (void)setEnableRefresh:(BOOL)enableRefresh {
+    _enableRefresh = enableRefresh;
+    if (enableRefresh) {
+        WEAKSELF
+        [self addLegendHeaderWithRefreshingBlock:^{
+            [weakSelf downloadAtIndex:kDefaultPageStartIndex];
+        }];
+    }
+    else {
+        if (self.header.refreshingBlock) {
+            self.header.refreshingBlock = nil;
+        }
+    }
+}
+- (void)setEnableLoadMore:(BOOL)enableLoadMore {
+    _enableLoadMore = enableLoadMore;
+    if (enableLoadMore) {
+        WEAKSELF
+        [self addLegendFooterWithRefreshingBlock:^{
+            [weakSelf downloadAtIndex:weakSelf.currentPageIndex + 1];
+        }];
+    }
+    else {
+        if (self.footer.refreshingBlock) {
+            self.footer.refreshingBlock = nil;
+        }
+    }
+}
 - (void)setEnableTips:(BOOL)enableTips {
     _enableTips = enableTips;
     if (enableTips && isEmpty(self.tipsView)) {
@@ -146,7 +181,30 @@
     }
 }
 
-//兼容下拉刷新和上拉加载更多
+
+
+#pragma mark - 外部可调用的方法
+//启动刷新(能加载一次缓存)
+- (void)beginRefreshing {
+    [self beginRefreshingByAnimation:YES];
+}
+- (void)beginRefreshingByAnimation:(BOOL)animation {
+    [self loadCacheArray];//加载缓存
+    if (animation) {
+        [self.header beginRefreshing];
+    }
+    else {
+        [self downloadAtIndex:kDefaultPageStartIndex];
+    }
+}
+//开启缓存模式
+- (void)enableCacheWithFileName:(NSString *)fileName {
+    ReturnWhenObjectIsEmpty(fileName)
+    self.enableCache = YES;
+    self.cacheFileName = fileName;
+}
+
+//下载数据(可重写)
 - (void)downloadAtIndex:(NSInteger)pageIndex {
     WEAKSELF
     YSCIdResultBlock resultBlock = ^(id responseObject, NSError *error) {
@@ -154,13 +212,10 @@
         isPullToRefresh ? [weakSelf.header endRefreshing] : [weakSelf.footer endRefreshing];
         //处理返回结果
         if (error) {
-            NSString *errMsg = @"";
-            [UIView showAlertVieWithMessage:errMsg];
-            
             //数据加载失败的tips
             if (weakSelf.tipsView) {
                 weakSelf.tipsView.iconImageView.image = [UIImage imageNamed:weakSelf.tipsFailedIcon];
-                weakSelf.tipsView.messageLabel.text = errMsg;
+                weakSelf.tipsView.messageLabel.text = error.localizedDescription;
             }
             weakSelf.failedBlock();
         }
@@ -197,28 +252,32 @@
             if ([newDataArray count] > 0) {
                 //-----------------多section的刷新--------------
                 NSMutableArray *insertedIndexPaths = [NSMutableArray array];
-                for (BaseDataModel *model in newDataArray) {
+                for (NSObject *object in newDataArray) {
                     NSInteger row = 0, section = 0;
+                    NSString *sectionKey = @"";//NOTE:兼容object是数组的情况
+                    if ([object isKindOfClass:[BaseDataModel class]]) {
+                        sectionKey = Trim(((BaseDataModel *)object).sectionKey);
+                    }
                     
-                    if ([weakSelf.sectionKeyArray containsObject:Trim(model.sectionKey)]) {
-                        section = [weakSelf.sectionKeyArray indexOfObject:Trim(model.sectionKey)];
+                    if ([weakSelf.sectionKeyArray containsObject:Trim(sectionKey)]) {
+                        section = [weakSelf.sectionKeyArray indexOfObject:Trim(sectionKey)];
                         NSMutableArray *tempArray = weakSelf.cellDataArray[section];
-                        [tempArray addObject:model];
+                        [tempArray addObject:object];
                         row = [tempArray count] - 1;
                     }
                     else {
                         row = 0;
                         section = [weakSelf.sectionKeyArray count];
-                        [weakSelf.sectionKeyArray addObject:Trim(model.sectionKey)];
+                        [weakSelf.sectionKeyArray addObject:Trim(sectionKey)];
                         
                         //处理section header model(直接保存原始的model，在具体显示的时候再确定显示哪个属性)
-                        [weakSelf.headerDataArray addObject:model];
+                        [weakSelf.headerDataArray addObject:object];
                         
                         NSMutableArray *tempArray = [NSMutableArray array];
-                        [tempArray addObject:model];
+                        [tempArray addObject:object];
                         [weakSelf.cellDataArray addObject:tempArray];
                         
-                        if (NO == isPullToRefresh) {//insert section
+                        if (NO == isPullToRefresh && isNotEmpty(sectionKey)) {//insert section
                             [weakSelf insertSections:[NSIndexSet indexSetWithIndex:section]
                                     withRowAnimation:UITableViewRowAnimationNone];
                         }
@@ -257,7 +316,7 @@
             weakSelf.successBlock();
             
             //5. 缓存数据
-            if (weakSelf.enableCache) {
+            if (weakSelf.enableCache && isNotEmpty(weakSelf.cacheFileName)) {
                 SaveCacheObjectByFile(weakSelf.sectionKeyArray, KeyOfSectionKey, weakSelf.cacheFileName);
                 SaveCacheObjectByFile(weakSelf.headerDataArray, KeyOfHeaderData, weakSelf.cacheFileName);
                 SaveCacheObjectByFile(weakSelf.cellDataArray, KeyOfCellData, weakSelf.cacheFileName);
@@ -294,6 +353,41 @@
     }
 }
 
+
+#pragma mark - 私有方法
+//加载缓存数组
+- (void)loadCacheArray {
+    if (self.enableCache && NO == self.isLoadedCache) {
+        self.isLoadedCache = YES;//控制缓存只加载一次
+        
+        [self.sectionKeyArray removeAllObjects];
+        NSArray *array = GetCacheObjectByFile(KeyOfSectionKey, self.cacheFileName);
+        if (isNotEmpty(array)) {
+            [self.sectionKeyArray addObjectsFromArray:array];
+        }
+        
+        [self.headerDataArray removeAllObjects];
+        array = GetCacheObjectByFile(KeyOfHeaderData, self.cacheFileName);
+        if (isNotEmpty(array)) {
+            [self.headerDataArray addObjectsFromArray:array];
+        }
+        
+        [self.cellDataArray removeAllObjects];
+        array = GetCacheObjectByFile(KeyOfCellData, self.cacheFileName);
+        if (isNotEmpty(array)) {
+            [self.cellDataArray addObjectsFromArray:array];
+        }
+        
+        [self.footerDataArray removeAllObjects];
+        array = GetCacheObjectByFile(KeyOfFooterData, self.cacheFileName);
+        if (isNotEmpty(array)) {
+            [self.footerDataArray addObjectsFromArray:array];
+        }
+        [self reloadData];//TODO:test 是否需要reload？
+    }
+}
+
+
 #pragma mark - UITableViewDataSource & UITableViewDelegate
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
     return [self.cellDataArray count];
@@ -329,7 +423,7 @@
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
     NSArray *array = self.cellDataArray[indexPath.section];
     if ([NSClassFromString(self.cellName) isKindOfClass:[YSCBaseTableViewCell class]]) {
-        return [NSClassFromString(self.cellName) HeightOfCellByDataModel:array[indexPath.row]];
+        return [NSClassFromString(self.cellName) HeightOfCellByObject:array[indexPath.row]];
     }
     else {
         return 44;
