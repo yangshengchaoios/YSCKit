@@ -269,7 +269,7 @@
             if ([contentView isKindOfClass:[UITableView class]]) {
                 YSCBaseTableViewCell *cell = [(UITableView *)contentView dequeueReusableCellWithIdentifier:kCellIdentifier];
                 if ([cell isKindOfClass:[YSCBaseTableViewCell class]]) {
-                    [cell layoutDataModel:data];
+                    [cell layoutObject:data];
                 }
                 cell.selectionStyle = UITableViewCellSelectionStyleNone;//去掉cell的选中状态
                 return cell;
@@ -277,7 +277,7 @@
             else if ([contentView isKindOfClass:[UICollectionView class]]) {
                 YSCBaseCollectionViewCell *cell = [(UICollectionView *)contentView dequeueReusableCellWithReuseIdentifier:kItemCellIdentifier forIndexPath:indexPath];
                 if ([cell isKindOfClass:[YSCBaseCollectionViewCell class]]) {
-                    [cell layoutDataModel:data];
+                    [cell layoutObject:data];
                 }
                 return cell;
             }

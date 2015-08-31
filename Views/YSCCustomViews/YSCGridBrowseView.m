@@ -82,7 +82,7 @@ UICollectionViewDelegateFlowLayout>
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
     YSCBaseCollectionViewCell *cell = [self.collectionView dequeueReusableCellWithReuseIdentifier:kItemCellIdentifier forIndexPath:indexPath];
     if ([cell isKindOfClass:[YSCBaseCollectionViewCell class]]) {
-        [cell layoutDataModel:self.dataArray[indexPath.row]];
+        [cell layoutObject:self.dataArray[indexPath.row]];
     }
     return cell;
 }

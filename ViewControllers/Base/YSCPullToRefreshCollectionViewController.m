@@ -75,12 +75,7 @@
 - (UIView *)layoutCellWithData:(id)object atIndexPath:(NSIndexPath *)indexPath {
     YSCBaseCollectionViewCell *cell = [self.collectionView dequeueReusableCellWithReuseIdentifier:kItemCellIdentifier forIndexPath:indexPath];
     if ([cell isKindOfClass:[YSCBaseCollectionViewCell class]]) {
-        if ([object isKindOfClass:[NSArray class]]) {
-            [cell layoutDataModels:(NSArray *)object];
-        }
-        else {
-            [cell layoutDataModel:object];
-        }
+        [cell layoutObject:object];
     }
     return cell;
 }

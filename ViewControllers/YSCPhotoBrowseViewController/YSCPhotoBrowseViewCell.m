@@ -16,7 +16,7 @@
 
 @implementation YSCPhotoBrowseViewCell
 
-- (void)layoutDataModel:(YSCPhotoBrowseCellModel *)dataModel {
+- (void)layoutObject:(YSCPhotoBrowseCellModel *)dataModel {
     if (isNotEmpty(dataModel.imageUrl)) {
         WEAKSELF
         self.photoImageView.hidden = YES;
@@ -38,8 +38,9 @@
     UIPinchGestureRecognizer *pinchGestureRecognizer = [[UIPinchGestureRecognizer alloc] initWithTarget:self action:@selector(pinchView:)];
     [self.photoImageView addGestureRecognizer:pinchGestureRecognizer];
 }
+
 // 处理缩放手势
-- (void) pinchView:(UIPinchGestureRecognizer *)pinchGestureRecognizer {
+- (void)pinchView:(UIPinchGestureRecognizer *)pinchGestureRecognizer {
     if([pinchGestureRecognizer state] == UIGestureRecognizerStateBegan) {
         // Reset the last scale, necessary if there are multiple objects with different scales
         self.lastScale = [pinchGestureRecognizer scale];
