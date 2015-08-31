@@ -138,7 +138,7 @@
     //设置Title字体大小和颜色(如果不设置将按默认显示whiteColor)
     [[UINavigationBar appearance] setTitleTextAttributes:@{NSForegroundColorAttributeName : kDefaultNaviBarTitleColor,
                                                            NSFontAttributeName : kDefaultNaviBarTitleFont}];
-    [[UINavigationBar appearance] setBarStyle:UIBarStyleDefault];//TODO:用处不大？
+    [[UINavigationBar appearance] setBarStyle:UIBarStyleDefault];//默认样式，带下横线的
     
     //设置BarButtonItem字体大小和颜色(如果不设置将按默认的tintColor显示)
     [[UIBarButtonItem appearance] setTitleTextAttributes:@{NSForegroundColorAttributeName : kDefaultNaviBarItemColor,
@@ -335,6 +335,9 @@
     else {
         return [NSString stringWithFormat:@"%.2f", value];
     }
+}
++ (NSString *)formatNumberValue:(NSNumber *)value {
+    return [self formatFloatValue:value.floatValue];
 }
 //规范化mac地址
 + (NSString *)formatMacAddress:(NSString *)macAddress {

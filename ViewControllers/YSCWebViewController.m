@@ -97,6 +97,7 @@
 }
 - (void)webViewDidFinishLoad:(UIWebView *)webView {
     [self hideHUDLoadingOnView:self.webView];
+    self.navigationItem.title = [webView stringByEvaluatingJavaScriptFromString:@"document.title"];
     [self.view layoutIfNeeded];
 }
 - (void)webView:(UIWebView *)webView didFailLoadWithError:(NSError *)error {

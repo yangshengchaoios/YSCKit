@@ -70,6 +70,7 @@
 + (NSString *)formatPrice:(NSNumber *)price showMoneyTag:(BOOL)isTagUsed showDecimalPoint:(BOOL) isDecimal useUnit:(BOOL)isUnitUsed;
 //规范化floatValue：如果有小数点才显示两位，否则就不显示小数点
 + (NSString *)formatFloatValue:(CGFloat)value;
++ (NSString *)formatNumberValue:(NSNumber *)value;
 //规范化mac地址
 + (NSString *)formatMacAddress:(NSString *)macAddress;
 

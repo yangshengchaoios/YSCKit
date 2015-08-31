@@ -110,7 +110,7 @@ return _sharedObject;
     #define kDefaultNaviBarItemColor        kDefaultNaviBarTintColor//导航栏左右文字颜色
 #endif
 #ifndef kDefaultNaviTintColor
-    #define kDefaultNaviTintColor           [UIColor whiteColor]    //系统导航栏背景颜色(包括了StatusBar)
+    #define kDefaultNaviTintColor           RGBA(255, 255, 255, 1)    //系统导航栏背景颜色(包括了StatusBar)
 #endif
 #ifndef kDefaultCustomNaviTintColor
     #define kDefaultCustomNaviTintColor     RGB(234, 106, 84)       //自定义导航栏背景颜色(包括了StatusBar)

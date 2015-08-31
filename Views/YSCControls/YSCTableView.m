@@ -24,6 +24,13 @@
 
 @implementation YSCTableView
 
+- (id)initWithFrame:(CGRect)frame style:(UITableViewStyle)style {
+    self = [super initWithFrame:frame style:style];
+    if (self) {
+        [self setup];
+    }
+    return self;
+}
 - (id)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
@@ -94,15 +101,16 @@
     }
     
     //2. 设置cell的分割线
-    self.separatorInset = UIEdgeInsetsMake(0, self.cellSeperatorLeft, 0, self.cellSeperatorRight);
-    self.layoutMargins = UIEdgeInsetsMake(0, self.cellSeperatorLeft, 0, self.cellSeperatorRight);
+    [self resetCellEdgeInsets];
+    self.separatorStyle = UITableViewCellSeparatorStyleSingleLine;
+    self.separatorColor = kDefaultBorderColor;//NOTE:xib < this
+    
     //3. 设置其他参数
     self.tableHeaderView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 0, 0.01)];
     self.tableFooterView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 0, 0.01)];
     self.dataSource = self;
     self.delegate = self;
     self.backgroundColor = [UIColor clearColor];
-    self.separatorColor = kDefaultBorderColor;//NOTE:xib < this
 }
 
 #pragma mark - 属性设置
@@ -126,38 +134,35 @@
 }
 - (void)setCellSeperatorLeft:(CGFloat)cellSeperatorLeft {
     _cellSeperatorLeft = AUTOLAYOUT_LENGTH(cellSeperatorLeft);
-    self.separatorInset = UIEdgeInsetsMake(0, self.cellSeperatorLeft, 0, self.cellSeperatorRight);
-    self.layoutMargins = UIEdgeInsetsMake(0, self.cellSeperatorLeft, 0, self.cellSeperatorRight);
+    [self resetCellEdgeInsets];
 }
 - (void)setCellSeperatorRight:(CGFloat)cellSeperatorRight {
     _cellSeperatorRight = AUTOLAYOUT_LENGTH(cellSeperatorRight);
-    self.separatorInset = UIEdgeInsetsMake(0, self.cellSeperatorLeft, 0, self.cellSeperatorRight);
-    self.layoutMargins = UIEdgeInsetsMake(0, self.cellSeperatorLeft, 0, self.cellSeperatorRight);
+    [self resetCellEdgeInsets];
 }
 - (void)setEnableRefresh:(BOOL)enableRefresh {
     _enableRefresh = enableRefresh;
-    WEAKSELF
-    [self addLegendHeaderWithRefreshingBlock:^{
-        if (enableRefresh) {
+    if (enableRefresh) {
+        WEAKSELF
+        [self addLegendHeaderWithRefreshingBlock:^{
             [weakSelf refreshAtPageIndex:kDefaultPageStartIndex];
-        }
-        else {
-            [weakSelf.header endRefreshing];
-        }
-    }];
+        }];
+    }
+    else {
+        [self removeHeader];
+    }
 }
 - (void)setEnableLoadMore:(BOOL)enableLoadMore {
     _enableLoadMore = enableLoadMore;
-    WEAKSELF
-    [self addLegendFooterWithRefreshingBlock:^{
-        if (enableLoadMore) {
+    if (enableLoadMore) {
+        WEAKSELF
+        [self addLegendFooterWithRefreshingBlock:^{
             [weakSelf refreshAtPageIndex:weakSelf.currentPageIndex + 1];
-        }
-        else {
-            [weakSelf.footer endRefreshing];
-        }
-        
-    }];
+        }];
+    }
+    else {
+        [self removeFooter];
+    }
 }
 - (void)setEnableTips:(BOOL)enableTips {
     _enableTips = enableTips;
@@ -208,6 +213,13 @@
         [self refreshAtPageIndex:kDefaultPageStartIndex];
     }
 }
+//当数据为空时执行下拉刷新
+- (void)refreshWhenCellDataEmpty {
+    if (isEmpty(self.cellDataArray)) {
+        [self beginRefreshing];
+    }
+}
+
 //开启缓存模式
 - (void)enableCacheWithFileName:(NSString *)fileName {
     ReturnWhenObjectIsEmpty(fileName)
@@ -230,9 +242,6 @@
             if (weakSelf.tipsView) {
                 weakSelf.tipsView.iconImageView.image = [UIImage imageNamed:weakSelf.tipsFailedIcon];
                 weakSelf.tipsView.messageLabel.text = error.localizedDescription;
-            }
-            if (weakSelf.failedBlock) {
-                weakSelf.failedBlock();
             }
         }
         else {
@@ -331,9 +340,6 @@
                 weakSelf.tipsView.iconImageView.image = [UIImage imageNamed:weakSelf.tipsEmptyIcon];
                 weakSelf.tipsView.messageLabel.text = weakSelf.tipsEmptyText;
             }
-            if (weakSelf.successBlock) {
-                weakSelf.successBlock();
-            }
             
             //5. 缓存数据
             if (weakSelf.enableCache && isNotEmpty(weakSelf.cacheFileName)) {
@@ -344,6 +350,18 @@
             }
         }
         weakSelf.tipsView.hidden = [NSArray isNotEmpty:weakSelf.cellDataArray];
+
+        //最后回调(可能会处理tipsView的显示与否的问题)
+        if (error) {
+            if (weakSelf.failedBlock) {
+                weakSelf.failedBlock();
+            }
+        }
+        else {
+            if (weakSelf.successBlock) {
+                weakSelf.successBlock();
+            }
+        }
     };
     
     //4. 开始网络访问
@@ -381,6 +399,29 @@
     }
 }
 
+//判断是否为空
+- (BOOL)isCellDataEmpty {
+    return [self.cellDataArray count] == 0;
+}
+//判断cell是否最后一个
+- (BOOL)isLastCellByIndexPath:(NSIndexPath *)indexPath {
+    if (indexPath.section == [self.headerDataArray count] - 1) {
+        NSArray *array = self.cellDataArray[indexPath.section];
+        if (indexPath.row == [array count] - 1) {
+            return YES;
+        }
+        else {
+            return NO;
+        }
+    }
+    else {
+        return NO;
+    }
+}
+//判断section是否最后一个
+- (BOOL)isLastSectionByIndexPath:(NSIndexPath *)indexPath {
+    return indexPath.section == [self.headerDataArray count] - 1;
+}
 
 #pragma mark - 私有方法
 //加载缓存数组
@@ -412,6 +453,15 @@
             [self.footerDataArray addObjectsFromArray:array];
         }
         [self reloadData];//TODO:test 是否需要reload？
+    }
+}
+- (void)resetCellEdgeInsets {
+    UIEdgeInsets edgeInsets = UIEdgeInsetsMake(0, self.cellSeperatorLeft, 0, self.cellSeperatorRight);
+    if ([self respondsToSelector:@selector(setSeparatorInset:)]) {
+        [self setSeparatorInset:edgeInsets];
+    }
+    if ([self respondsToSelector:@selector(setLayoutMargins:)]) {
+        [self setLayoutMargins:edgeInsets];
     }
 }
 
@@ -525,7 +575,7 @@
     return YES;
 }
 - (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath {
-    self.layoutMargins = UIEdgeInsetsMake(0, self.cellSeperatorLeft, 0, self.cellSeperatorRight);
+    [self resetCellEdgeInsets];
 }
 
 @end

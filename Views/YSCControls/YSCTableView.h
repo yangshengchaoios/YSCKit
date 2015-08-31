@@ -82,6 +82,8 @@ typedef CGFloat (^YSCFloatSetBlock)(NSIndexPath *indexPath);
 //启动刷新(能加载一次缓存)
 - (void)beginRefreshing;
 - (void)beginRefreshingByAnimation:(BOOL)animation;
+//当数据为空时执行下拉刷新
+- (void)refreshWhenCellDataEmpty;
 
 //开启缓存模式
 - (void)enableCacheWithFileName:(NSString *)fileName;
@@ -89,5 +91,9 @@ typedef CGFloat (^YSCFloatSetBlock)(NSIndexPath *indexPath);
 //下载数据(可重写)
 - (void)refreshAtPageIndex:(NSInteger)pageIndex;
 - (void)refreshAtPageIndex:(NSInteger)pageIndex response:(NSObject *)responseObject error:(NSString *)errMsg;
+
+- (BOOL)isCellDataEmpty;//判断cell数组是否为空
+- (BOOL)isLastCellByIndexPath:(NSIndexPath *)indexPath;//判断cell是否最后一个
+- (BOOL)isLastSectionByIndexPath:(NSIndexPath *)indexPath;//判断section是否最后一个
 
 @end
