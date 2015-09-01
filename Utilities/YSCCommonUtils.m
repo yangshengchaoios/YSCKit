@@ -49,6 +49,9 @@
             }
         }
     }
+    else if (3 == [kCheckNewVersionType integerValue]) {//检测app store上通过审核的新版本
+        [YSCCommonUtils checkNewVersionByAppleId:@"1000594167"];
+    }
 }
 
 //具体检测新版本的业务逻辑
@@ -96,7 +99,7 @@
         }
     }
 }
-- (void)checkNewVersionByAppleId:(NSString *)appleId {
++ (void)checkNewVersionByAppleId:(NSString *)appleId {
     NSMutableURLRequest *request = [[NSMutableURLRequest alloc] init];
     [request setURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://itunes.apple.com/lookup?id=%@", appleId]]];
     [request setHTTPMethod:@"POST"];
@@ -115,7 +118,7 @@
             NSString *showMsg = [NSString stringWithFormat:@"发现新版本%@，是否前往更新？", onlineVersion];
             UIAlertView *alertView = [[UIAlertView alloc] bk_initWithTitle:@"提示" message:showMsg];
             [alertView bk_addButtonWithTitle:@"更新" handler:^{
-                NSString *openUrl = [NSString stringWithFormat:@"https://itunes.apple.com/cn/app/qu-ting/id%@", appleId];
+                NSString *openUrl = [NSString stringWithFormat:@"https://itunes.apple.com/app/id%@", appleId];
                 [[UIApplication sharedApplication] openURL:[NSURL URLWithString:openUrl]];
             }];
             [alertView bk_setCancelButtonWithTitle:@"关闭" handler:nil];
@@ -226,50 +229,6 @@
          UIRemoteNotificationTypeSound];
     }
 }
-
-/**
- *  创建搜索框
- *
- *  @param width     宽度
- *  @param textField 输入框
- *
- *  @return
- */
-//+ (UIView *)createSearchViewWithWidth:(NSInteger)width withTextField:(UITextField *)textField {
-//    if (width <= 0) {
-//        width = NSIntegerMax;
-//    }
-//    UIView *searchBoxContainerView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, AUTOLAYOUT_LENGTH(width), AUTOLAYOUT_LENGTH(60))];
-//    searchBoxContainerView.backgroundColor = RGBA(10, 10, 10, 0.3);
-//    [UIView makeRoundForView:searchBoxContainerView withRadius:AUTOLAYOUT_LENGTH(60) / 2];
-//    
-//    //1. 设置搜索框背景图片
-////    UIImageView *searchBoxImageView = [[UIImageView alloc] initWithFrame:CGRectZero];
-////    searchBoxImageView.image = [UIImage imageNamed:@"bg_searchBlack"];
-////    [searchBoxContainerView addSubview:searchBoxImageView];
-////    [searchBoxImageView autoPinEdgeToSuperviewEdge:ALEdgeTop];
-////    [searchBoxImageView autoPinEdgeToSuperviewEdge:ALEdgeLeading];
-////    [searchBoxImageView autoPinEdgeToSuperviewEdge:ALEdgeBottom];
-////    [searchBoxImageView autoPinEdgeToSuperviewEdge:ALEdgeTrailing];
-//    
-//    //2. 设置搜索图标icon
-//    UIImageView *searchIconImageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"icon_search"]];
-//    [searchBoxContainerView addSubview:searchIconImageView];
-//    [searchIconImageView autoPinEdgeToSuperviewEdge:ALEdgeLeading withInset:AUTOLAYOUT_LENGTH(15)];
-//    [searchIconImageView autoAlignAxisToSuperviewAxis:ALAxisHorizontal];
-//    
-//    //3. 设置关键词输入框
-//    textField.font = AUTOLAYOUT_FONT(28);
-//    textField.textColor = [UIColor whiteColor];
-//    [textField setValue:[UIColor whiteColor] forKeyPath:@"_placeholderLabel.textColor"];
-//    [searchBoxContainerView addSubview:textField];
-//    [textField autoPinEdgeToSuperviewEdge:ALEdgeLeading withInset:AUTOLAYOUT_LENGTH(60)];
-//    [textField autoPinEdgeToSuperviewEdge:ALEdgeTop];
-//    [textField autoPinEdgeToSuperviewEdge:ALEdgeBottom];
-//    [textField autoPinEdgeToSuperviewEdge:ALEdgeTrailing withInset:AUTOLAYOUT_LENGTH(10)];
-//    
-//    return searchBoxContainerView;
-//}
 
 
 #pragma mark 格式化金额
@@ -626,9 +585,9 @@
 //2。按需求获取
 + (NSString *)CurrentWifiBSSID {
     //NOTE: Does not work on the simulator.    
-//    if ([UIDevice isRunningOnSimulator]) {
-//        return @"";
-//    }
+    if ([UIDevice isRunningOnSimulator]) {
+        return @"";
+    }
     NSString *bssid = nil;
     NSArray *ifs = (__bridge id)CNCopySupportedInterfaces();
     NSLog(@"ifs:%@",ifs);

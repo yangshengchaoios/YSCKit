@@ -97,7 +97,10 @@
 }
 - (void)webViewDidFinishLoad:(UIWebView *)webView {
     [self hideHUDLoadingOnView:self.webView];
-    self.navigationItem.title = [webView stringByEvaluatingJavaScriptFromString:@"document.title"];
+    NSString *title = [webView stringByEvaluatingJavaScriptFromString:@"document.title"];
+    if (isNotEmpty(title)) {
+        self.navigationItem.title = title;
+    }
     [self.view layoutIfNeeded];
 }
 - (void)webView:(UIWebView *)webView didFailLoadWithError:(NSError *)error {

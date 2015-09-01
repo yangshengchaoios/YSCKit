@@ -38,7 +38,6 @@
 + (void)configUmeng;
 + (void)configUmengPushWithOptions:(NSDictionary *)launchOptions;
 + (void)registerForRemoteNotification;
-+ (UIView *)createSearchViewWithWidth:(NSInteger)width withTextField:(UITextField *)textField;
 
 #pragma mark - 格式化金额
 
