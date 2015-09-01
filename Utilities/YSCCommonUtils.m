@@ -427,6 +427,21 @@
     return isExists;
 }
 
++ (int)SqliteGetRows:(NSString *)sql {
+    return [self SqliteGetRows:sql dbPath:DBRealPath];
+}
++ (int)SqliteGetRows:(NSString *)sql dbPath:(NSString *)dbPath {
+    int num = 0;
+    FMDatabase *db = [FMDatabase databaseWithPath:dbPath];
+    if ([db open]) {
+        FMResultSet *resultSet = [db executeQuery:sql];
+        if ([resultSet next]) {
+            num = [resultSet intForColumnIndex:0];
+        }
+    }
+    [db close];
+    return num;
+}
 #pragma mark - 过去了多长时间
 /**
  *  1. 如果是1分钟以内  返回 'xx秒之前'
