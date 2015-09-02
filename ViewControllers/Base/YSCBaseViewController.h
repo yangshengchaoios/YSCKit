@@ -28,6 +28,7 @@
 @property (nonatomic, assign) BOOL isAppeared;      //当前viewcontroller是否显示
 @property (nonatomic, assign) BOOL isRunViewDidLoadExtension;
 @property (nonatomic, assign) BOOL isClicked;       //判断重复点击某一操作
+@property (nonatomic, copy) YSCResultBlock block;
 
 #pragma mark - 这里可以获取相对布局的view大小，在viewDidAppear中调用
 - (void)viewDidiLoadExtension;

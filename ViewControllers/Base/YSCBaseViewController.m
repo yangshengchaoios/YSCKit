@@ -92,6 +92,7 @@
 - (void)viewDidLoad {
 	[super viewDidLoad];
     WeakSelfType blockSelf = self;
+    self.block = self.params[kParamBlock];
     
     //view基本参数设置
     if ([NSString isEmpty:self.navigationItem.title] && [NSString isNotEmpty:self.params[kParamTitle]]) {//已经有标题的就不再设置了

@@ -253,7 +253,8 @@
                                                                    kParamLongitude : Trim(APPCONFIG.currentLongitude),
                                                                    kParamLatitude : Trim(APPCONFIG.currentLatitude),
                                                                    kParamToken : TOKEN,
-                                                                   kParamChannel : kAppChannel
+                                                                   kParamChannel : kAppChannel,
+                                                                   kParamDeviceToken : Trim([AppConfigManager sharedInstance].deviceToken)
                                                                    }];
     NSLog(@"encryptString=%@", httpHeaderToken);
     [manager.requestSerializer setValue:httpHeaderToken forHTTPHeaderField:kAppHTTPTokenName];
