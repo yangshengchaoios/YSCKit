@@ -74,16 +74,13 @@
 + (NSString *)formatMacAddress:(NSString *)macAddress;
 
 #pragma mark - 打电话
-
 + (void)MakeCall:(NSString *)phoneNumber;
 + (void)MakeCall:(NSString *)phoneNumber success:(void (^)(void))block;
 
 #pragma mark - 打开APP的设置并进入隐私界面
-
 + (void)OpenPrivacyOfSetting;
 
 #pragma mark - 更新Sqlite操作
-
 + (BOOL)SqliteUpdate:(NSString *)sql;
 + (BOOL)SqliteUpdate:(NSString *)sql dbPath:(NSString *)dbPath;
 + (BOOL)SqliteCheckIfExists:(NSString *)sql;
@@ -93,22 +90,18 @@
 
 
 #pragma mark - 过去了多长时间 + 还剩多少时间
-
 + (NSString *)TimePassed:(NSString *)timeStamp;
 + (NSString *)TimeRemain:(NSString *)timeStamp;
 + (NSString *)TimeRemain:(NSString *)timeStamp currentTime:(NSString *)currentTime;
 
 #pragma mark - NSURL获取参数
-
 + (NSDictionary *)GetParamsInNSURL:(NSURL *)url;
 + (NSDictionary *)GetParamsInQueryString:(NSString *)queryString;
 
 #pragma mark - UIButton添加pop动画
-
 + (void)addPopAnimationToButton:(UIButton *)button;
 
 #pragma mark - 加密解密
-
 + (NSString *)AESEncryptString:(NSString *)string byKey:(NSString *)key;
 + (NSString *)AESDecryptString:(NSString *)string byKey:(NSString *)key;
 
@@ -117,10 +110,6 @@
 + (NSString *)CurrentWifiBSSID;
 
 #pragma mark - 缓存数据
-+ (BOOL)SaveCacheObject:(NSObject *)object forKey:(NSString *)key fileName:(NSString *)fileName;
-+ (id)GetCacheObjectForKey:(NSString *)key fileName:(NSString *)fileName;
-
-
 + (BOOL)SaveObject:(NSObject *)object forKey:(NSString *)key fileName:(NSString *)fileName subFolder:(NSString *)subFoler;
 + (BOOL)SaveCacheObject:(NSObject *)object forKey:(NSString *)key fileName:(NSString *)fileName subFolder:(NSString *)subFoler;
 

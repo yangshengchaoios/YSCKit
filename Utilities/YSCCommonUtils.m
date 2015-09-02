@@ -631,9 +631,6 @@
 + (BOOL)SaveCacheObject:(NSObject *)object forKey:(NSString *)key {
     return [self SaveCacheObject:object forKey:key fileName:nil subFolder:nil];
 }
-+ (BOOL)SaveCacheObject:(NSObject *)object forKey:(NSString *)key fileName:(NSString *)fileName {
-    return [self SaveCacheObject:object forKey:key fileName:fileName subFolder:nil];
-}
 + (BOOL)SaveCacheObject:(NSObject *)object forKey:(NSString *)key fileName:(NSString *)fileName subFolder:(NSString *)subFoler {
     return [self SaveObject:object forKey:key fileName:fileName subFolder:subFoler folder:[STORAGEMANAGER directoryPathOfLibraryCachesCommon]];
 }
@@ -661,9 +658,6 @@
 //------------------------------------
 + (id)GetCacheObjectForKey:(NSString *)key {
     return [self GetCacheObjectForKey:key fileName:nil subFolder:nil];
-}
-+ (id)GetCacheObjectForKey:(NSString *)key fileName:(NSString *)fileName {
-    return [self GetCacheObjectForKey:key fileName:fileName subFolder:nil];
 }
 + (id)GetCacheObjectForKey:(NSString *)key fileName:(NSString *)fileName subFolder:(NSString *)subFoler {
     return [self GetObjectForKey:key fileName:fileName subFolder:subFoler folder:[STORAGEMANAGER directoryPathOfLibraryCachesCommon]];
