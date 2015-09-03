@@ -96,6 +96,15 @@
         return;//url为空就直接返回默认图片
     }
     
+    //是否本地缓存图片
+    if ([NSString isNotUrl:newUrlString]) {
+        UIImage *cacheImage = [UIImage imageWithContentsOfFile:newUrlString];
+        if (cacheImage) {
+            [self setCustomImage:cacheImage];
+            return;
+        }
+    }
+    
     //处理相对路径
     if ([NSString isNotUrl:newUrlString]) {
         newUrlString = [[NSString replaceString:kResPathAppResUrl byRegex:@"/+$" to:@""] stringByAppendingFormat:@"/%@",

@@ -20,11 +20,21 @@
     if (isNotEmpty(dataModel.imageUrl)) {
         WEAKSELF
         self.photoImageView.hidden = YES;
-        [self.photoImageView setImageWithURLString:dataModel.imageUrl completed:^(UIImage *image, NSError *error) {
-            weakSelf.photoImageView.hidden = NO;
-            weakSelf.photoImageView.contentMode = UIViewContentModeScaleAspectFit;
-            weakSelf.savedImage = image;
-        }];
+        if ([NSString isNotUrl:dataModel.imageUrl]) {
+            UIImage *cacheImage = [UIImage imageWithContentsOfFile:dataModel.imageUrl];
+            if (cacheImage) {
+                self.photoImageView.hidden = NO;
+                self.photoImageView.image = cacheImage;
+                self.photoImageView.contentMode = UIViewContentModeScaleAspectFill;
+            }
+        }
+        else {
+            [self.photoImageView setImageWithURLString:dataModel.imageUrl completed:^(UIImage *image, NSError *error) {
+                weakSelf.photoImageView.hidden = NO;
+                weakSelf.photoImageView.contentMode = UIViewContentModeScaleAspectFit;
+                weakSelf.savedImage = image;
+            }];
+        }
     }
     else {
         self.photoImageView.image = dataModel.image;
