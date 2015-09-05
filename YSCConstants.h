@@ -10,7 +10,7 @@
 #define EZGoal_YSCConstants_h
 
 typedef void (^YSCBlock)();
-typedef void (^YSCResultBlock)(NSObject *error);
+typedef void (^YSCResultBlock)(NSObject *object);
 typedef void (^YSCStringResultBlock)(NSString *string, NSError *error);
 typedef void (^YSCBooleanResultBlock)(BOOL succeeded, NSError *error);
 typedef void (^YSCFloatBlock)(CGFloat percentDone);
