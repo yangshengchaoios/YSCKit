@@ -249,10 +249,10 @@
                                                                    kParamVersion : AppVersion,
                                                                    kParamUdid : [AppConfigManager sharedInstance].udid,
                                                                    kParamFrom : kParamFromValue,
-                                                                   kParamBSSID : Trim(APPCONFIG.currentBSSID),
-                                                                   kParamLongitude : Trim(APPCONFIG.currentLongitude),
-                                                                   kParamLatitude : Trim(APPCONFIG.currentLatitude),
-                                                                   kParamToken : TOKEN,
+//                                                                   kParamBSSID : Trim(APPCONFIG.currentBSSID),
+//                                                                   kParamLongitude : Trim(APPCONFIG.currentLongitude),
+//                                                                   kParamLatitude : Trim(APPCONFIG.currentLatitude),
+//                                                                   kParamToken : TOKEN,
                                                                    kParamChannel : kAppChannel,
                                                                    kParamDeviceToken : Trim([AppConfigManager sharedInstance].deviceToken)
                                                                    }];
