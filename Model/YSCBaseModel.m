@@ -97,7 +97,31 @@
 + (NSDictionary *)jsonToModelMapping {
     return nil;
 }
-+(JSONKeyMapper*)keyMapper { //将大写首字母转换为小写
++ (void)GetByMethod:(NSString *)method params:(NSDictionary *)params block:(YSCObjectResultBlock)block {
+    [AFNManager getDataWithAPI:method
+                  andDictParam:params
+                     modelName:[self class]
+              requestSuccessed:^(id responseObjec) {
+                  block(responseObjec, nil);
+              }
+                requestFailure:^(NSInteger errorCode, NSString *errorMessage) {
+                    block(nil, CreateNSError(errorMessage));
+                }];
+}
++ (void)PostByMethod:(NSString *)method params:(NSDictionary *)params block:(YSCObjectResultBlock)block {
+    [AFNManager postDataWithAPI:method
+                  andDictParam:params
+                     modelName:[self class]
+              requestSuccessed:^(id responseObjec) {
+                  block(responseObjec, nil);
+              }
+                requestFailure:^(NSInteger errorCode, NSString *errorMessage) {
+                    block(nil, CreateNSError(errorMessage));
+                }];
+}
+
+//将大写首字母转换为小写
++(JSONKeyMapper*)keyMapper {
     NSDictionary* userToModelMap = [self jsonToModelMapping];
     NSDictionary* userToJSONMap  = [NSMutableDictionary dictionaryWithObjects:userToModelMap.allKeys
                                                                       forKeys:userToModelMap.allValues];
@@ -140,13 +164,7 @@
                                           modelToJSONBlock:toJSON];
 }
 
-/**
- *  添加反序列化方法
- *
- *  @param aDecoder
- *
- *  @return
- */
+//添加反序列化方法
 -(id)initWithCoder:(NSCoder *)aDecoder {
     if (self = [super init]) {
         unsigned int outCount = 0;
@@ -175,12 +193,7 @@
     }
     return self;
 }
-
-/**
- *  添加序列化方法
- *
- *  @param aCoder
- */
+//添加序列化方法
 - (void)encodeWithCoder:(NSCoder *)aCoder {
     unsigned int outCount = 0;
     objc_property_t *properties = class_copyPropertyList([self class], &outCount);
@@ -203,7 +216,6 @@
     free(properties);
     properties = NULL;
 }
-
 @end
 
 @implementation StateModel

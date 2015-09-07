@@ -75,7 +75,7 @@
          requestType:(RequestType)requestType
     requestSuccessed:(RequestSuccessed)requestSuccessed
       requestFailure:(RequestFailure)requestFailure {
-    [self   requestByUrl:url withAPI:apiName andArrayParam:arrayParam andDictParam:dictParam andBodyParam:bodyParam imageData:nil customModelClass:ClassOfObject(YSCBaseModel) requestType:requestType
+    [self   requestByUrl:url withAPI:apiName andArrayParam:arrayParam andDictParam:dictParam andBodyParam:bodyParam imageData:nil customModelClass:[YSCBaseModel class] requestType:requestType
 	    requestSuccessed: ^(id responseObject) {
             YSCBaseModel *baseModel = (YSCBaseModel *)responseObject;
             [baseModel formatProperties];
@@ -128,7 +128,7 @@
           andDictParam:dictParam
           andBodyParam:nil
              imageData:UIImagePNGRepresentation(image)
-      customModelClass:ClassOfObject(YSCBaseModel)
+      customModelClass:[YSCBaseModel class]
            requestType:RequestTypeUploadFile
       requestSuccessed:^(id responseObject) {
           YSCBaseModel *baseModel = (YSCBaseModel *)responseObject;

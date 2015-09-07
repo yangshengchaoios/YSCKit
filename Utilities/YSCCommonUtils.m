@@ -30,7 +30,7 @@
         [AFNManager getDataFromUrl:kCheckNewVersionUrl
                            withAPI:@""
                       andDictParam:params
-                         modelName:ClassOfObject(NewVersionModel)
+                         modelName:[NewVersionModel class]
                   requestSuccessed: ^(id responseObject) {
                       [YSCCommonUtils checkNewVersion:responseObject showMessage:showMessage];
                   }

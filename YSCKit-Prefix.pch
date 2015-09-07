@@ -23,5 +23,10 @@
     #import "Masonry.h"
 
     #import "Constants.h"   //项目全局header文件
-    #import "YSCKit.h"      //基础框架库(必须放在最后！原因是有些参数define了默认值，而项目里需要重新设置)
+    #import "YSCKit.h"      //基础框架库(必须放在Constants后！原因是有些参数define了默认值，而项目里需要重新设置)
+
+    //业务逻辑相关
+    #import "DataModel.h"
+    #import "AppData.h"
+    #import "EZGUtils.h"
 #endif
