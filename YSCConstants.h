@@ -10,7 +10,7 @@
 #define EZGoal_YSCConstants_h
 
 typedef void (^YSCBlock)();
-typedef void (^YSCResultBlock)(NSError *error);
+typedef void (^YSCResultBlock)(NSObject *object);
 typedef void (^YSCStringResultBlock)(NSString *string, NSError *error);
 typedef void (^YSCBooleanResultBlock)(BOOL succeeded, NSError *error);
 typedef void (^YSCFloatBlock)(CGFloat percentDone);
@@ -25,8 +25,25 @@ typedef void (^YSCDictionaryResultBlock)(NSDictionary * dict, NSError *error);
 
 //常量
 #ifndef kLogManageType
-    #define kLogManageType  @"1"
+    #define kLogManageType              @"1"
 #endif
+#ifndef kDefaultTipsEmptyText
+    #define kDefaultTipsEmptyText       @"暂无数据"
+#endif
+#ifndef kDefaultTipsEmptyIcon
+    #define kDefaultTipsEmptyIcon       @"icon_empty"//列表为空时的默认icon名称
+#endif
+#ifndef kDefaultTipsFailedIcon
+    #define kDefaultTipsFailedIcon      @"icon_failed"//列表加载失败时的默认icon名称
+#endif
+#ifndef kDefaultTipsButtonTitle
+    #define kDefaultTipsButtonTitle     @"重新加载"//列表加载失败、为空时的按钮名称
+#endif
+
+//方法或属性过期标志
+//#define YSCDeprecated(instead) NS_DEPRECATED(2_0, 2_0, 2_0, 2_0, instead)
+#define YSCDeprecated(explain) __attribute__((deprecated(explain)))
+
 
 /**
  *  重新定义NSLog
@@ -65,11 +82,50 @@ return _sharedObject;
 
 
 //设置默认颜色
+#ifndef kDefaultViewColor
+    #define kDefaultViewColor               RGB(238, 238, 238)      //self.view的默认背景颜色
+#endif
+#ifndef kDefaultColor
+    #define kDefaultColor                   RGB(47, 152, 233)       //app默认主色(普通按钮+文本)
+#endif
 #ifndef kDefaultBorderColor
-    #define kDefaultBorderColor          RGB(216, 216, 216)
+    #define kDefaultBorderColor             RGB(218, 218, 218)      //默认边框颜色
 #endif
 #ifndef kDefaultPlaceholderColor
-    #define kDefaultPlaceholderColor     RGB(216, 216, 216)
+    #define kDefaultPlaceholderColor        RGB(218, 218, 218)      //默认占位字符颜色
+#endif
+#ifndef kDefaultTipViewButtonColor
+    #define kDefaultTipViewButtonColor      [UIColor redColor]      //默认【重新加载】按钮背景色
+#endif
+#ifndef kDefaultImageBackColor
+    #define kDefaultImageBackColor          RGB(240, 240, 240)      //默认图片背景色
+#endif
+#ifndef kDefaultNaviBarTintColor
+    #define kDefaultNaviBarTintColor        RGB(47, 152, 233)       //导航栏默认文字、icon的颜色
+#endif
+#ifndef kDefaultNaviBarTitleColor
+    #define kDefaultNaviBarTitleColor       RGB(10, 10, 10)         //导航栏标题颜色
+#endif
+#ifndef kDefaultNaviBarItemColor
+    #define kDefaultNaviBarItemColor        kDefaultNaviBarTintColor//导航栏左右文字颜色
+#endif
+#ifndef kDefaultNaviTintColor
+    #define kDefaultNaviTintColor           RGBA(255, 255, 255, 1)    //系统导航栏背景颜色(包括了StatusBar)
+#endif
+#ifndef kDefaultCustomNaviTintColor
+    #define kDefaultCustomNaviTintColor     RGB(234, 106, 84)       //自定义导航栏背景颜色(包括了StatusBar)
+#endif
+#ifndef kDefaultNaviBarTitleFont
+    #define kDefaultNaviBarTitleFont        [UIFont boldSystemFontOfSize:AUTOLAYOUT_LENGTH(34)]    //导航栏标题字体大小
+#endif
+#ifndef kDefaultNaviBarItemFont
+    #define kDefaultNaviBarItemFont         AUTOLAYOUT_FONT(26)     //导航栏左右文字大小
+#endif
+#ifndef kDefaultNaviBarSubTitleFont
+    #define kDefaultNaviBarSubTitleFont     AUTOLAYOUT_FONT(26)    //导航栏副标题字体大小
+#endif
+#ifndef kDefaultNaviBarSubTitleColor
+    #define kDefaultNaviBarSubTitleColor    kDefaultNaviBarTitleColor     //导航栏副标题字体颜色
 #endif
 
 //代码段简写
@@ -78,6 +134,10 @@ return _sharedObject;
     || [object isKindOfClass:[NSNull class]] \
     || ([object respondsToSelector:@selector(length)] && [(NSData *)object length] == 0) \
     || ([object respondsToSelector:@selector(count)]  && [(NSArray *)object count] == 0))
+#endif
+
+#ifndef isNotEmpty
+    #define isNotEmpty(object) (! isEmpty(object))
 #endif
 
 #ifndef WeakSelfType
@@ -107,6 +167,10 @@ return _sharedObject;
 #define ReturnZeroWhenObjectIsEmpty(object)         if ([NSObject isEmpty:object]) { return 0;  }
 #define Trim(x)                                     [NSString trimString:x]
 #define RandomInt(from,to)                          ((int)((from) + arc4random() % ((to)-(from) + 1)))  //随机数 [from,to] 之间
+#define CreateNSError(errMsg)                       [NSError errorWithDomain:@"" code:0 userInfo:@{NSLocalizedDescriptionKey : Trim(errMsg)}]
+#define CreateNSErrorCode(code,errMsg)                   [NSError errorWithDomain:@"" code:Code userInfo:@{NSLocalizedDescriptionKey : Trim(errMsg)}]
+#define GetNSErrorMsg(error)                        ((NSError *)error).userInfo[NSLocalizedDescriptionKey]  //=error.localizedDescription
+#define STORAGEMANAGER                              [StorageManager sharedInstance]
 
 /**
  *  版本相关

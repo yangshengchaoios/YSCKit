@@ -30,6 +30,8 @@
  */
 @interface BaseDataModel : JSONModel
 
+@property (nonatomic, strong) NSString *sectionKey;
+
 + (NSDictionary *)jsonToModelMapping;
 
 @end

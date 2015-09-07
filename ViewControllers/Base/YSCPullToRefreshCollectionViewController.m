@@ -75,7 +75,7 @@
 - (UIView *)layoutCellWithData:(id)object atIndexPath:(NSIndexPath *)indexPath {
     YSCBaseCollectionViewCell *cell = [self.collectionView dequeueReusableCellWithReuseIdentifier:kItemCellIdentifier forIndexPath:indexPath];
     if ([cell isKindOfClass:[YSCBaseCollectionViewCell class]]) {
-        [cell layoutDataModel:object];//简单设置cell显示内容，如果需要处理cell的特殊点击事件就必须重写该方法
+        [cell layoutObject:object];//简单设置cell显示内容，如果需要处理cell的特殊点击事件就必须重写该方法
     }
     return cell;
 }
@@ -86,7 +86,7 @@
     NSString *nibName = [self nibNameOfCell];
     if ([NSString isNotEmpty:nibName] &&
         [NSClassFromString(nibName) isSubclassOfClass:[YSCBaseCollectionViewCell class]]) {
-        return [NSClassFromString(nibName) SizeOfCell];
+        return [NSClassFromString(nibName) SizeOfCellByObject:nil];
     }
     else {
         return CGSizeMake(290, 290);

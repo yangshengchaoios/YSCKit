@@ -39,7 +39,7 @@
     self.backgroundImageView.contentMode = UIViewContentModeScaleAspectFill;
     self.backgroundImageView.top = 63;
     self.backgroundImageView.height = 0.5;
-    self.backgroundImageView.backgroundColor = kDefaultTitleBarColor;
+    self.backgroundImageView.backgroundColor = kDefaultCustomNaviTintColor;
     [self addSubview:self.backgroundImageView];
     
     UIView *statusBarView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, STATUSBAR_HEIGHT)];

@@ -48,6 +48,8 @@
     self.allowsLetter = YES;
     self.allowsNumber = YES;
     self.cornerRadius = 8;
+    self.textLeftMargin = 10;
+    self.textRightMargin = 10;
     self.borderColor = kDefaultBorderColor;
     
     self.borderStyle = UITextBorderStyleNone;
@@ -59,7 +61,30 @@
     self.oldString = @"";
     addNObserverWithObj(@selector(textFieldChanged:), UITextFieldTextDidChangeNotification, self);
 }
+- (void)setBorderColor:(UIColor *)borderColor {
+    _borderColor = borderColor;
+    self.layer.borderColor = borderColor.CGColor;
+    self.layer.borderWidth = AUTOLAYOUT_LENGTH(1);
+}
+- (void)setCornerRadius:(CGFloat)cornerRadius {
+    _cornerRadius = cornerRadius;
+    self.layer.cornerRadius = AUTOLAYOUT_LENGTH(cornerRadius);
+    self.layer.masksToBounds = YES;
+}
+- (void)setTextLeftMargin:(CGFloat)textLeftMargin {
+    _textLeftMargin = textLeftMargin;
+    [self layoutSubviews];
+}
+- (void)setTextRightMargin:(CGFloat)textRightMargin {
+    _textRightMargin = textRightMargin;
+    [self layoutSubviews];
+}
 
+//NOTE:xib中修改了某些属性，需要重新设置参数
+- (void)layoutSubviews {
+    [super layoutSubviews];
+    self.textType = _textType;
+}
 //当输入框内容改变时触发
 //NOTE:彻底解决中文输入高亮超过限制会crash的问题！
 - (void)textFieldChanged:(NSNotification *)notification {
@@ -186,17 +211,6 @@
 
     return YES;
 }
-//NOTE:xib中修改了某些属性，需要重新设置参数
-- (void)layoutSubviews {
-    [super layoutSubviews];
-    [self setTextType:_textType];
-    //设置圆角弧度
-    self.layer.cornerRadius = AUTOLAYOUT_LENGTH(self.cornerRadius);
-    self.layer.masksToBounds = YES;
-    //设置边框颜色
-    self.layer.borderColor = self.borderColor.CGColor;
-    self.layer.borderWidth = AUTOLAYOUT_LENGTH(1);
-}
 
 //定义弹出键盘类型
 //ios keyboardtype:
@@ -271,11 +285,11 @@
 #pragma mark - 重写基类方法
 // placeholder position
 - (CGRect)textRectForBounds:(CGRect)bounds {
-    return CGRectInset(bounds, 8, 8);
+    return CGRectInset(bounds, AUTOLAYOUT_LENGTH(self.textLeftMargin), AUTOLAYOUT_LENGTH(self.textRightMargin));
 }
 // text position
 - (CGRect)editingRectForBounds:(CGRect)bounds {
-    return CGRectInset(bounds, 8, 8);
+    return CGRectInset(bounds, AUTOLAYOUT_LENGTH(self.textLeftMargin), AUTOLAYOUT_LENGTH(self.textRightMargin));
 }
 
 @end

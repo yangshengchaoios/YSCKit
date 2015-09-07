@@ -16,6 +16,8 @@
 //4. 支持
 @interface YSCPhotoBrowseView : YSCGridBrowseView
 
-@property (nonatomic, assign) IBInspectable CGFloat itemSeperator;//间隔默认20px
+@property (nonatomic, copy) YSCIntegerResultBlock scrollAtIndex;
+
+- (void)resetCurrentIndex:(NSInteger)index;
 
 @end

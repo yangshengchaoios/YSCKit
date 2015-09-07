@@ -10,6 +10,7 @@
 #define EZGoal_YSCKit_h
 
 //常量
+#import "YSCEnum.h"
 #import "YSCConstants.h"
 #import "YSCEmoji.h"
 
@@ -40,24 +41,15 @@
 #import "StorageManager.h"
 #import "LogManager.h"
 #import "AFNManager.h"
-//#import "AppConfigManager.h"
-//#import "ShowPhotosManager.h"
-//#import "SNSShareManager.h"
 
 //常用自定义控件
+#import "YSCKTipsView.h"
+#import "YSCTitleBarView.h"
 #import "YSCTextField.h"
 #import "YSCTextView.h"
-//Utils
-#import "YSCFileUtils.h"
-#import "YSCImageUtils.h"
-#import "YSCCommonUtils.h"
-
-//Manager
-#import "PlayAudioManager.h"
-#import "ReachabilityManager.h"
-#import "StorageManager.h"
-#import "LogManager.h"
-#import "AFNManager.h"
+#import "YSCPickerView.h"
+#import "YSCTableViewCell.h"
+#import "YSCTableView.h"
 
 //基类
 #import "YSCBaseModel.h"

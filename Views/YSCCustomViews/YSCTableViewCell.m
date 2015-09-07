@@ -22,7 +22,7 @@
     self.subtitleBottomTitleLabel.text = @"";
 }
 
-+ (CGFloat)HeightOfCell {
++ (CGFloat)HeightOfCellByObject:(NSObject *)object {
     return AUTOLAYOUT_LENGTH(80);
 }
 

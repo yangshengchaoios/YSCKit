@@ -15,10 +15,10 @@
                     <rect key="frame" x="0.0" y="110" width="640" height="320"/>
                     <subviews>
                         <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="icon_failed.png" translatesAutoresizingMaskIntoConstraints="NO" id="zEw-qK-cvn">
-                            <rect key="frame" x="248" y="0.0" width="145" height="145"/>
+                            <rect key="frame" x="212" y="0.0" width="216" height="145"/>
                             <constraints>
                                 <constraint firstAttribute="height" constant="145" id="Il5-BS-vkM"/>
-                                <constraint firstAttribute="width" constant="145" id="PtO-fv-OeQ"/>
+                                <constraint firstAttribute="width" constant="216" id="PtO-fv-OeQ"/>
                             </constraints>
                         </imageView>
                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Xec-eu-fcz">
@@ -73,6 +73,6 @@
         </view>
     </objects>
     <resources>
-        <image name="icon_failed.png" width="63" height="63"/>
+        <image name="icon_failed.png" width="108" height="72"/>
     </resources>
 </document>

@@ -56,6 +56,8 @@ typedef NS_ENUM(NSInteger, YSCTextType) {
 //控制UI样式
 @property (nonatomic, assign) IBInspectable CGFloat cornerRadius;       //圆角弧度
 @property (nonatomic, strong) IBInspectable UIColor *borderColor;       //边框颜色
+@property (nonatomic, assign) IBInspectable CGFloat textLeftMargin;
+@property (nonatomic, assign) IBInspectable CGFloat textRightMargin;
 
 - (BOOL)isValid;            //检测输入内容是否有效
 - (NSString *)textString;   //返回去掉首位空格后的字符串

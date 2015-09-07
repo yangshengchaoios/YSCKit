@@ -14,15 +14,6 @@
 typedef void (^RequestSuccessed)(id responseObject);
 typedef void (^RequestFailure)(NSInteger errorCode, NSString *errorMessage);
 
-typedef NS_ENUM (NSInteger, RequestType) {
-	RequestTypeGET = 0,
-	RequestTypePOST,
-    RequestTypeUploadFile,
-    RequestTypeDownloadFile,
-    RequestTypePostBodyData
-};
-
-
 @interface AFNManager : NSObject
 
 #pragma mark - 最常用的GET和POST
