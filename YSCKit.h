@@ -52,6 +52,7 @@
 #import "YSCPickerView.h"
 #import "YSCTableViewCell.h"
 #import "YSCTableView.h"
+#import "YSCMultiTableView.h"
 
 //基类
 #import "YSCBaseModel.h"
