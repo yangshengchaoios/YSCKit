@@ -345,13 +345,13 @@
     [view resetConstraintOfView];
 }
 - (void)resetConstraintOfView {
-    if ([self respondsToSelector:@selector(setCloseResetFontAndConstraint:)]) {
-        return;
-    }
     for (NSLayoutConstraint *constraint in self.constraints) {
         if (constraint.constant > 0) {
             constraint.constant = AUTOLAYOUT_LENGTH(constraint.constant);
         }
+    }
+    if ([self respondsToSelector:@selector(setCloseResetFontAndConstraint:)]) {
+        return;
     }
     
     if ([self.subviews count] > 0) {

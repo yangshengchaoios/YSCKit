@@ -20,7 +20,7 @@
 
 #pragma mark - 注册与重用
 + (void)registerCellToCollectionView:(UICollectionView *)collectionView {
-    [collectionView registerNib:[[self class] NibNameOfView] forCellWithReuseIdentifier:[[self class] identifier]];
+    [collectionView registerNib:[[self class] NibNameOfCell] forCellWithReuseIdentifier:[[self class] identifier]];
 }
 + (instancetype)dequeueCellByCollectionView:(UICollectionView *)collectionView forIndexPath:(NSIndexPath*)indexPath {
     YSCBaseCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:[[self class] identifier] forIndexPath:indexPath];
