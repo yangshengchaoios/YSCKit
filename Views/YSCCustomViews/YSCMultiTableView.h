@@ -26,5 +26,8 @@ typedef UITableView *(^YSCTableViewSetBlock)(NSInteger pageIndex);
 
 //刷新列表
 - (void)reloadTableViews;
+//滚动到指定页面
+- (void)scrollToPage:(NSInteger)pageIndex;
+- (void)scrollToPage:(NSInteger)pageIndex animated:(BOOL)animated;
 
 @end

@@ -90,6 +90,14 @@
         }];
     }
 }
+//滚动到指定页面
+- (void)scrollToPage:(NSInteger)pageIndex {
+    [self scrollToPage:pageIndex animated:YES];
+}
+- (void)scrollToPage:(NSInteger)pageIndex animated:(BOOL)animated {
+    CGFloat pageWidth = self.scrollView.width;
+    [self.scrollView setContentOffset:CGPointMake(pageIndex * pageWidth, 0) animated:animated];
+}
 
 #pragma mark - UIScrollViewDelegate
 - (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView {
