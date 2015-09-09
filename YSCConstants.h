@@ -92,7 +92,7 @@ return _sharedObject;
     #define kDefaultBorderColor             RGB(218, 218, 218)      //默认边框颜色
 #endif
 #ifndef kDefaultPlaceholderColor
-    #define kDefaultPlaceholderColor        RGB(218, 218, 218)      //默认占位字符颜色
+    #define kDefaultPlaceholderColor        RGB(200, 200, 200)      //默认占位字符颜色
 #endif
 #ifndef kDefaultTipViewButtonColor
     #define kDefaultTipViewButtonColor      [UIColor redColor]      //默认【重新加载】按钮背景色
