@@ -611,11 +611,14 @@
     return [date stringWithFormat:toFormat];
 }
 
++ (NSDateComponents *)ComponentsBetweenStartDate:(NSDate *)startDate withEndDate:(NSDate *)endDate {
+    return [self ComponentsBetweenStartDate:startDate withEndDate:endDate
+                             withComponents:NSCalendarUnitDay | NSCalendarUnitHour | NSCalendarUnitMinute | NSCalendarUnitSecond];
+}
 + (NSDateComponents *)ComponentsBetweenStartDate:(NSDate *)startDate withEndDate:(NSDate *)endDate withComponents:(NSCalendarUnit)unitFlags {
     //方法一：使用NSDateComponents
     return [[NSCalendar currentCalendar] components:unitFlags fromDate:startDate toDate:endDate options:0];
 }
-
 + (NSDateComponents *)ComponentsRemainInterval:(NSTimeInterval)remainInterval withComponents:(NSCalendarUnit)unitFlags {
     NSDateComponents *components = [NSDateComponents new];
     

@@ -92,6 +92,7 @@
 - (NSInteger)daysAfterDate:(NSDate *)aDate;
 - (NSInteger)daysBeforeDate:(NSDate *)aDate;
 
++ (NSDateComponents *)ComponentsBetweenStartDate:(NSDate *)startDate withEndDate:(NSDate *)endDate;
 // Calculte interval between two dates (NSDayCalendarUnit | NSHourCalendarUnit | NSMinuteCalendarUnit | NSSecondCalendarUnit)
 + (NSDateComponents *)ComponentsBetweenStartDate:(NSDate *)startDate withEndDate:(NSDate *)endDate withComponents:(NSCalendarUnit)unitFlags;
 + (NSDateComponents *)ComponentsRemainInterval:(NSTimeInterval)remainInterval withComponents:(NSCalendarUnit)unitFlags;

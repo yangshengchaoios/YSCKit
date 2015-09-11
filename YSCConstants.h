@@ -119,7 +119,7 @@ return _sharedObject;
     #define kDefaultNaviBarTitleFont        [UIFont boldSystemFontOfSize:AUTOLAYOUT_LENGTH(34)]    //导航栏标题字体大小
 #endif
 #ifndef kDefaultNaviBarItemFont
-    #define kDefaultNaviBarItemFont         AUTOLAYOUT_FONT(26)     //导航栏左右文字大小
+    #define kDefaultNaviBarItemFont         AUTOLAYOUT_FONT(28)     //导航栏左右文字大小
 #endif
 #ifndef kDefaultNaviBarSubTitleFont
     #define kDefaultNaviBarSubTitleFont     AUTOLAYOUT_FONT(26)    //导航栏副标题字体大小
