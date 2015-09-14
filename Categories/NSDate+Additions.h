@@ -11,15 +11,16 @@
 
 #import <Foundation/Foundation.h>
 
-#define DateFormat1 @"yyyy-MM-dd HH:mm:ss"
-#define DateFormat2 @"yyyy.MM.dd HH:mm"
-#define DateFormat3 @"yyyy-MM-dd"
-#define DateFormat4 @"yyyy.MM.dd"
-#define DateFormat5 @"yyyy年MM月dd日"
-#define DateFormat6 @"yyyy-MM-dd HH:mm"
-#define DateFormat7 @"yyyy年MM月dd日 HH:mm"
-#define DateFormat8 @"MM月dd日"
-#define DateFormat9 @"yyyy年MM月"
+#define DateFormat1     @"yyyy-MM-dd HH:mm:ss"
+#define DateFormat2     @"yyyy.MM.dd HH:mm"
+#define DateFormat3     @"yyyy-MM-dd"
+#define DateFormat4     @"yyyy.MM.dd"
+#define DateFormat5     @"yyyy年MM月dd日"
+#define DateFormat6     @"yyyy-MM-dd HH:mm"
+#define DateFormat7     @"yyyy年MM月dd日 HH:mm"
+#define DateFormat8     @"MM月dd日"
+#define DateFormat9     @"yyyy年MM月"
+#define DateFormat10    @"HH:mm"
 
 #define D_MINUTE    60
 #define D_HOUR      3600
