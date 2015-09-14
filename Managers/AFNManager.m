@@ -245,13 +245,15 @@
     [manager.requestSerializer setValue:kParamFromValue forHTTPHeaderField:kParamFrom];
     [manager.requestSerializer setValue:signature forHTTPHeaderField:kParamSignature];
 #if IsNeedEncryptHTTPHeader
+    NSString *currentLongitude = [NSString stringWithFormat:@"%f", APPDATA.currentLongitude];
+    NSString *currentLatitude = [NSString stringWithFormat:@"%f", APPDATA.currentLatitude];
     NSString *httpHeaderToken = [self encryptHttpHeaderWithParam:@{kParamAppId : kAppId,
                                                                    kParamVersion : AppVersion,
                                                                    kParamUdid : [AppConfigManager sharedInstance].udid,
                                                                    kParamFrom : kParamFromValue,
 //                                                                   kParamBSSID : Trim(APPCONFIG.currentBSSID),
-                                                                   kParamLongitude : Trim(APPDATA.currentLongitude),
-                                                                   kParamLatitude : Trim(APPDATA.currentLatitude),
+                                                                   kParamLongitude : Trim(currentLongitude),
+                                                                   kParamLatitude : Trim(currentLatitude),
                                                                    kParamS4Id : Trim(APPDATA.user.s4Id),
                                                                    kParamToken : UserLoggedToken,
                                                                    kParamChannel : kAppChannel,
