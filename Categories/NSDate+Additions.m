@@ -621,6 +621,10 @@
 }
 + (NSDateComponents *)ComponentsRemainInterval:(NSTimeInterval)remainInterval withComponents:(NSCalendarUnit)unitFlags {
     NSDateComponents *components = [NSDateComponents new];
+    components.day = 0;
+    components.hour = 0;
+    components.minute = 0;
+    components.second = 0;
     
     //方法二：计算间隔时间是根据从零时间点(1970-01-01)开始的NSDate对象(效率最低！)
 //    NSDate *sinceDate = [NSDate dateFromString:@"1970-01-01" withFormat:@"yyyy-MM-dd"];

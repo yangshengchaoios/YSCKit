@@ -50,7 +50,7 @@
         }
     }
     else if (3 == [kCheckNewVersionType integerValue]) {//检测app store上通过审核的新版本
-        [YSCCommonUtils checkNewVersionByAppleId:@"1000594167"];
+        [YSCCommonUtils checkNewVersionByAppleId:kAppStoreId];
     }
 }
 
