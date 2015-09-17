@@ -14,13 +14,13 @@
 @implementation YSCCommonUtils
 
 + (void)checkNewVersionShowMessage:(BOOL)showMessage {
-    [self checkNewVersionShowMessage:showMessage withParams:nil];
+    [self checkNewVersionShowMessage:showMessage withParams:nil andType:[kCheckNewVersionType integerValue]];
 }
-+ (void)checkNewVersionShowMessage:(BOOL)showMessage withParams:(NSDictionary *)params {
-    if (0 == [kCheckNewVersionType integerValue]) {
++ (void)checkNewVersionShowMessage:(BOOL)showMessage withParams:(NSDictionary *)params andType:(NSInteger)type {
+    if (0 == type) {
         return;
     }
-    else if (1 == [kCheckNewVersionType integerValue]) {
+    else if (1 == type) {
         if ([NSString isNotUrl:kCheckNewVersionUrl]) {
             return;
         }
@@ -40,16 +40,7 @@
                         }
                     }];
     }
-    else if (2 == [kCheckNewVersionType integerValue]) {
-        NSString *tempModel = kNewVersionModel;
-        if ([NSString isNotEmpty:tempModel]) {
-            NewVersionModel *versionModel = [[NewVersionModel alloc] initWithString:tempModel error:nil];
-            if ([versionModel isKindOfClass:[NewVersionModel class]]) {
-                [YSCCommonUtils checkNewVersion:versionModel showMessage:showMessage];
-            }
-        }
-    }
-    else if (3 == [kCheckNewVersionType integerValue]) {//检测app store上通过审核的新版本
+    else if (2 == type) {//检测app store上通过审核的新版本
         [YSCCommonUtils checkNewVersionByAppleId:kAppStoreId];
     }
 }
@@ -60,7 +51,6 @@
         BOOL isSkipTheVersion = [GetCacheObject(Trim(versionModel.appVersion)) boolValue];
         if ( ! isSkipTheVersion) {
             if (NSOrderedAscending == [AppVersion compare:versionModel.appVersion options:NSNumericSearch]) {
-//            if (VersionCompareResultAscending == [AppVersion compareWithVersion:versionModel.appVersion]) {
                 [UIView hideHUDLoadingOnWindow];
                 if ([NSString isNotEmpty:versionModel.appDownloadUrl]) {//TODO:这里可以进一步判断是否是标准的ios更新地址
                     NSString *title = [NSString stringWithFormat:@"发现新版本 %@", versionModel.appVersion];

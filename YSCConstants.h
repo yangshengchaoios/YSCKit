@@ -41,7 +41,6 @@ typedef void (^YSCDictionaryResultBlock)(NSDictionary * dict, NSError *error);
 #endif
 
 //方法或属性过期标志
-//#define YSCDeprecated(instead) NS_DEPRECATED(2_0, 2_0, 2_0, 2_0, instead)
 #define YSCDeprecated(explain) __attribute__((deprecated(explain)))
 
 
