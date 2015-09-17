@@ -114,5 +114,6 @@
 - (void)networkReachablityChanged:(BOOL)reachable;
 //专门针对tableview的seperator左右间隔进行设置
 - (UIEdgeInsets)edgeInsetsOfCellSeperator;
+- (void)callBlock;
 
 @end

@@ -661,6 +661,14 @@
 - (UIEdgeInsets)edgeInsetsOfCellSeperator {
     return UIEdgeInsetsZero;
 }
+- (void)callBlock {
+    WEAKSELF
+    [self bk_performBlock:^(id obj) {
+        if (weakSelf.block) {
+            weakSelf.block(nil);
+        }
+    } afterDelay:1];
+}
 
 #pragma mark - UITextFieldDelegate
 
