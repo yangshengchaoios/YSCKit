@@ -57,10 +57,9 @@
 //具体检测新版本的业务逻辑
 + (void)checkNewVersion:(NewVersionModel *)versionModel showMessage:(BOOL)showMessage {
     if ([versionModel isKindOfClass:[NewVersionModel class]]) {
-        BOOL isSkipTheVersion = [GetCacheObject(Trim(versionModel.appVersion)) boolValue];
+        BOOL isSkipTheVersion = [GetCacheObject(SkipVersion(Trim(versionModel.appVersion))) boolValue];
         if ( ! isSkipTheVersion) {
             if (NSOrderedAscending == [AppVersion compare:versionModel.appVersion options:NSNumericSearch]) {
-//            if (VersionCompareResultAscending == [AppVersion compareWithVersion:versionModel.appVersion]) {
                 [UIView hideHUDLoadingOnWindow];
                 if ([NSString isNotEmpty:versionModel.appDownloadUrl]) {//TODO:这里可以进一步判断是否是标准的ios更新地址
                     NSString *title = [NSString stringWithFormat:@"发现新版本 %@", versionModel.appVersion];
@@ -73,7 +72,7 @@
                     }];
                     if (NO == versionModel.isForcedUpdate ) {   //非强制更新的话才显示更多选项
                         [alertView bk_addButtonWithTitle:@"忽略此版本" handler:^{
-                            SaveCacheObject(@(YES), Trim(versionModel.appVersion));
+                            SaveCacheObject(@(YES), SkipVersion(Trim(versionModel.appVersion)));
                         }];
                         [alertView bk_addButtonWithTitle:@"稍后再说" handler:nil];//下次启动再次检测
                     }
