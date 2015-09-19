@@ -180,7 +180,7 @@ return _sharedObject;
 #define ProductVersion                  [NSString stringWithFormat:@"%@ (%@)", AppVersion, BundleVersion]           //产品版本(1.0.1 (15))
 #define BundleIdentifier                [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleIdentifier"]
 #define WelcomeVersion                  [NSString stringWithFormat:@"Welcome_V%@.%@", AppVersion, BundleVersion]
-#define SkipVersion                     [NSString stringWithFormat:@"SkipVersion_V%@.%@", AppVersion, BundleVersion]
+#define SkipVersion(x)                  [NSString stringWithFormat:@"SkipVersion_V%@", x]
 
 
 /**
