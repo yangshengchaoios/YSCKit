@@ -96,6 +96,15 @@
         return;//url为空就直接返回默认图片
     }
     
+    //是否本地缓存图片
+    if ([NSString isNotUrl:newUrlString]) {
+        UIImage *cacheImage = [UIImage imageWithContentsOfFile:newUrlString];
+        if (cacheImage) {
+            [self setCustomImage:cacheImage];
+            return;
+        }
+    }
+    
     //处理相对路径
     if ([NSString isNotUrl:newUrlString]) {
         newUrlString = [[NSString replaceString:kResPathAppResUrl byRegex:@"/+$" to:@""] stringByAppendingFormat:@"/%@",
@@ -109,7 +118,7 @@
 
     //采用SDWebImage的缓存方案
     if ([[ReachabilityManager sharedInstance].reachability isReachableViaWiFi] ||
-        [[NSUserDefaults standardUserDefaults] boolForKey:kParamEnableDownloadImage]) {//wifi环境下一定会显示图片
+        [GetObject(kParamEnableDownloadImage) boolValue]) {//wifi环境下一定会显示图片
         [self sd_setImageWithURL:[NSURL URLWithString:newUrlString]
                 placeholderImage:placeholderImage
                        completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL)  {

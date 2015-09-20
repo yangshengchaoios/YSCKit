@@ -57,9 +57,11 @@
          }*/
     }
     self.isAppeared = YES;
+    [AppConfigManager sharedInstance].currentViewController = self;
 }
 - (void)viewDidAppear:(BOOL)animated {
 	[super viewDidAppear:animated];
+    self.isClicked = NO;
     
     //控制只执行一次的方法
     if (!self.isRunViewDidLoadExtension) {
@@ -88,6 +90,7 @@
 - (void)viewDidLoad {
 	[super viewDidLoad];
     WeakSelfType blockSelf = self;
+    self.block = self.params[kParamBlock];
     
     //view基本参数设置
     if ([NSString isEmpty:self.navigationItem.title] && [NSString isNotEmpty:self.params[kParamTitle]]) {//已经有标题的就不再设置了
@@ -386,7 +389,7 @@
 - (UINavigationController *)presentNormalViewController:(UIViewController *)viewController {
     [self hideKeyboard];
     UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:viewController];
-    navigationController.navigationController.navigationBar.translucent = NO;
+//    navigationController.navigationController.navigationBar.translucent = YES;
 //    navigationController.interactivePopGestureRecognizer.enabled = YES;//NOTE:关闭系统自带的侧边滑动功能，会与MLTransition冲突！
 //    navigationController.interactivePopGestureRecognizer.delegate = self;
     [self presentViewController:navigationController animated:YES completion:nil];
@@ -521,65 +524,44 @@
 #pragma mark - alert view
 
 - (UIAlertView *)showAlertVieWithMessage:(NSString *)message {
-	return [self showAlertViewWithTitle:@"提示" andMessage:message];
+    return [self showAlertViewWithTitle:@"提示" andMessage:message block:nil];
 }
 - (UIAlertView *)showAlertViewWithTitle:(NSString *)title andMessage:(NSString *)message {
-	UIAlertView *alertView = [UIAlertView bk_alertViewWithTitle:title message:message];
-	[alertView bk_setCancelButtonWithTitle:@"确定" handler:nil];
-	[alertView show];
-	return alertView;
+	return [self showAlertViewWithTitle:title andMessage:message block:nil];
+}
+- (UIAlertView *)showAlertVieWithMessage:(NSString *)message block:(YSCResultBlock)block {
+    return [self showAlertViewWithTitle:@"提示" andMessage:message block:block];
+}
+- (UIAlertView *)showAlertViewWithTitle:(NSString *)title andMessage:(NSString *)message block:(YSCResultBlock)block {
+    UIAlertView *alertView = [UIAlertView bk_alertViewWithTitle:title message:message];
+    [alertView bk_setCancelButtonWithTitle:@"确定" handler:^{
+        if (block) {
+            block(nil);
+        }
+    }];
+    [alertView show];
+    return alertView;
 }
 
 #pragma mark - Overridden methods 缓存相关
-
-- (NSString *)cacheFilePath {
-	return [self cacheFilePath:nil];
-}
-- (NSString *)cacheFilePath:(NSString *)suffix {
-	NSString *fileName = [NSString stringWithFormat:@"%@%@.dat",
-                          NSStringFromClass(self.class),
-                          [NSString isEmpty:suffix] ? @"" :[NSString stringWithFormat:@"_%@",suffix]]; //缓存文件名称
-	return [[[StorageManager sharedInstance] directoryPathOfLibraryCachesCommon] stringByAppendingPathComponent:fileName];
-}
 - (id)cachedObjectForKey:(NSString *)cachedKey {
 	return [self cachedObjectForKey:cachedKey withSuffix:nil];
 }
 - (id)cachedObjectForKey:(NSString *)cachedKey withSuffix:(NSString *)suffix {
-	NSDictionary *cacheInfo = [[StorageManager sharedInstance] unarchiveDictionaryFromFilePath:[self cacheFilePath:suffix]];
-	if ([cacheInfo objectForKey:cachedKey]) {
-		return cacheInfo[cachedKey];
-	}
-	else {
-		return nil;
-	}
+    NSString *fileName = [NSString stringWithFormat:@"%@%@.dat",
+                          NSStringFromClass(self.class),
+                          [NSString isEmpty:suffix] ? @"" :[NSString stringWithFormat:@"_%@",suffix]]; //缓存文件名称
+    return GetCacheObjectByFile(cachedKey, fileName);
 }
 - (void)saveObject:(id)object forKey:(NSString *)cachedKey {
 	[self saveObject:object forKey:cachedKey withSuffix:nil];
 }
 - (void)saveObject:(id)object forKey:(NSString *)cachedKey withSuffix:(NSString *)suffix {
-	if ([NSString isEmpty:cachedKey]) {
-		return;
-	}
+    NSString *fileName = [NSString stringWithFormat:@"%@%@.dat",
+                          NSStringFromClass(self.class),
+                          [NSString isEmpty:suffix] ? @"" :[NSString stringWithFormat:@"_%@",suffix]]; //缓存文件名称
     
-	@try {
-		BOOL isSuccess = [[StorageManager sharedInstance] archiveDictionary:@{ cachedKey : object }
-                                                                 toFilePath:[self cacheFilePath:suffix]
-                                                                  overwrite:NO];
-		if (isSuccess) {
-			NSLog(@"缓存成功！");
-		}
-		else {
-			NSLog(@"缓存失败！");
-		}
-	}
-	@catch (NSException *exception)
-	{
-		NSLog(@"将数组保存至本地缓存时出错！%@",
-		      exception); //可能是没有在对象里做序列号和反序列化！
-	}
-	@finally
-	{
-	}
+    SaveCacheObjectByFile(object, cachedKey, fileName);
 }
 
 /**

@@ -339,7 +339,7 @@
 }
 
 - (NSString *)hintStringWhenNoData {
-    return kDefaultTipText;
+    return kDefaultTipsEmptyText;
 }
 
 - (BOOL)tipsViewEnable {

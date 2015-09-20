@@ -39,8 +39,6 @@
 //初始化配置参数
 - (void)setup {
     //设置参数默认值
-    self.maxLength = 400;
-    self.showsRemainingCount = NO;
     self.allowsEmpty = NO;
     self.allowsEmoji = NO;
     self.allowsSimpleEmoji = NO;
@@ -51,9 +49,6 @@
     self.allowsNumber = YES;
     self.cornerRadius = 8;
     self.borderColor = kDefaultBorderColor;
-    self.placeholderString = @"";
-    self.placeholderColor = kDefaultPlaceholderColor;
-    self.remainingTextColor = [UIColor redColor];
     
     //创建placeholerLabel
     self.placeholderLabel = [[UILabel alloc] initWithFrame:CGRectZero];
@@ -62,33 +57,39 @@
     self.placeholderLabel.text = self.placeholderString;
     self.placeholderLabel.font = self.font;
     [self.placeholderLabel mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.left.equalTo(self.mas_left).offset(8);
+        make.left.equalTo(self.mas_left).offset(10);
         make.top.equalTo(self.mas_top).offset(13);
         make.width.equalTo(self.mas_width).offset(0);
     }];
+    self.placeholderString = @"";
+    self.placeholderColor = kDefaultPlaceholderColor;
     
-    //TODO:创建remainingLabel
+    //创建remainingLabel
     self.remainingLabel = [[UILabel alloc] initWithFrame:CGRectZero];
     [self addSubview:self.remainingLabel];
     self.remainingCount = self.maxLength;
     self.remainingLabel.font = [UIFont systemFontOfSize:22];
+    self.remainingLabel.backgroundColor = [UIColor clearColor];
+    self.remainingLabel.textAlignment = NSTextAlignmentRight;
     [self.remainingLabel mas_makeConstraints:^(MASConstraintMaker *make) {
-//        make.left.equalTo(self.mas_left);
-//        make.top.equalTo(self.mas_top);
-//        make.right.mas_equalTo(self.mas_right);
-//        make.bottom.mas_equalTo(self.mas_bottom);
-        make.bottom.equalTo(self.mas_bottom);
-        make.right.equalTo(self.mas_right);
+        //NOTE:很奇怪！这里设置右边距和下边距没有用！所以只能用下面的方法代替
+        make.top.equalTo(self.mas_top).offset(self.height - 30);
+        make.leading.equalTo(self.mas_leading).offset(self.width - 110);
         make.width.equalTo(@100);
-        make.height.equalTo(@50);
     }];
+    self.showsRemainingCount = NO;
+    self.remainingTextColor = kDefaultPlaceholderColor;
+    self.maxLength = 400;
     
     self.backgroundColor = [UIColor whiteColor];
     self.delegate = [YSCTextDelegate sharedInstance];
     self.oldString = @"";
     addNObserverWithObj(@selector(textViewChanged:), UITextViewTextDidChangeNotification, self);
 }
-
+- (void)setMaxLength:(NSInteger)maxLength {
+    _maxLength = maxLength;
+    self.remainingLabel.text = [NSString stringWithFormat:@"%ld", (long)maxLength];
+}
 - (void)setRemainingCount:(NSInteger)remainingCount {
     _remainingCount = remainingCount;
     if (remainingCount == self.maxLength) {
@@ -96,7 +97,7 @@
         self.placeholderLabel.hidden = NO;
     }
     else {
-        self.remainingLabel.text = [NSString stringWithFormat:@"还剩 %ld", (long)remainingCount];
+        self.remainingLabel.text = [NSString stringWithFormat:@"%ld", (long)remainingCount];
         self.placeholderLabel.hidden = YES;
     }
 }
@@ -202,22 +203,36 @@
     //1.2 根据property属性校验
     return [self isValidByProperty];
 }
+- (void)setBorderColor:(UIColor *)borderColor {
+    _borderColor = borderColor;
+    self.layer.borderColor = borderColor.CGColor;
+    self.layer.borderWidth = AUTOLAYOUT_LENGTH(1);
+}
+- (void)setCornerRadius:(CGFloat)cornerRadius {
+    _cornerRadius = cornerRadius;
+    self.layer.cornerRadius = AUTOLAYOUT_LENGTH(cornerRadius);
+    self.layer.masksToBounds = YES;
+}
+- (void)setPlaceholderColor:(UIColor *)placeholderColor {
+    _placeholderColor = placeholderColor;
+    self.placeholderLabel.textColor = placeholderColor;
+}
+- (void)setPlaceholderString:(NSString *)placeholderString {
+    _placeholderString = placeholderString;
+    self.placeholderLabel.text = placeholderString;
+}
+- (void)setRemainingTextColor:(UIColor *)remainingTextColor {
+    _remainingTextColor = remainingTextColor;
+    self.remainingLabel.textColor = remainingTextColor;
+}
+- (void)setShowsRemainingCount:(BOOL)showsRemainingCount {
+    _showsRemainingCount = showsRemainingCount;
+    self.remainingLabel.hidden = ! showsRemainingCount;
+}
 //NOTE:xib中修改了某些属性，需要重新设置参数
 - (void)layoutSubviews {
     [super layoutSubviews];
     [self resetKeyboardType];
-    //设置圆角弧度
-    self.layer.cornerRadius = AUTOLAYOUT_LENGTH(self.cornerRadius);
-    self.layer.masksToBounds = YES;
-    //设置边框颜色
-    self.layer.borderColor = self.borderColor.CGColor;
-    self.layer.borderWidth = AUTOLAYOUT_LENGTH(1);
-    //设置提示label
-    self.placeholderLabel.text = _placeholderString;
-    self.placeholderLabel.textColor = _placeholderColor;
-    //设置是否显示剩余字符数
-    self.remainingLabel.textColor = _remainingTextColor;
-    self.remainingLabel.hidden = ! _showsRemainingCount;
 }
 
 //定义弹出键盘类型

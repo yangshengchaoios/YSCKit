@@ -8,16 +8,13 @@
 //
 
 #import <UIKit/UIKit.h>
-//静态类
-
-
-//自定义view
-#import "YSCKTipsView.h"
-#import "YSCTitleBarView.h"
 
 //第三方库
 //#import "UIViewController+ScrollingNavbar.h"
 //#import "UIViewController+Additions.h"
+
+#define CheckWeakSelfIsClicked      if(weakSelf.isClicked){ return; }weakSelf.isClicked = YES;
+#define CheckSelfIsClicked          if(self.isClicked){ return; }self.isClicked = YES;
 
 @interface YSCBaseViewController : UIViewController <UITextFieldDelegate>
 
@@ -30,6 +27,8 @@
 @property (nonatomic, assign) BackType backType;    //返回类型（是上一级还是侧边栏）默认是pop上一级
 @property (nonatomic, assign) BOOL isAppeared;      //当前viewcontroller是否显示
 @property (nonatomic, assign) BOOL isRunViewDidLoadExtension;
+@property (nonatomic, assign) BOOL isClicked;       //判断重复点击某一操作
+@property (nonatomic, copy) YSCResultBlock block;
 
 #pragma mark - 这里可以获取相对布局的view大小，在viewDidAppear中调用
 - (void)viewDidiLoadExtension;
@@ -90,11 +89,10 @@
 #pragma mark - alert view
 - (UIAlertView *)showAlertVieWithMessage:(NSString *)message;
 - (UIAlertView *)showAlertViewWithTitle:(NSString *)title andMessage:(NSString *)message;
-
+- (UIAlertView *)showAlertVieWithMessage:(NSString *)message block:(YSCResultBlock)block;
+- (UIAlertView *)showAlertViewWithTitle:(NSString *)title andMessage:(NSString *)message block:(YSCResultBlock)block;
 
 #pragma mark - Overridden methods 缓存相关
-//- (NSString *)cacheFilePath;
-//- (NSString *)cacheFilePath:(NSString *)suffix;
 - (id)cachedObjectForKey:(NSString *)cachedKey;
 - (id)cachedObjectForKey:(NSString *)cachedKey withSuffix:(NSString *)suffix;
 - (void)saveObject:(id)object forKey:(NSString *)cachedKey;

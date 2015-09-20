@@ -75,7 +75,7 @@
          requestType:(RequestType)requestType
     requestSuccessed:(RequestSuccessed)requestSuccessed
       requestFailure:(RequestFailure)requestFailure {
-    [self   requestByUrl:url withAPI:apiName andArrayParam:arrayParam andDictParam:dictParam andBodyParam:bodyParam imageData:nil customModelClass:ClassOfObject(YSCBaseModel) requestType:requestType
+    [self   requestByUrl:url withAPI:apiName andArrayParam:arrayParam andDictParam:dictParam andBodyParam:bodyParam imageData:nil customModelClass:[YSCBaseModel class] requestType:requestType
 	    requestSuccessed: ^(id responseObject) {
             YSCBaseModel *baseModel = (YSCBaseModel *)responseObject;
             [baseModel formatProperties];
@@ -104,6 +104,9 @@
                 }
             }
             else {
+                if (99 == baseModel.stateInteger) {//登录过期
+                    postNWithInfo(kNotificationLoginExpired, @{kParamMessage : Trim(baseModel.message)});
+                }
                 if (requestFailure) {
                     requestFailure(baseModel.stateInteger, baseModel.message);
                 }
@@ -128,7 +131,7 @@
           andDictParam:dictParam
           andBodyParam:nil
              imageData:UIImagePNGRepresentation(image)
-      customModelClass:ClassOfObject(YSCBaseModel)
+      customModelClass:[YSCBaseModel class]
            requestType:RequestTypeUploadFile
       requestSuccessed:^(id responseObject) {
           YSCBaseModel *baseModel = (YSCBaseModel *)responseObject;
@@ -140,6 +143,9 @@
                   }
               }
               else {
+                  if (99 == baseModel.stateInteger) {//登录过期
+                      postNWithInfo(kNotificationLoginExpired, @{kParamMessage : Trim(baseModel.message)});
+                  }
                   if (requestFailure) {
                       requestFailure(baseModel.stateInteger, baseModel.message);
                   }
@@ -224,40 +230,25 @@
 	//3. 组装数组参数
 	NSMutableString *newUrlString = [NSMutableString stringWithString:urlString];
 	for (NSObject *param in arrayParam) {
-		[newUrlString appendString:@"/"];
-		[newUrlString appendFormat:@"%@",param];
+		[newUrlString appendFormat:@"/%@",param];
 	}
     
-    //4. 对提交的dict添加一个加密的参数'signature'
-    NSMutableDictionary *newDictParam = [NSMutableDictionary dictionaryWithDictionary:dictParam];
-    NSString *signature = [self signatureWithParam:newDictParam];
+    //4. 格式化所有请求的参数
+    NSDictionary *newDictParam = [AppData FormatRequestParams:dictParam];
+    NSLog(@"request params=%@", newDictParam);
     
 	//5. 发起网络请求
-    AFHTTPRequestOperationManager *manager = [AFHTTPRequestOperationManager manager];   //create new AFHTTPRequestOperationManager
-    manager.responseSerializer = [AFHTTPResponseSerializer serializer];//TODO:针对返回数据不规范的情况
-    
+    AFHTTPRequestOperationManager *manager = [AFHTTPRequestOperationManager manager];
+    manager.responseSerializer = [AFHTTPResponseSerializer serializer];
     manager.requestSerializer.cachePolicy = NSURLRequestReloadIgnoringLocalCacheData;
     manager.requestSerializer.timeoutInterval = kDefaultAFNTimeOut;//设置POST和GET的超时时间
     //解决返回的Content-Type始终是application/xml问题！
     [manager.requestSerializer setValue:@"application/xml" forHTTPHeaderField:@"Accept"];
-//    [manager.requestSerializer setValue:@"gzip" forHTTPHeaderField:@"Accept-Encoding"];
+//    [manager.requestSerializer setValue:@"gzip" forHTTPHeaderField:@"Accept-Encoding"];//TODO:压缩上传内容
     [manager.requestSerializer setValue:AppVersion forHTTPHeaderField:kParamVersion];
     [manager.requestSerializer setValue:kParamFromValue forHTTPHeaderField:kParamFrom];
-    [manager.requestSerializer setValue:signature forHTTPHeaderField:kParamSignature];
-#if IsNeedEncryptHTTPHeader
-    NSString *httpHeaderToken = [self encryptHttpHeaderWithParam:@{kParamAppId : kAppId,
-                                                                   kParamVersion : AppVersion,
-                                                                   kParamUdid : [AppConfigManager sharedInstance].udid,
-                                                                   kParamFrom : kParamFromValue,
-                                                                   kParamBSSID : Trim(APPCONFIG.currentBSSID),
-                                                                   kParamLongitude : Trim(APPCONFIG.currentLongitude),
-                                                                   kParamLatitude : Trim(APPCONFIG.currentLatitude),
-                                                                   kParamToken : TOKEN,
-                                                                   kParamChannel : kAppChannel
-                                                                   }];
-    NSLog(@"encryptString=%@", httpHeaderToken);
-    [manager.requestSerializer setValue:httpHeaderToken forHTTPHeaderField:kAppHTTPTokenName];
-#endif
+    [manager.requestSerializer setValue:[AppData SignatureWithParams:newDictParam] forHTTPHeaderField:kParamSignature];
+    [manager.requestSerializer setValue:[AppData EncryptHttpHeaderToken] forHTTPHeaderField:kAppHTTPTokenName];
     
     //   定义返回成功的block
     void (^requestSuccessed1)(AFHTTPRequestOperation *operation, id responseObject) = ^(AFHTTPRequestOperation *operation, id responseObject) {
@@ -265,7 +256,9 @@
         if ([responseObject isKindOfClass:[NSData class]]) {
             responseObject = [[NSString alloc] initWithData:responseObject encoding:NSUTF8StringEncoding];
         }
-        responseObject = [NSString replaceString:responseObject byRegex:@"[\r\n\t]" to:@""];
+        if ([responseObject isKindOfClass:[NSString class]]) {
+            responseObject = [NSString replaceString:responseObject byRegex:@"[\r\n\t]" to:@""];
+        }
         NSLog(@"request success! \r\noperation=%@\r\nresponseObject=%@", operation, responseObject);
         JSONModelError *initError = nil;
         id jsonModel = nil;
@@ -305,6 +298,7 @@
         if (200 != operation.response.statusCode) {
             if (401 == operation.response.statusCode) {
                 if (requestFailure) {
+                    postNWithInfo(kNotificationLoginExpired, @{kParamMessage : @"登录失效，请重新登录！"});
                     requestFailure(1003, @"您还未登录呢！");
                 }
             }
@@ -359,6 +353,7 @@
         NSLog(@"posting bodydata...");
         NSMutableURLRequest *mutableRequest = [manager.requestSerializer requestWithMethod:@"POST" URLString:newUrlString parameters:nil error:nil];
         mutableRequest.HTTPBody = [bodyParam dataUsingEncoding:manager.requestSerializer.stringEncoding];
+        [mutableRequest setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
         AFHTTPRequestOperation *operation = [manager HTTPRequestOperationWithRequest:mutableRequest success:requestSuccessed1 failure:requestFailure1];
         [manager.operationQueue addOperation:operation];
     }
@@ -368,10 +363,9 @@
                  saveToPath:(NSString *)destPath
            requestSuccessed:(RequestSuccessed)requestSuccessed
              requestFailure:(RequestFailure)requestFailure {
-        NSLog(@"downloading file");
         NSURLSessionConfiguration *configuration = [NSURLSessionConfiguration defaultSessionConfiguration];
         AFURLSessionManager *manager = [[AFURLSessionManager alloc] initWithSessionConfiguration:configuration];
-    NSString *fileName = [NSString stringWithFormat:@"%@.sqlite", [[NSUUID UUID] UUIDString]];
+    NSString *fileName = [NSString stringWithFormat:@"%@.tempfile", [[NSUUID UUID] UUIDString]];
     NSString *downloadToFilePath = [[YSCFileUtils DirectoryPathOfDocuments] stringByAppendingPathComponent:fileName];
         NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:url]];
         NSURLSessionDownloadTask *downloadTask = [manager downloadTaskWithRequest:request progress:nil destination:^NSURL *(NSURL *targetPath, NSURLResponse *response) {
@@ -400,56 +394,6 @@
             }
         }];
         [downloadTask resume];
-}
-
-/**
- *  对参数进行签名
- *
- *  @param param oldDict
- *
- *  @return signature
- */
-+ (NSString *)signatureWithParam:(NSMutableDictionary *)param {
-    NSArray *keys = [[param allKeys] sortedArrayUsingSelector:@selector(compare:)];
-    
-    //1. 按照字典顺序拼接url字符串
-    NSLog(@"signature param = %@", param);
-    NSMutableString *joinedString = [NSMutableString string];
-    for (NSString *key in keys) {
-        NSObject *value = param[key];
-        if ([kParamSignature isEqualToString:key]) {//不对signature进行加密
-            continue;
-        }
-        //去掉key和value的前后空格字符
-        NSString *newKey = Trim(key);
-        NSString *newValue = [NSString stringWithFormat:@"%@", [NSString isEmpty:value] ? @"" : value];
-        newValue = Trim(newValue);
-//        newValue = [NSString replaceString:newValue byRegex:@" +" to:@""];//NOTE:去掉字符串中间的空格
-        [param removeObjectForKey:key];//移除修改前的key
-        param[newKey] = newValue;
-        [joinedString appendFormat:@"%@%@", newKey, newValue];
-    }
-    
-    //2. 对参数进行md5加密
-    NSString *newString = [NSString stringWithFormat:@"%@%@", joinedString, kParamSecretKey];
-    NSString *signature = [[NSString MD5Encrypt:newString] lowercaseString];
-    NSLog(@"signature = %@", signature);
-    return signature;
-}
-
-//将字典对象转换成json字符串
-+ (NSString *)encryptHttpHeaderWithParam:(NSDictionary *)param {
-    NSLog(@"aes param = %@", param);
-    NSString *jsonString = @"";
-    NSError *error;
-    NSData *jsonData = [NSJSONSerialization dataWithJSONObject:param
-                                                       options:NSJSONWritingPrettyPrinted
-                                                         error:&error];
-    if (jsonData) {
-        jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
-    }
-    NSLog(@"aes jsonString=%@", jsonString);
-    return [NSString AESEncrypt:jsonString useKey:kParamHttpHeaderSecretKey];
 }
 
 @end

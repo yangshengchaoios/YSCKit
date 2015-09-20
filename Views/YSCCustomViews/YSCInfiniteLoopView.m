@@ -73,9 +73,6 @@
     [self resetFrameOfSubviews];//这里仅仅是为了在viewDidLoad方法内调用便于获取真实的frame大小
 }
 - (void)reloadData {
-    if (self.totalPageCount == 0) {
-        return;
-    }
     [self.scrollView.subviews makeObjectsPerformSelector:@selector(removeFromSuperview)];
     
     NSInteger scrollPages = MAX(3, self.totalPageCount);
@@ -159,7 +156,7 @@
                                                  repeats:YES];
 }
 - (void)setTotalPageCount:(NSInteger)totalPageCount {
-    if (totalPageCount <= 0) {
+    if (totalPageCount < 0) {
         return;
     }
     _totalPageCount = totalPageCount;
@@ -183,14 +180,16 @@
 }
 - (UIView *)getPageViewAtIndex:(NSInteger)pageIndex {
     if (self.pageViewAtIndex) {
-        UIView *view = self.pageViewAtIndex(pageIndex);
-        if (view) {
-            return view;
+        if (pageIndex >= 0 && pageIndex < self.totalPageCount) {
+            UIView *view = self.pageViewAtIndex(pageIndex);
+            if (view) {
+                return view;
+            }
         }
     }
     
     UIView *emptyView = [[UIView alloc] initWithFrame:self.bounds];
-    emptyView.backgroundColor = [UIColor redColor];
+    emptyView.backgroundColor = [UIColor clearColor];
     return emptyView;
 }
 - (void)animationTimerDidFired:(NSTimer *)timer {

@@ -10,7 +10,19 @@
 
 @interface YSCBaseCollectionHeaderFooterView : UICollectionReusableView
 
-+ (CGSize)SizeOfView;
+#pragma mark - 注册与重用
++ (void)registerHeaderToCollectionView:(UICollectionView *)collectionView;
++ (void)registerFooterToCollectionView:(UICollectionView *)collectionView;
++ (instancetype)dequeueHeaderByCollectionView:(UICollectionView *)collectionView forIndexPath:(NSIndexPath *)indexPath;
++ (instancetype)dequeueFooterByCollectionView:(UICollectionView *)collectionView forIndexPath:(NSIndexPath *)indexPath;
++ (NSString *)identifier;
 + (UINib *)NibNameOfView;
+
+#pragma mark - 计算大小
++ (CGSize)SizeOfView;
++ (CGSize)SizeOfViewByObject:(NSObject *)object;
+
+#pragma mark - 呈现数据
+- (void)layoutObject:(NSObject *)object;
 
 @end

@@ -317,6 +317,9 @@
 }
 - (void)resetFontSizeOfView {
     for (UIView *subview in self.subviews) {
+        if ([subview respondsToSelector:@selector(setCloseResetFontAndConstraint:)]) {
+            continue;
+        }
         if ([subview isMemberOfClass:[UILabel class]]) {
             UILabel *label = (UILabel *)subview;
             label.font = AUTOLAYOUT_FONT(label.font.pointSize);
@@ -346,6 +349,9 @@
         if (constraint.constant > 0) {
             constraint.constant = AUTOLAYOUT_LENGTH(constraint.constant);
         }
+    }
+    if ([self respondsToSelector:@selector(setCloseResetFontAndConstraint:)]) {
+        return;
     }
     
     if ([self.subviews count] > 0) {

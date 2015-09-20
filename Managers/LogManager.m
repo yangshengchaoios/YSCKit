@@ -13,7 +13,7 @@
 @implementation LogManager
 
 + (void)saveLog:(NSString *)logString {
-    NSString *logDirectory = [[StorageManager sharedInstance] directoryPathOfDocumentsLog];
+    NSString *logDirectory = [STORAGEMANAGER directoryPathOfDocumentsLog];
     NSString *fileName =  [[NSDate date] stringWithFormat:@"yyyy-MM-dd"];
     NSString *logFilePath = [logDirectory stringByAppendingPathComponent:fileName];
     NSString *logStringWithTime = [NSString stringWithFormat:@"%@ -> %@\r\n", [[NSDate date] stringWithFormat:@"HH:mm:ss SSS"], logString];
@@ -21,13 +21,13 @@
 }
 
 + (void)saveTempLog:(NSString *)logString {
-    NSString *logDirectory = [[StorageManager sharedInstance] directoryPathOfDocumentsLog];
+    NSString *logDirectory = [STORAGEMANAGER directoryPathOfDocumentsLog];
     NSString *logFilePath = [logDirectory stringByAppendingPathComponent:@"temp"];
     [self saveLog:logString intoFilePath:logFilePath overWrite:YES];
 }
 
 + (void)saveLog:(NSString *)logString intoFileName:(NSString *)fileName {
-    NSString *logDirectory = [[StorageManager sharedInstance] directoryPathOfDocumentsLog];
+    NSString *logDirectory = [STORAGEMANAGER directoryPathOfDocumentsLog];
     NSString *logFilePath = [logDirectory stringByAppendingPathComponent:fileName];
     [self saveLog:logString intoFilePath:logFilePath overWrite:YES];
 }

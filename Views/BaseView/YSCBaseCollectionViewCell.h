@@ -10,9 +10,19 @@
 
 @interface YSCBaseCollectionViewCell : UICollectionViewCell
 
-+ (CGSize)SizeOfCell;
+#pragma mark - 注册与重用
++ (void)registerCellToCollectionView:(UICollectionView *)collectionView;
++ (instancetype)dequeueCellByCollectionView:(UICollectionView *)collectionView forIndexPath:(NSIndexPath*)indexPath;
++ (NSString *)identifier;
 + (UINib *)NibNameOfCell;
-- (void)layoutDataModel:(BaseDataModel *)dataModel;
-- (void)layoutDataModels:(NSArray *)dataModelArray;
+
+#pragma mark - 计算大小
++ (CGSize)SizeOfCellByObject:(NSObject *)object;
++ (CGSize)SizeOfCell;
+
+#pragma mark - 呈现数据
+- (void)layoutObject:(NSObject *)object;
+- (void)layoutDataModel:(BaseDataModel *)dataModel DEPRECATED_ATTRIBUTE;
+- (void)layoutDataModels:(NSArray *)dataModelArray DEPRECATED_ATTRIBUTE;
 
 @end

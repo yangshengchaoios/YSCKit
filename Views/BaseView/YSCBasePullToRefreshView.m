@@ -109,15 +109,17 @@
     self.scrollView.delegate = self;
     [self addSubview:self.scrollView];
     //添加约束
-    [self.scrollView autoPinEdgeToSuperviewEdge:ALEdgeLeading];
-    [self.scrollView autoPinEdgeToSuperviewEdge:ALEdgeTrailing];
-    [self.scrollView autoPinEdgeToSuperviewEdge:ALEdgeBottom];
-    if (self.segmentedControl) {
-        [self.scrollView autoPinEdge:ALEdgeTop toEdge:ALEdgeBottom ofView:self.segmentedBottomLineView];
-    }
-    else {
-        [self.scrollView autoPinEdgeToSuperviewEdge:ALEdgeTop];
-    }
+    [self.scrollView mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.left.equalTo(self.mas_left);
+        make.bottom.equalTo(self.mas_bottom);
+        make.right.equalTo(self.mas_right);
+        if (self.segmentedControl) {
+            make.top.equalTo(self.segmentedControl.mas_bottom);
+        }
+        else {
+            make.top.equalTo(self.mas_top);
+        }
+    }];
     
     //3. 创建contentView
     [self initContentViews];
@@ -267,7 +269,7 @@
             if ([contentView isKindOfClass:[UITableView class]]) {
                 YSCBaseTableViewCell *cell = [(UITableView *)contentView dequeueReusableCellWithIdentifier:kCellIdentifier];
                 if ([cell isKindOfClass:[YSCBaseTableViewCell class]]) {
-                    [cell layoutDataModel:data];
+                    [cell layoutObject:data];
                 }
                 cell.selectionStyle = UITableViewCellSelectionStyleNone;//去掉cell的选中状态
                 return cell;
@@ -275,7 +277,7 @@
             else if ([contentView isKindOfClass:[UICollectionView class]]) {
                 YSCBaseCollectionViewCell *cell = [(UICollectionView *)contentView dequeueReusableCellWithReuseIdentifier:kItemCellIdentifier forIndexPath:indexPath];
                 if ([cell isKindOfClass:[YSCBaseCollectionViewCell class]]) {
-                    [cell layoutDataModel:data];
+                    [cell layoutObject:data];
                 }
                 return cell;
             }
@@ -348,10 +350,12 @@
     UIView *backgroundView = [[UIView alloc] initWithFrame:CGRectZero];
     backgroundView.backgroundColor = [UIColor clearColor];
     [self addSubview:backgroundView];
-    [backgroundView autoPinEdgeToSuperviewEdge:ALEdgeLeading withInset:self.segmentedLeading];
-    [backgroundView autoPinEdgeToSuperviewEdge:ALEdgeTop];
-    [backgroundView autoPinEdgeToSuperviewEdge:ALEdgeTrailing withInset:self.segmentedTailing];
-    [backgroundView autoSetDimension:ALDimensionHeight toSize:self.segmentedHeight];
+    [backgroundView mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.top.equalTo(self.mas_top);
+        make.left.equalTo(self.mas_left).offset(self.segmentedLeading);
+        make.right.equalTo(self.mas_right).offset(self.segmentedTailing);
+        make.height.equalTo(@(self.segmentedHeight));
+    }];
     //设置item之间的间隔线
     for (int i = 0; i < [self.segmentedTitleArray count] - 1; i++) {
         //TODO:
@@ -363,18 +367,20 @@
     [self addSubview:self.segmentedControl];
     
     //2. 添加约束
-    [self.segmentedControl autoPinEdgeToSuperviewEdge:ALEdgeLeading withInset:self.segmentedLeading];
-    [self.segmentedControl autoPinEdgeToSuperviewEdge:ALEdgeTop];
-    [self.segmentedControl autoPinEdgeToSuperviewEdge:ALEdgeTrailing withInset:self.segmentedTailing];
-    [self.segmentedControl autoSetDimension:ALDimensionHeight toSize:self.segmentedHeight];
+    [self.segmentedControl mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.top.equalTo(self.mas_top);
+        make.left.equalTo(self.mas_left).offset(self.segmentedLeading);
+        make.right.equalTo(self.mas_right).offset(self.segmentedTailing);
+        make.height.equalTo(@(self.segmentedHeight));
+    }];
     
     //3. 设置基本属性
     if (nil == self.segmentedTitleArray) {
         self.segmentedTitleArray = [NSMutableArray array];
     }
     WeakSelfType blockSelf = self;
-    self.segmentedControl.textColor = kDefaultTextColor;
-    self.segmentedControl.selectedTextColor = kDefaultTextColor;
+    self.segmentedControl.textColor = kDefaultTextColorBlack1;
+    self.segmentedControl.selectedTextColor = kDefaultTextColorBlack1;
     self.segmentedControl.selectionIndicatorColor = [UIColor redColor];
     self.segmentedControl.font = AUTOLAYOUT_FONT(28);
     self.segmentedControl.sectionTitles = self.segmentedTitleArray;
@@ -407,12 +413,14 @@
     //4. 设置底部间隔线
     self.segmentedBottomLineView = [[UIView alloc] initWithFrame:CGRectZero];
     self.segmentedBottomLineView.backgroundColor = kDefaultBorderColor;
-    [self addSubview:self.segmentedBottomLineView];
+    [self.segmentedControl addSubview:self.segmentedBottomLineView];
+    [self.segmentedBottomLineView mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.bottom.equalTo(self.mas_bottom);
+        make.left.equalTo(self.mas_left);
+        make.right.equalTo(self.mas_right);
+        make.height.equalTo(@(AUTOLAYOUT_LENGTH(1)));
+    }];
     [self bringSubviewToFront:self.segmentedControl];
-    [self.segmentedBottomLineView autoPinEdgeToSuperviewEdge:ALEdgeLeading];
-    [self.segmentedBottomLineView autoPinEdge:ALEdgeBottom toEdge:ALEdgeBottom ofView:self.segmentedControl withOffset:0];
-    [self.segmentedBottomLineView autoPinEdgeToSuperviewEdge:ALEdgeTrailing];
-    [self.segmentedBottomLineView autoSetDimension:ALDimensionHeight toSize:AUTOLAYOUT_LENGTH(1)];
 }
 //初始化contentViews
 - (void)initContentViews {
@@ -510,19 +518,22 @@
         [self.scrollView addSubview:contentView];
         
         //3. 添加约束
-        [contentView autoPinEdgeToSuperviewEdge:ALEdgeTop];
-        [contentView autoPinEdgeToSuperviewEdge:ALEdgeBottom];
-        [contentView autoMatchDimension:ALDimensionWidth toDimension:ALDimensionWidth ofView:self.scrollView];
-        [contentView autoMatchDimension:ALDimensionHeight toDimension:ALDimensionHeight ofView:self.scrollView];
-        if (0 == i) {//第一个的leading要基于self.scrollView
-            [contentView autoPinEdgeToSuperviewEdge:ALEdgeLeading];
-        }
-        else {
-            [contentView autoPinEdge:ALEdgeLeading toEdge:ALEdgeTrailing ofView:self.contentViewArray[i - 1] withOffset:self.contentViewSpace];
-        }
-        if ([self.segmentedTitleArray count] - 1 == i) {//最后一个的trailing要基于self.scrollView
-            [contentView autoPinEdgeToSuperviewEdge:ALEdgeTrailing];
-        }
+        [contentView mas_makeConstraints:^(MASConstraintMaker *make) {
+            make.top.equalTo(self.scrollView.mas_top);
+            make.bottom.equalTo(self.scrollView.mas_bottom);
+            make.width.equalTo(self.scrollView.mas_width);
+            make.height.equalTo(self.scrollView.mas_height);
+            if (0 == i) {//第一个的leading要基于self.scrollView
+                make.left.equalTo(self.scrollView.mas_left);
+            }
+            else {
+                make.left.equalTo(((UIView *)self.contentViewArray[i - 1]).mas_right).offset(self.contentViewSpace);
+            }
+            if ([self.segmentedTitleArray count] - 1 == i) {//最后一个的trailing要基于self.scrollView
+                make.right.equalTo(self.scrollView.mas_right);
+            }
+        }];
+        
         
         //4. 下拉刷新&上拉加载更多
         if ([contentView isKindOfClass:[UIScrollView class]]) {
@@ -569,7 +580,8 @@
             shouldCacheData = self.shouldCacheDataAtIndex(i);
         }
         if (shouldCacheData) {
-            NSArray *cacheArray = [self cachedObjectForKey:KeyOfCachedData atIndex:i];
+            NSString *fileName = [NSString stringWithFormat:@"%@_%ld.dat", self.viewControllerClassName, (long)i];
+            NSArray *cacheArray = GetCacheObjectByFile(KeyOfCachedData, fileName);
             if ([cacheArray isKindOfClass:[NSArray class]] && [NSArray isNotEmpty:cacheArray]) {
                 [[self dataArrayAtIndex:i] addObjectsFromArray:cacheArray];
             }
@@ -700,7 +712,8 @@
         shouldCacheData = self.shouldCacheDataAtIndex(index);
     }
     if (shouldCacheData) {
-        [self saveObject:array forKey:KeyOfCachedData atIndex:index];
+        NSString *fileName = [NSString stringWithFormat:@"%@_%ld.dat", self.viewControllerClassName, index];
+        SaveCacheObjectByFile(array, KeyOfCachedData, fileName);
     }
 }
 //加载更多
@@ -717,46 +730,6 @@
         [UIView insertCollectionViewCell:(UICollectionView *)contentView oldCount:oldCount addCount:[array count]];
     }
 }
-//获取缓存数组
-- (NSArray *)cachedObjectForKey:(NSString *)cachedKey atIndex:(NSInteger)index {
-    NSString *fileName = [NSString stringWithFormat:@"%@_%ld.dat", self.viewControllerClassName, index];
-    NSString *filePath = [[[StorageManager sharedInstance] directoryPathOfLibraryCachesCommon] stringByAppendingPathComponent:fileName];
-    NSDictionary *cacheInfo = [[StorageManager sharedInstance] unarchiveDictionaryFromFilePath:filePath];
-    if ([cacheInfo objectForKey:cachedKey]) {
-        return cacheInfo[cachedKey];
-    }
-    else {
-        return nil;
-    }
-}
-//缓存数组
-- (void)saveObject:(NSArray *)object forKey:(NSString *)cachedKey atIndex:(NSInteger)index {
-    ReturnWhenObjectIsEmpty(object);
-    ReturnWhenObjectIsEmpty(cachedKey);
-    
-    @try {
-        NSString *fileName = [NSString stringWithFormat:@"%@_%ld.dat", self.viewControllerClassName, index];
-        NSString *filePath = [[[StorageManager sharedInstance] directoryPathOfLibraryCachesCommon] stringByAppendingPathComponent:fileName];
-        BOOL isSuccess = [[StorageManager sharedInstance] archiveDictionary:@{cachedKey : object}
-                                                                 toFilePath:filePath
-                                                                  overwrite:NO];
-        if (isSuccess) {
-            NSLog(@"缓存成功！");
-        }
-        else {
-            NSLog(@"缓存失败！");
-        }
-    }
-    @catch (NSException *exception)
-    {
-        NSLog(@"将数组保存至本地缓存时出错！%@",
-              exception); //可能是没有在对象里做序列号和反序列化！
-    }
-    @finally
-    {
-    }
-}
-
 
 //-------------------------------------------------------------------------------------------
 //
