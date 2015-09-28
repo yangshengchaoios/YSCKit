@@ -9,10 +9,6 @@
 
 #import <UIKit/UIKit.h>
 
-//第三方库
-//#import "UIViewController+ScrollingNavbar.h"
-//#import "UIViewController+Additions.h"
-
 #define CheckWeakSelfIsClicked      if(weakSelf.isClicked){ return; }weakSelf.isClicked = YES;
 #define CheckSelfIsClicked          if(self.isClicked){ return; }self.isClicked = YES;
 
@@ -26,12 +22,8 @@
 @property (nonatomic, strong) UIButton *backButton;
 @property (nonatomic, assign) BackType backType;    //返回类型（是上一级还是侧边栏）默认是pop上一级
 @property (nonatomic, assign) BOOL isAppeared;      //当前viewcontroller是否显示
-@property (nonatomic, assign) BOOL isRunViewDidLoadExtension;
 @property (nonatomic, assign) BOOL isClicked;       //判断重复点击某一操作
 @property (nonatomic, copy) YSCResultBlock block;
-
-#pragma mark - 这里可以获取相对布局的view大小，在viewDidAppear中调用
-- (void)viewDidiLoadExtension;
 
 #pragma mark - push view controller
 - (UIViewController *)pushViewController:(NSString *)className;
@@ -60,11 +52,6 @@
 - (void)dismissOnPresentedViewController;
 
 
-#pragma mark - scrollingNavbar
-- (UIView *)scrollableView;
-
-#pragma mark - push & pop with animation
-//- (UIViewController *)pushViewController:(NSString *)className withParams:(NSDictionary *)paramDict withAnimation:(ADTransition *)transition;
 
 #pragma mark -  show & hide HUD
 - (MBProgressHUD *)showHUDLoading:(NSString *)hintString;
@@ -114,5 +101,6 @@
 - (void)networkReachablityChanged:(BOOL)reachable;
 //专门针对tableview的seperator左右间隔进行设置
 - (UIEdgeInsets)edgeInsetsOfCellSeperator;
+- (void)callBlock;
 
 @end

@@ -60,19 +60,12 @@
     [AppConfigManager sharedInstance].currentViewController = self;
 }
 - (void)viewDidAppear:(BOOL)animated {
+    UMEventBeginLogPageView;
 	[super viewDidAppear:animated];
     self.isClicked = NO;
-    
-    //控制只执行一次的方法
-    if (!self.isRunViewDidLoadExtension) {
-        [self viewDidiLoadExtension];
-        self.isRunViewDidLoadExtension = YES;
-    }
-}
-- (void)viewWillDisappear:(BOOL)animated {
-    [super viewWillDisappear:animated];
 }
 - (void)viewDidDisappear:(BOOL)animated {
+    UMEventEndLogPageView;
 	self.isAppeared = NO;
     [super viewDidDisappear:animated];
 }
@@ -267,13 +260,6 @@
 	}
 }
 
-
-#pragma mark - 这里可以获取相对布局的view大小
-- (void)viewDidiLoadExtension {
-
-}
-
-
 #pragma mark - push & pop & dismiss view controller
 - (UIViewController *)pushViewController:(NSString *)className {
 	return [self pushViewController:className withParams:nil];
@@ -299,12 +285,11 @@
 }
 
 #pragma mark - pop & dismiss
-/*
- * 返回上一层(最多到根)
- * 如果没有NavigationController就直接dismiss
- */
+//返回上一层(最多到根)
+//如果没有NavigationController就直接dismiss
 - (UIViewController *)popViewController {
     [self hideKeyboard];
+    UMEventKeyPopViewController;
 	if (self.navigationController) {     //如果有navigationBar
 		NSInteger index = [self.navigationController.viewControllers indexOfObject:self];
 		UIViewController *previousViewController = [self.navigationController.viewControllers objectAtIndex:MAX(index - 1, 0)];
@@ -316,13 +301,11 @@
         return self.presentingViewController;
 	}
 }
-
-/**
- * 返回上一层(会自动dismiss根)
- * 如果没有NavigationController就直接dismiss
- */
+//返回上一层(会自动dismiss根)
+//如果没有NavigationController就直接dismiss
 - (UIViewController *)backViewController {
     [self hideKeyboard];
+    UMEventKeyBackViewController;
 	if (self.navigationController) {            //如果有navigationBar
 		NSInteger index = [self.navigationController.viewControllers indexOfObject:self];
 		if (index > 0) {                        //不是root，就返回上一级
@@ -338,10 +321,7 @@
         return self.presentingViewController;
 	}
 }
-
-/**
- *  @return 最顶层的viewController
- */
+//return 最顶层的viewController
 - (UIViewController *)popToRootViewController {
     if (self.navigationController) {
         UIViewController *topViewController = [self.navigationController.viewControllers objectAtIndex:0];
@@ -366,7 +346,6 @@
 }
 
 #pragma mark - present & dismiss viewcontroller [presentingViewController -> self -> presentedViewController]
-
 - (UINavigationController *)presentViewController:(NSString *)className {
 	return [self presentViewController:className withParams:nil];
 }
@@ -389,7 +368,7 @@
 - (UINavigationController *)presentNormalViewController:(UIViewController *)viewController {
     [self hideKeyboard];
     UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:viewController];
-//    navigationController.navigationController.navigationBar.translucent = YES;
+    navigationController.navigationController.navigationBar.translucent = NO;
 //    navigationController.interactivePopGestureRecognizer.enabled = YES;//NOTE:关闭系统自带的侧边滑动功能，会与MLTransition冲突！
 //    navigationController.interactivePopGestureRecognizer.delegate = self;
     [self presentViewController:navigationController animated:YES completion:nil];
@@ -410,17 +389,14 @@
 
 
 #pragma mark -  show & hide HUD
-
 //在self.view上显示hud
 - (MBProgressHUD *)showHUDLoading:(NSString *)hintString {
 	return [self showHUDLoading:hintString onView:self.view];
 }
-
 //在window上显示hud
 - (MBProgressHUD *)showHUDLoadingOnWindow:(NSString *)hintString {
 	return [self showHUDLoading:hintString onView:KeyWindow];
 }
-
 //显示hud的通用方法
 - (MBProgressHUD *)showHUDLoading:(NSString *)hintString onView:(UIView *)view {
 	MBProgressHUD *hud = [MBProgressHUD HUDForView:view];
@@ -434,57 +410,47 @@
 	hud.mode = MBProgressHUDModeIndeterminate;
 	return hud;
 }
-
 //隐藏self.view上的hud
 - (void)hideHUDLoading {
 	[self hideHUDLoadingOnView:self.view];
 }
-
 //隐藏window上的hud
 - (void)hideHUDLoadingOnWindow {
 	[self hideHUDLoadingOnView:KeyWindow];
 }
-
 //隐藏hud的通用方法
 - (void)hideHUDLoadingOnView:(UIView *)view {
 	MBProgressHUD *hud = [MBProgressHUD HUDForView:view];
 	[hud hide:YES];
 }
-
 //直接隐藏self.view上的hud
 - (void)showResultThenHide:(NSString *)resultString {
 	[self showResultThenHide:resultString afterDelay:kHudIntervalNormal onView:self.view];
 }
-
 //直接隐藏window上的hud
 - (void)showResultThenHideOnWindow:(NSString *)resultString {
 	[self showResultThenHide:resultString afterDelay:kHudIntervalNormal onView:KeyWindow];
 }
-
 //延迟隐藏self.view上的hud,返回上一级
 - (void)showResultThenPop:(NSString *)resultString {
 	[self showResultThenHide:resultString afterDelay:kHudIntervalNormal onView:self.view];
 	[self performSelector:@selector(popViewController) withObject:nil afterDelay:kHudIntervalNormal];
 }
-
 //延迟隐藏window上的hud后，返回上一级
 - (void)showResultThenPopOnWindow:(NSString *)resultString {
 	[self showResultThenHide:resultString afterDelay:kHudIntervalNormal onView:KeyWindow];
 	[self performSelector:@selector(popViewController) withObject:nil afterDelay:kHudIntervalNormal];
 }
-
 //延迟隐藏self.view上的hud后，并返回上一级或dismiss
 - (void)showResultThenBack:(NSString *)resultString {
 	[self showResultThenHide:resultString afterDelay:kHudIntervalNormal onView:self.view];
 	[self performSelector:@selector(backViewController) withObject:nil afterDelay:kHudIntervalNormal];
 }
-
 //延迟隐藏window上的hud后，并返回上一级或dismiss
 - (void)showResultThenBackOnWindow:(NSString *)resultString {
 	[self showResultThenHide:resultString afterDelay:kHudIntervalNormal onView:KeyWindow];
 	[self performSelector:@selector(backViewController) withObject:nil afterDelay:kHudIntervalNormal];
 }
-
 //延迟隐藏self.view上的hud后，并dismiss
 - (void)showResultThenDismiss:(NSString *)resultString {
     [self showResultThenHide:resultString afterDelay:kHudIntervalNormal onView:self.view];
@@ -496,7 +462,6 @@
         [self performSelector:@selector(dismissOnPresentedViewController) withObject:nil afterDelay:kHudIntervalNormal];
     }
 }
-
 //延迟隐藏window上的hud后，并dismiss
 - (void)showResultThenDismissOnWindow:(NSString *)resultString {
     [self showResultThenHide:resultString afterDelay:kHudIntervalNormal onView:KeyWindow];
@@ -508,7 +473,6 @@
         [self performSelector:@selector(dismissOnPresentedViewController) withObject:nil afterDelay:kHudIntervalNormal];
     }
 }
-
 //延迟隐藏view上hud的通用方法
 - (void)showResultThenHide:(NSString *)resultString afterDelay:(NSTimeInterval)delay onView:(UIView *)view {
 	MBProgressHUD *hud = [MBProgressHUD HUDForView:view];
@@ -656,6 +620,14 @@
 //专门针对tableview的seperator左右间隔进行设置
 - (UIEdgeInsets)edgeInsetsOfCellSeperator {
     return UIEdgeInsetsZero;
+}
+- (void)callBlock {
+    WEAKSELF
+    [self bk_performBlock:^(id obj) {
+        if (weakSelf.block) {
+            weakSelf.block(nil);
+        }
+    } afterDelay:1];
 }
 
 #pragma mark - UITextFieldDelegate
