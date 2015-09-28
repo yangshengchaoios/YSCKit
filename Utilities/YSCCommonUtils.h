@@ -29,7 +29,7 @@
 @interface YSCCommonUtils : NSObject
 
 + (void)checkNewVersionShowMessage:(BOOL)showMessage;
-+ (void)checkNewVersionShowMessage:(BOOL)showMessage withParams:(NSDictionary *)params;
++ (void)checkNewVersionShowMessage:(BOOL)showMessage withParams:(NSDictionary *)params andType:(NSInteger)type;
 + (void)checkNewVersion:(NewVersionModel *)versionModel showMessage:(BOOL)showMessage;
 + (void)checkNewVersionByAppleId:(NSString *)appleId;
 

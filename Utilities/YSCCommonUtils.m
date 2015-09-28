@@ -14,13 +14,13 @@
 @implementation YSCCommonUtils
 
 + (void)checkNewVersionShowMessage:(BOOL)showMessage {
-    [self checkNewVersionShowMessage:showMessage withParams:nil];
+    [self checkNewVersionShowMessage:showMessage withParams:nil andType:[kCheckNewVersionType integerValue]];
 }
-+ (void)checkNewVersionShowMessage:(BOOL)showMessage withParams:(NSDictionary *)params {
-    if (0 == [kCheckNewVersionType integerValue]) {
++ (void)checkNewVersionShowMessage:(BOOL)showMessage withParams:(NSDictionary *)params andType:(NSInteger)type {
+    if (0 == type) {
         return;
     }
-    else if (1 == [kCheckNewVersionType integerValue]) {
+    else if (1 == type) {
         if ([NSString isNotUrl:kCheckNewVersionUrl]) {
             return;
         }
@@ -30,7 +30,7 @@
         [AFNManager getDataFromUrl:kCheckNewVersionUrl
                            withAPI:@""
                       andDictParam:params
-                         modelName:ClassOfObject(NewVersionModel)
+                         modelName:[NewVersionModel class]
                   requestSuccessed: ^(id responseObject) {
                       [YSCCommonUtils checkNewVersion:responseObject showMessage:showMessage];
                   }
@@ -40,17 +40,8 @@
                         }
                     }];
     }
-    else if (2 == [kCheckNewVersionType integerValue]) {
-        NSString *tempModel = kNewVersionModel;
-        if ([NSString isNotEmpty:tempModel]) {
-            NewVersionModel *versionModel = [[NewVersionModel alloc] initWithString:tempModel error:nil];
-            if ([versionModel isKindOfClass:[NewVersionModel class]]) {
-                [YSCCommonUtils checkNewVersion:versionModel showMessage:showMessage];
-            }
-        }
-    }
-    else if (3 == [kCheckNewVersionType integerValue]) {//检测app store上通过审核的新版本
-        [YSCCommonUtils checkNewVersionByAppleId:@"1000594167"];
+    else if (2 == type) {//检测app store上通过审核的新版本
+        [YSCCommonUtils checkNewVersionByAppleId:kAppStoreId];
     }
 }
 
@@ -149,11 +140,11 @@
 }
 + (void)configUmeng {
 #pragma mark - 设置UMeng应用的key
-    [MobClick setAppVersion:AppVersion];
-    [UMSocialData openLog:NO];//是否打开调试日志输出
+//    [MobClick setAppVersion:AppVersion];
+//    [UMSocialData openLog:NO];//是否打开调试日志输出
 //    [UMFeedback setLogEnabled:NO];
-    [MobClick startWithAppkey:kUMAppKey reportPolicy:REALTIME channelId:kAppChannel];//配置统计
-    [UMSocialData setAppKey:kUMAppKey];//设置友盟社会化组件
+//    [MobClick startWithAppkey:kUMAppKey reportPolicy:REALTIME channelId:kAppChannel];//配置统计
+//    [UMSocialData setAppKey:kUMAppKey];//设置友盟社会化组件
 //    [UMFeedback checkWithAppkey:kUMAppKey];//配置用户反馈
     
 #pragma mark - 分享相关设置
@@ -162,7 +153,7 @@
 //    [UMSocialQQHandler setSupportWebView:YES];
     
     //设置微信AppId，设置分享url，默认使用友盟的网址
-    [UMSocialWechatHandler setWXAppId:AppKeyWeiXin appSecret:AppSecretWeiXin url:AppRedirectUrlOfWeibo];
+//    [UMSocialWechatHandler setWXAppId:AppKeyWeiXin appSecret:AppSecretWeiXin url:AppRedirectUrlOfWeibo];
     
     //打开新浪微博的SSO开关
 //    [UMSocialSinaHandler openSSOWithRedirectURL:AppRedirectUrlOfWeibo];

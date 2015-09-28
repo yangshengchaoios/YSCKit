@@ -41,7 +41,6 @@ typedef void (^YSCDictionaryResultBlock)(NSDictionary * dict, NSError *error);
 #endif
 
 //方法或属性过期标志
-//#define YSCDeprecated(instead) NS_DEPRECATED(2_0, 2_0, 2_0, 2_0, instead)
 #define YSCDeprecated(explain) __attribute__((deprecated(explain)))
 
 
@@ -92,7 +91,7 @@ return _sharedObject;
     #define kDefaultBorderColor             RGB(218, 218, 218)      //默认边框颜色
 #endif
 #ifndef kDefaultPlaceholderColor
-    #define kDefaultPlaceholderColor        RGB(218, 218, 218)      //默认占位字符颜色
+    #define kDefaultPlaceholderColor        RGB(200, 200, 200)      //默认占位字符颜色
 #endif
 #ifndef kDefaultTipViewButtonColor
     #define kDefaultTipViewButtonColor      [UIColor redColor]      //默认【重新加载】按钮背景色
@@ -119,7 +118,7 @@ return _sharedObject;
     #define kDefaultNaviBarTitleFont        [UIFont boldSystemFontOfSize:AUTOLAYOUT_LENGTH(34)]    //导航栏标题字体大小
 #endif
 #ifndef kDefaultNaviBarItemFont
-    #define kDefaultNaviBarItemFont         AUTOLAYOUT_FONT(26)     //导航栏左右文字大小
+    #define kDefaultNaviBarItemFont         AUTOLAYOUT_FONT(28)     //导航栏左右文字大小
 #endif
 #ifndef kDefaultNaviBarSubTitleFont
     #define kDefaultNaviBarSubTitleFont     AUTOLAYOUT_FONT(26)    //导航栏副标题字体大小
@@ -181,7 +180,7 @@ return _sharedObject;
 #define ProductVersion                  [NSString stringWithFormat:@"%@ (%@)", AppVersion, BundleVersion]           //产品版本(1.0.1 (15))
 #define BundleIdentifier                [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleIdentifier"]
 #define WelcomeVersion                  [NSString stringWithFormat:@"Welcome_V%@.%@", AppVersion, BundleVersion]
-#define SkipVersion(x)                     [NSString stringWithFormat:@"SkipVersion_V%@", x]
+#define SkipVersion(x)                  [NSString stringWithFormat:@"SkipVersion_V%@", x]
 
 
 /**

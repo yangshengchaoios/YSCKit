@@ -43,7 +43,6 @@
 #import "AFNManager.h"
 #import "AppConfigManager.h"
 #import "ShowPhotosManager.h"
-#import "SNSShareManager.h"
 
 //常用自定义控件
 #import "YSCKTipsView.h"
@@ -53,6 +52,7 @@
 #import "YSCPickerView.h"
 #import "YSCTableViewCell.h"
 #import "YSCTableView.h"
+#import "YSCMultiTableView.h"
 
 //基类
 #import "YSCBaseModel.h"

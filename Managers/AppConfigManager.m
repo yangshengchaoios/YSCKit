@@ -66,13 +66,6 @@
         return tempValue;
     }
     
-    //2. 判断UMeng在线参数缓存
-    tempValue = [self valueOfUMengConfig:name];
-    if ([NSString isNotEmpty:tempValue]) {
-        [self.appTempParams setValue:tempValue forKey:name];
-        return tempValue;
-    }
-    
     //3. 获取本地配置的参数
     tempValue = [self valueOfLocalConfig:name];
     if ([NSString isNotEmpty:tempValue]) {
@@ -107,73 +100,6 @@
         tempLocalValue = Trim(self.localTempParams[name]);
     }
     return tempLocalValue;
-}
-
-//UMeng在线参数值(保证从该方法返回的都一定是最新的参数值)
-- (NSString *)valueOfUMengConfig:(NSString *)name {
-    ReturnEmptyWhenObjectIsEmpty(name);
-    //0. 检测缓存是否有值
-    NSString *tempOnlineValue = Trim(self.umengTempParams[name]);
-    if ([NSString isNotEmpty:tempOnlineValue]) {
-        return tempOnlineValue;//直接返回内存中的参数值
-    }
-    
-    //1. 针对特定udid的参数
-    if ([NSString isEmpty:tempOnlineValue]) {
-        tempOnlineValue = UMengParamValue(name, self.udid, @"");//s_udid_param
-    }
-    
-    NSArray *versionArray = [NSString splitString:AppVersion byRegex:@"."];
-    if ([versionArray count] < 2) {
-        return @"";
-    }
-    NSString *midVersion = [NSString stringWithFormat:@"%@.%@", versionArray[0], versionArray[1]];
-    NSString *mainVersion = [NSString stringWithFormat:@"%@", versionArray[0]];
-    
-    //2. 检测带渠道名称的参数
-    if ([NSString isEmpty:tempOnlineValue]) {
-        tempOnlineValue = UMengParamValue(name, kAppChannel, AppVersion);//s_AppStore_1_0_0_param
-    }
-    if ([NSString isEmpty:tempOnlineValue]) {
-        tempOnlineValue = UMengParamValue(name, kAppChannel, midVersion);//s_AppStore_1_0_param
-    }
-    if ([NSString isEmpty:tempOnlineValue]) {
-        tempOnlineValue = UMengParamValue(name, kAppChannel, mainVersion);//s_AppStore_1_param
-    }
-    if ([NSString isEmpty:tempOnlineValue]) {
-        tempOnlineValue = UMengParamValue(name, kAppChannel, @"");//s_AppStore_param
-    }
-    
-    //3. 检测不带渠道名称的参数
-    if ([NSString isEmpty:tempOnlineValue]) {
-        tempOnlineValue = UMengParamValue(name, @"", AppVersion);//s_1_0_0_param
-    }
-    if ([NSString isEmpty:tempOnlineValue]) {
-        tempOnlineValue = UMengParamValue(name, @"", midVersion);//s_1_0_param
-    }
-    if ([NSString isEmpty:tempOnlineValue]) {
-        tempOnlineValue = UMengParamValue(name, @"", mainVersion);//s_1_param
-    }
-    if ([NSString isEmpty:tempOnlineValue]) {
-        tempOnlineValue = UMengParamValue(name, @"", @"");//s_param
-    }
-    
-    [self.umengTempParams setValue:tempOnlineValue forKey:name];
-    return tempOnlineValue;
-}
-
-//组装UMeng在线参数名称
-- (NSString *)UMengParamName:(NSString *)name withChannel:(NSString *)channel andVersion:(NSString *)version {
-    ReturnEmptyWhenObjectIsEmpty(name)
-    NSMutableString *tempString = [NSMutableString stringWithString:@"s_"];
-    if ([NSString isNotEmpty:channel]) {
-        [tempString appendFormat:@"%@_", channel];
-    }
-    if ([NSString isNotEmpty:version]) {
-        [tempString appendFormat:@"%@_", [NSString replaceString:version byRegex:@"\\." to:@"_"]];
-    }
-    [tempString appendString:name];
-    return tempString;
 }
 
 @end

@@ -29,7 +29,7 @@
 @property (nonatomic, strong) IBInspectable UIColor *placeholderColor;  //
 @property (nonatomic, strong) IBInspectable UIColor *remainingTextColor;//
 
-//外边可以监听这个属性的变化
+//外面可以监听这个属性的变化
 @property (nonatomic, assign) NSInteger remainingCount;     //剩余字符数
 
 - (BOOL)isValid;            //检测输入内容是否有效

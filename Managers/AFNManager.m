@@ -76,7 +76,7 @@
     requestSuccessed:(RequestSuccessed)requestSuccessed
       requestFailure:(RequestFailure)requestFailure {
     [self   requestByUrl:url withAPI:apiName andArrayParam:arrayParam andDictParam:dictParam andBodyParam:bodyParam imageData:nil customModelClass:[YSCBaseModel class] requestType:requestType
-        requestSuccessed: ^(id responseObject) {
+	    requestSuccessed: ^(id responseObject) {
             YSCBaseModel *baseModel = (YSCBaseModel *)responseObject;
             [baseModel formatProperties];
             if (1 == baseModel.stateInteger) {  //接口访问成功
@@ -171,22 +171,22 @@
       customModelClass:(Class)modelClass
       requestSuccessed:(RequestSuccessed)requestSuccessed
         requestFailure:(RequestFailure)requestFailure {
-    [self requestByUrl:kResPathAppBaseUrl withAPI:apiName andDictParam:dictParam customModelClass:modelClass requestType:RequestTypeGET requestSuccessed:requestSuccessed requestFailure:requestFailure];
+     [self requestByUrl:kResPathAppBaseUrl withAPI:apiName andDictParam:dictParam customModelClass:modelClass requestType:RequestTypeGET requestSuccessed:requestSuccessed requestFailure:requestFailure];
 }
 + (void)postDataWithAPI:(NSString *)apiName
-           andDictParam:(NSDictionary *)dictParam
-       customModelClass:(Class)modelClass
-       requestSuccessed:(RequestSuccessed)requestSuccessed
-         requestFailure:(RequestFailure)requestFailure {
+          andDictParam:(NSDictionary *)dictParam
+      customModelClass:(Class)modelClass
+      requestSuccessed:(RequestSuccessed)requestSuccessed
+        requestFailure:(RequestFailure)requestFailure {
     [self requestByUrl:kResPathAppBaseUrl withAPI:apiName andDictParam:dictParam customModelClass:modelClass requestType:RequestTypePOST requestSuccessed:requestSuccessed requestFailure:requestFailure];
 }
 + (void)requestByUrl:(NSString *)url
              withAPI:(NSString *)apiName
-        andDictParam:(NSDictionary *)dictParam
-    customModelClass:(Class)modelClass
-         requestType:(RequestType)requestType
-    requestSuccessed:(RequestSuccessed)requestSuccessed
-      requestFailure:(RequestFailure)requestFailure {
+          andDictParam:(NSDictionary *)dictParam
+      customModelClass:(Class)modelClass
+           requestType:(RequestType)requestType
+      requestSuccessed:(RequestSuccessed)requestSuccessed
+        requestFailure:(RequestFailure)requestFailure {
     [self requestByUrl:url withAPI:apiName andArrayParam:nil andDictParam:dictParam andBodyParam:nil imageData:nil customModelClass:modelClass requestType:requestType requestSuccessed:requestSuccessed requestFailure:requestFailure];
 }
 
@@ -217,34 +217,34 @@
         return;
     }
     
-    //1. url合法性判断
-    if (![NSString isUrl:url]) {
-        requestFailure(1005, [NSString stringWithFormat:@"传递的url[%@]不合法！", url]);
-        return;
-    }
+	//1. url合法性判断
+	if (![NSString isUrl:url]) {
+		requestFailure(1005, [NSString stringWithFormat:@"传递的url[%@]不合法！", url]);
+		return;
+	}
     
     //2. 组装完整的url地址(去掉url最后的'/'字符,去掉apiName前面的'/'字符     )
     NSString *urlString = [[NSString replaceString:url byRegex:@"/+$" to:@""] stringByAppendingFormat:@"/%@",
                            [NSString replaceString:apiName byRegex:@"^/+" to:@""]];
     
-    //3. 组装数组参数
-    NSMutableString *newUrlString = [NSMutableString stringWithString:urlString];
-    for (NSObject *param in arrayParam) {
-        [newUrlString appendFormat:@"/%@",param];
-    }
+	//3. 组装数组参数
+	NSMutableString *newUrlString = [NSMutableString stringWithString:urlString];
+	for (NSObject *param in arrayParam) {
+		[newUrlString appendFormat:@"/%@",param];
+	}
     
     //4. 格式化所有请求的参数
     NSDictionary *newDictParam = [AppData FormatRequestParams:dictParam];
     NSLog(@"request params=%@", newDictParam);
     
-    //5. 发起网络请求
+	//5. 发起网络请求
     AFHTTPRequestOperationManager *manager = [AFHTTPRequestOperationManager manager];
     manager.responseSerializer = [AFHTTPResponseSerializer serializer];
     manager.requestSerializer.cachePolicy = NSURLRequestReloadIgnoringLocalCacheData;
     manager.requestSerializer.timeoutInterval = kDefaultAFNTimeOut;//设置POST和GET的超时时间
     //解决返回的Content-Type始终是application/xml问题！
     [manager.requestSerializer setValue:@"application/xml" forHTTPHeaderField:@"Accept"];
-    //    [manager.requestSerializer setValue:@"gzip" forHTTPHeaderField:@"Accept-Encoding"];//TODO:压缩上传内容
+//    [manager.requestSerializer setValue:@"gzip" forHTTPHeaderField:@"Accept-Encoding"];//TODO:压缩上传内容
     [manager.requestSerializer setValue:AppVersion forHTTPHeaderField:kParamVersion];
     [manager.requestSerializer setValue:kParamFromValue forHTTPHeaderField:kParamFrom];
     [manager.requestSerializer setValue:[AppData SignatureWithParams:newDictParam] forHTTPHeaderField:kParamSignature];
@@ -323,23 +323,23 @@
     //
     //        return [mutablePairs componentsJoinedByString:@"&"];
     //    }];
-    if (RequestTypeGET == requestType) {
-        NSLog(@"getting data...");
-        [manager   GET:newUrlString
-            parameters:newDictParam
-               success:requestSuccessed1
-               failure:requestFailure1];
-    }
-    else if (RequestTypePOST == requestType) {
-        NSLog(@"posting data...");
-        [manager  POST:newUrlString
-            parameters:newDictParam
-               success:requestSuccessed1
-               failure:requestFailure1];
-    }
-    else if (RequestTypeUploadFile == requestType) {
-        NSLog(@"uploading data...");
-        [manager       POST:newUrlString
+	if (RequestTypeGET == requestType) {
+		NSLog(@"getting data...");
+		[manager   GET:newUrlString
+		    parameters:newDictParam
+		       success:requestSuccessed1
+		       failure:requestFailure1];
+	}
+	else if (RequestTypePOST == requestType) {
+		NSLog(@"posting data...");
+		[manager  POST:newUrlString
+		    parameters:newDictParam
+		       success:requestSuccessed1
+		       failure:requestFailure1];
+	}
+	else if (RequestTypeUploadFile == requestType) {
+		NSLog(@"uploading data...");
+		[manager       POST:newUrlString
                  parameters:newDictParam
   constructingBodyWithBlock: ^(id < AFMultipartFormData > formData) {
       if (imageData) {
@@ -348,7 +348,7 @@
   }
                     success:requestSuccessed1
                     failure:requestFailure1];
-    }
+	}
     else if (RequestTypePostBodyData == requestType) {
         NSLog(@"posting bodydata...");
         NSMutableURLRequest *mutableRequest = [manager.requestSerializer requestWithMethod:@"POST" URLString:newUrlString parameters:nil error:nil];
@@ -363,37 +363,37 @@
                  saveToPath:(NSString *)destPath
            requestSuccessed:(RequestSuccessed)requestSuccessed
              requestFailure:(RequestFailure)requestFailure {
-    NSURLSessionConfiguration *configuration = [NSURLSessionConfiguration defaultSessionConfiguration];
-    AFURLSessionManager *manager = [[AFURLSessionManager alloc] initWithSessionConfiguration:configuration];
+        NSURLSessionConfiguration *configuration = [NSURLSessionConfiguration defaultSessionConfiguration];
+        AFURLSessionManager *manager = [[AFURLSessionManager alloc] initWithSessionConfiguration:configuration];
     NSString *fileName = [NSString stringWithFormat:@"%@.tempfile", [[NSUUID UUID] UUIDString]];
     NSString *downloadToFilePath = [[YSCFileUtils DirectoryPathOfDocuments] stringByAppendingPathComponent:fileName];
-    NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:url]];
-    NSURLSessionDownloadTask *downloadTask = [manager downloadTaskWithRequest:request progress:nil destination:^NSURL *(NSURL *targetPath, NSURLResponse *response) {
-        NSURL *documentsDirectoryURL = [[NSFileManager defaultManager] URLForDirectory:NSDocumentDirectory inDomain:NSUserDomainMask appropriateForURL:nil create:NO error:nil];
-        return [documentsDirectoryURL URLByAppendingPathComponent:fileName];//放在临时目录里的文件
-    } completionHandler:^(NSURLResponse *response, NSURL *filePath, NSError *error) {
-        NSLog(@"File downloaded to: %@", filePath);
-        if (error) {
-            if (requestFailure) {
-                requestFailure(1001, error.description);
-            }
-        }
-        else {
-            BOOL isSuccess = [YSCFileUtils copyFileFromPath:downloadToFilePath toPath:destPath];
-            if (isSuccess) {
-                [YSCFileUtils deleteFileOrDirectory:downloadToFilePath];
-                if (requestSuccessed) {
-                    requestSuccessed(@"下载成功");
+        NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:url]];
+        NSURLSessionDownloadTask *downloadTask = [manager downloadTaskWithRequest:request progress:nil destination:^NSURL *(NSURL *targetPath, NSURLResponse *response) {
+            NSURL *documentsDirectoryURL = [[NSFileManager defaultManager] URLForDirectory:NSDocumentDirectory inDomain:NSUserDomainMask appropriateForURL:nil create:NO error:nil];
+            return [documentsDirectoryURL URLByAppendingPathComponent:fileName];//放在临时目录里的文件
+        } completionHandler:^(NSURLResponse *response, NSURL *filePath, NSError *error) {
+            NSLog(@"File downloaded to: %@", filePath);
+            if (error) {
+                if (requestFailure) {
+                    requestFailure(1001, error.description);
                 }
             }
             else {
-                if (requestFailure) {
-                    requestFailure(1002, @"文件拷贝失败");
+                BOOL isSuccess = [YSCFileUtils copyFileFromPath:downloadToFilePath toPath:destPath];
+                if (isSuccess) {
+                    [YSCFileUtils deleteFileOrDirectory:downloadToFilePath];
+                    if (requestSuccessed) {
+                        requestSuccessed(@"下载成功");
+                    }
+                }
+                else {
+                    if (requestFailure) {
+                        requestFailure(1002, @"文件拷贝失败");
+                    }
                 }
             }
-        }
-    }];
-    [downloadTask resume];
+        }];
+        [downloadTask resume];
 }
 
 @end

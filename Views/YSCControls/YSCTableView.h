@@ -31,7 +31,8 @@ typedef CGFloat (^YSCFloatSetBlock)(NSIndexPath *indexPath);
 //------------------------------------
 @interface YSCTableView : UITableView
 
-@property (nonatomic, assign) BOOL closeResetFontAndConstraint;//关闭YSCBaseViewController中对该view进行缩放
+//关闭YSCBaseViewController中对该view的subview进行缩放
+@property (nonatomic, assign) BOOL closeResetFontAndConstraint;
 
 #pragma mark - 基本属性
 @property (nonatomic, strong) NSMutableArray *headerDataArray;

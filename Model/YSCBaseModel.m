@@ -110,14 +110,14 @@
 }
 + (void)PostByMethod:(NSString *)method params:(NSDictionary *)params block:(YSCObjectResultBlock)block {
     [AFNManager postDataWithAPI:method
-                   andDictParam:params
-                      modelName:[self class]
-               requestSuccessed:^(id responseObjec) {
-                   block(responseObjec, nil);
-               }
-                 requestFailure:^(NSInteger errorCode, NSString *errorMessage) {
-                     block(nil, CreateNSError(errorMessage));
-                 }];
+                  andDictParam:params
+                     modelName:[self class]
+              requestSuccessed:^(id responseObjec) {
+                  block(responseObjec, nil);
+              }
+                requestFailure:^(NSInteger errorCode, NSString *errorMessage) {
+                    block(nil, CreateNSError(errorMessage));
+                }];
 }
 
 //将大写首字母转换为小写
