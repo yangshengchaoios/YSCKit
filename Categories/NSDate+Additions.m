@@ -87,14 +87,14 @@
 #pragma mark Relative Dates
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-+ (NSDate *)dateWithDaysFromNow:(NSUInteger)days {
++ (NSDate *)dateWithDaysFromNow:(NSInteger)days {
 	NSTimeInterval aTimeInterval = [[NSDate date] timeIntervalSinceReferenceDate] + D_DAY * days;
 	NSDate *newDate = [NSDate dateWithTimeIntervalSinceReferenceDate:aTimeInterval];
 	return newDate;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-+ (NSDate *)dateWithDaysBeforeNow:(NSUInteger)days {
++ (NSDate *)dateWithDaysBeforeNow:(NSInteger)days {
 	NSTimeInterval aTimeInterval = [[NSDate date] timeIntervalSinceReferenceDate] - D_DAY * days;
 	NSDate *newDate = [NSDate dateWithTimeIntervalSinceReferenceDate:aTimeInterval];
 	return newDate;
@@ -121,28 +121,28 @@
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-+ (NSDate *)dateWithHoursFromNow:(NSUInteger)dHours {
++ (NSDate *)dateWithHoursFromNow:(NSInteger)dHours {
 	NSTimeInterval aTimeInterval = [[NSDate date] timeIntervalSinceReferenceDate] + D_HOUR * dHours;
 	NSDate *newDate = [NSDate dateWithTimeIntervalSinceReferenceDate:aTimeInterval];
 	return newDate;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-+ (NSDate *)dateWithHoursBeforeNow:(NSUInteger)dHours {
++ (NSDate *)dateWithHoursBeforeNow:(NSInteger)dHours {
 	NSTimeInterval aTimeInterval = [[NSDate date] timeIntervalSinceReferenceDate] - D_HOUR * dHours;
 	NSDate *newDate = [NSDate dateWithTimeIntervalSinceReferenceDate:aTimeInterval];
 	return newDate;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-+ (NSDate *)dateWithMinutesFromNow:(NSUInteger)dMinutes {
++ (NSDate *)dateWithMinutesFromNow:(NSInteger)dMinutes {
 	NSTimeInterval aTimeInterval = [[NSDate date] timeIntervalSinceReferenceDate] + D_MINUTE * dMinutes;
 	NSDate *newDate = [NSDate dateWithTimeIntervalSinceReferenceDate:aTimeInterval];
 	return newDate;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-+ (NSDate *)dateWithMinutesBeforeNow:(NSUInteger)dMinutes {
++ (NSDate *)dateWithMinutesBeforeNow:(NSInteger)dMinutes {
 	NSTimeInterval aTimeInterval = [[NSDate date] timeIntervalSinceReferenceDate] - D_MINUTE * dMinutes;
 	NSDate *newDate = [NSDate dateWithTimeIntervalSinceReferenceDate:aTimeInterval];
 	return newDate;
@@ -271,38 +271,38 @@
 #pragma mark Adjusting Dates
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-- (NSDate *)dateByAddingDays:(NSUInteger)dDays {
+- (NSDate *)dateByAddingDays:(NSInteger)dDays {
 	NSTimeInterval aTimeInterval = [self timeIntervalSinceReferenceDate] + D_DAY * dDays;
 	NSDate *newDate = [NSDate dateWithTimeIntervalSinceReferenceDate:aTimeInterval];
 	return newDate;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-- (NSDate *)dateBySubtractingDays:(NSUInteger)dDays {
+- (NSDate *)dateBySubtractingDays:(NSInteger)dDays {
 	return [self dateByAddingDays:(dDays * -1)];
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-- (NSDate *)dateByAddingHours:(NSUInteger)dHours {
+- (NSDate *)dateByAddingHours:(NSInteger)dHours {
 	NSTimeInterval aTimeInterval = [self timeIntervalSinceReferenceDate] + D_HOUR * dHours;
 	NSDate *newDate = [NSDate dateWithTimeIntervalSinceReferenceDate:aTimeInterval];
 	return newDate;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-- (NSDate *)dateBySubtractingHours:(NSUInteger)dHours {
+- (NSDate *)dateBySubtractingHours:(NSInteger)dHours {
 	return [self dateByAddingHours:(dHours * -1)];
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-- (NSDate *)dateByAddingMinutes:(NSUInteger)dMinutes {
+- (NSDate *)dateByAddingMinutes:(NSInteger)dMinutes {
 	NSTimeInterval aTimeInterval = [self timeIntervalSinceReferenceDate] + D_MINUTE * dMinutes;
 	NSDate *newDate = [NSDate dateWithTimeIntervalSinceReferenceDate:aTimeInterval];
 	return newDate;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-- (NSDate *)dateBySubtractingMinutes:(NSUInteger)dMinutes {
+- (NSDate *)dateBySubtractingMinutes:(NSInteger)dMinutes {
 	return [self dateByAddingMinutes:(dMinutes * -1)];
 }
 
@@ -611,22 +611,39 @@
     return [date stringWithFormat:toFormat];
 }
 
+//计算两个时间点之间的距离（方法一）
+//优势：可以自定义components
 + (NSDateComponents *)ComponentsBetweenStartDate:(NSDate *)startDate withEndDate:(NSDate *)endDate {
-    return [self ComponentsBetweenStartDate:startDate withEndDate:endDate
+    return [self ComponentsBetweenStartDate:startDate
+                                withEndDate:endDate
                              withComponents:NSCalendarUnitDay | NSCalendarUnitHour | NSCalendarUnitMinute | NSCalendarUnitSecond];
 }
 + (NSDateComponents *)ComponentsBetweenStartDate:(NSDate *)startDate withEndDate:(NSDate *)endDate withComponents:(NSCalendarUnit)unitFlags {
-    //方法一：使用NSDateComponents
+    if ([startDate isLaterThanDate:endDate]) {
+        return nil;
+    }
     return [[NSCalendar currentCalendar] components:unitFlags fromDate:startDate toDate:endDate options:0];
 }
-+ (NSDateComponents *)ComponentsRemainInterval:(NSTimeInterval)remainInterval withComponents:(NSCalendarUnit)unitFlags {
+
+//计算两个时间点之间的距离（方法二）
+//缺陷：最多只能计算到天数
++ (NSDateComponents *)ComponentsBetweenStartDate1:(NSDate *)startDate withEndDate:(NSDate *)endDate {
+    if ([startDate isLaterThanDate:endDate]) {
+        return nil;
+    }
+    return [self ComponentsRemainInterval:[endDate timeIntervalSinceDate:startDate]];
+}
++ (NSDateComponents *)ComponentsRemainInterval:(NSTimeInterval)remainInterval {
+    NSCalendarUnit unitFlags = NSCalendarUnitDay | NSCalendarUnitHour | NSCalendarUnitMinute | NSCalendarUnitSecond;
     NSDateComponents *components = [NSDateComponents new];
+    components.year = 0;
+    components.month = 0;
     components.day = 0;
     components.hour = 0;
     components.minute = 0;
     components.second = 0;
     
-    //方法二：计算间隔时间是根据从零时间点(1970-01-01)开始的NSDate对象(效率最低！)
+    //方法一：计算间隔时间是根据从零时间点(1970-01-01)开始的NSDate对象(效率最低！)
 //    NSDate *sinceDate = [NSDate dateFromString:@"1970-01-01" withFormat:@"yyyy-MM-dd"];
 //    NSDate *tempDate = [NSDate dateWithTimeInterval:remainTimeInterval sinceDate:sinceDate];//NOTE:dateWithTimeIntervalSince1970会有时差问题
 //    NSInteger day = [tempDate daysAfterDate:sinceDate];//NOTE:这里不能用tempDate.day
@@ -634,13 +651,14 @@
 //    NSInteger minute = tempDate.minute;
 //    NSInteger second = tempDate.seconds;
     
-    //方法三：最直接的方法(效率最高！)
+    //方法二：最直接的方法(效率最高！)
     NSInteger day = (NSInteger)(remainInterval / D_DAY);
     NSInteger hour = (NSInteger)(remainInterval / D_HOUR) - 24 * day;
     NSInteger minute = (NSInteger)(remainInterval / D_MINUTE) - 60 * hour - 24 * 60 * day;
     NSInteger second = (NSInteger)remainInterval - 60 * minute - 60 * 60 * hour - 24 * 60 * 60 * day;
     
     //--------------------设置components START----------------------------------------
+    
     //设置day
     if (NSDayCalendarUnit == (NSDayCalendarUnit & unitFlags)) {
         [components setDay:day];
@@ -692,14 +710,87 @@
     }
     //--------------------设置components END----------------------------------------
     
-    //方法四：重用
-//    NSDate *startDate = [NSDate date];
-//    NSDate *endDate = [NSDate dateWithTimeInterval:remainTimeInterval sinceDate:startDate];
-//    components = [NSDate ComponentsBetweenStartDate:startDate withEndDate:endDate withComponents:unitFlags];
-    
     return components;
 }
 
-#pragma mark - private methods
 
+#pragma mark - 过去了多长时间
+/**
+ *  1. 如果>=0s  && <60s  返回   '刚刚'
+ *  2. 如果>=1m  && <60m  返回   'x分钟前'
+ *  3. 如果>=1h  && <24h  返回   'x小时之前'
+ *  4. 如果>=1d  && <30d  返回   'x天之前'
+ *  5. 如果>=30d && <365d 返回   'M月d日'
+ *  6. 如果>=365d         返回   'yyyy年M月d日'
+ */
++ (NSString *)TimePassedByStartDate:(NSDate *)startDate {
+    ReturnEmptyWhenObjectIsEmpty(startDate);
+    return [self TimePassedByStartTimeStamp:startDate.timeStamp];
+}
++ (NSString *)TimePassedByStartTimeStamp:(NSString *)timeStamp {
+    NSDate *startDate= [NSDate dateFromTimeStamp:timeStamp];
+    NSDate *endDate = [NSDate date];//TODO:服务器时间
+    ReturnEmptyWhenObjectIsEmpty(startDate);
+    //异常时间处理
+    if ([startDate isLaterThanDate:endDate]) {
+        return [startDate stringWithFormat:DateFormat5];
+    }
+    NSDateComponents *dateComponents = [NSDate ComponentsBetweenStartDate1:startDate withEndDate:endDate];
+    //如果>=365d
+    if (dateComponents.day >= 365) {
+        return [startDate stringWithFormat:DateFormat5];
+    }
+    //如果>=30d && <365d
+    if (dateComponents.day >= 30 && dateComponents.day < 365) {
+        return [startDate stringWithFormat:@"M月d日"];
+    }
+    //如果>=1d  && <30d
+    if (dateComponents.day >= 1 && dateComponents.day < 30) {
+        return [NSString stringWithFormat:@"%ld天前", (long)dateComponents.day];
+    }
+    //如果>=1h  && <24h
+    if (dateComponents.hour >= 1 && dateComponents.hour < 24) {
+        return [NSString stringWithFormat:@"%ld小时前", (long)dateComponents.hour];
+    }
+    //如果>=1m  && <60m
+    if (dateComponents.minute >= 1 && dateComponents.minute < 60) {
+        return [NSString stringWithFormat:@"%ld分钟前", (long)dateComponents.minute];
+    }
+    return @"刚刚";//1分钟以内
+}
+
+#pragma mark - 还剩多长时间
++ (NSString *)TimeRemainByEndDate:(NSDate *)endDate {
+    ReturnEmptyWhenObjectIsEmpty(endDate);
+    return [self TimeRemainByEndTimeStamp:endDate.timeStamp];
+}
++ (NSString *)TimeRemainByEndTimeStamp:(NSString *)timeStamp {
+    NSDate *startDate= [NSDate date];//TODO:服务器时间
+    NSDate *endDate = [NSDate dateFromTimeStamp:timeStamp];
+    ReturnEmptyWhenObjectIsEmpty(endDate);
+    //异常时间处理
+    if ([startDate isLaterThanDate:endDate]) {
+        return @"过时";
+    }
+    NSDateComponents *dateComponents = [NSDate ComponentsBetweenStartDate:startDate withEndDate:endDate withComponents:NSCalendarUnitYear | NSCalendarUnitMonth | NSCalendarUnitDay | NSCalendarUnitHour | NSCalendarUnitMinute | NSCalendarUnitSecond];
+    if (dateComponents.year >= 1) {
+        return [NSString stringWithFormat:@"还剩%ld年", (long)dateComponents.year];
+    }
+    if (dateComponents.month >= 1) {
+        return [NSString stringWithFormat:@"还剩%ld个月", (long)dateComponents.month];
+    }
+    if (dateComponents.day >= 1) {
+        return [NSString stringWithFormat:@"还剩%ld天", (long)dateComponents.day];
+    }
+    if (dateComponents.hour >= 1) {
+        return [NSString stringWithFormat:@"还剩%ld小时", (long)dateComponents.hour];
+    }
+    if (dateComponents.minute >= 1) {
+        return [NSString stringWithFormat:@"还剩%ld分钟", (long)dateComponents.minute];
+    }
+    if (dateComponents.second >= 1) {
+        return [NSString stringWithFormat:@"还剩%ld秒", (long)dateComponents.second];
+    }
+    return @"过时";
+}
 @end

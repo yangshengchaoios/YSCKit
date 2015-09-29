@@ -26,9 +26,10 @@
 
 
 #define D_MINUTE    60
-#define D_HOUR      3600
-#define D_DAY       86400
-#define D_WEEK      604800
+#define D_HOUR      (60 * D_MINUTE)
+#define D_DAY       (24 * D_HOUR)
+#define D_WEEK      (7 * D_DAY)
+#define D_MONTH     (30 * D_DAY)
 #define D_YEAR      31556926
 
 @interface NSDate (Additions)
@@ -50,12 +51,12 @@
 + (NSDate *)dateTomorrow;
 + (NSDate *)dateYesterday;
 + (NSDate *)dateBeforeYesterday;
-+ (NSDate *)dateWithDaysFromNow:(NSUInteger)days;
-+ (NSDate *)dateWithDaysBeforeNow:(NSUInteger)days;
-+ (NSDate *)dateWithHoursFromNow:(NSUInteger)dHours;
-+ (NSDate *)dateWithHoursBeforeNow:(NSUInteger)dHours;
-+ (NSDate *)dateWithMinutesFromNow:(NSUInteger)dMinutes;
-+ (NSDate *)dateWithMinutesBeforeNow:(NSUInteger)dMinutes;
++ (NSDate *)dateWithDaysFromNow:(NSInteger)days;
++ (NSDate *)dateWithDaysBeforeNow:(NSInteger)days;
++ (NSDate *)dateWithHoursFromNow:(NSInteger)dHours;
++ (NSDate *)dateWithHoursBeforeNow:(NSInteger)dHours;
++ (NSDate *)dateWithMinutesFromNow:(NSInteger)dMinutes;
++ (NSDate *)dateWithMinutesBeforeNow:(NSInteger)dMinutes;
 
 // convert to date
 + (NSDate *)dateFromTimeStamp:(NSString *)timeStamp;
@@ -80,12 +81,12 @@
 - (BOOL)isLaterThanDate:(NSDate *)aDate;
 
 // Adjusting dates
-- (NSDate *)dateByAddingDays:(NSUInteger)dDays;
-- (NSDate *)dateBySubtractingDays:(NSUInteger)dDays;
-- (NSDate *)dateByAddingHours:(NSUInteger)dHours;
-- (NSDate *)dateBySubtractingHours:(NSUInteger)dHours;
-- (NSDate *)dateByAddingMinutes:(NSUInteger)dMinutes;
-- (NSDate *)dateBySubtractingMinutes:(NSUInteger)dMinutes;
+- (NSDate *)dateByAddingDays:(NSInteger)dDays;
+- (NSDate *)dateBySubtractingDays:(NSInteger)dDays;
+- (NSDate *)dateByAddingHours:(NSInteger)dHours;
+- (NSDate *)dateBySubtractingHours:(NSInteger)dHours;
+- (NSDate *)dateByAddingMinutes:(NSInteger)dMinutes;
+- (NSDate *)dateBySubtractingMinutes:(NSInteger)dMinutes;
 - (NSDate *)dateAtStartOfDay;
 
 // Retrieving intervals
@@ -96,11 +97,6 @@
 - (NSInteger)daysAfterDate:(NSDate *)aDate;
 - (NSInteger)daysBeforeDate:(NSDate *)aDate;
 
-+ (NSDateComponents *)ComponentsBetweenStartDate:(NSDate *)startDate withEndDate:(NSDate *)endDate;
-// Calculte interval between two dates (NSDayCalendarUnit | NSHourCalendarUnit | NSMinuteCalendarUnit | NSSecondCalendarUnit)
-+ (NSDateComponents *)ComponentsBetweenStartDate:(NSDate *)startDate withEndDate:(NSDate *)endDate withComponents:(NSCalendarUnit)unitFlags;
-+ (NSDateComponents *)ComponentsRemainInterval:(NSTimeInterval)remainInterval withComponents:(NSCalendarUnit)unitFlags;
-
 // format the date to string
 - (NSString *)chineseWeekDay;
 - (NSString *)timeStamp;
@@ -109,5 +105,21 @@
 - (NSString *)constellation;//星座
 + (NSString *)StringFromTimeStamp:(NSString *)timeStamp withFormat:(NSString *)format;
 + (NSString *)ConvertDateString:(NSString *)dataString fromFormat:(NSString *)fromFormat toFormat:(NSString *)toFormat;
+
+//计算两个时间点之间的距离（方法一）
+//优势：可以自定义components
++ (NSDateComponents *)ComponentsBetweenStartDate:(NSDate *)startDate withEndDate:(NSDate *)endDate;
++ (NSDateComponents *)ComponentsBetweenStartDate:(NSDate *)startDate withEndDate:(NSDate *)endDate withComponents:(NSCalendarUnit)unitFlags;
+//计算两个时间点之间的距离（方法二）
+//缺陷：最多只能计算到天数
++ (NSDateComponents *)ComponentsBetweenStartDate1:(NSDate *)startDate withEndDate:(NSDate *)endDate;
+
+//过去了多长时间
++ (NSString *)TimePassedByStartDate:(NSDate *)startDate;
++ (NSString *)TimePassedByStartTimeStamp:(NSString *)timeStamp;
+
+//还剩多长时间
++ (NSString *)TimeRemainByEndDate:(NSDate *)endDate;
++ (NSString *)TimeRemainByEndTimeStamp:(NSString *)timeStamp;
 
 @end

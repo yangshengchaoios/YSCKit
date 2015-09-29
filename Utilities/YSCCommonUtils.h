@@ -88,12 +88,6 @@
 + (int)SqliteGetRows:(NSString *)sql;
 + (int)SqliteGetRows:(NSString *)sql dbPath:(NSString *)dbPath;
 
-
-#pragma mark - 过去了多长时间 + 还剩多少时间
-+ (NSString *)TimePassed:(NSString *)timeStamp;
-+ (NSString *)TimeRemain:(NSString *)timeStamp;
-+ (NSString *)TimeRemain:(NSString *)timeStamp currentTime:(NSString *)currentTime;
-
 #pragma mark - NSURL获取参数
 + (NSDictionary *)GetParamsInNSURL:(NSURL *)url;
 + (NSDictionary *)GetParamsInQueryString:(NSString *)queryString;
