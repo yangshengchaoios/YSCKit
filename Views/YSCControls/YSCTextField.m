@@ -38,6 +38,7 @@
 - (void)setup {
     //设置参数默认值
     self.textType = YSCTextTypeProperty;
+    self.minLength = 0;
     self.maxLength = 20;
     self.allowsEmpty = NO;
     self.allowsEmoji = NO;
@@ -118,7 +119,7 @@
 }
 //只检测配置属性 ok -> err
 - (BOOL)isValidByProperty {
-    if (self.maxLength > 0 && [self.text length] > self.maxLength) {
+    if (self.maxLength > 0 && [self.text StringLength] > self.maxLength) {
         return NO;
     }
     if (isEmpty(self.text)) {
@@ -184,7 +185,11 @@
         if (isEmpty(self.text)) {
             return self.allowsEmpty;
         }
-        //1.2 根据property属性校验
+        //1.2 最小值判断
+        if (self.minLength > 0 && [self textLength] < self.minLength) {
+            return NO;
+        }
+        //1.3 根据property属性校验
         return [self isValidByProperty];
     }
     //3. 根据内置正则表达式来校验
@@ -258,7 +263,7 @@
 }
 //返回去掉首位空格后的字符串的长度
 - (NSInteger)textLength {
-    return [[self textString] length];
+    return [[self textString] StringLength];
 }
 //输入text的时候过滤非法内容
 - (void)filterText:(NSString *)text {

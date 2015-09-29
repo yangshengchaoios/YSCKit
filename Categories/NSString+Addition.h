@@ -39,9 +39,6 @@
 
 /**
  *  除了三个条件(1-是否为nil 2-是否为NSNull 3-长度是否为0)外，还考虑了是否全部是空格的情况
- *
- *  @param string 要判断的字符串
- *
  *  @return YES/NO
  */
 + (BOOL)isEmptyConsiderWhitespace:(NSString *)string;
@@ -65,10 +62,6 @@
 #pragma mark - 字符串比较
 /**
  *  比较两个版本号的大小
- *
- *  @param versionString1 1.2.1
- *  @param versionString2 1.2.2
- *
  *  @return -1:version1小  0:两者相等  1:version1大
  */
 + (VersionCompareResult)compareBetweenVersion:(NSString *)version1 withVersion:(NSString *)version2;
@@ -83,22 +76,15 @@
 - (NSObject *)jsonObjectOfString;
 //将id对象转换成json字符串
 + (NSString *)jsonStringWithObject:(id)object;
-/**
- *  把符合pattern正则表达式的字符串替换成toString (默认是大小写敏感的)
- *
- *  @param string   原始字符串
- *  @param pattern  正则表达式
- *  @param toString 用来替换的新字符串
- *
- *  @return 变化后的新字符串
- */
+//把符合pattern正则表达式的字符串替换成toString (默认是大小写敏感的)
 + (NSString *)replaceString:(NSString *)string byRegex:(NSString *)pattern to:(NSString *)toString;
 + (NSString *)replaceString:(NSString *)string byRegex:(NSString *)pattern to:(NSString *)toString options:(NSRegularExpressionOptions)options;
 - (NSString *)replaceByRegex:(NSString *)pattern to:(NSString *)toString options:(NSRegularExpressionOptions)options;
+//计算字符串的长度（1个英文字母为1个字节，1个汉字为2个字节）
++ (NSInteger)StringLength:(NSString *)string;
+- (NSInteger)StringLength;
 
-/**
- * 移除字符串最后一个字符
- */
+//移除字符串最后一个字符
 + (NSString *)removeLastCharOfString:(NSString *)string;
 - (NSString *)removeLastChar;
 + (void)removeLastCharOfMutableString:(NSMutableString *)mutableString;
@@ -108,25 +94,11 @@
 - (NSString *)toPinYin;
 
 #pragma mark - 字符串分解
-/**
- *  根据分隔符切分字符串为数组 (默认是大小写敏感的)
- *
- *  @param string    待分解的字符串
- *  @param separator 分隔符
- *
- *  @return 分隔后的数组
- */
+//根据分隔符切分字符串为数组 (默认是大小写敏感的)
 + (NSArray *)splitString:(NSString *)string byRegex:(NSString *)pattern;
 + (NSArray *)splitString:(NSString *)string byRegex:(NSString *)pattern options:(NSRegularExpressionOptions)options;
 - (NSArray *)splitByRegex:(NSString *)pattern options:(NSRegularExpressionOptions)options;
-/**
- *  返回匹配regex的数组 (默认是大小写敏感的)
- *
- *  @param string  要匹配的字符串
- *  @param pattern regex表达式
- *
- *  @return 结果数组
- */
+//返回匹配regex的数组 (默认是大小写敏感的)
 + (NSArray *)matchesInString:(NSString *)string byRegex:(NSString *)pattern;
 + (NSArray *)matchesInString:(NSString *)string byRegex:(NSString *)pattern options:(NSRegularExpressionOptions)options;
 - (NSArray *)matchesByRegex:(NSString *)pattern options:(NSRegularExpressionOptions)options;

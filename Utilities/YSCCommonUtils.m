@@ -222,38 +222,15 @@
 
 
 #pragma mark 格式化金额
-
-/**
- *  常用的价格字符串格式化方法（默认：显示￥、显示小数点）
- *
- *  @param price 价格参数
- *
- *  @return
- */
+//常用的价格字符串格式化方法（默认：显示￥、显示小数点）
 + (NSString *)formatPrice:(NSNumber *)price {
     return [self formatPrice:price showMoneyTag:YES showDecimalPoint:YES useUnit:NO];
 }
-
-/**
- *  常用的价格字符串格式化方法（默认：显示￥、显示小数点、显示元）
- *
- *  @param price
- *
- *  @return
- */
+//常用的价格字符串格式化方法（默认：显示￥、显示小数点、显示元）
 + (NSString *)formatPriceWithUnit:(NSNumber *)price {
     return [self formatPrice:price showMoneyTag:YES showDecimalPoint:YES useUnit:YES];
 }
-
-/**
- *  格式化价格字符串输出
- *
- *  @param price     价格
- *  @param useTag    是否显示￥
- *  @param isDecimal 是否显示小数点
- *
- *  @return 组装好的字符串
- */
+//格式化价格字符串输出
 + (NSString *)formatPrice:(NSNumber *)price showMoneyTag:(BOOL)isTagUsed showDecimalPoint:(BOOL) isDecimal useUnit:(BOOL)isUnitUsed {
     NSString *formatedPrice = @"";
     //是否保留2位小数
@@ -308,7 +285,6 @@
 
 
 #pragma mark 打电话
-
 + (void)MakeCall:(NSString *)phoneNumber {
     [self MakeCall:phoneNumber success:nil];
 }
@@ -335,7 +311,6 @@
 }
 
 #pragma mark - 打开APP的设置并进入隐私界面
-
 + (void)OpenPrivacyOfSetting {
     UIAlertView *alertView = [UIAlertView bk_alertViewWithTitle:@"位置服务不可用"
                                                         message:@"请在设置页面打开位置服务，否则在本应用中与定位相关的功能将不可用。"];
@@ -347,7 +322,6 @@
 }
 
 #pragma makr - Sqlite操作
-
 + (BOOL)SqliteUpdate:(NSString *)sql {
     return [self SqliteUpdate:sql dbPath:DBRealPath];
 }
@@ -393,7 +367,6 @@
 }
 
 #pragma mark - NSURL获取参数
-
 + (NSDictionary *)GetParamsInNSURL:(NSURL *)url {
     ReturnNilWhenObjectIsEmpty(url)
     return [self GetParamsInQueryString:url.query];
@@ -420,7 +393,6 @@
 }
 
 #pragma mark - UIButton添加pop动画
-
 + (void)addPopAnimationToButton:(UIButton *)button {
 //    [button bk_addEventHandler:^(id sender) {
 //        POPBasicAnimation *scaleAnimation = [POPBasicAnimation animationWithPropertyNamed:kPOPLayerScaleXY];
@@ -442,7 +414,6 @@
 }
 
 #pragma mark - AES加密解密(与java调通)
-
 + (NSString *)AESEncryptString:(NSString *)string byKey:(NSString *)key {
     CCCryptorStatus status = kCCSuccess;
     NSData* result = [[string dataUsingEncoding:NSUTF8StringEncoding]

@@ -34,38 +34,16 @@
 + (void)checkNewVersionByAppleId:(NSString *)appleId;
 
 + (void)configNavigationBar;
-
 + (void)configUmeng;
 + (void)configUmengPushWithOptions:(NSDictionary *)launchOptions;
 + (void)registerForRemoteNotification;
 
 #pragma mark - 格式化金额
-
-/**
- *  常用的价格字符串格式化方法（默认：显示￥、显示小数点）
- *
- *  @param price 价格参数
- *
- *  @return
- */
+//常用的价格字符串格式化方法（默认：显示￥、显示小数点）
 + (NSString *)formatPrice:(NSNumber *)price;
-/**
- *  常用的价格字符串格式化方法（默认：显示￥、显示小数点、显示元）
- *
- *  @param price
- *
- *  @return
- */
+//常用的价格字符串格式化方法（默认：显示￥、显示小数点、显示元）
 + (NSString *)formatPriceWithUnit:(NSNumber *)price;
-/**
- *  格式化价格字符串输出
- *
- *  @param price     价格
- *  @param useTag    是否显示￥
- *  @param isDecimal 是否显示小数点
- *
- *  @return 组装好的字符串
- */
+//格式化价格字符串输出
 + (NSString *)formatPrice:(NSNumber *)price showMoneyTag:(BOOL)isTagUsed showDecimalPoint:(BOOL) isDecimal useUnit:(BOOL)isUnitUsed;
 //规范化floatValue：如果有小数点才显示两位，否则就不显示小数点
 + (NSString *)formatFloatValue:(CGFloat)value;

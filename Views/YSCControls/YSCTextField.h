@@ -43,6 +43,7 @@ typedef NS_ENUM(NSInteger, YSCTextType) {
 
 @property (nonatomic, assign) IBInspectable YSCTextType textType;       //default YSCTextTypeProperty
 //控制内容
+@property (nonatomic, assign) IBInspectable NSInteger minLength;        //default 0 means no limit
 @property (nonatomic, assign) IBInspectable NSInteger maxLength;        //default 20, -1 means no limit
 @property (nonatomic, strong) IBInspectable NSString *customRegex;      //default nil
 @property (nonatomic, assign) IBInspectable BOOL allowsEmpty;           //default NO

@@ -209,10 +209,55 @@
     }
     return [[expression stringByReplacingMatchesInString:self options:0 range:NSMakeRange(0, [self length]) withTemplate:toString] trimString];
 }
+//计算字符串的长度（1个英文字母为1个字节，1个汉字为2个字节）
++ (NSInteger)StringLength:(NSString *)string {
+    ReturnZeroWhenObjectIsEmpty(string);
+    return [string StringLength];
+}
+- (NSInteger)StringLength {
+//    //方法一：有的汉字长度为1，如 '开'
+//    int strlength = 0;
+//    char* p = (char*)[self cStringUsingEncoding:NSUnicodeStringEncoding];
+//    for (int i=0 ; i<[self lengthOfBytesUsingEncoding:NSUnicodeStringEncoding] ;i++) {
+//        if (*p) {
+//            p++;
+//            strlength++;
+//        }
+//        else {
+//            p++;
+//        }
+//    }
+//    return strlength;
+//    
+//    //方法二：有的汉字长度为1，如 '开'
+//    NSUInteger words = 0;
+//    NSScanner *scanner = [NSScanner scannerWithString:self];
+//    
+//    // Look for spaces, tabs and newlines
+//    NSCharacterSet *whiteSpace = [NSCharacterSet whitespaceAndNewlineCharacterSet];
+//    while ([scanner scanUpToCharactersFromSet:whiteSpace intoString:nil])
+//        words++;
+//    return words;
+    
+    //方法三：暂时没有发现汉字计算错误的情况
+    int l = 0,a = 0,b = 0;
+    unichar c;
+    for(int i = 0; i < [self length]; i++){
+        c = [self characterAtIndex:i];
+        if(isblank(c)) {
+            b++;
+        }
+        else if(isascii(c)) {
+            a++;
+        }
+        else {
+            l++;
+        }
+    }
+    return 2 * l + (a + b);
+}
 
-/**
- * 移除字符串最后一个字符
- */
+//移除字符串最后一个字符
 + (NSString *)removeLastCharOfString:(NSString *)string {
     ReturnEmptyWhenObjectIsEmpty(string)
     return [string removeLastChar];
@@ -632,6 +677,9 @@
 }
 
 @end
+
+
+
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

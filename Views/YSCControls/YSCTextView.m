@@ -132,12 +132,12 @@
                 textView.text = self.oldString;
             }
         }
-        self.remainingCount = self.maxLength - [self.text length];
+        self.remainingCount = self.maxLength - [self.text StringLength];
     }
 }
 //只检测配置属性 ok -> err
 - (BOOL)isValidByProperty {
-    if (self.maxLength > 0 && [self.text length] > self.maxLength) {
+    if (self.maxLength > 0 && [self.text StringLength] > self.maxLength) {
         return NO;
     }
     if (isEmpty(self.text)) {
@@ -268,7 +268,7 @@
 }
 //返回去掉首位空格后的字符串的长度
 - (NSInteger)textLength {
-    return [[self textString] length];
+    return [[self textString] StringLength];
 }
 //输入text的时候过滤非法内容
 - (void)filterText:(NSString *)text {
