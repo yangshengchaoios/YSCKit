@@ -141,7 +141,10 @@ return _sharedObject;
 
 #ifndef WeakSelfType
     #define WeakSelfType __weak __typeof(&*self)
-    #define WEAKSELF  WeakSelfType weakSelf = self;
+#endif
+
+#ifndef WEAKSELF
+    #define WEAKSELF WeakSelfType weakSelf = self;
 #endif
 
 /**
