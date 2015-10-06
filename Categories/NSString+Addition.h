@@ -124,20 +124,24 @@
 #pragma mark - AES加密解密(标准的)
 + (NSString *)AESEncrypt:(NSString *)string;
 - (NSString *)AESEncryptString;
-+ (NSString *)AESEncrypt:(NSString *)string useKey:(NSString *)key;
++ (NSString *)AESEncrypt:(NSString *)string byKey:(NSString *)key;
 
 + (NSString *)AESDecrypt:(NSString *)string;
 - (NSString *)AESDecryptString;
-+ (NSString *)AESDecrypt:(NSString *)string useKey:(NSString *)key;
++ (NSString *)AESDecrypt:(NSString *)string byKey:(NSString *)key;
+
+#pragma mark - AES加密解密(与java调通)
++ (NSString *)AESEncrypt1:(NSString *)string byKey:(NSString *)key;
++ (NSString *)AESDecrypt1:(NSString *)string byKey:(NSString *)key;
 
 #pragma mark - DES加密解密
 + (NSString *)DESEncrypt:(NSString *)string;
 - (NSString *)DESEncryptString;
-+ (NSString *)DESEncrypt:(NSString *)string useKey:(NSString *)key;
++ (NSString *)DESEncrypt:(NSString *)string byKey:(NSString *)key;
 
 + (NSString *)DESDecrypt:(NSString *)string;
 - (NSString *)DESDecryptString;
-+ (NSString *)DESDecrypt:(NSString *)string useKey:(NSString *)key;
++ (NSString *)DESDecrypt:(NSString *)string byKey:(NSString *)key;
 
 
 #pragma mark - RSA加密解密

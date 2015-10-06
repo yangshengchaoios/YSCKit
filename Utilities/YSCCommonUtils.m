@@ -7,8 +7,6 @@
 //
 
 #import "YSCCommonUtils.h"
-#import <CommonCrypto/CommonCrypto.h>
-#import "NSData+CommonCrypto.h"
 #import <SystemConfiguration/CaptiveNetwork.h>
 
 @implementation YSCCommonUtils
@@ -137,71 +135,6 @@
     [[UIBarButtonItem appearance] setTitleTextAttributes:@{NSForegroundColorAttributeName : kDefaultNaviBarItemColor,
                                                            NSFontAttributeName : kDefaultNaviBarItemFont}
                                                 forState:UIControlStateNormal];
-}
-+ (void)configUmeng {
-#pragma mark - 设置UMeng应用的key
-//    [MobClick setAppVersion:AppVersion];
-//    [UMSocialData openLog:NO];//是否打开调试日志输出
-//    [UMFeedback setLogEnabled:NO];
-//    [MobClick startWithAppkey:kUMAppKey reportPolicy:REALTIME channelId:kAppChannel];//配置统计
-//    [UMSocialData setAppKey:kUMAppKey];//设置友盟社会化组件
-//    [UMFeedback checkWithAppkey:kUMAppKey];//配置用户反馈
-    
-#pragma mark - 分享相关设置
-    
-    //设置支持没有客户端情况下是否支持单独授权
-//    [UMSocialQQHandler setSupportWebView:YES];
-    
-    //设置微信AppId，设置分享url，默认使用友盟的网址
-//    [UMSocialWechatHandler setWXAppId:AppKeyWeiXin appSecret:AppSecretWeiXin url:AppRedirectUrlOfWeibo];
-    
-    //打开新浪微博的SSO开关
-//    [UMSocialSinaHandler openSSOWithRedirectURL:AppRedirectUrlOfWeibo];
-    
-    //设置分享到QQ/Qzone的应用Id，和分享url 链接
-//    [UMSocialQQHandler setQQWithAppId:AppKeyQQ appKey:AppSecretQQ url:AppRedirectUrlOfWeibo];
-    
-    //NOTE:打开腾讯微博SSO开关，设置回调地址 只支持32位
-//    [UMSocialTencentWeiboHandler openSSOWithRedirectUrl:AppRedirectUrlOfWeibo];
-}
-+ (void)configUmengPushWithOptions:(NSDictionary *)launchOptions {
-//    [UMessage startWithAppkey:kUMAppKey launchOptions:launchOptions];
-//    [UMessage setLogEnabled:NO];
-//    
-//#if __IPHONE_OS_VERSION_MAX_ALLOWED >= _IPHONE80_
-//    if(IOS8_OR_LATER) { //register remoteNotification types
-//        UIMutableUserNotificationAction *action1 = [[UIMutableUserNotificationAction alloc] init];
-//        action1.identifier = @"identifier_accept";
-//        action1.title = @"打开";
-//        action1.activationMode = UIUserNotificationActivationModeForeground;//当点击的时候启动程序
-//        
-//        UIMutableUserNotificationAction *action2 = [[UIMutableUserNotificationAction alloc] init];  //第二按钮
-//        action2.identifier = @"identifier_reject";
-//        action2.title = @"拒绝";
-//        action2.activationMode = UIUserNotificationActivationModeBackground;//当点击的时候不启动程序，在后台处理
-//        action2.authenticationRequired = YES;//需要解锁才能处理，如果action.activationMode = UIUserNotificationActivationModeForeground;则这个属性被忽略；
-//        action2.destructive = YES;
-//        
-//        UIMutableUserNotificationCategory *categorys = [[UIMutableUserNotificationCategory alloc] init];
-//        categorys.identifier = @"category1";//这组动作的唯一标示
-//        [categorys setActions:@[action1,action2] forContext:(UIUserNotificationActionContextDefault)];
-//        
-//        UIUserNotificationSettings *userSettings = [UIUserNotificationSettings settingsForTypes:UIUserNotificationTypeBadge|UIUserNotificationTypeSound|UIUserNotificationTypeAlert
-//                                                                                     categories:[NSSet setWithObject:categorys]];
-//        [UMessage registerRemoteNotificationAndUserNotificationSettings:userSettings];
-//    }
-//    else { //register remoteNotification types
-//        [UMessage registerForRemoteNotificationTypes:UIRemoteNotificationTypeBadge
-//         |UIRemoteNotificationTypeSound
-//         |UIRemoteNotificationTypeAlert];
-//    }
-//#else
-//    //register remoteNotification types
-//    [UMessage registerForRemoteNotificationTypes:UIRemoteNotificationTypeBadge
-//     |UIRemoteNotificationTypeSound
-//     |UIRemoteNotificationTypeAlert];
-//    
-//#endif
 }
 + (void)registerForRemoteNotification {
     UIApplication *application = [UIApplication sharedApplication];
@@ -392,58 +325,6 @@
     return parameters;
 }
 
-#pragma mark - UIButton添加pop动画
-+ (void)addPopAnimationToButton:(UIButton *)button {
-//    [button bk_addEventHandler:^(id sender) {
-//        POPBasicAnimation *scaleAnimation = [POPBasicAnimation animationWithPropertyNamed:kPOPLayerScaleXY];
-//        scaleAnimation.toValue = [NSValue valueWithCGSize:CGSizeMake(0.95f, 0.95f)];
-//        [button.layer pop_addAnimation:scaleAnimation forKey:@"layerScaleSmallAnimation"];
-//    } forControlEvents:UIControlEventTouchDown];
-//    [button bk_addEventHandler:^(id sender) {
-//        POPSpringAnimation *scaleAnimation = [POPSpringAnimation animationWithPropertyNamed:kPOPLayerScaleXY];
-//        scaleAnimation.velocity = [NSValue valueWithCGSize:CGSizeMake(3.f, 3.f)];
-//        scaleAnimation.toValue = [NSValue valueWithCGSize:CGSizeMake(1.f, 1.f)];
-//        scaleAnimation.springBounciness = 20.0f;
-//        [button.layer pop_addAnimation:scaleAnimation forKey:@"layerScaleSpringAnimation"];
-//    } forControlEvents:UIControlEventTouchUpInside];
-//    [button bk_addEventHandler:^(id sender) {
-//        POPBasicAnimation *scaleAnimation = [POPBasicAnimation animationWithPropertyNamed:kPOPLayerScaleXY];
-//        scaleAnimation.toValue = [NSValue valueWithCGSize:CGSizeMake(1.f, 1.f)];
-//        [button.layer pop_addAnimation:scaleAnimation forKey:@"layerScaleDefaultAnimation"];
-//    } forControlEvents:UIControlEventTouchDragExit];
-}
-
-#pragma mark - AES加密解密(与java调通)
-+ (NSString *)AESEncryptString:(NSString *)string byKey:(NSString *)key {
-    CCCryptorStatus status = kCCSuccess;
-    NSData* result = [[string dataUsingEncoding:NSUTF8StringEncoding]
-                      dataEncryptedUsingAlgorithm:kCCAlgorithmAES128
-                      key:key
-                      initializationVector:nil   // ECB加密不会用到iv
-                      options:(kCCOptionPKCS7Padding|kCCOptionECBMode)
-                      error:&status];
-    if (status != kCCSuccess) {
-        NSLog(@"加密失败:%d", status);
-        return nil;
-    }
-    return [NSString EncodeBase64Data:result];
-}
-+ (NSString *)AESDecryptString:(NSString *)string byKey:(NSString *)key {
-    CCCryptorStatus status = kCCSuccess;
-    NSData *decryptData = [[NSData alloc] initWithBase64EncodedData:[string dataUsingEncoding:NSUTF8StringEncoding]
-                                                            options:NSDataBase64DecodingIgnoreUnknownCharacters];
-    NSData* result = [decryptData
-                      decryptedDataUsingAlgorithm:kCCAlgorithmAES128
-                      key:key
-                      initializationVector:nil   // ECB解密不会用到iv
-                      options:(kCCOptionPKCS7Padding|kCCOptionECBMode)
-                      error:&status];
-    if (status != kCCSuccess) {
-        NSLog(@"解密失败:%d", status);
-        return nil;
-    }
-    return [[NSString alloc] initWithData:result encoding:NSUTF8StringEncoding];
-}
 
 //-----------------------------------
 //

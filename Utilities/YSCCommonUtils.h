@@ -34,11 +34,9 @@
 + (void)checkNewVersionByAppleId:(NSString *)appleId;
 
 + (void)configNavigationBar;
-+ (void)configUmeng;
-+ (void)configUmengPushWithOptions:(NSDictionary *)launchOptions;
 + (void)registerForRemoteNotification;
 
-#pragma mark - 格式化金额
+#pragma mark - 格式化
 //常用的价格字符串格式化方法（默认：显示￥、显示小数点）
 + (NSString *)formatPrice:(NSNumber *)price;
 //常用的价格字符串格式化方法（默认：显示￥、显示小数点、显示元）
@@ -58,7 +56,7 @@
 #pragma mark - 打开APP的设置并进入隐私界面
 + (void)OpenPrivacyOfSetting;
 
-#pragma mark - 更新Sqlite操作
+#pragma mark - 数据库Sqlite操作
 + (BOOL)SqliteUpdate:(NSString *)sql;
 + (BOOL)SqliteUpdate:(NSString *)sql dbPath:(NSString *)dbPath;
 + (BOOL)SqliteCheckIfExists:(NSString *)sql;
@@ -69,13 +67,6 @@
 #pragma mark - NSURL获取参数
 + (NSDictionary *)GetParamsInNSURL:(NSURL *)url;
 + (NSDictionary *)GetParamsInQueryString:(NSString *)queryString;
-
-#pragma mark - UIButton添加pop动画
-+ (void)addPopAnimationToButton:(UIButton *)button;
-
-#pragma mark - 加密解密
-+ (NSString *)AESEncryptString:(NSString *)string byKey:(NSString *)key;
-+ (NSString *)AESDecryptString:(NSString *)string byKey:(NSString *)key;
 
 #pragma mark - 获取wifi的mac地址
 + (id)FetchSSIDInfo;

@@ -7,6 +7,7 @@
 //
 
 #import "NSString+Addition.h"
+#import "NSData+CommonCrypto.h"
 #import <CommonCrypto/CommonDigest.h>
 #import <CommonCrypto/CommonCryptor.h>
 
@@ -408,17 +409,17 @@
     return [string AESEncryptString];
 }
 - (NSString *)AESEncryptString {
-	return [NSString AESEncrypt:self useKey:DEFAULTKEY];
+	return [NSString AESEncrypt:self byKey:DEFAULTKEY];
 }
-+ (NSString *)AESEncrypt:(NSString *)string useKey:(NSString *)key {
++ (NSString *)AESEncrypt:(NSString *)string byKey:(NSString *)key {
     ReturnEmptyWhenObjectIsEmpty(string)
     ReturnEmptyWhenObjectIsEmpty(key)
 	NSData *sourceData = [string dataUsingEncoding:NSUTF8StringEncoding];
-	NSData *encryptData = [self AESEncryptData:sourceData useKey:key];
+	NSData *encryptData = [self AESEncryptData:sourceData byKey:key];
     return [NSString EncodeBase64Data:encryptData];
 }
 //私有方法
-+ (NSData *)AESEncryptData:(NSData *)data useKey:(NSString *)key {
++ (NSData *)AESEncryptData:(NSData *)data byKey:(NSString *)key {
 	char keyPtr[kCCKeySizeAES256 + 1];
 	bzero(keyPtr, sizeof(keyPtr));
 	[key getCString:keyPtr maxLength:sizeof(keyPtr) encoding:NSUTF8StringEncoding];
@@ -448,17 +449,17 @@
 	return [string AESDecryptString];
 }
 - (NSString *)AESDecryptString {
-    return [NSString AESDecrypt:self useKey:DEFAULTKEY];
+    return [NSString AESDecrypt:self byKey:DEFAULTKEY];
 }
-+ (NSString *)AESDecrypt:(NSString *)string useKey:(NSString *)key {
++ (NSString *)AESDecrypt:(NSString *)string byKey:(NSString *)key {
     ReturnEmptyWhenObjectIsEmpty(string)
     ReturnEmptyWhenObjectIsEmpty(key)
     NSData *encryptData = [[NSData alloc] initWithBase64EncodedData:[string dataUsingEncoding:NSUTF8StringEncoding] options:NSDataBase64DecodingIgnoreUnknownCharacters];
-	NSData *decryptData = [self AESDecryptData:encryptData useKey:key];
+	NSData *decryptData = [self AESDecryptData:encryptData byKey:key];
 	return [[NSString alloc] initWithData:decryptData encoding:NSUTF8StringEncoding];
 }
 //私有方法
-+ (NSData *)AESDecryptData:(NSData *)data useKey:(NSString *)key {
++ (NSData *)AESDecryptData:(NSData *)data byKey:(NSString *)key {
 	char keyPtr[kCCKeySizeAES256 + 1];
 	bzero(keyPtr, sizeof(keyPtr));
 	[key getCString:keyPtr maxLength:sizeof(keyPtr) encoding:NSUTF8StringEncoding];
@@ -484,6 +485,38 @@
 	return nil;
 }
 
+#pragma mark - AES加密解密(与java调通)
++ (NSString *)AESEncrypt1:(NSString *)string byKey:(NSString *)key {
+    CCCryptorStatus status = kCCSuccess;
+    NSData* result = [[string dataUsingEncoding:NSUTF8StringEncoding]
+                      dataEncryptedUsingAlgorithm:kCCAlgorithmAES128
+                      key:key
+                      initializationVector:nil   // ECB加密不会用到iv
+                      options:(kCCOptionPKCS7Padding|kCCOptionECBMode)
+                      error:&status];
+    if (status != kCCSuccess) {
+        NSLog(@"加密失败:%d", status);
+        return nil;
+    }
+    return [NSString EncodeBase64Data:result];
+}
++ (NSString *)AESDecrypt1:(NSString *)string byKey:(NSString *)key {
+    CCCryptorStatus status = kCCSuccess;
+    NSData *decryptData = [[NSData alloc] initWithBase64EncodedData:[string dataUsingEncoding:NSUTF8StringEncoding]
+                                                            options:NSDataBase64DecodingIgnoreUnknownCharacters];
+    NSData* result = [decryptData
+                      decryptedDataUsingAlgorithm:kCCAlgorithmAES128
+                      key:key
+                      initializationVector:nil   // ECB解密不会用到iv
+                      options:(kCCOptionPKCS7Padding|kCCOptionECBMode)
+                      error:&status];
+    if (status != kCCSuccess) {
+        NSLog(@"解密失败:%d", status);
+        return nil;
+    }
+    return [[NSString alloc] initWithData:result encoding:NSUTF8StringEncoding];
+}
+
 
 
 #pragma mark - DES加密解密
@@ -492,17 +525,17 @@
 	return [string DESEncryptString];
 }
 - (NSString *)DESEncryptString {
-    return [NSString DESEncrypt:self useKey:DEFAULTKEY];
+    return [NSString DESEncrypt:self byKey:DEFAULTKEY];
 }
-+ (NSString *)DESEncrypt:(NSString *)string useKey:(NSString *)key {
++ (NSString *)DESEncrypt:(NSString *)string byKey:(NSString *)key {
     ReturnEmptyWhenObjectIsEmpty(string)
     ReturnEmptyWhenObjectIsEmpty(key)
 	NSData *sourceData = [string dataUsingEncoding:NSUTF8StringEncoding];
-	NSData *encryptData = [self DESEncryptData:sourceData useKey:key];
+	NSData *encryptData = [self DESEncryptData:sourceData byKey:key];
     return [NSString EncodeBase64Data:encryptData];
 }
 //私有方法
-+ (NSData *)DESEncryptData:(NSData *)data useKey:(NSString *)key {
++ (NSData *)DESEncryptData:(NSData *)data byKey:(NSString *)key {
 	NSUInteger dataLength = [data length];
 	size_t bufferSize = dataLength + kCCBlockSizeDES;
 	void *buffer = malloc(bufferSize);
@@ -529,17 +562,17 @@
 	return [string DESDecryptString];
 }
 - (NSString *)DESDecryptString {
-    return [NSString DESDecrypt:self useKey:DEFAULTKEY];
+    return [NSString DESDecrypt:self byKey:DEFAULTKEY];
 }
-+ (NSString *)DESDecrypt:(NSString *)string useKey:(NSString *)key {
++ (NSString *)DESDecrypt:(NSString *)string byKey:(NSString *)key {
     ReturnEmptyWhenObjectIsEmpty(string)
     ReturnEmptyWhenObjectIsEmpty(key)
 	NSData *encryptData = [[NSData alloc] initWithBase64EncodedData:[string dataUsingEncoding:NSUTF8StringEncoding] options:NSDataBase64DecodingIgnoreUnknownCharacters];
-	NSData *decryptData = [self DESDecryptData:encryptData useKey:key];
+	NSData *decryptData = [self DESDecryptData:encryptData byKey:key];
     return [[NSString alloc] initWithData:decryptData encoding:NSUTF8StringEncoding];
 }
 //私有方法
-+ (NSData *)DESDecryptData:(NSData *)data useKey:(NSString *)key {
++ (NSData *)DESDecryptData:(NSData *)data byKey:(NSString *)key {
 	NSUInteger dataLength = [data length];
 	size_t bufferSize = dataLength + kCCBlockSizeDES;
 	void *buffer = malloc(bufferSize);
