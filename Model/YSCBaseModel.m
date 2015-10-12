@@ -101,8 +101,8 @@
     [AFNManager getDataWithAPI:method
                   andDictParam:params
                      modelName:[self class]
-              requestSuccessed:^(id responseObjec) {
-                  block(responseObjec, nil);
+              requestSuccessed:^(id responseObject) {
+                  block(responseObject, nil);
               }
                 requestFailure:^(NSInteger errorCode, NSString *errorMessage) {
                     block(nil, CreateNSError(errorMessage));
@@ -112,8 +112,8 @@
     [AFNManager postDataWithAPI:method
                   andDictParam:params
                      modelName:[self class]
-              requestSuccessed:^(id responseObjec) {
-                  block(responseObjec, nil);
+              requestSuccessed:^(id responseObject) {
+                  block(responseObject, nil);
               }
                 requestFailure:^(NSInteger errorCode, NSString *errorMessage) {
                     block(nil, CreateNSError(errorMessage));
