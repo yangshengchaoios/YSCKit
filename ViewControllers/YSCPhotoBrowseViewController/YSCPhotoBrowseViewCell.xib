@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="7706" systemVersion="14D136" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="8191" systemVersion="14F27" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="7703"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="8154"/>
     </dependencies>
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
@@ -13,23 +13,36 @@
             <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
                 <rect key="frame" x="0.0" y="0.0" width="405" height="468"/>
                 <subviews>
-                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="aip-QT-epN">
+                    <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="nQf-wt-wQM">
                         <rect key="frame" x="0.0" y="0.0" width="405" height="468"/>
-                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
-                    </imageView>
+                        <subviews>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="ych-Xm-Koh">
+                                <rect key="frame" x="0.0" y="0.0" width="405" height="468"/>
+                            </imageView>
+                        </subviews>
+                        <constraints>
+                            <constraint firstItem="ych-Xm-Koh" firstAttribute="top" secondItem="nQf-wt-wQM" secondAttribute="top" id="4XY-1a-4hB"/>
+                            <constraint firstItem="ych-Xm-Koh" firstAttribute="height" secondItem="nQf-wt-wQM" secondAttribute="height" id="PF8-zW-jIm"/>
+                            <constraint firstAttribute="bottom" secondItem="ych-Xm-Koh" secondAttribute="bottom" id="eoc-0b-vSG"/>
+                            <constraint firstItem="ych-Xm-Koh" firstAttribute="leading" secondItem="nQf-wt-wQM" secondAttribute="leading" id="gsM-Zd-STS"/>
+                            <constraint firstItem="ych-Xm-Koh" firstAttribute="width" secondItem="nQf-wt-wQM" secondAttribute="width" id="jvH-a0-aTm"/>
+                            <constraint firstAttribute="trailing" secondItem="ych-Xm-Koh" secondAttribute="trailing" id="nMC-W3-UjD"/>
+                        </constraints>
+                    </scrollView>
                 </subviews>
                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
             </view>
             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
             <constraints>
-                <constraint firstItem="aip-QT-epN" firstAttribute="top" secondItem="gTV-IL-0wX" secondAttribute="top" id="JK3-0g-iyB"/>
-                <constraint firstAttribute="bottom" secondItem="aip-QT-epN" secondAttribute="bottom" id="JwU-4P-573"/>
-                <constraint firstAttribute="trailing" secondItem="aip-QT-epN" secondAttribute="trailing" id="dhw-6n-oec"/>
-                <constraint firstItem="aip-QT-epN" firstAttribute="leading" secondItem="gTV-IL-0wX" secondAttribute="leading" id="ovZ-qw-NXg"/>
+                <constraint firstItem="nQf-wt-wQM" firstAttribute="leading" secondItem="gTV-IL-0wX" secondAttribute="leading" id="PMf-sO-ZKH"/>
+                <constraint firstAttribute="bottom" secondItem="nQf-wt-wQM" secondAttribute="bottom" id="X3g-2M-QgM"/>
+                <constraint firstItem="nQf-wt-wQM" firstAttribute="top" secondItem="gTV-IL-0wX" secondAttribute="top" id="bSI-NZ-LNi"/>
+                <constraint firstAttribute="trailing" secondItem="nQf-wt-wQM" secondAttribute="trailing" id="rRs-pf-aGe"/>
             </constraints>
             <size key="customSize" width="405" height="468"/>
             <connections>
-                <outlet property="photoImageView" destination="aip-QT-epN" id="gtY-DO-HFm"/>
+                <outlet property="photoImageView" destination="ych-Xm-Koh" id="AZc-k7-yb4"/>
+                <outlet property="zoomScrollView" destination="nQf-wt-wQM" id="0FK-7W-LeK"/>
             </connections>
             <point key="canvasLocation" x="379.5" y="394"/>
         </collectionViewCell>

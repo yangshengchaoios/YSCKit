@@ -10,6 +10,7 @@
 
 @interface YSCPhotoBrowseViewCell : YSCBaseCollectionViewCell
 
+@property (weak, nonatomic) IBOutlet UIScrollView *zoomScrollView;
 @property (weak, nonatomic) IBOutlet UIImageView *photoImageView;
 @property (strong, nonatomic) UIImage *savedImage;
 

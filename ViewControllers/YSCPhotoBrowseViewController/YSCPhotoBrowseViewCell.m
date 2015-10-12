@@ -8,7 +8,7 @@
 
 #import "YSCPhotoBrowseViewCell.h"
 
-@interface YSCPhotoBrowseViewCell ()
+@interface YSCPhotoBrowseViewCell () <UIScrollViewDelegate>
 
 @property (assign, nonatomic) CGFloat lastScale;
 
@@ -16,6 +16,11 @@
 
 @implementation YSCPhotoBrowseViewCell
 
+- (void)awakeFromNib {
+    [super awakeFromNib];
+    self.photoImageView.userInteractionEnabled = YES;
+    self.zoomScrollView.userInteractionEnabled = YES;
+}
 - (void)layoutObject:(YSCPhotoBrowseCellModel *)dataModel {
     if (isNotEmpty(dataModel.imageUrl)) {
         WEAKSELF
@@ -41,37 +46,52 @@
         self.savedImage = dataModel.image;
         self.photoImageView.contentMode = UIViewContentModeScaleAspectFit;
     }
+    [self resetImageFrame];
+    self.zoomScrollView.showsHorizontalScrollIndicator = NO;
+    self.zoomScrollView.showsVerticalScrollIndicator = NO;
+    self.zoomScrollView.minimumZoomScale = 1.0;
+    self.zoomScrollView.maximumZoomScale = 3.0;
+    self.zoomScrollView.delegate = self;
     
-    self.photoImageView.transform = CGAffineTransformMakeScale(1, 1);
-    self.photoImageView.userInteractionEnabled = YES;
+    //NOTE:添加点击图片关闭图片查看器
     [self.photoImageView removeAllGestureRecognizers];
-    UIPinchGestureRecognizer *pinchGestureRecognizer = [[UIPinchGestureRecognizer alloc] initWithTarget:self action:@selector(pinchView:)];
-    [self.photoImageView addGestureRecognizer:pinchGestureRecognizer];
+    [self.photoImageView bk_whenTapped:^{
+        UIViewController *controller = [AppConfigManager sharedInstance].currentViewController;
+        [controller.navigationController popViewControllerAnimated:NO];
+    }];
 }
 
-// 处理缩放手势
-- (void)pinchView:(UIPinchGestureRecognizer *)pinchGestureRecognizer {
-    if([pinchGestureRecognizer state] == UIGestureRecognizerStateBegan) {
-        // Reset the last scale, necessary if there are multiple objects with different scales
-        self.lastScale = [pinchGestureRecognizer scale];
-    }
-    if ([pinchGestureRecognizer state] == UIGestureRecognizerStateBegan ||
-        [pinchGestureRecognizer state] == UIGestureRecognizerStateChanged) {
-        
-        CGFloat currentScale = [[[pinchGestureRecognizer view].layer valueForKeyPath:@"transform.scale"] floatValue];
-        
-        // Constants to adjust the max/min values of zoom
-        const CGFloat kMaxScale = 2.5;
-        const CGFloat kMinScale = 0.75;
-        
-        CGFloat newScale = 1 -  (self.lastScale - [pinchGestureRecognizer scale]);
-        newScale = MIN(newScale, kMaxScale / currentScale);
-        newScale = MAX(newScale, kMinScale / currentScale);
-        CGAffineTransform transform = CGAffineTransformScale([[pinchGestureRecognizer view] transform], newScale, newScale);
-        [pinchGestureRecognizer view].transform = transform;
-        
-        self.lastScale = [pinchGestureRecognizer scale];  // Store the previous scale factor for the next pinch gesture call
-    }
+- (UIView *)viewForZoomingInScrollView:(UIScrollView *)scrollView {
+    return self.photoImageView;
 }
+- (void)scrollViewDidZoom:(UIScrollView *)scrollView {
+    CGSize boundSize = scrollView.bounds.size;
+    CGRect frameToCenter = self.photoImageView.frame;
+    // center horizontally
+    if (frameToCenter.size.width < boundSize.width)
+        frameToCenter.origin.x = (boundSize.width - frameToCenter.size.width) / 2;
+    else
+        frameToCenter.origin.x = 0.0;
+    
+    // center vertically
+    if (frameToCenter.size.height < boundSize.height)
+        frameToCenter.origin.y = (boundSize.height - frameToCenter.size.height) / 2;
+    else
+        frameToCenter.origin.y = 0.0;
+    
+    self.photoImageView.frame = frameToCenter;
+}
+- (CGRect)zoomRectForScale:(float)scale withCenter:(CGPoint)center {
+    CGRect zoomRect;
+    zoomRect.size.height = self.zoomScrollView.frame.size.height / scale;
+    zoomRect.size.width  = self.zoomScrollView.frame.size.width  / scale;
+    zoomRect.origin.x = center.x;
+    zoomRect.origin.y = center.y;
+    return zoomRect;
+}
+- (void)resetImageFrame {
+    [self.zoomScrollView setZoomScale:1 animated:NO];
+}
+
 
 @end
