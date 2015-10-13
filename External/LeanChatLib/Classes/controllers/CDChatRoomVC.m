@@ -440,7 +440,6 @@ static NSInteger const kOnePageSize = 10;
 }
 
 - (void)sendMsg:(AVIMTypedMessage *)msg {
-    msg.attributes = @{@"username" : Trim(USER.userNickName)};
     [[CDChatManager manager] sendMessage:msg conversation:self.conv callback:^(BOOL succeeded, NSError *error) {
         if (error) {
             // 伪造一个 messageId，重发的成功的时候，根据这个伪造的id把数据库中的改过来
