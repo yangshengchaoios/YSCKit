@@ -46,7 +46,7 @@
         self.savedImage = dataModel.image;
         self.photoImageView.contentMode = UIViewContentModeScaleAspectFit;
     }
-    [self resetImageFrame];
+    [self.zoomScrollView setZoomScale:1 animated:NO];
     self.zoomScrollView.showsHorizontalScrollIndicator = NO;
     self.zoomScrollView.showsVerticalScrollIndicator = NO;
     self.zoomScrollView.minimumZoomScale = 1.0;
@@ -64,34 +64,5 @@
 - (UIView *)viewForZoomingInScrollView:(UIScrollView *)scrollView {
     return self.photoImageView;
 }
-- (void)scrollViewDidZoom:(UIScrollView *)scrollView {
-    CGSize boundSize = scrollView.bounds.size;
-    CGRect frameToCenter = self.photoImageView.frame;
-    // center horizontally
-    if (frameToCenter.size.width < boundSize.width)
-        frameToCenter.origin.x = (boundSize.width - frameToCenter.size.width) / 2;
-    else
-        frameToCenter.origin.x = 0.0;
-    
-    // center vertically
-    if (frameToCenter.size.height < boundSize.height)
-        frameToCenter.origin.y = (boundSize.height - frameToCenter.size.height) / 2;
-    else
-        frameToCenter.origin.y = 0.0;
-    
-    self.photoImageView.frame = frameToCenter;
-}
-- (CGRect)zoomRectForScale:(float)scale withCenter:(CGPoint)center {
-    CGRect zoomRect;
-    zoomRect.size.height = self.zoomScrollView.frame.size.height / scale;
-    zoomRect.size.width  = self.zoomScrollView.frame.size.width  / scale;
-    zoomRect.origin.x = center.x;
-    zoomRect.origin.y = center.y;
-    return zoomRect;
-}
-- (void)resetImageFrame {
-    [self.zoomScrollView setZoomScale:1 animated:NO];
-}
-
 
 @end
