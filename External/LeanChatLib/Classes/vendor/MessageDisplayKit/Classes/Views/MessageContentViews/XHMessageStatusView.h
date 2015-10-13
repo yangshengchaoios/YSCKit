@@ -12,7 +12,7 @@
 
 static const CGFloat kXHStatusViewWidth=40;
 static const CGFloat kXHStatusViewHeight=20;
-static const CGFloat kXHStatusViewSentWidth=32;
+static const CGFloat kXHStatusViewSentWidth=25;
 static const CGFloat kXHStatusViewSentHeight=15;
 static const CGFloat kXHStatusViewRetryButtonSize=20;
 static const CGFloat kXHStatusViewPadding=5;

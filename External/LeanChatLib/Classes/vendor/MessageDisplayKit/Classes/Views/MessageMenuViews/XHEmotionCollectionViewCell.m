@@ -36,7 +36,8 @@
 
 - (void)setup {
     if (!_emotionImageView) {
-        UIImageView *emotionImageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, kXHEmotionImageViewSize, kXHEmotionImageViewSize)];
+//        UIImageView *emotionImageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 30, 30)];
+        UIImageView *emotionImageView = [[UIImageView alloc] initWithFrame:CGRectZero];
         //emotionImageView.backgroundColor = [UIColor blackColor];
         [self.contentView addSubview:emotionImageView];
         self.emotionImageView = emotionImageView;
@@ -54,6 +55,11 @@
         [self setup];
     }
     return self;
+}
+
+- (void)layoutSubviews {
+    [super layoutSubviews];
+    self.emotionImageView.frame = CGRectMake(0, 0, self.emotionSize.width, self.emotionSize.height);
 }
 
 - (void)dealloc {

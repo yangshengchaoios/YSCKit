@@ -383,6 +383,7 @@ static CGPoint  delayOffset = {0.0};
             weakSelf.voiceRecordHUD.peakPower = peakPowerForChannel;
         };
         _voiceRecordHelper.maxRecordTime = kVoiceRecorderTotalTime;
+        _voiceRecordHelper.minRecordTime = kVoiceRecorderMinTime;
     }
     return _voiceRecordHelper;
 }
@@ -681,7 +682,7 @@ static CGPoint  delayOffset = {0.0};
     return NO;
 }
 
-- (NSUInteger)supportedInterfaceOrientations {
+- (UIInterfaceOrientationMask)supportedInterfaceOrientations {
     return UIInterfaceOrientationMaskPortrait;
 }
 
@@ -1037,7 +1038,13 @@ static CGPoint  delayOffset = {0.0};
 
 - (void)didFinishRecoingVoiceAction {
     DLog(@"didFinishRecoingVoice");
-    [self finishRecorded];
+    if (self.voiceRecordHelper.currentTimeInterval < self.voiceRecordHelper.minRecordTime) {
+        [UIView showResultThenHideOnWindow:@"录音时间太短"];
+        [self cancelRecord];
+    }
+    else {
+        [self finishRecorded];
+    }
 }
 
 - (void)didDragOutsideAction {

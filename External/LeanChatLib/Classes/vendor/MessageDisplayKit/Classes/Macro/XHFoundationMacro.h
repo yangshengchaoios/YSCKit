@@ -16,9 +16,7 @@
 #endif
 
 // block self
-#ifndef WEAKSELF
-    #define WEAKSELF  typeof(self) __weak weakSelf = self;
-#endif
+#define WEAKSELF typeof(self) __weak weakSelf = self;
 #define STRONGSELF typeof(weakSelf) __strong strongSelf = weakSelf;
 
 // device verson float value

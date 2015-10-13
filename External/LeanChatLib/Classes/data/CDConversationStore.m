@@ -78,12 +78,12 @@
 @implementation CDConversationStore
 
 + (CDConversationStore *)store {
-    static CDConversationStore *manager;
+    static CDConversationStore *store;
     static dispatch_once_t token;
     dispatch_once(&token, ^{
-        manager = [[CDConversationStore alloc] init];
+        store = [[CDConversationStore alloc] init];
     });
-    return manager;
+    return store;
 }
 
 - (void)setupStoreWithDatabasePath:(NSString *)path {

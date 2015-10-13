@@ -31,7 +31,7 @@
         _sentView.layer.masksToBounds=YES;
 
         //[_sentView sizeToFit];
-        [_sentView setText:@"未读"];
+        [_sentView setText:NSLocalizedStringFromTable(@"sent", @"MessageDisplayKitString", @"未读")];
         [_sentView setBackgroundColor:[UIColor colorWithRed:249/255.0 green:140/255.0 blue:140/255.0 alpha:1]];
         //[_sentView setBackgroundColor:[UIColor greenColor]];
         [_sentView setTextColor:[UIColor whiteColor]];

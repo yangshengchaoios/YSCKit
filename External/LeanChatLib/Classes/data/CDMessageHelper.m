@@ -9,6 +9,7 @@
 #import "CDMessageHelper.h"
 #import "CDChatManager.h"
 #import "CDEmotionUtils.h"
+#import "AVIMEmotionMessage.h"
 
 @interface CDMessageHelper ()
 
@@ -36,19 +37,21 @@
         case kAVIMMessageMediaTypeText:
             title = [CDEmotionUtils emojiStringFromString:msg.text];
             break;
-            
         case kAVIMMessageMediaTypeAudio:
-            title = @"声音";
+            title = @"[声音]";
             break;
-            
         case kAVIMMessageMediaTypeImage:
-            title = @"图片";
+            title = @"[图片]";
             break;
-            
         case kAVIMMessageMediaTypeLocation:
             locationMsg = (AVIMLocationMessage *)msg;
             title = locationMsg.text;
             break;
+        case kAVIMMessageMediaTypeEmotion:
+            title = @"[表情]";
+            break;
+        case kAVIMMessageMediaTypeVideo:
+            title = @"[视频]";
         default:
             break;
     }
@@ -71,12 +74,15 @@
     } else {
         finalText = title;
     }
+    if (finalText == nil) {
+        finalText = @"";
+    }
     if ([self.attributedStringCache objectForKey:finalText]) {
         return [self.attributedStringCache objectForKey:finalText];
     }
     UIFont *font = [UIFont systemFontOfSize:13];
     NSDictionary *attributes = @{NSForegroundColorAttributeName: [UIColor grayColor], (id)NSFontAttributeName:font};
-    NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:Trim(finalText) attributes:attributes];
+    NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:finalText attributes:attributes];
     
     if (conversation.mentioned) {
         NSRange range = [finalText rangeOfString:mentionText];

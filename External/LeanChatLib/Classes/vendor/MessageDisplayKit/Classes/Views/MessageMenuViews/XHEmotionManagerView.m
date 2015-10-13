@@ -56,9 +56,7 @@
     
     
     XHEmotionManager *emotionManager = [self.dataSource emotionManagerForColumn:self.selectedIndex];
-    NSInteger numberOfEmotions = emotionManager.emotions.count;
-    self.emotionPageControl.numberOfPages = (numberOfEmotions / (kXHEmotionPerRowItemCount * kXHEmotionPerColumnItemCount) + (numberOfEmotions % (kXHEmotionPerRowItemCount * kXHEmotionPerColumnItemCount) ? 1 : 0));
-    
+    self.emotionPageControl.numberOfPages = emotionManager.estimatedPages;
     
     [self.emotionCollectionView reloadData];
 }
@@ -174,15 +172,23 @@
     
     XHEmotionManager *emotionManager = [self.dataSource emotionManagerForColumn:self.selectedIndex];
     cell.emotion = emotionManager.emotions[indexPath.row];
+    cell.emotionSize = emotionManager.emotionSize;
     
     return cell;
 }
 
 #pragma mark - UICollectionView delegate
 
+- (CGSize)collectionView:(UICollectionView *)collectionView
+                  layout:(UICollectionViewLayout *)collectionViewLayout
+  sizeForItemAtIndexPath:(NSIndexPath *)indexPath {
+    XHEmotionManager *emotionManager = [self.dataSource emotionManagerForColumn:self.selectedIndex];
+    return emotionManager.emotionSize;
+}
+
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
     if ([self.delegate respondsToSelector:@selector(didSelecteEmotion:atIndexPath:)]) {
-        XHEmotionManager *emotionManager = [self.dataSource emotionManagerForColumn:indexPath.section];
+        XHEmotionManager *emotionManager = [self.dataSource emotionManagerForColumn:self.selectedIndex];
         [self.delegate didSelecteEmotion:emotionManager.emotions[indexPath.row] atIndexPath:indexPath];
     }
 }

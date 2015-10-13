@@ -12,9 +12,7 @@
 #import "CDConversationStore.h"
 #import "CDFailedMessageStore.h"
 #import "CDMacros.h"
-
-static NSString *kConversationUnreadsKey = @"unreads";
-static NSString *kConversationMentionKey = @"mention";
+#import "CDChatManager_Internal.h"
 
 static CDChatManager *instance;
 
@@ -43,6 +41,9 @@ static CDChatManager *instance;
 - (instancetype)init {
     self = [super init];
     if (self) {
+        [AVIMClient setTimeoutIntervalInSeconds:20];
+        // 以下选项也即是说 A 不在线时，有人往A发了很多条消息，下次启动时，不再收到具体的离线消息，而是收到离线消息的数目(未读通知)
+        [AVIMClient setUserOptions:@{AVIMUserOptionUseUnread:@(YES)}];
         [AVIMClient defaultClient].delegate =self;
         /* 取消下面的注释，将对 im的 open ，start(create conv),kick,invite 操作签名，更安全
          可以从你的服务器获得签名，这里从云代码获取，需要部署云代码，https://github.com/leancloud/leanchat-cloudcode
@@ -51,10 +52,6 @@ static CDChatManager *instance;
         _cachedConvs = [NSMutableDictionary dictionary];
     }
     return self;
-}
-
-- (AVIMClient *)imClient {
-    return [AVIMClient defaultClient];
 }
 
 - (void)dealloc {
@@ -75,14 +72,11 @@ static CDChatManager *instance;
         if (callback) {
             callback(succeeded, error);
         }
+//        [CDEmotionUtils saveEmotions];
     }];
 }
 
 - (void)closeWithCallback:(AVBooleanResultBlock)callback {
-    if (_selfId == nil) {
-        return;
-    }
-    _selfId = nil;
     [[AVIMClient defaultClient] closeWithCallback:callback];
 }
 
@@ -90,23 +84,41 @@ static CDChatManager *instance;
 
 - (void)fecthConvWithConvid:(NSString *)convid callback:(AVIMConversationResultBlock)callback {
     AVIMConversationQuery *q = [[AVIMClient defaultClient] conversationQuery];
+    q.cachePolicy = kAVCachePolicyNetworkElseCache;
     [q whereKey:@"objectId" equalTo:convid];
     [q findConversationsWithCallback: ^(NSArray *objects, NSError *error) {
         if (error) {
             callback(nil, error);
         }
         else {
-            callback([objects objectAtIndex:0], error);
+            if (objects.count == 0) {
+                callback(nil, [CDChatManager errorWithText:[NSString stringWithFormat:@"conversation of %@ not exists", convid]]);
+            } else {
+                callback([objects objectAtIndex:0], error);
+            }
         }
     }];
 }
 
+- (void)checkDuplicateValueOfArray:(NSArray *)array {
+    NSSet *set = [NSSet setWithArray:array];
+    if (set.count != array.count) {
+        [NSException raise:NSInvalidArgumentException format:@"The array has duplicate value"];
+    }
+}
+
 - (void)fetchConvWithMembers:(NSArray *)members type:(CDConvType)type callback:(AVIMConversationResultBlock)callback {
+    if ([members containsObject:self.selfId] == NO) {
+        [NSException raise:NSInvalidArgumentException format:@"members should contain myself"];
+    }
+    [self checkDuplicateValueOfArray:members];
     AVIMConversationQuery *q = [[AVIMClient defaultClient] conversationQuery];
     [q whereKey:AVIMAttr(CONV_TYPE) equalTo:@(type)];
     [q whereKey:kAVIMKeyMember containsAllObjectsInArray:members];
+    // 如果没有数组size限制，传[2,3]，可能取回 [1,2,3]
     [q whereKey:kAVIMKeyMember sizeEqualTo:members.count];
     [q orderByDescending:@"createdAt"];
+    q.cachePolicy = kAVCachePolicyNetworkElseCache;
     q.limit = 1;
     [q findConversationsWithCallback: ^(NSArray *objects, NSError *error) {
         if (error) {
@@ -138,15 +150,27 @@ static CDChatManager *instance;
 - (void)createConvWithMembers:(NSArray *)members type:(CDConvType)type callback:(AVIMConversationResultBlock)callback {
     NSString *name = nil;
     if (type == CDConvTypeGroup) {
+        // 群聊默认名字， 老王、小李
         name = [AVIMConversation nameOfUserIds:members];
     }
     [[AVIMClient defaultClient] createConversationWithName:name clientIds:members attributes:@{ CONV_TYPE:@(type) } options:AVIMConversationOptionNone callback:callback];
 }
 
 - (void)findGroupedConvsWithBlock:(AVIMArrayResultBlock)block {
+    [self findGroupedConvsWithNetworkFirst:NO block:block];
+}
+
+- (void)findGroupedConvsWithNetworkFirst:(BOOL)networkFirst block:(AVIMArrayResultBlock)block {
     AVIMConversationQuery *q = [[AVIMClient defaultClient] conversationQuery];
     [q whereKey:AVIMAttr(CONV_TYPE) equalTo:@(CDConvTypeGroup)];
     [q whereKey:kAVIMKeyMember containedIn:@[self.selfId]];
+    if (networkFirst) {
+        q.cachePolicy = kAVCachePolicyNetworkElseCache;
+    } else {
+        q.cachePolicy = kAVCachePolicyCacheElseNetwork;
+        q.cacheMaxAge = 60 * 30; // 半小时
+    }
+    // 默认 limit 为10
     q.limit = 1000;
     [q findConversationsWithCallback:block];
 }
@@ -166,10 +190,10 @@ static CDChatManager *instance;
     if (convids.count > 0) {
         AVIMConversationQuery *q = [[AVIMClient defaultClient] conversationQuery];
         [q whereKey:@"objectId" containedIn:[convids allObjects]];
+        q.cachePolicy = kAVCachePolicyNetworkElseCache;
         q.limit = 1000;  // default limit:10
         [q findConversationsWithCallback:callback];
-    }
-    else {
+    } else {
         callback([NSMutableArray array], nil);
     }
 }
@@ -179,11 +203,20 @@ static CDChatManager *instance;
 - (void)sendMessage:(AVIMTypedMessage*)message conversation:(AVIMConversation *)conversation callback:(AVBooleanResultBlock)block {
     id<CDUserModel> selfUser = [[CDChatManager manager].userDelegate getUserById:self.selfId];
     NSMutableDictionary *attributes = [NSMutableDictionary dictionary];
-    [attributes setObject:selfUser.username forKey:@"username"];
+    // 云代码中获取到用户名，来设置推送消息, 老王:今晚约吗？
+    if (selfUser.username) {
+        // 避免为空造成崩溃
+        [attributes setObject:selfUser.username forKey:@"username"];
+    }
     if (self.useDevPushCerticate) {
         [attributes setObject:@YES forKey:@"dev"];
     }
-    message.attributes = attributes;
+    if (message.attributes == nil) {
+        message.attributes = attributes;
+    } else {
+        [attributes addEntriesFromDictionary:message.attributes];
+        message.attributes = attributes;
+    }
     [conversation sendMessage:message options:AVIMMessageSendOptionRequestReceipt callback:block];
 }
 
@@ -202,6 +235,7 @@ static CDChatManager *instance;
 
 - (void)queryTypedMessagesWithConversation:(AVIMConversation *)conversation timestamp:(int64_t)timestamp limit:(NSInteger)limit block:(AVIMArrayResultBlock)block {
     AVIMArrayResultBlock callback = ^(NSArray *messages, NSError *error) {
+        //以下过滤为了避免非法的消息，引起崩溃
         NSMutableArray *typedMessages = [NSMutableArray array];
         for (AVIMTypedMessage *message in messages) {
             if ([message isKindOfClass:[AVIMTypedMessage class]]) {
@@ -211,10 +245,21 @@ static CDChatManager *instance;
         block(typedMessages, error);
     };
     if(timestamp == 0) {
+        // sdk 会设置好 timestamp
         [conversation queryMessagesWithLimit:limit callback:callback];
     } else {
         [conversation queryMessagesBeforeId:nil timestamp:timestamp limit:limit callback:callback];
     }
+}
+
+#pragma mark - remote notification
+
+- (BOOL)didReceiveRemoteNotification:(NSDictionary *)userInfo {
+    if (userInfo[@"convid"]) {
+        self.remoteNotificationConvid = userInfo[@"convid"];
+        return YES;
+    }
+    return NO;
 }
 
 #pragma mark - AVIMClientDelegate
@@ -232,16 +277,13 @@ static CDChatManager *instance;
 }
 
 #pragma mark - status
-
+// 除了 sdk 的上面三个回调调用了，还在 open client 的时候调用了，好统一处理
 - (void)updateConnectStatus {
     self.connect = [AVIMClient defaultClient].status == AVIMClientStatusOpened;
     [[NSNotificationCenter defaultCenter] postNotificationName:kCDNotificationConnectivityUpdated object:@(self.connect)];
 }
 
-#pragma mark - AVIMMessageDelegate
-
-- (void)conversation:(AVIMConversation *)conversation didReceiveCommonMessage:(AVIMMessage *)message {
-}
+#pragma mark - receive message handle
 
 - (void)receiveMessage:(AVIMTypedMessage *)message conversation:(AVIMConversation *)conversation{
     [[CDConversationStore store] insertConversation:conversation];
@@ -259,9 +301,25 @@ static CDChatManager *instance;
             [[CDSoundManager manager] vibrateIfNeed];
         }
     }
+    [conversation markAsReadInBackground];
+    //只要接受到消息，就表示之前所有已发送的消息都是已读的>>>
+    NSString *received_convid = [NSString stringWithFormat:@"received_%@", Trim(conversation.conversationId)];
+    SaveCacheObject(@(message.sendTimestamp), received_convid);
+    //在进入聊天对话框的时候就设置为已读<<<<<<<<<<<<<<<<<<
+    
     [[NSNotificationCenter defaultCenter] postNotificationName:kCDNotificationMessageReceived object:message];
 }
 
+#pragma mark - AVIMMessageDelegate
+
+// content : "this is message"
+- (void)conversation:(AVIMConversation *)conversation didReceiveCommonMessage:(AVIMMessage *)message {
+    // 不做处理，此应用没有用到
+    // 可以看做跟 AVIMTypedMessage 两个频道。构造消息和收消息的接口都不一样，互不干扰。
+    // 其实一般不用，有特殊的需求时可以考虑优先用 自定义 AVIMTypedMessage 来实现。见 AVIMCustomMessage 类
+}
+
+// content : "{\"_lctype\":-1,\"_lctext\":\"sdfdf\"}"  sdk 会解析好
 - (void)conversation:(AVIMConversation *)conversation didReceiveTypedMessage:(AVIMTypedMessage *)message {
     if (message.messageId) {
         if (conversation.creator == nil && [[CDConversationStore store] isConversationExists:conversation] == NO) {
@@ -288,6 +346,14 @@ static CDChatManager *instance;
     }
 }
 
+- (void)conversation:(AVIMConversation *)conversation didReceiveUnread:(NSInteger)unread {
+    // 需要开启 AVIMUserOptionUseUnread 选项，见 init
+    DLog(@"conversatoin:%@ didReceiveUnread:%@", conversation, @(unread));
+    [conversation markAsReadInBackground];
+}
+
+#pragma mark - AVIMClientDelegate
+
 - (void)conversation:(AVIMConversation *)conversation membersAdded:(NSArray *)clientIds byClientId:(NSString *)clientId {
     DLog();
 }
@@ -304,6 +370,8 @@ static CDChatManager *instance;
     DLog();
 }
 
+#pragma mark - signature
+
 - (id)convSignWithSelfId:(NSString *)selfId convid:(NSString *)convid targetIds:(NSArray *)targetIds action:(NSString *)action {
     NSMutableDictionary *dict = [NSMutableDictionary dictionary];
     [dict setObject:selfId forKey:@"self_id"];
@@ -316,6 +384,7 @@ static CDChatManager *instance;
     if (action) {
         [dict setObject:action forKey:@"action"];
     }
+    //这里是从云代码获取签名，也可以从你的服务器获取
     return [AVCloud callFunction:@"conv_sign" withParameters:dict];
 }
 
@@ -375,6 +444,11 @@ static CDChatManager *instance;
     return [[self getFilesPath] stringByAppendingFormat:@"%@", objectId];
 }
 
+- (NSString *)videoPathOfMessag:(AVIMVideoMessage *)message {
+    // 视频播放会根据文件扩展名来识别格式
+    return [[self getFilesPath] stringByAppendingFormat:@"%@.%@", message.messageId, message.format];
+}
+
 - (NSString *)tmpPath {
     return [[self getFilesPath] stringByAppendingFormat:@"tmp"];
 }
@@ -390,6 +464,10 @@ static CDChatManager *instance;
         [result appendString:[chars substringWithRange:range]];
     }
     return result;
+}
+
++ (NSError *)errorWithText:(NSString *)text {
+    return [NSError errorWithDomain:@"LeanChatLib" code:0 userInfo:@{NSLocalizedDescriptionKey:text}];
 }
 
 #pragma mark - conv cache
@@ -424,7 +502,6 @@ static CDChatManager *instance;
     static BOOL refreshedFromServer = NO;
     NSArray *conversations = [[CDConversationStore store] selectAllConversations];
     if (refreshedFromServer == NO && self.connect) {
-        refreshedFromServer = YES;
         NSMutableSet *convids = [NSMutableSet set];
         for (AVIMConversation *conversation in conversations) {
             [convids addObject:conversation.conversationId];
@@ -433,6 +510,7 @@ static CDChatManager *instance;
             if (error) {
                 block(conversations, nil);
             } else {
+                refreshedFromServer = YES;
                 [[CDConversationStore store] updateConversations:objects];
                 block([[CDConversationStore store] selectAllConversations], nil);
             }
@@ -465,14 +543,20 @@ static CDChatManager *instance;
         NSArray *sortedRooms = [conversations sortedArrayUsingComparator:^NSComparisonResult(AVIMConversation *conv1, AVIMConversation *conv2) {
             return conv2.lastMessage.sendTimestamp - conv1.lastMessage.sendTimestamp;
         }];
-        [self.userDelegate cacheUserByIds:userIds block: ^(BOOL succeeded, NSError *error) {
-            if (error) {
-                block(nil,0, error);
-            }
-            else {
-                block(sortedRooms, totalUnreadCount, error);
-            }
-        }];
+        
+        if ([self.userDelegate respondsToSelector:@selector(cacheUserByIds:block:)]) {
+            [self.userDelegate cacheUserByIds:userIds block: ^(BOOL succeeded, NSError *error) {
+                if (error) {
+                    block(nil,0, error);
+                }
+                else {
+                    block(sortedRooms, totalUnreadCount, error);
+                }
+            }];
+        } else {
+            DLog(@"self.userDelegate not reponds to cacheUserByIds:block:, may have problem");
+            block([NSArray array], 0 , nil);
+        }
     }];
 }
 

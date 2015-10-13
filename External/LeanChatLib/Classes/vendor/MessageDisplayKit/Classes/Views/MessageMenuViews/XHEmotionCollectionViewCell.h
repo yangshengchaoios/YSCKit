@@ -18,4 +18,6 @@
  */
 @property (nonatomic, strong) XHEmotion *emotion;
 
+@property (nonatomic, assign) CGSize emotionSize;
+
 @end

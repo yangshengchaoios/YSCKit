@@ -8,7 +8,6 @@
 
 #import <Foundation/Foundation.h>
 
-#define kXHEmotionImageViewSize 30
 #define kXHEmotionMinimumLineSpacing 5
 #define kXHEmotionImageViewInset 5
 

@@ -10,11 +10,10 @@
 
 @implementation XHEmotionCollectionViewFlowLayout
 
-- (id)init {
+- (instancetype)init {
     self = [super init];
     if (self) {
         self.scrollDirection = UICollectionViewScrollDirectionHorizontal;
-        self.itemSize = CGSizeMake(kXHEmotionImageViewSize+kXHEmotionImageViewInset, kXHEmotionImageViewSize+kXHEmotionImageViewInset);
         self.minimumLineSpacing = kXHEmotionMinimumLineSpacing;
         self.sectionInset = UIEdgeInsetsMake(kXHEmotionCollectionViewSectionInset, kXHEmotionCollectionViewSectionInset, 0, kXHEmotionCollectionViewSectionInset);
         self.collectionView.alwaysBounceVertical = YES;

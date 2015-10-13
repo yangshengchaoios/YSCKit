@@ -9,7 +9,6 @@
 #import "CDChatListVC.h"
 #import "LZStatusView.h"
 #import "UIView+XHRemoteImage.h"
-#import "LZConversationCell.h"
 #import "CDChatManager.h"
 #import "AVIMConversation+Custom.h"
 #import "UIView+XHRemoteImage.h"
@@ -17,6 +16,8 @@
 #import "CDMessageHelper.h"
 #import "DateTools.h"
 #import "CDConversationStore.h"
+#import "CDChatManager_Internal.h"
+#import "CDMacros.h"
 
 @interface CDChatListVC ()
 
@@ -103,17 +104,51 @@ static NSString *cellIdentifier = @"ContactCell";
     }
     self.isRefreshing = YES;
     [[CDChatManager manager] findRecentConversationsWithBlock:^(NSArray *conversations, NSInteger totalUnreadCount, NSError *error) {
-        [self stopRefreshControl:refreshControl];
-        if ([self filterError:error]) {
-            self.conversations = conversations;
-            [self.tableView reloadData];
-            if ([self.chatListDelegate respondsToSelector:@selector(setBadgeWithTotalUnreadCount:)]) {
-                [self.chatListDelegate setBadgeWithTotalUnreadCount:totalUnreadCount];
+        dispatch_block_t finishBlock = ^{
+            [self stopRefreshControl:refreshControl];
+            if ([self filterError:error]) {
+                self.conversations = conversations;
+                [self.tableView reloadData];
+                if ([self.chatListDelegate respondsToSelector:@selector(setBadgeWithTotalUnreadCount:)]) {
+                    [self.chatListDelegate setBadgeWithTotalUnreadCount:totalUnreadCount];
+                }
+                [self selectConversationIfHasRemoteNotificatoinConvid];
             }
-            
+            self.isRefreshing = NO;
+        };
+        
+        if ([self.chatListDelegate respondsToSelector:@selector(prepareConversationsWhenLoad:completion:)]) {
+            [self.chatListDelegate prepareConversationsWhenLoad:conversations completion:^(BOOL succeeded, NSError *error) {
+                if ([self filterError:error]) {
+                    finishBlock();
+                } else {
+                    [self stopRefreshControl:refreshControl];
+                    self.isRefreshing = NO;
+                }
+            }];
+        } else {
+            finishBlock();
         }
-        self.isRefreshing = NO;
     }];
+}
+
+- (void)selectConversationIfHasRemoteNotificatoinConvid {
+    if ([CDChatManager manager].remoteNotificationConvid) {
+        // 进入之前推送弹框点击的对话
+        BOOL found = NO;
+        for (AVIMConversation *conversation in self.conversations) {
+            if ([conversation.conversationId isEqualToString:[CDChatManager manager].remoteNotificationConvid]) {
+                if ([self.chatListDelegate respondsToSelector:@selector(viewController:didSelectConv:)]) {
+                    [self.chatListDelegate viewController:self didSelectConv:conversation];
+                    found = YES;
+                }
+            }
+        }
+        if (!found) {
+            DLog(@"not found remoteNofitciaonID");
+        }
+        [CDChatManager manager].remoteNotificationConvid = nil;
+    }
 }
 
 #pragma mark - utils
@@ -146,7 +181,7 @@ static NSString *cellIdentifier = @"ContactCell";
     if (conversation.type == CDConvTypeSingle) {
         id <CDUserModel> user = [[CDChatManager manager].userDelegate getUserById:conversation.otherId];
         cell.nameLabel.text = user.username;
-        [cell.avatarImageView setImageWithURLString:user.avatarUrl placeholderImageName:@"default_avatar" withFadeIn:NO];
+        [cell.avatarImageView setImageWithURL:[NSURL URLWithString:user.avatarUrl]];
     }
     else {
         [cell.avatarImageView setImage:conversation.icon];
@@ -162,6 +197,9 @@ static NSString *cellIdentifier = @"ContactCell";
         } else {
             cell.badgeView.badgeText = [NSString stringWithFormat:@"%ld", conversation.unreadCount];
         }
+    }
+    if ([self.chatListDelegate respondsToSelector:@selector(configureCell:atIndexPath:withConversation:)]) {
+        [self.chatListDelegate configureCell:cell atIndexPath:indexPath withConversation:conversation];
     }
     return cell;
 }

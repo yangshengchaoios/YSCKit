@@ -20,5 +20,7 @@
 
 // Max record Time
 #define kVoiceRecorderTotalTime 60.0
+// Min record Time
+#define kVoiceRecorderMinTime   1.0
 
 #endif

@@ -11,6 +11,10 @@
 
 @interface XHEmotionManager : NSObject
 
+@property (nonatomic, assign) NSInteger estimatedPages;
+
+@property (nonatomic, assign) CGSize emotionSize;
+
 @property (nonatomic, copy) NSString *emotionName;
 /**
  *  某一类表情的数据源

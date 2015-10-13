@@ -15,6 +15,8 @@
 #define kXHTouchToRecord         @"按住 说话"
 #define kXHTouchToFinish         @"松开 结束"
 
+#define MIN_AUDIO_RECORDING_INTERVAL 1
+
 @interface XHMessageInputView () <UITextViewDelegate>
 
 @property (nonatomic, weak, readwrite) XHMessageTextView *inputTextView;
@@ -41,6 +43,11 @@
  *  在切换语音和文本消息的时候，需要保存原本已经输入的文本，这样达到一个好的UE
  */
 @property (nonatomic, copy) NSString *inputedText;
+
+/**
+ *  记录每次录音的开始时间，防止用户疯狂点击。
+ */
+@property (nonatomic, assign, readwrite) CFTimeInterval lastAudioRecordingTime;
 
 /**
  *  输入框内的所有按钮，点击事件所触发的方法
@@ -176,7 +183,28 @@
     }
 }
 
+/**
+ *  防止用户疯狂点击录音按钮。
+ */
+- (BOOL)audioRecordingShouldBegin {
+    BOOL result = YES;
+
+    CFTimeInterval now = CACurrentMediaTime();
+
+    if (self.lastAudioRecordingTime > 0 && now - self.lastAudioRecordingTime < MIN_AUDIO_RECORDING_INTERVAL) {
+        result = NO;
+    }
+
+    self.lastAudioRecordingTime = now;
+
+    return result;
+}
+
 - (void)holdDownButtonTouchDown {
+    if (![self audioRecordingShouldBegin]) {
+        return;
+    }
+
     self.isCancelled = NO;
     self.isRecording = NO;
     if ([self.delegate respondsToSelector:@selector(prepareRecordingVoiceActionWithCompletion:)]) {

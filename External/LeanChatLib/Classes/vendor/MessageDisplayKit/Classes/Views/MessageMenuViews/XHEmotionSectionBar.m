@@ -8,7 +8,7 @@
 
 #import "XHEmotionSectionBar.h"
 
-#define kXHStoreManagerItemWidth 40
+#define kXHStoreManagerItemWidth 50
 #define kXHEmotionStoreButtonMargin 10
 
 @interface XHEmotionSectionBar ()
@@ -42,9 +42,10 @@
 }
 
 - (UIButton *)createdButton {
-    UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
+    UIButton *button = [UIButton buttonWithType:UIButtonTypeSystem];
     button.frame = CGRectMake(0, 0, kXHStoreManagerItemWidth, CGRectGetHeight(self.bounds));
     [button addTarget:self action:@selector(sectionButtonClicked:) forControlEvents:UIControlEventTouchUpInside];
+//    [button setTitleColor:[UIColor colorWithRed:40.f/255 green:130.f/255 blue:226.f/255 alpha:1] forState:UIControlStateNormal];
     return button;
 }
 
@@ -97,7 +98,6 @@
         storeManagerItemButton.frame = storeManagerItemButtonFrame;
         
         [storeManagerItemButton setTitle:@"发送" forState:UIControlStateNormal];
-        [storeManagerItemButton setTitleColor:[UIColor redColor] forState:UIControlStateNormal];
         [storeManagerItemButton addTarget:self action:@selector(storeButtonClicked:) forControlEvents:UIControlEventTouchUpInside];
         [self addSubview:storeManagerItemButton];
         _storeManagerItemButton = storeManagerItemButton;
