@@ -161,11 +161,11 @@ static NSInteger const kOnePageSize = 10;
             YSCPhotoBrowseViewController *photoDetail = (YSCPhotoBrowseViewController *)[UIResponder createBaseViewController:@"YSCPhotoBrowseViewController"];
             if (isNotEmpty(message.thumbnailUrl)) {
                 photoDetail.params = @{kParamImageUrls : @[Trim(message.thumbnailUrl)]};
-                [self.navigationController pushViewController:photoDetail animated:YES];
+                [self.navigationController pushViewController:photoDetail animated:NO];
             }
             else if (isNotEmpty(message.photo)) {
                 photoDetail.params = @{kParamImages : @[message.photo]};
-                [self.navigationController pushViewController:photoDetail animated:YES];
+                [self.navigationController pushViewController:photoDetail animated:NO];
             }
         }
             break;
