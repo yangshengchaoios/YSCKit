@@ -535,6 +535,7 @@ static const CGFloat kXHBubbleMessageViewPadding = 8;
 //    self.messageBubbleView.backgroundColor=[UIColor blackColor];
 //    self.avatorButton.backgroundColor=[UIColor redColor];
 //    self.userNameLabel.backgroundColor=[UIColor greenColor];
+    self.userNameLabel.hidden = YES;//不显示用户名
 }
 
 - (void)dealloc {
