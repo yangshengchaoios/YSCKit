@@ -29,6 +29,7 @@
 #import "NSArray+Addition.h"
 #import "UIScrollView+Additions.h"
 #import "UIImage+Additions.h"
+#import "ALAssetsLibrary+CustomPhotoAlbum.h"
 
 //工具类
 #import "YSCFileUtils.h"

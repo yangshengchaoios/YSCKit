@@ -1087,7 +1087,7 @@ static CGPoint  delayOffset = {0.0};
         }
         
         if (1 == index && saveImage) {
-            UIImageWriteToSavedPhotosAlbum(saveImage,nil,nil,nil);
+            [[ALAssetsLibrary new] saveImage:saveImage toAlbum:@"EZGoal" completion:nil failure:nil];
         }
     };
     switch (index) {
