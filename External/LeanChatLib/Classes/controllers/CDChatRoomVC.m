@@ -454,6 +454,8 @@ static NSInteger const kOnePageSize = 10;
             [[CDSoundManager manager] playSendSoundIfNeed];
             [self insertMessage:msg];
         } else {
+            self.conv.lastMessage = msg;
+            APPDATA.totalUnreadCount = APPDATA.totalUnreadCount;//NOTE: refresh list
             [[CDSoundManager manager] playSendSoundIfNeed];
             [self insertMessage:msg];
         }
