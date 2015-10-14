@@ -43,7 +43,7 @@ static CDChatManager *instance;
     if (self) {
         [AVIMClient setTimeoutIntervalInSeconds:20];
         // 以下选项也即是说 A 不在线时，有人往A发了很多条消息，下次启动时，不再收到具体的离线消息，而是收到离线消息的数目(未读通知)
-        [AVIMClient setUserOptions:@{AVIMUserOptionUseUnread:@(YES)}];
+//        [AVIMClient setUserOptions:@{AVIMUserOptionUseUnread:@(YES)}];
         [AVIMClient defaultClient].delegate =self;
         /* 取消下面的注释，将对 im的 open ，start(create conv),kick,invite 操作签名，更安全
          可以从你的服务器获得签名，这里从云代码获取，需要部署云代码，https://github.com/leancloud/leanchat-cloudcode
