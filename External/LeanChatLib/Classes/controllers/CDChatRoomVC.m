@@ -65,6 +65,9 @@ static NSInteger const kOnePageSize = 10;
     [super viewDidLoad];
     NSString *received_convid = [NSString stringWithFormat:@"received_%@", Trim(self.conv.conversationId)];
     self.lastSentTimestamp = [GetCacheObject(received_convid) longLongValue];
+    if (0 == self.lastSentTimestamp) {
+        self.lastSentTimestamp = [[NSDate date] timeIntervalSince1970] * 1000;
+    }
     
     [self initBarButton];
     [self initBottomMenuAndEmotionView];
