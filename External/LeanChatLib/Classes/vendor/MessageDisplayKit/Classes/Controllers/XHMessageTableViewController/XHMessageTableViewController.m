@@ -1064,11 +1064,9 @@ static CGPoint  delayOffset = {0.0};
     
     WEAKSELF
     void (^PickerMediaBlock)(UIImage *image, NSDictionary *editingInfo) = ^(UIImage *image, NSDictionary *editingInfo) {
+        UIImage *saveImage = image;
         if (image) {
             [weakSelf didSendMessageWithPhoto:image];
-            if (1 == index) {
-                UIImageWriteToSavedPhotosAlbum(image,nil,nil,nil);
-            }
         } else {
             if (!editingInfo)
                 return ;
@@ -1080,11 +1078,16 @@ static CGPoint  delayOffset = {0.0};
                 videoPath = [videoUrl path];
                 
                 UIImage *thumbnailImage = [XHMessageVideoConverPhotoFactory videoConverPhotoWithVideoPath:videoPath];
-                
+                saveImage = thumbnailImage;
                 [weakSelf didSendMessageWithVideoConverPhoto:thumbnailImage videoPath:videoPath];
             } else {
-                [weakSelf didSendMessageWithPhoto:[editingInfo valueForKey:UIImagePickerControllerOriginalImage]];
+                saveImage = [editingInfo valueForKey:UIImagePickerControllerOriginalImage];
+                [weakSelf didSendMessageWithPhoto:saveImage];
             }
+        }
+        
+        if (1 == index && saveImage) {
+            UIImageWriteToSavedPhotosAlbum(saveImage,nil,nil,nil);
         }
     };
     switch (index) {
@@ -1093,7 +1096,7 @@ static CGPoint  delayOffset = {0.0};
                 [self.photographyHelper showOnPickerViewControllerSourceType:UIImagePickerControllerSourceTypePhotoLibrary onViewController:self compled:PickerMediaBlock];
             }
             else {
-                [UIView showAlertVieWithMessage:@"请在设置->隐私->照片,打开翼畅行应用的权限"];
+                [UIView showAlertVieWithMessage:@"请在设置->隐私->照片,打开本应用的权限"];
             }
             break;
         }
@@ -1102,7 +1105,7 @@ static CGPoint  delayOffset = {0.0};
                 [self.photographyHelper showOnPickerViewControllerSourceType:UIImagePickerControllerSourceTypeCamera onViewController:self compled:PickerMediaBlock];
             }
             else {
-                [UIView showAlertVieWithMessage:@"请在设置->隐私->相机,打开翼畅行应用的权限"];
+                [UIView showAlertVieWithMessage:@"请在设置->隐私->相机,打开本应用的权限"];
             }
             break;
         }
