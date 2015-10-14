@@ -498,11 +498,6 @@ static NSInteger const kOnePageSize = 10;
 - (void)receiveMessage:(NSNotification *)notification {
     AVIMTypedMessage *message = notification.object;
     if ([message.conversationId isEqualToString:self.conv.conversationId]) {
-        if (self.conv.muted == NO) {
-            [[CDSoundManager manager] playReceiveSoundIfNeed];
-        }
-        [self insertMessage:message];
-        
         //关闭'未读'提示标记>>>>>>>>>>>>>>>>>>>>>>>>>
         for (int pos = 0; pos < self.msgs.count; pos++) {
             AVIMTypedMessage *msg = self.msgs[pos];
@@ -513,10 +508,14 @@ static NSInteger const kOnePageSize = 10;
                 [self.messages setObject:xhMsg atIndexedSubscript:pos];
                 NSIndexPath *indexPath = [NSIndexPath indexPathForRow:pos inSection:0];
                 [self.messageTableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationNone];
-                [self scrollToBottomAnimated:YES];
             }
         }
         //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+        
+        if (self.conv.muted == NO) {
+            [[CDSoundManager manager] playReceiveSoundIfNeed];
+        }
+        [self insertMessage:message];
     }
 }
 
