@@ -75,7 +75,7 @@
          requestType:(RequestType)requestType
     requestSuccessed:(RequestSuccessed)requestSuccessed
       requestFailure:(RequestFailure)requestFailure {
-    [self   requestByUrl:url withAPI:apiName andArrayParam:arrayParam andDictParam:dictParam andBodyParam:bodyParam imageData:nil customModelClass:ClassOfObject(YSCBaseModel) requestType:requestType
+    [self   requestByUrl:url withAPI:apiName andArrayParam:arrayParam andDictParam:dictParam andBodyParam:bodyParam andImageDataParam:nil customModelClass:ClassOfObject(YSCBaseModel) requestType:requestType
 	    requestSuccessed: ^(id responseObject) {
             YSCBaseModel *baseModel = (YSCBaseModel *)responseObject;
             [baseModel formatProperties];
@@ -114,20 +114,19 @@
 
 #pragma mark - 上传文件
 
-+ (void)uploadImage:(UIImage *)image
-              toUrl:(NSString *)url
-            withApi:(NSString *)apiName
-       andDictParam:(NSDictionary *)dictParam
-       imageQuality:(ImageQuality)quality
-   requestSuccessed:(RequestSuccessed)requestSuccessed
-     requestFailure:(RequestFailure)requestFailure {
-    //TODO:resize
++ (void)uploadImageDataParam:(NSDictionary *)imageDataParam
+                       toUrl:(NSString *)url
+                     withApi:(NSString *)apiName
+                andDictParam:(NSDictionary *)dictParam
+                imageQuality:(ImageQuality)quality
+            requestSuccessed:(RequestSuccessed)requestSuccessed
+              requestFailure:(RequestFailure)requestFailure {
     [self requestByUrl:url
                withAPI:apiName
          andArrayParam:nil
           andDictParam:dictParam
           andBodyParam:nil
-             imageData:UIImagePNGRepresentation(image)
+             andImageDataParam:imageDataParam
       customModelClass:ClassOfObject(YSCBaseModel)
            requestType:RequestTypeUploadFile
       requestSuccessed:^(id responseObject) {
@@ -181,7 +180,7 @@
            requestType:(RequestType)requestType
       requestSuccessed:(RequestSuccessed)requestSuccessed
         requestFailure:(RequestFailure)requestFailure {
-    [self requestByUrl:url withAPI:apiName andArrayParam:nil andDictParam:dictParam andBodyParam:nil imageData:nil customModelClass:modelClass requestType:requestType requestSuccessed:requestSuccessed requestFailure:requestFailure];
+    [self requestByUrl:url withAPI:apiName andArrayParam:nil andDictParam:dictParam andBodyParam:nil andImageDataParam:nil customModelClass:modelClass requestType:requestType requestSuccessed:requestSuccessed requestFailure:requestFailure];
 }
 
 /**
@@ -201,7 +200,7 @@
        andArrayParam:(NSArray *)arrayParam
         andDictParam:(NSDictionary *)dictParam
         andBodyParam:(NSString *)bodyParam
-           imageData:(NSData *)imageData
+   andImageDataParam:(NSDictionary *)imageDataParam
     customModelClass:(Class)modelClass
          requestType:(RequestType)requestType
     requestSuccessed:(RequestSuccessed)requestSuccessed
@@ -348,8 +347,9 @@
 		[manager       POST:newUrlString
                  parameters:newDictParam
   constructingBodyWithBlock: ^(id < AFMultipartFormData > formData) {
-      if (imageData) {
-          [formData appendPartWithFileData:imageData name:@"file" fileName:@"avatar.png" mimeType:@"application/octet-stream"];
+      for (NSString *imageName in imageDataParam.allKeys) {
+          NSData *imageData = UIImageJPEGRepresentation(imageDataParam[imageName], 0.1);
+          [formData appendPartWithFileData:imageData name:@"files" fileName:imageName mimeType:@"application/octet-stream"];
       }
   }
                     success:requestSuccessed1

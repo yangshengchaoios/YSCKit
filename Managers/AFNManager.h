@@ -59,13 +59,13 @@ typedef void (^RequestFailure)(NSInteger errorCode, NSString *errorMessage);
 
 #pragma mark - 上传文件
 
-+ (void)uploadImage:(UIImage *)image
-              toUrl:(NSString *)url
-            withApi:(NSString *)apiName
-       andDictParam:(NSDictionary *)dictParam
-       imageQuality:(ImageQuality)quality
-   requestSuccessed:(RequestSuccessed)requestSuccessed
-     requestFailure:(RequestFailure)requestFailure;
++ (void)uploadImageDataParam:(NSDictionary *)imageDataParam
+                       toUrl:(NSString *)url
+                     withApi:(NSString *)apiName
+                andDictParam:(NSDictionary *)dictParam
+                imageQuality:(ImageQuality)quality
+            requestSuccessed:(RequestSuccessed)requestSuccessed
+              requestFailure:(RequestFailure)requestFailure;
 
 #pragma mark - 通用的GET、POST和上传图片（返回JSONModel的所有内容）
 
@@ -93,7 +93,7 @@ typedef void (^RequestFailure)(NSInteger errorCode, NSString *errorMessage);
        andArrayParam:(NSArray *)arrayParam
         andDictParam:(NSDictionary *)dictParam
         andBodyParam:(NSString *)bodyParam
-           imageData:(NSData *)imageData
+   andImageDataParam:(NSDictionary *)imageDataParam
     customModelClass:(Class)modelClass
          requestType:(RequestType)requestType
     requestSuccessed:(RequestSuccessed)requestSuccessed
