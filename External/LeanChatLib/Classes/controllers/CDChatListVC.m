@@ -16,7 +16,6 @@
 #import "CDMessageHelper.h"
 #import "DateTools.h"
 #import "CDConversationStore.h"
-#import "CDChatManager_Internal.h"
 #import "CDMacros.h"
 
 @interface CDChatListVC ()
@@ -107,7 +106,8 @@ static NSString *cellIdentifier = @"ContactCell";
         dispatch_block_t finishBlock = ^{
             [self stopRefreshControl:refreshControl];
             if ([self filterError:error]) {
-                self.conversations = conversations;
+                [self.conversations removeAllObjects];
+                [self.conversations addObjectsFromArray:conversations];
                 [self.tableView reloadData];
                 if ([self.chatListDelegate respondsToSelector:@selector(setBadgeWithTotalUnreadCount:)]) {
                     [self.chatListDelegate setBadgeWithTotalUnreadCount:totalUnreadCount];

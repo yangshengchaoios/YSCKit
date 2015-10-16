@@ -80,6 +80,11 @@ typedef void (^CDRecentConversationsCallback)(NSArray *conversations, NSInteger 
 @property (nonatomic, assign) BOOL useDevPushCerticate;
 
 /**
+ *  推送弹框点击时记录的 convid
+ */
+@property (nonatomic, strong) NSString *remoteNotificationConvid;
+
+/**
  *  获取单例
  */
 + (instancetype)manager;
@@ -95,6 +100,8 @@ typedef void (^CDRecentConversationsCallback)(NSArray *conversations, NSInteger 
  */
 - (void)closeWithCallback:(AVBooleanResultBlock)callback;
 
+
+#pragma mark - conversation
 /**
  *  根据 conversationId 获取对话
  *  @param convid   对话的 id
@@ -116,6 +123,13 @@ typedef void (^CDRecentConversationsCallback)(NSArray *conversations, NSInteger 
  */
 - (void)fetchConvWithMembers:(NSArray *)members callback:(AVIMConversationResultBlock)callback;
 
+//根据成员名称查找或创建一个单聊或群聊会话
+- (void)fetchConvWithMembers:(NSArray *)members type:(CDConvType)type callback:(AVIMConversationResultBlock)callback;
+//根据成员名称查找或创建一个单聊或群聊会话
+- (void)fetchConvWithMembers:(NSArray *)members type:(CDConvType)type extendAttributes:(NSDictionary *)attributes callback:(AVIMConversationResultBlock)callback;
+
+
+
 /**
  *  获取我在其中的群聊对话，优先从缓存中获取
  *  @param block 对话数组回调
@@ -130,14 +144,6 @@ typedef void (^CDRecentConversationsCallback)(NSArray *conversations, NSInteger 
 - (void)findGroupedConvsWithNetworkFirst:(BOOL)networkFirst block:(AVIMArrayResultBlock)block;
 
 /**
- *  创建对话
- *  @param members  初始成员
- *  @param type     单聊/群聊
- *  @param callback 对话回调
- */
-- (void)createConvWithMembers:(NSArray *)members type:(CDConvType)type callback:(AVIMConversationResultBlock)callback;
-
-/**
  *  更新对话 name 或 attrs
  *  @param conv     要更新的对话
  *  @param name     对话名字
@@ -145,19 +151,6 @@ typedef void (^CDRecentConversationsCallback)(NSArray *conversations, NSInteger 
  *  @param callback
  */
 - (void)updateConv:(AVIMConversation *)conv name:(NSString *)name attrs:(NSDictionary *)attrs callback:(AVIMBooleanResultBlock)callback;
-/**
- *  将对话缓存在内存中
- *  @param convids  需要缓存的对话 ids
- *  @param callback
- */
-- (void)cacheConvsWithIds:(NSMutableSet *)convids callback:(AVBooleanResultBlock)callback;
-
-/**
- *  根据对话 id 查找内存中的对话
- *  @param convid 对话 id
- *  @return conversation 对象
- */
-- (AVIMConversation *)lookupConvById:(NSString *)convid;
 
 /**
  *  统一的发送消息接口
@@ -224,7 +217,7 @@ typedef void (^CDRecentConversationsCallback)(NSArray *conversations, NSInteger 
  *  发送失败的消息的临时的 id
  *  @return
  */
-- (NSString *)uuid;
+- (NSString *)tempMessageId;
 
 + (NSError *)errorWithText:(NSString *)text;
 

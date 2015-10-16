@@ -30,11 +30,6 @@
  */
 + (NSString *)plainStringFromEmojiString:(NSString *)emojiText;
 
-/*!
- *  方便开发者把本地表情保存到云端，调用一次保存到后台
- */
-+ (void)saveEmotions;
-
 + (void)findEmotionWithName:(NSString *)name block:(AVFileResultBlock)block;
 
 @end

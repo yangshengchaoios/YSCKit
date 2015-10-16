@@ -83,8 +83,9 @@
     self.clickHeaderBlock = ^(NSObject *object, NSInteger section) {};
     self.clickCellBlock = ^(NSObject *object, NSIndexPath *indexPath) {};
     self.clickFooterBlock = ^(NSObject *object, NSInteger section) {};
-    self.layoutHeader = ^(UIView *view, NSObject *object) {};
-    self.layoutFooter = ^(UIView *view, NSObject *object) {};
+    self.layoutHeaderView = ^(UIView *view, NSObject *object) {};
+    self.layoutCellView = ^(UIView *view, NSObject *object) {};
+    self.layoutFooterView = ^(UIView *view, NSObject *object) {};
     
     [self initTableView];//初始化tableView
 }
@@ -491,9 +492,11 @@
     if (isNotEmpty(self.headerName) && (section >= 0 && section < [self.headerDataArray count])) {
         header = [NSClassFromString(self.headerName) dequeueHeaderFooterByTableView:tableView];
         NSObject *object = self.headerDataArray[section];
-        [header layoutObject:object];
-        if (self.layoutHeader) {
-            self.layoutHeader(header, object);
+        if ([header isKindOfClass:[YSCBaseTableHeaderFooterView class]]) {
+            [header layoutObject:object];
+        }
+        if (self.layoutHeaderView) {
+            self.layoutHeaderView(header, object);
         }
         
         WEAKSELF
@@ -528,6 +531,9 @@
     if ([cell isKindOfClass:[YSCBaseTableViewCell class]]) {
         [cell layoutObject:object];
     }
+    if (self.layoutCellView) {
+        self.layoutCellView(cell, object);
+    }
     cell.selectionStyle = UITableViewCellSelectionStyleNone;
     return cell;
 }
@@ -548,9 +554,11 @@
     if (isNotEmpty(self.footerName) && (section >= 0 && section < [self.footerDataArray count])) {
         footer = [NSClassFromString(self.footerName) dequeueHeaderFooterByTableView:tableView];
         NSObject *object = self.footerDataArray[section];
-        [footer layoutObject:object];
-        if (self.layoutFooter) {
-            self.layoutFooter(footer, object);
+        if ([footer isKindOfClass:[YSCBaseTableHeaderFooterView class]]) {
+            [footer layoutObject:object];
+        }
+        if (self.layoutFooterView) {
+            self.layoutFooterView(footer, object);
         }
         
         WEAKSELF

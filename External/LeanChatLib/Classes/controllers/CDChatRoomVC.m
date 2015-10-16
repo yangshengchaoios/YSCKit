@@ -415,7 +415,7 @@ static NSInteger const kOnePageSize = 10;
 #pragma mark - conversations store
 
 - (void)updateConversationAsRead {
-    [[CDConversationStore store] insertConversation:self.conv];
+    [[CDConversationStore store] insertConversation:self.conv];//如果已经存在就不会继续插入，保证有消息就有会话！
     [[CDConversationStore store] updateUnreadCountToZeroWithConversation:self.conv];
     [[CDConversationStore store] updateMentioned:NO conversation:self.conv];
     [[NSNotificationCenter defaultCenter] postNotificationName:kCDNotificationUnreadsUpdated object:nil];
@@ -446,7 +446,7 @@ static NSInteger const kOnePageSize = 10;
     [[CDChatManager manager] sendMessage:msg conversation:self.conv callback:^(BOOL succeeded, NSError *error) {
         if (error) {
             // 伪造一个 messageId，重发的成功的时候，根据这个伪造的id把数据库中的改过来
-            msg.messageId = [[CDChatManager manager] uuid];
+            msg.messageId = [[CDChatManager manager] tempMessageId];
             msg.sendTimestamp = [[NSDate date] timeIntervalSince1970] * 1000;
             if (msg.conversationId == nil) {
                 //文件没有保存上会导致 conversationId 为空
@@ -546,11 +546,9 @@ static NSInteger const kOnePageSize = 10;
 }
 
 #pragma mark - modal convert
-
 - (NSDate *)getTimestampDate:(int64_t)timestamp {
     return [NSDate dateWithTimeIntervalSince1970:timestamp / 1000];
 }
-
 - (XHMessage *)getXHMessageByMsg:(AVIMTypedMessage *)msg {
     id <CDUserModel> fromUser = [[CDChatManager manager].userDelegate getUserById:msg.clientId];
     XHMessage *xhMessage;
@@ -627,7 +625,6 @@ static NSInteger const kOnePageSize = 10;
     }
     return xhMessage;
 }
-
 - (NSMutableArray *)getXHMessages:(NSArray *)msgs {
     NSMutableArray *messages = [[NSMutableArray alloc] init];
     for (AVIMTypedMessage *msg in msgs) {
@@ -709,7 +706,7 @@ static NSInteger const kOnePageSize = 10;
         }];
     }
 }
-
+//缓存消息内容文件，不是消息本身！
 - (void)cacheMsgs:(NSArray *)msgs callback:(AVBooleanResultBlock)callback {
     [self runInGlobalQueue:^{
         NSMutableSet *userIds = [[NSMutableSet alloc] init];
