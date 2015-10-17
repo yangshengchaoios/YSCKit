@@ -69,6 +69,10 @@
     @"SET " kCDConversationTableKeyData @" = ? "                \
     kCDConversationTableWhereClause                             \
 
+#define kCDConversationTableSelectTotalUnreadCountSQL           \
+    @"SELECT " kCDConversationTableKeyUnreadCount               \
+    @" FROM " kCDConversationTableName                          \
+
 @interface CDConversationStore ()
 
 @property (nonatomic, strong) FMDatabaseQueue *databaseQueue;
@@ -177,12 +181,51 @@
     return conversations;
 }
 
+- (AVIMConversation *)selectOneConversationByConvId:(NSString *)convId {
+    if (nil == convId) {
+        return nil;
+    }
+    __block AVIMConversation *conv = nil;
+    [self.databaseQueue inDatabase:^(FMDatabase *db) {
+        FMResultSet * resultSet = [db executeQuery:kCDConversationTableSelectOneSQL withArgumentsInArray:@[convId]];
+        if ([resultSet next]) {
+            conv = [self createConversationFromResultSet:resultSet];
+        }
+        [resultSet close];
+    }];
+    return conv;
+}
+
+- (NSInteger)selectTotalUnreadCount {
+    __block NSInteger totalUnreadCount = 0;
+    [self.databaseQueue inDatabase:^(FMDatabase *db) {
+        FMResultSet * resultSet = [db executeQuery:kCDConversationTableSelectTotalUnreadCountSQL withArgumentsInArray:@[]];
+        NSLog(@"sql = %@", kCDConversationTableSelectTotalUnreadCountSQL);
+        while ([resultSet next]) {
+            NSInteger unreadCount = [resultSet intForColumn:kCDConversationTableKeyUnreadCount];
+            if (unreadCount > 0) {
+                totalUnreadCount += unreadCount;
+            }
+        }
+        [resultSet close];
+    }];
+    return totalUnreadCount;
+}
+
 - (void)updateConversations:(NSArray *)conversations {
     [self.databaseQueue inDatabase:^(FMDatabase *db) {
         [db beginTransaction];
         for (AVIMConversation *conversation in conversations) {
             [db executeUpdate:kCDConversationTableUpdateDataSQL, [self dataFromConversation:conversation], conversation.conversationId];
         }
+        [db commit];
+    }];
+}
+
+- (void)updateConversation:(AVIMConversation *)conversation {
+    [self.databaseQueue inDatabase:^(FMDatabase *db) {
+        [db beginTransaction];
+        [db executeUpdate:kCDConversationTableUpdateDataSQL, [self dataFromConversation:conversation], conversation.conversationId];
         [db commit];
     }];
 }

@@ -38,7 +38,7 @@ static CDChatManager *instance;
     if (self) {
         [AVIMClient setTimeoutIntervalInSeconds:20];
         // 以下选项也即是说 A 不在线时，有人往A发了很多条消息，下次启动时，不再收到具体的离线消息，而是收到离线消息的数目(未读通知)
-//        [AVIMClient setUserOptions:@{AVIMUserOptionUseUnread:@(YES)}];
+        [AVIMClient setUserOptions:@{AVIMUserOptionUseUnread:@(NO)}];
         [AVIMClient defaultClient].delegate =self;
     }
     return self;
@@ -451,7 +451,7 @@ static CDChatManager *instance;
 #pragma mark - conv cache
 //只是刷新本地已有的会话列表而已
 - (void)selectOrRefreshConversationsWithBlock:(AVIMArrayResultBlock)block {
-    NSArray *conversations = [[CDConversationStore store] selectAllConversations];//本地的convId是从哪里来的？？？
+    NSArray *conversations = [[CDConversationStore store] selectAllConversations];//本地的convId是从哪里来的？？？有新消息到达就插入一条conversation记录
     if (isEmpty(conversations)) {
         block(nil, nil);
         return;

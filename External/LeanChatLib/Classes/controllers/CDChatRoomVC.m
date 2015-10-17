@@ -54,13 +54,11 @@ static NSInteger const kOnePageSize = 10;
     }
     return self;
 }
-
 - (instancetype)initWithConv:(AVIMConversation *)conv {
     self = [self init];
     self.conv = conv;
     return self;
 }
-
 - (void)viewDidLoad {
     [super viewDidLoad];
     NSString *received_convid = [NSString stringWithFormat:@"received_%@", Trim(self.conv.conversationId)];
@@ -84,21 +82,21 @@ static NSInteger const kOnePageSize = 10;
     [self loadMessagesWhenInit];
     [self updateStatusView];
 }
-
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
     [CDChatManager manager].chattingConversationId = self.conv.conversationId;
 }
-
 - (void)viewDidDisappear:(BOOL)animated {
-    [super viewDidDisappear:animated];
     [CDChatManager manager].chattingConversationId = nil;
     if (self.msgs.count > 0) {
-        [self updateConversationAsRead];
+        AVIMConversation *tempConv = [[CDConversationStore store] selectOneConversationByConvId:self.conv.conversationId];
+        if (tempConv.unreadCount > 0) {
+            [self updateConversationAsRead];
+        }
     }
     [[XHAudioPlayerHelper shareInstance] stopAudio];
+    [super viewDidDisappear:animated];
 }
-
 - (void)dealloc {
     [[NSNotificationCenter defaultCenter] removeObserver:self name:kCDNotificationMessageReceived object:nil];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:kCDNotificationMessageDelivered object:nil];
@@ -108,13 +106,11 @@ static NSInteger const kOnePageSize = 10;
 }
 
 #pragma mark - ui init
-
 - (void)initBarButton {
     UIBarButtonItem *backBtn = [[UIBarButtonItem alloc] initWithTitle:@"返回" style:UIBarButtonItemStylePlain target:nil action:nil];
     [self.navigationItem setBackBarButtonItem:backBtn];
 //    self.navigationItem.backBarButtonItem.title
 }
-
 - (void)initBottomMenuAndEmotionView {
     NSMutableArray *shareMenuItems = [NSMutableArray array];
     NSArray *plugIcons = @[@"sharemore_pic", @"sharemore_video", @"sharemore_location"];
@@ -130,13 +126,11 @@ static NSInteger const kOnePageSize = 10;
     self.emotionManagerView.isShowEmotionStoreButton = YES;
     [self.emotionManagerView reloadData];
 }
-
 - (void)refreshConv {
     self.title = self.conv.title;
 }
 
 #pragma mark - connect status view
-
 - (LZStatusView *)clientStatusView {
     if (_clientStatusView == nil) {
         _clientStatusView = [[LZStatusView alloc] initWithFrame:CGRectMake(0, 64, self.messageTableView.frame.size.width, kLZStatusViewHight)];
@@ -144,7 +138,6 @@ static NSInteger const kOnePageSize = 10;
     }
     return _clientStatusView;
 }
-
 - (void)updateStatusView {
     if ([CDChatManager manager].connect) {
         self.clientStatusView.hidden = YES;
@@ -154,7 +147,6 @@ static NSInteger const kOnePageSize = 10;
 }
 
 #pragma mark - XHMessageTableViewCell delegate
-
 - (void)multiMediaMessageDidSelectedOnMessage:(id <XHMessageModel> )message atIndexPath:(NSIndexPath *)indexPath onMessageTableViewCell:(XHMessageTableViewCell *)messageTableViewCell {
     UIViewController *disPlayViewController;
     switch (message.messageMediaType) {
@@ -176,7 +168,7 @@ static NSInteger const kOnePageSize = 10;
         case XHBubbleMessageMediaTypeVoice: {
             // Mark the voice as read and hide the red dot.
             //message.isRead = YES;
-            //messageTableViewCell.messageBubbleView.voiceUnreadDotImageView.hidden = YES;
+//            messageTableViewCell.messageBubbleView.voiceUnreadDotImageView.hidden = YES;
             [[XHAudioPlayerHelper shareInstance] setDelegate:self];
             if (_currentSelectedCell) {
                 [_currentSelectedCell.messageBubbleView.animationVoiceImageView stopAnimating];
@@ -212,27 +204,22 @@ static NSInteger const kOnePageSize = 10;
         [self.navigationController pushViewController:disPlayViewController animated:YES];
     }
 }
-
 - (void)didDoubleSelectedOnTextMessage:(id <XHMessageModel> )message atIndexPath:(NSIndexPath *)indexPath {
     DLog(@"text : %@", message.text);
     XHDisplayTextViewController *displayTextViewController = [[XHDisplayTextViewController alloc] init];
     displayTextViewController.message = message;
     [self.navigationController pushViewController:displayTextViewController animated:YES];
 }
-
 - (void)didSelectedAvatorOnMessage:(id <XHMessageModel> )message atIndexPath:(NSIndexPath *)indexPath {
     DLog(@"indexPath : %@", indexPath);
 }
-
 - (void)menuDidSelectedAtBubbleMessageMenuSelecteType:(XHBubbleMessageMenuSelecteType)bubbleMessageMenuSelecteType {
 }
-
 - (void)didRetrySendMessage:(id <XHMessageModel> )message atIndexPath:(NSIndexPath *)indexPath {
     [self resendMessageAtIndexPath:indexPath discardIfFailed:false];
 }
 
 #pragma mark - XHAudioPlayerHelper Delegate
-
 - (void)didAudioPlayerStopPlay:(AVAudioPlayer *)audioPlayer {
     if (!_currentSelectedCell) {
         return;
@@ -242,31 +229,25 @@ static NSInteger const kOnePageSize = 10;
 }
 
 #pragma mark - XHEmotionManagerView DataSource
-
 - (NSInteger)numberOfEmotionManagers {
     return self.emotionManagers.count;
 }
-
 - (XHEmotionManager *)emotionManagerForColumn:(NSInteger)column {
     return [self.emotionManagers objectAtIndex:column];
 }
-
 - (NSArray *)emotionManagersAtManager {
     return self.emotionManagers;
 }
 
 #pragma mark - XHMessageTableViewController Delegate
-
 - (BOOL)shouldLoadMoreMessagesScrollToTop {
     return YES;
 }
-
 - (void)loadMoreMessagesScrollTotop {
     [self loadOldMessages];
 }
 
 #pragma mark - didSend delegate
-
 //发送文本消息的回调方法
 - (void)didSendText:(NSString *)text fromSender:(NSString *)sender onDate:(NSDate *)date {
     if ([text length] > 0) {
@@ -275,25 +256,21 @@ static NSInteger const kOnePageSize = 10;
         [self finishSendMessageWithBubbleMessageType:XHBubbleMessageMediaTypeText];
     }
 }
-
 //发送图片消息的回调方法
 - (void)didSendPhoto:(UIImage *)photo fromSender:(NSString *)sender onDate:(NSDate *)date {
     [self sendImage:photo];
     [self finishSendMessageWithBubbleMessageType:XHBubbleMessageMediaTypePhoto];
 }
-
 // 发送视频消息的回调方法
 - (void)didSendVideoConverPhoto:(UIImage *)videoConverPhoto videoPath:(NSString *)videoPath fromSender:(NSString *)sender onDate:(NSDate *)date {
     AVIMVideoMessage* sendVideoMessage = [AVIMVideoMessage messageWithText:nil attachedFilePath:videoPath attributes:nil];
     [self sendMsg:sendVideoMessage];
 }
-
 // 发送语音消息的回调方法
 - (void)didSendVoice:(NSString *)voicePath voiceDuration:(NSString *)voiceDuration fromSender:(NSString *)sender onDate:(NSDate *)date {
     AVIMTypedMessage *msg = [AVIMAudioMessage messageWithText:nil attachedFilePath:voicePath attributes:nil];
     [self sendMsg:msg];
 }
-
 // 发送表情消息的回调方法
 - (void)didSendEmotion:(NSString *)emotion fromSender:(NSString *)sender onDate:(NSDate *)date {
     if ([emotion hasPrefix:@":"]) {
@@ -312,14 +289,12 @@ static NSInteger const kOnePageSize = 10;
         [self finishSendMessageWithBubbleMessageType:XHBubbleMessageMediaTypeEmotion];
     }
 }
-
 - (void)didSendGeoLocationsPhoto:(UIImage *)geoLocationsPhoto geolocations:(NSString *)geolocations location:(CLLocation *)location fromSender:(NSString *)sender onDate:(NSDate *)date {
     [self sendLocationWithLatitude:location.coordinate.latitude longitude:location.coordinate.longitude address:geolocations];
     [self finishSendMessageWithBubbleMessageType:XHBubbleMessageMediaTypeLocalPosition];
 }
 
 #pragma mark -  ui config
-
 // 是否显示时间轴Label的回调方法
 - (BOOL)shouldDisplayTimestampForRowAtIndexPath:(NSIndexPath *)indexPath {
     if (indexPath.row == 0) {
@@ -337,7 +312,6 @@ static NSInteger const kOnePageSize = 10;
         }
     }
 }
-
 // 配置Cell的样式或者字体
 - (void)configureCell:(XHMessageTableViewCell *)cell atIndexPath:(NSIndexPath *)indexPath {
     XHMessage *msg = [self.messages objectAtIndex:indexPath.row];
@@ -356,31 +330,26 @@ static NSInteger const kOnePageSize = 10;
         [textView setTextColor:[UIColor blackColor]];
     }
 }
-
 // 协议回掉是否支持用户手动滚动
 - (BOOL)shouldPreventScrollToBottomWhileUserScrolling {
     return YES;
 }
-
 - (void)didSelecteShareMenuItem:(XHShareMenuItem *)shareMenuItem atIndex:(NSInteger)index {
     [super didSelecteShareMenuItem:shareMenuItem atIndex:index];
 }
 
 #pragma mark - @ reference other
-
 - (void)didInputAtSignOnMessageTextView:(XHMessageTextView *)messageInputTextView {
     
 }
 
 #pragma mark - alert and async utils
-
 - (void)alert:(NSString *)msg {
     UIAlertView *alertView = [[UIAlertView alloc]
                               initWithTitle:nil message:msg delegate:nil
                               cancelButtonTitle   :@"确定" otherButtonTitles:nil];
     [alertView show];
 }
-
 - (BOOL)alertError:(NSError *)error {
     if (error) {
         if (error.code == kAVIMErrorConnectionLost) {
@@ -396,16 +365,12 @@ static NSInteger const kOnePageSize = 10;
     }
     return NO;
 }
-
 - (BOOL)filterError:(NSError *)error {
     return [self alertError:error] == NO;
 }
-
-
 - (void)runInMainQueue:(void (^)())queue {
     dispatch_async(dispatch_get_main_queue(), queue);
 }
-
 - (void)runInGlobalQueue:(void (^)())queue {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), queue);
 }
@@ -422,7 +387,6 @@ static NSInteger const kOnePageSize = 10;
 }
 
 #pragma mark - send message
-
 - (void)sendImage:(UIImage *)image {
     NSData *imageData = UIImageJPEGRepresentation(image, 0.6);
     NSString *path = [[CDChatManager manager] tmpPath];
@@ -436,12 +400,10 @@ static NSInteger const kOnePageSize = 10;
         [self alert:@"write image to file error"];
     }
 }
-
 - (void)sendLocationWithLatitude:(double)latitude longitude:(double)longitude address:(NSString *)address {
     AVIMLocationMessage *locMsg = [AVIMLocationMessage messageWithText:address latitude:latitude longitude:longitude attributes:nil];
     [self sendMsg:locMsg];
 }
-
 - (void)sendMsg:(AVIMTypedMessage *)msg {
     [[CDChatManager manager] sendMessage:msg conversation:self.conv callback:^(BOOL succeeded, NSError *error) {
         if (error) {
@@ -457,21 +419,17 @@ static NSInteger const kOnePageSize = 10;
             [[CDSoundManager manager] playSendSoundIfNeed];
             [self insertMessage:msg];
         } else {
-            self.conv.lastMessage = msg;
-            APPDATA.totalUnreadCount = APPDATA.totalUnreadCount;//NOTE: refresh list
             [[CDSoundManager manager] playSendSoundIfNeed];
             [self insertMessage:msg];
         }
     }];
 }
-
 - (void)replaceMesssage:(AVIMTypedMessage *)message atIndexPath:(NSIndexPath *)indexPath {
     self.msgs[indexPath.row] = message;
     XHMessage *xhMessage = [self getXHMessageByMsg:message];
     self.messages[indexPath.row] = xhMessage;
     [self.messageTableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
 }
-
 - (void)resendMessageAtIndexPath:(NSIndexPath *)indexPath discardIfFailed:(BOOL)discardIfFailed {
     AVIMTypedMessage *msg = self.msgs[indexPath.row];
     msg.status = AVIMMessageStatusSending;
@@ -497,7 +455,6 @@ static NSInteger const kOnePageSize = 10;
 }
 
 #pragma mark - receive and delivered
-
 - (void)receiveMessage:(NSNotification *)notification {
     AVIMTypedMessage *message = notification.object;
     if ([message.conversationId isEqualToString:self.conv.conversationId]) {
@@ -521,7 +478,6 @@ static NSInteger const kOnePageSize = 10;
         [self insertMessage:message];
     }
 }
-
 - (void)onMessageDelivered:(NSNotification *)notification {
     AVIMTypedMessage *message = notification.object;
     if ([message.conversationId isEqualToString:self.conv.conversationId]) {
@@ -637,11 +593,24 @@ static NSInteger const kOnePageSize = 10;
 }
 
 #pragma mark - query messages
-
 - (void)queryAndCacheMessagesWithTimestamp:(int64_t)timestamp block:(AVIMArrayResultBlock)block {
     [[CDChatManager manager] queryTypedMessagesWithConversation:self.conv timestamp:timestamp limit:kOnePageSize block:^(NSArray *msgs, NSError *error) {
         if (error) {
-            block(msgs, error);
+            if (error.code == kAVIMErrorConversationNotFound) {
+                //0. 虽然服务器端的会话已不存在，但本地的会话未读数也要清空！
+                [self updateConversationAsRead];
+                //1. 删除缓存数据库的conv
+                [[CDConversationStore store] deleteConversation:self.conv];
+                //2. 弹出提示语
+                UIAlertView *alertView = [UIAlertView bk_alertViewWithTitle:@"会话未找到"];
+                [alertView bk_setCancelBlock:^{
+                    [self.navigationController popViewControllerAnimated:YES];
+                }];
+                [alertView show];
+            }
+            else {
+                block(msgs, error);
+            }
         } else {
             [self cacheMsgs:msgs callback:^(BOOL succeeded, NSError *error) {
                 block (msgs, error);
@@ -649,7 +618,6 @@ static NSInteger const kOnePageSize = 10;
         }
     }];
 }
-
 - (void)loadMessagesWhenInit {
     if (self.isLoadingMsg) {
         return;
@@ -683,7 +651,6 @@ static NSInteger const kOnePageSize = 10;
         }];
     }
 }
-
 - (void)loadOldMessages{
     if (self.messages.count == 0 || self.isLoadingMsg) {
         return;

@@ -57,6 +57,12 @@
 - (void)updateConversations:(NSArray *)conversations;
 
 /**
+ *  更新单个会话
+ *  @param conversation
+ */
+- (void)updateConversation:(AVIMConversation *)conversation;
+
+/**
  *  最近对话列表左滑删除本地数据库的对话，将不显示在列表
  *  @param conversation
  */
@@ -67,6 +73,18 @@
  *  @return 对话数据
  */
 - (NSArray *)selectAllConversations;
+
+/**
+ *  从本地数据库查找对话
+ *  @return 对话
+ */
+- (AVIMConversation *)selectOneConversationByConvId:(NSString *)convId;
+
+/**
+ *  从本地数据库查找未读消息总数
+ *  @return 未读消息总数
+ */
+- (NSInteger)selectTotalUnreadCount;
 
 /**
  *  判断某对话是否存在于本地数据库。接收到消息的时候用，sdk 传过来的对话的members 等数据可能是空的，如果本地数据库存在该对话，则不去服务器请求对话了。如果不存在，则向服务器请求对话的元数据。使得在最近对话列表，取出对话的时候，对话都有元数据。
