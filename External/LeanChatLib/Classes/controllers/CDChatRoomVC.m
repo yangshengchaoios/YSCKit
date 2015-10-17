@@ -89,10 +89,9 @@ static NSInteger const kOnePageSize = 10;
 - (void)viewDidDisappear:(BOOL)animated {
     [CDChatManager manager].chattingConversationId = nil;
     if (self.msgs.count > 0) {
-        AVIMConversation *tempConv = [[CDConversationStore store] selectOneConversationByConvId:self.conv.conversationId];
-        if (tempConv.unreadCount > 0) {
-            [self updateConversationAsRead];
-        }
+        //如果有未读消息，且通过推送栏进入本页面后，继续有新消息到达，退出的时候就需要清空conv的未读消息，
+        //因为处于当页面时不会发送kCDNotificationUnreadsUpdated通知！
+        [self updateConversationAsRead];
     }
     [[XHAudioPlayerHelper shareInstance] stopAudio];
     [super viewDidDisappear:animated];

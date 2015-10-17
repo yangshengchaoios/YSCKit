@@ -67,10 +67,9 @@ static CDChatManager *instance;
 
 #pragma mark - conversation
 //根据会话id查询(不创建)会话
-//NOTE:缓存策略？
 - (void)fecthConvWithConvid:(NSString *)convid callback:(AVIMConversationResultBlock)callback {
     AVIMConversationQuery *q = [[AVIMClient defaultClient] conversationQuery];
-    q.cachePolicy = kAVCachePolicyNetworkElseCache;
+    q.cachePolicy = kAVCachePolicyNetworkOnly;
     [q whereKey:@"objectId" equalTo:convid];
     [q findConversationsWithCallback: ^(NSArray *objects, NSError *error) {
         if (error) {
@@ -97,12 +96,10 @@ static CDChatManager *instance;
     [self fetchConvWithMembers:members type:CDConvTypeGroup callback:callback];
 }
 //根据成员名称查找或创建一个单聊或群聊会话
-//NOTE:缓存策略？
 - (void)fetchConvWithMembers:(NSArray *)members type:(CDConvType)type callback:(AVIMConversationResultBlock)callback {
     [self fetchConvWithMembers:members type:type extendAttributes:nil callback:callback];
 }
 //根据成员名称查找或创建一个单聊或群聊会话
-//NOTE:缓存策略？
 - (void)fetchConvWithMembers:(NSArray *)members type:(CDConvType)type extendAttributes:(NSDictionary *)attributes callback:(AVIMConversationResultBlock)callback {
     //判断自己是否包括在内
     if ([members containsObject:self.selfId] == NO) {
@@ -119,7 +116,7 @@ static CDChatManager *instance;
     // 如果没有数组size限制，传[2,3]，可能取回 [1,2,3]
     [q whereKey:kAVIMKeyMember sizeEqualTo:members.count];
     [q orderByDescending:@"updateAt"];
-    q.cachePolicy = kAVCachePolicyNetworkElseCache;
+    q.cachePolicy = kAVCachePolicyNetworkOnly;
     q.limit = 1;
     [q findConversationsWithCallback: ^(NSArray *objects, NSError *error) {
         if (error) {
@@ -177,7 +174,7 @@ static CDChatManager *instance;
     if (convids.count > 0) {
         AVIMConversationQuery *q = [[AVIMClient defaultClient] conversationQuery];
         [q whereKey:@"objectId" containedIn:[convids allObjects]];
-        q.cachePolicy = kAVCachePolicyNetworkElseCache;
+        q.cachePolicy = kAVCachePolicyNetworkOnly;
         q.limit = 1000;  // default limit:10
         [q findConversationsWithCallback:callback];
     } else {
