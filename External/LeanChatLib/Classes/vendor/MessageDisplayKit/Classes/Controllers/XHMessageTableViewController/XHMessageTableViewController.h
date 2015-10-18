@@ -274,7 +274,8 @@
 - (void)scrollToRowAtIndexPath:(NSIndexPath *)indexPath
 			  atScrollPosition:(UITableViewScrollPosition)position
 					  animated:(BOOL)animated;
-
+//根据图片开始发送图片消息
+- (void)didSendMessageWithPhoto:(UIImage *)photo;
 //根据地理位置信息和地理经纬度开始发送地理位置消息
 - (void)didSendGeolocationsMessageWithGeolocaltions:(NSString *)geolcations location:(CLLocation *)location;
 @end
