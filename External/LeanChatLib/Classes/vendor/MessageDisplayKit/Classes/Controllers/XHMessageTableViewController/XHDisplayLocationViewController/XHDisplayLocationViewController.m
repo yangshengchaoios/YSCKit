@@ -64,6 +64,7 @@
 
 - (void)dealloc {
     self.mapView = nil;
+    NSLog(@"XHDisplayLocationViewController deallocing...");
 }
 
 @end
