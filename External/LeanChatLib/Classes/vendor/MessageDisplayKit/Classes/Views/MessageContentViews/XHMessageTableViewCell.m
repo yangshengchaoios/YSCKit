@@ -247,9 +247,9 @@ static const CGFloat kXHBubbleMessageViewPadding = 8;
         }
         case XHBubbleMessageMediaTypeText:
         case XHBubbleMessageMediaTypeVoice: {
-            NSString* durationStr=@"";
-            if(message.voiceDuration!=0){
-                durationStr=[NSString stringWithFormat:@"%@\'\'", message.voiceDuration];
+            NSString* durationStr = @"";
+            if(message.voiceDuration != 0){
+                durationStr = [NSString stringWithFormat:@"%@\'\'", message.voiceDuration];
             }
             self.messageBubbleView.voiceDurationLabel.text = durationStr;
 //            break;
@@ -306,7 +306,7 @@ static const CGFloat kXHBubbleMessageViewPadding = 8;
     if (longPressGestureRecognizer.state != UIGestureRecognizerStateBegan || ![self becomeFirstResponder])
         return;
     
-    UIMenuItem *copy = [[UIMenuItem alloc] initWithTitle:NSLocalizedStringFromTable(@"copy", @"MessageDisplayKitString", @"复制文本消息") action:@selector(copyed:)];
+    UIMenuItem *copy = [[UIMenuItem alloc] initWithTitle:NSLocalizedStringFromTable(@"copy", @"MessageDisplayKitString", @"复制") action:@selector(copyed:)];
     UIMenuItem *transpond = [[UIMenuItem alloc] initWithTitle:NSLocalizedStringFromTable(@"transpond", @"MessageDisplayKitString", @"转发") action:@selector(transpond:)];
     UIMenuItem *favorites = [[UIMenuItem alloc] initWithTitle:NSLocalizedStringFromTable(@"favorites", @"MessageDisplayKitString", @"收藏") action:@selector(favorites:)];
     UIMenuItem *more = [[UIMenuItem alloc] initWithTitle:NSLocalizedStringFromTable(@"more", @"MessageDisplayKitString", @"更多") action:@selector(more:)];
@@ -376,13 +376,9 @@ static const CGFloat kXHBubbleMessageViewPadding = 8;
     
     CGFloat timestampHeight = displayTimestamp ? (kXHTimeStampLabelHeight + kXHLabelPadding * 2) : kXHLabelPadding;
     CGFloat avatarHeight = kXHAvatarImageSize;
-    
     CGFloat userNameHeight = 20;
-    
     CGFloat subviewHeights = timestampHeight + kXHBubbleMessageViewPadding * 2 + userNameHeight;
-    
     CGFloat bubbleHeight = [XHMessageBubbleView calculateCellHeightWithMessage:message];
-    
     return subviewHeights + MAX(avatarHeight, bubbleHeight);
 }
 
@@ -393,7 +389,6 @@ static const CGFloat kXHBubbleMessageViewPadding = 8;
     self.selectionStyle = UITableViewCellSelectionStyleNone;
     self.accessoryType = UITableViewCellAccessoryNone;
     self.accessoryView = nil;
-    
 }
 
 - (instancetype)initWithMessage:(id <XHMessageModel>)message
@@ -455,14 +450,13 @@ static const CGFloat kXHBubbleMessageViewPadding = 8;
         // 4、配置需要显示什么消息内容，比如语音、文字、视频、图片
         if (!_messageBubbleView) {
             CGFloat bubbleX = 0.0f;
-            
             CGFloat offsetX = 0.0f;
-            
-            if (message.bubbleMessageType == XHBubbleMessageTypeReceiving)
+            if (message.bubbleMessageType == XHBubbleMessageTypeReceiving) {
                 bubbleX = kXHAvatarImageSize + kXHAvatorPaddingX + kXHAvatorPaddingX;
-            else
+            }
+            else {
                 offsetX = kXHAvatarImageSize + kXHAvatorPaddingX + kXHAvatorPaddingX;
-            
+            }
             CGRect frame = CGRectMake(bubbleX,
                                       kXHBubbleMessageViewPadding + (self.displayTimestamp ? (kXHTimeStampLabelHeight + kXHLabelPadding) : kXHLabelPadding),
                                       self.contentView.frame.size.width - bubbleX - offsetX,
@@ -481,8 +475,6 @@ static const CGFloat kXHBubbleMessageViewPadding = 8;
         if(!self.statusView){
             CGRect statusViewFrame=CGRectMake(0, 0, kXHStatusViewWidth, kXHStatusViewHeight);
             XHMessageStatusView* statusView=[[XHMessageStatusView alloc] initWithFrame:statusViewFrame];
-
-            //attributedLabel.backgroundColor=[UIColor redColor];
             [self.contentView addSubview:statusView];
             [self.contentView bringSubviewToFront:statusView];
             [statusView.retryButton addTarget:self action:@selector(retryButtonClicked:) forControlEvents:UIControlEventTouchUpInside];
@@ -513,35 +505,32 @@ static const CGFloat kXHBubbleMessageViewPadding = 8;
     CGRect avatorButtonFrame = self.avatorButton.frame;
     avatorButtonFrame.origin.y = layoutOriginY;
     avatorButtonFrame.origin.x = ([self bubbleMessageType] == XHBubbleMessageTypeReceiving) ? kXHAvatorPaddingX : ((CGRectGetWidth(self.bounds) - kXHAvatorPaddingX - kXHAvatarImageSize));
-    
     layoutOriginY = kXHBubbleMessageViewPadding + (self.displayTimestamp ? kXHTimeStampLabelHeight : 0);
     CGRect bubbleMessageViewFrame = self.messageBubbleView.frame;
     bubbleMessageViewFrame.origin.y = layoutOriginY;
-    
     CGFloat bubbleX = 0.0f;
-    if ([self bubbleMessageType] == XHBubbleMessageTypeReceiving)
+    if ([self bubbleMessageType] == XHBubbleMessageTypeReceiving) {
         bubbleX = kXHAvatarImageSize + kXHAvatorPaddingX + kXHAvatorPaddingX;
+    }
     bubbleMessageViewFrame.origin.x = bubbleX;
     
     self.avatorButton.frame = avatorButtonFrame;
-    
     self.userNameLabel.center = CGPointMake(CGRectGetMidX(avatorButtonFrame), CGRectGetMaxY(avatorButtonFrame) + CGRectGetMidY(self.userNameLabel.bounds));
-    
     self.messageBubbleView.frame = bubbleMessageViewFrame;
-    
-    if(self.bubbleMessageType==XHBubbleMessageTypeSending){
-        self.statusView.hidden=NO;
-        CGFloat statusX=CGRectGetMinX(self.messageBubbleView.bubbleFrame)-kXHStatusViewWidth-3;
-        CGFloat halfH=self.messageBubbleView.bubbleFrame.size.height/2;
-        CGRect statusFrame=self.statusView.frame;
-        statusFrame.origin.y=layoutOriginY+halfH;
-        if([self.messageBubbleView.message messageMediaType]==XHBubbleMessageMediaTypeVoice && self.messageBubbleView.message.voiceDuration!=0){
-            statusX=statusX-15;
+    if(self.bubbleMessageType == XHBubbleMessageTypeSending) {
+        self.statusView.hidden = NO;
+        CGFloat statusX = CGRectGetMinX(self.messageBubbleView.bubbleFrame) - kXHStatusViewWidth - 3;
+        CGFloat halfH = self.messageBubbleView.bubbleFrame.size.height / 2;
+        CGRect statusFrame = self.statusView.frame;
+        statusFrame.origin.y = layoutOriginY + halfH;
+        if([self.messageBubbleView.message messageMediaType] == XHBubbleMessageMediaTypeVoice && self.messageBubbleView.message.voiceDuration != 0){
+            statusX = statusX - 20;
         }
-        statusFrame.origin.x=statusX;
-        self.statusView.frame=statusFrame;
-    }else{
-        self.statusView.hidden=YES;
+        statusFrame.origin.x = statusX;
+        self.statusView.frame = statusFrame;
+    }
+    else {
+        self.statusView.hidden = YES;
     }
 //    self.messageBubbleView.backgroundColor=[UIColor blackColor];
 //    self.avatorButton.backgroundColor=[UIColor redColor];
@@ -569,11 +558,4 @@ static const CGFloat kXHBubbleMessageViewPadding = 8;
     self.messageBubbleView.emotionImageView.animatedImage = nil;
     self.timestampLabel.text = nil;
 }
-
-- (void)setSelected:(BOOL)selected animated:(BOOL)animated {
-    [super setSelected:selected animated:animated];
-
-    // Configure the view for the selected state
-}
-
 @end

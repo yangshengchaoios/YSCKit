@@ -72,6 +72,7 @@ static NSInteger const kOnePageSize = 10;
     [self.view addSubview:self.clientStatusView];
     [self loadMessagesWhenInit];
     [self updateStatusView];
+    [[XHAudioPlayerHelper shareInstance] setDelegate:self];
 }
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
@@ -138,12 +139,10 @@ static NSInteger const kOnePageSize = 10;
             // Mark the voice as read and hide the red dot.
             //message.isRead = YES;
 //            messageTableViewCell.messageBubbleView.voiceUnreadDotImageView.hidden = YES;
-            [[XHAudioPlayerHelper shareInstance] setDelegate:self];
-            if (_currentSelectedCell) {
-                [_currentSelectedCell.messageBubbleView.animationVoiceImageView stopAnimating];
+            if (self.currentSelectedCell) {
+                [self.currentSelectedCell.messageBubbleView.animationVoiceImageView stopAnimating];
             }
-            if (_currentSelectedCell == messageTableViewCell) {
-                [messageTableViewCell.messageBubbleView.animationVoiceImageView stopAnimating];
+            if (self.currentSelectedCell == messageTableViewCell) {
                 [[XHAudioPlayerHelper shareInstance] stopAudio];
                 self.currentSelectedCell = nil;
             }
@@ -187,11 +186,22 @@ static NSInteger const kOnePageSize = 10;
 
 #pragma mark - XHAudioPlayerHelper Delegate
 - (void)didAudioPlayerStopPlay:(AVAudioPlayer *)audioPlayer {
-    if (!_currentSelectedCell) {
+    if (!self.currentSelectedCell) {
         return;
     }
-    [_currentSelectedCell.messageBubbleView.animationVoiceImageView stopAnimating];
+    [self.currentSelectedCell.messageBubbleView.animationVoiceImageView stopAnimating];
     self.currentSelectedCell = nil;
+}
+
+#pragma mark - XHMessageInputView Delegate
+//开始录音
+- (void)prepareRecordingVoiceActionWithCompletion:(BOOL (^)(void))completion {
+    [[XHAudioPlayerHelper shareInstance] stopAudio];
+    if (self.currentSelectedCell) {
+        [self.currentSelectedCell.messageBubbleView.animationVoiceImageView stopAnimating];
+        self.currentSelectedCell = nil;
+    }
+    [super prepareRecordingVoiceActionWithCompletion:completion];
 }
 
 #pragma mark - XHEmotionManagerView DataSource

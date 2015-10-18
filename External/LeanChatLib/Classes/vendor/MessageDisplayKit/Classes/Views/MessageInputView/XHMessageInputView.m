@@ -30,16 +30,6 @@
 @property (nonatomic, weak, readwrite) UIButton *holdDownButton;
 
 /**
- *  是否取消錄音
- */
-@property (nonatomic, assign, readwrite) BOOL isCancelled;
-
-/**
- *  是否正在錄音
- */
-@property (nonatomic, assign, readwrite) BOOL isRecording;
-
-/**
  *  在切换语音和文本消息的时候，需要保存原本已经输入的文本，这样达到一个好的UE
  */
 @property (nonatomic, copy) NSString *inputedText;
@@ -119,6 +109,9 @@
 #pragma mark - Action
 
 - (void)messageStyleButtonClicked:(UIButton *)sender {
+    if (self.isRecording) {
+        return;
+    }
     NSInteger index = sender.tag;
     switch (index) {
         case 0: {
@@ -421,6 +414,8 @@
         [button setTitle:kXHTouchToRecord forState:UIControlStateNormal];
         [button setTitle:kXHTouchToFinish forState:UIControlStateHighlighted];
         buttonFrame = _inputTextView.frame;
+        buttonFrame.origin.y -= 4;
+        buttonFrame.size.height += 8;
         button.frame = buttonFrame;
         button.alpha = self.voiceChangeButton.selected;
         [button addTarget:self action:@selector(holdDownButtonTouchDown) forControlEvents:UIControlEventTouchDown];

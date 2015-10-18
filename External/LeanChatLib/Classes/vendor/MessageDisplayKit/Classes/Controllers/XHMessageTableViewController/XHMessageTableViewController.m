@@ -498,12 +498,9 @@ static CGPoint  delayOffset = {0.0};
 //动态改变TextView的高度
 - (void)layoutAndAnimateMessageInputTextView:(UITextView *)textView {
     CGFloat maxHeight = [XHMessageInputView maxHeight];
-    
     CGFloat contentH = [self getTextViewContentH:textView];
-    
     BOOL isShrinking = contentH < self.previousTextViewContentHeight;
     CGFloat changeInHeight = contentH - _previousTextViewContentHeight;
-    
     if (!isShrinking && (self.previousTextViewContentHeight == maxHeight || textView.text.length == 0)) {
         changeInHeight = 0;
     }
@@ -717,6 +714,7 @@ static CGPoint  delayOffset = {0.0};
     [self.voiceRecordHelper prepareRecordingWithPath:[self getRecorderPath] prepareRecorderCompletion:completion];
 }
 - (void)startRecord {
+    self.messageTableView.scrollEnabled = NO;
     [self.voiceRecordHUD startRecordingHUDAtView:self.view];
     [self.voiceRecordHelper startRecordingWithStartRecorderCompletion:^{
     }];
@@ -725,6 +723,9 @@ static CGPoint  delayOffset = {0.0};
     WEAKSELF
     [self.voiceRecordHUD stopRecordCompled:^(BOOL fnished) {
         weakSelf.voiceRecordHUD = nil;
+        weakSelf.messageInputView.isRecording = NO;
+        weakSelf.messageInputView.isCancelled = NO;
+        weakSelf.messageTableView.scrollEnabled = YES;
     }];
     [self.voiceRecordHelper stopRecordingWithStopRecorderCompletion:^{
         [weakSelf didSendMessageWithVoice:weakSelf.voiceRecordHelper.recordPath voiceDuration:weakSelf.voiceRecordHelper.recordDuration];
@@ -740,6 +741,9 @@ static CGPoint  delayOffset = {0.0};
     WEAKSELF
     [self.voiceRecordHUD cancelRecordCompled:^(BOOL fnished) {
         weakSelf.voiceRecordHUD = nil;
+        weakSelf.messageInputView.isRecording = NO;
+        weakSelf.messageInputView.isCancelled = YES;
+        weakSelf.messageTableView.scrollEnabled = YES;
     }];
     [self.voiceRecordHelper cancelledDeleteWithCompletion:^{
         
@@ -755,6 +759,7 @@ static CGPoint  delayOffset = {0.0};
 		self.previousTextViewContentHeight = [self getTextViewContentH:messageInputTextView];
 }
 - (void)didChangeSendVoiceAction:(BOOL)changed {
+    DLog(@"didChangeSendVoiceAction");
     if (changed) {
         if (self.textViewInputViewType == XHInputViewTypeText)
             return;
@@ -780,6 +785,7 @@ static CGPoint  delayOffset = {0.0};
     [self layoutOtherMenuViewHiden:NO];
 }
 - (void)didSendFaceAction:(BOOL)sendFace {
+    DLog(@"didSendFaceAction");
     if (sendFace) {
         self.textViewInputViewType = XHInputViewTypeEmotion;
         [self layoutOtherMenuViewHiden:NO];
@@ -802,7 +808,7 @@ static CGPoint  delayOffset = {0.0};
 - (void)didFinishRecoingVoiceAction {
     DLog(@"didFinishRecoingVoice");
     if (self.voiceRecordHelper.currentTimeInterval < self.voiceRecordHelper.minRecordTime) {
-        [UIView showResultThenHideOnWindow:@"录音时间太短"];
+        [UIView showResultThenHideOnWindow:@"录音时间太短" afterDelay:0.5];
         [self cancelRecord];
     }
     else {

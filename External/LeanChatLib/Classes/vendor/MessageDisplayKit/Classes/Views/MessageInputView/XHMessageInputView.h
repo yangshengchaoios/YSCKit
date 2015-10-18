@@ -99,6 +99,15 @@ typedef NS_ENUM(NSInteger, XHMessageInputViewStyle) {
 @interface XHMessageInputView : UIImageView
 
 @property (nonatomic, weak) id <XHMessageInputViewDelegate> delegate;
+/**
+ *  是否取消錄音
+ */
+@property (nonatomic, assign, readwrite) BOOL isCancelled;
+
+/**
+ *  是否正在錄音
+ */
+@property (nonatomic, assign, readwrite) BOOL isRecording;
 
 /**
  *  用于输入文本消息的输入框

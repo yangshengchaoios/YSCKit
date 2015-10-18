@@ -32,7 +32,8 @@
 - (id)init {
     self = [super init];
     if (self) {
-        self.maxRecordTime = 60.0;
+        self.minRecordTime = 1.0f;
+        self.maxRecordTime = 60.0f;
         self.recordDuration = @"0";
 #if TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE
         _backgroundIdentifier = UIBackgroundTaskInvalid;
@@ -255,7 +256,7 @@
             }
         });
         
-        if (self.currentTimeInterval > self.maxRecordTime) {
+        if (self.currentTimeInterval >= self.maxRecordTime) {
             [self stopRecord];
             dispatch_async(dispatch_get_main_queue(), ^{
                 _maxTimeStopRecorderCompletion();
