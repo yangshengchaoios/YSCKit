@@ -92,5 +92,5 @@
  *  @return
  */
 - (BOOL)isConversationExists:(AVIMConversation *)conversation;
-
+- (BOOL)isConversationExistsByConvId:(NSString *)convId;
 @end

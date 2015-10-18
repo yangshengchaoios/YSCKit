@@ -136,9 +136,16 @@
 }
 
 - (BOOL)isConversationExists:(AVIMConversation *)conversation {
+    return [self isConversationExistsByConvId:conversation.conversationId];
+}
+- (BOOL)isConversationExistsByConvId:(NSString *)convId {
+    if (isEmpty(convId)) {
+        return NO;
+    }
+    
     __block BOOL exists = NO;
     [self.databaseQueue inDatabase:^(FMDatabase *db) {
-        FMResultSet *resultSet = [db executeQuery:kCDConversationTableSelectOneSQL withArgumentsInArray:@[conversation.conversationId]];
+        FMResultSet *resultSet = [db executeQuery:kCDConversationTableSelectOneSQL withArgumentsInArray:@[convId]];
         if ([resultSet next]) {
             exists = YES;
         }
