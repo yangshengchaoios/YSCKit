@@ -198,9 +198,20 @@ static const CGFloat kXHBubbleMessageViewPadding = 8;
     self.displayTimestamp = displayTimestamp;
     self.timestampLabel.hidden = !self.displayTimestamp;
     if (displayTimestamp) {
-        self.timestampLabel.text = [NSDateFormatter localizedStringFromDate:message.timestamp
-                                                                  dateStyle:NSDateFormatterMediumStyle
-                                                                  timeStyle:NSDateFormatterShortStyle];
+        NSString *dateText = [message.timestamp stringWithFormat:@"yyyy-M-d"];
+        NSString *timeText = [message.timestamp stringWithFormat:@"HH:mm"];
+        if ([message.timestamp isThisYear]) {
+            if ([message.timestamp isToday]) {
+                dateText = NSLocalizedStringFromTable(@"Today", @"MessageDisplayKitString", @"今天");
+            }
+            else if ([message.timestamp isYesterday]) {
+                dateText = NSLocalizedStringFromTable(@"Yesterday", @"MessageDisplayKitString", @"昨天");
+            }
+            else {
+                dateText = [message.timestamp stringWithFormat:@"M-d"];
+            }
+        }
+        self.timestampLabel.text = [NSString stringWithFormat:@"%@ %@",dateText,timeText];
     }
 }
 

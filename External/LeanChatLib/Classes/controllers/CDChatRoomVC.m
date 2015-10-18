@@ -61,24 +61,17 @@ static NSInteger const kOnePageSize = 10;
 }
 - (void)viewDidLoad {
     [super viewDidLoad];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(receiveMessage:) name:kCDNotificationMessageReceived object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onMessageDelivered:) name:kCDNotificationMessageDelivered object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateStatusView) name:kCDNotificationConnectivityUpdated object:nil];
+    
     NSString *received_convid = [NSString stringWithFormat:@"received_%@", Trim(self.conv.conversationId)];
     self.lastSentTimestamp = [GetCacheObject(received_convid) longLongValue];
     if (0 == self.lastSentTimestamp) {
         self.lastSentTimestamp = [[NSDate date] timeIntervalSince1970] * 1000;
     }
-    
-    [self initBarButton];
     [self initBottomMenuAndEmotionView];
     [self.view addSubview:self.clientStatusView];
-    // 设置自身用户名
-    id<CDUserModel> selfUser = [[CDChatManager manager].userDelegate getUserById:[CDChatManager manager].selfId];
-    self.messageSender = [selfUser username];
-    
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(receiveMessage:) name:kCDNotificationMessageReceived object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onMessageDelivered:) name:kCDNotificationMessageDelivered object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(refreshConv) name:kCDNotificationConversationUpdated object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateStatusView) name:kCDNotificationConnectivityUpdated object:nil];
-    [self refreshConv];
     [self loadMessagesWhenInit];
     [self updateStatusView];
 }
@@ -90,7 +83,7 @@ static NSInteger const kOnePageSize = 10;
     [CDChatManager manager].chattingConversationId = nil;
     if (self.msgs.count > 0) {
         //如果有未读消息，且通过推送栏进入本页面后，继续有新消息到达，退出的时候就需要清空conv的未读消息，
-        //因为处于当页面时不会发送kCDNotificationUnreadsUpdated通知！
+        //因为处于当前页面时不会发送kCDNotificationUnreadsUpdated通知！
         [self updateConversationAsRead];
     }
     [[XHAudioPlayerHelper shareInstance] stopAudio];
@@ -99,17 +92,11 @@ static NSInteger const kOnePageSize = 10;
 - (void)dealloc {
     [[NSNotificationCenter defaultCenter] removeObserver:self name:kCDNotificationMessageReceived object:nil];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:kCDNotificationMessageDelivered object:nil];
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:kCDNotificationConversationUpdated object:nil];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:kCDNotificationConnectivityUpdated object:nil];
     [[XHAudioPlayerHelper shareInstance] setDelegate:nil];
 }
 
 #pragma mark - ui init
-- (void)initBarButton {
-    UIBarButtonItem *backBtn = [[UIBarButtonItem alloc] initWithTitle:@"返回" style:UIBarButtonItemStylePlain target:nil action:nil];
-    [self.navigationItem setBackBarButtonItem:backBtn];
-//    self.navigationItem.backBarButtonItem.title
-}
 - (void)initBottomMenuAndEmotionView {
     NSMutableArray *shareMenuItems = [NSMutableArray array];
     NSArray *plugIcons = @[@"sharemore_pic", @"sharemore_video", @"sharemore_location"];
@@ -125,9 +112,6 @@ static NSInteger const kOnePageSize = 10;
     self.emotionManagerView.isShowEmotionStoreButton = YES;
     [self.emotionManagerView reloadData];
 }
-- (void)refreshConv {
-    self.title = self.conv.title;
-}
 
 #pragma mark - connect status view
 - (LZStatusView *)clientStatusView {
@@ -138,11 +122,7 @@ static NSInteger const kOnePageSize = 10;
     return _clientStatusView;
 }
 - (void)updateStatusView {
-    if ([CDChatManager manager].connect) {
-        self.clientStatusView.hidden = YES;
-    } else {
-        self.clientStatusView.hidden = NO;
-    }
+    self.clientStatusView.hidden = ([AVIMClient defaultClient].status != AVIMClientStatusClosed);
 }
 
 #pragma mark - XHMessageTableViewCell delegate
@@ -296,45 +276,32 @@ static NSInteger const kOnePageSize = 10;
 #pragma mark -  ui config
 // 是否显示时间轴Label的回调方法
 - (BOOL)shouldDisplayTimestampForRowAtIndexPath:(NSIndexPath *)indexPath {
-    if (indexPath.row == 0) {
-        return YES;
-    }
-    else {
+    if (indexPath.row > 0 && indexPath.row < [self.messages count]) {
         XHMessage *msg = [self.messages objectAtIndex:indexPath.row];
         XHMessage *lastMsg = [self.messages objectAtIndex:indexPath.row - 1];
         int interval = [msg.timestamp timeIntervalSinceDate:lastMsg.timestamp];
-        if (interval > 60 * 3) {
-            return YES;
-        }
-        else {
-            return NO;
-        }
+        return (interval > 60 * 3);
+    }
+    else {
+        return YES;
     }
 }
 // 配置Cell的样式或者字体
 - (void)configureCell:(XHMessageTableViewCell *)cell atIndexPath:(NSIndexPath *)indexPath {
-    XHMessage *msg = [self.messages objectAtIndex:indexPath.row];
-    if ([self shouldDisplayTimestampForRowAtIndexPath:indexPath]) {
-        NSDate *ts = msg.timestamp;
-        NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-        [dateFormatter setDateFormat:@"MM-dd HH:mm"];
-        NSString *str = [dateFormatter stringFromDate:ts];
-        cell.timestampLabel.text = str;
-    }
-    SETextView *textView = cell.messageBubbleView.displayTextView;
-    if (msg.bubbleMessageType == XHBubbleMessageTypeSending) {
-        [textView setTextColor:[UIColor whiteColor]];
-    }
-    else {
-        [textView setTextColor:[UIColor blackColor]];
+    if (indexPath.row < [self.messages count]) {
+        XHMessage *msg = [self.messages objectAtIndex:indexPath.row];
+        SETextView *textView = cell.messageBubbleView.displayTextView;
+        if (msg.bubbleMessageType == XHBubbleMessageTypeSending) {
+            [textView setTextColor:[UIColor whiteColor]];
+        }
+        else {
+            [textView setTextColor:[UIColor blackColor]];
+        }
     }
 }
-// 协议回掉是否支持用户手动滚动
+// 是否支持用户手动滚动
 - (BOOL)shouldPreventScrollToBottomWhileUserScrolling {
     return YES;
-}
-- (void)didSelecteShareMenuItem:(XHShareMenuItem *)shareMenuItem atIndex:(NSInteger)index {
-    [super didSelecteShareMenuItem:shareMenuItem atIndex:index];
 }
 
 #pragma mark - @ reference other
@@ -377,7 +344,6 @@ static NSInteger const kOnePageSize = 10;
 #pragma mark - LeanCloud 
 
 #pragma mark - conversations store
-
 - (void)updateConversationAsRead {
     [[CDConversationStore store] insertConversation:self.conv];//如果已经存在就不会继续插入，保证有消息就有会话！
     [[CDConversationStore store] updateUnreadCountToZeroWithConversation:self.conv];
@@ -723,7 +689,6 @@ static NSInteger const kOnePageSize = 10;
         }
     }];
 }
-
 - (void)insertMessage:(AVIMTypedMessage *)message {
     if (self.isLoadingMsg) {
         [self performSelector:@selector(insertMessage:) withObject:message afterDelay:1];
