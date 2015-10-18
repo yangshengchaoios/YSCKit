@@ -25,7 +25,6 @@
 @property (nonatomic, strong) UIActivityIndicatorView *loadMoreActivityIndicatorView;
 
 @property (nonatomic, strong) XHPhotographyHelper *photographyHelper;//管理本机的摄像和图片库的工具对象
-@property (nonatomic, strong) XHLocationHelper *locationHelper;//管理地理位置的工具对象
 @property (nonatomic, strong) XHVoiceRecordHelper *voiceRecordHelper;//管理录音工具对象
 @end
 
@@ -853,29 +852,17 @@ static CGPoint  delayOffset = {0.0};
             break;
         }
         case 2: {
-            if ([UIDevice isLocationAvaible]) {
-                WEAKSELF
-                [UIView showHUDLoadingOnWindow:@"正在发送位置"];
-                [self.locationHelper getCurrentGeolocationsCompled:^(NSArray *placemarks) {
-                    CLPlacemark *placemark = [placemarks lastObject];
-                    if (placemark) {
-                        [UIView hideHUDLoadingOnWindow];
-                        NSDictionary *addressDictionary = placemark.addressDictionary;
-                        NSArray *formattedAddressLines = [addressDictionary valueForKey:@"FormattedAddressLines"];
-                        NSString *geoLocations = [formattedAddressLines lastObject];
-                        if (geoLocations) {
-                            [weakSelf didSendGeolocationsMessageWithGeolocaltions:geoLocations location:placemark.location];
-                        }
+            [self.locationHelper getCurrentGeolocationsCompled:^(NSArray *placemarks) {
+                CLPlacemark *placemark = [placemarks lastObject];
+                if (placemark) {
+                    NSDictionary *addressDictionary = placemark.addressDictionary;
+                    NSArray *formattedAddressLines = [addressDictionary valueForKey:@"FormattedAddressLines"];
+                    NSString *geoLocations = [formattedAddressLines lastObject];
+                    if (geoLocations) {
+                        [weakSelf didSendGeolocationsMessageWithGeolocaltions:geoLocations location:placemark.location];
                     }
-                    else {
-                        [UIView hideHUDLoadingOnWindow];
-                        [UIView showAlertVieWithMessage:@"发送位置信息出错，请检查系统设置中是否打开位置服务"];
-                    }
-                }];
-            }
-            else {
-                [YSCCommonUtils OpenPrivacyOfSetting];
-            }
+                }
+            }];
             break;
         }
         default:

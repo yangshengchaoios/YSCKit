@@ -144,8 +144,8 @@
 @interface XHMessageTableViewController : UIViewController <UITableViewDataSource, UITableViewDelegate, XHMessageTableViewControllerDelegate, XHMessageTableViewControllerDataSource, XHMessageInputViewDelegate, XHMessageTableViewCellDelegate, XHShareMenuViewDelegate, XHEmotionManagerViewDelegate, XHEmotionManagerViewDataSource>
 
 @property (nonatomic, weak) id <XHMessageTableViewControllerDelegate> delegate;
-
 @property (nonatomic, weak) id <XHMessageTableViewControllerDataSource> dataSource;
+@property (nonatomic, strong) XHLocationHelper *locationHelper;//管理地理位置的工具对象
 
 /**
  *  数据源，显示多少消息
@@ -275,4 +275,6 @@
 			  atScrollPosition:(UITableViewScrollPosition)position
 					  animated:(BOOL)animated;
 
+//根据地理位置信息和地理经纬度开始发送地理位置消息
+- (void)didSendGeolocationsMessageWithGeolocaltions:(NSString *)geolcations location:(CLLocation *)location;
 @end

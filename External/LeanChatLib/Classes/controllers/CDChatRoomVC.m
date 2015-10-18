@@ -12,9 +12,7 @@
 
 #import "XHDisplayTextViewController.h"
 #import "XHDisplayMediaViewController.h"
-#import "XHDisplayLocationViewController.h"
 #import "XHAudioPlayerHelper.h"
-#import "YSCPhotoBrowseViewController.h"
 
 #import "LZStatusView.h"
 #import "CDEmotionUtils.h"
@@ -127,23 +125,15 @@ static NSInteger const kOnePageSize = 10;
 
 #pragma mark - XHMessageTableViewCell delegate
 - (void)multiMediaMessageDidSelectedOnMessage:(id <XHMessageModel> )message atIndexPath:(NSIndexPath *)indexPath onMessageTableViewCell:(XHMessageTableViewCell *)messageTableViewCell {
-    UIViewController *disPlayViewController;
     switch (message.messageMediaType) {
         case XHBubbleMessageMediaTypeVideo:
-            break;
         case XHBubbleMessageMediaTypePhoto: {
-            YSCPhotoBrowseViewController *photoDetail = (YSCPhotoBrowseViewController *)[UIResponder createBaseViewController:@"YSCPhotoBrowseViewController"];
-            if (isNotEmpty(message.thumbnailUrl)) {
-                photoDetail.params = @{kParamImageUrls : @[Trim(message.thumbnailUrl)]};
-                [self.navigationController pushViewController:photoDetail animated:NO];
-            }
-            else if (isNotEmpty(message.photo)) {
-                photoDetail.params = @{kParamImages : @[message.photo]};
-                [self.navigationController pushViewController:photoDetail animated:NO];
-            }
+            XHDisplayMediaViewController *messageDisplayTextView = [[XHDisplayMediaViewController alloc] init];
+            messageDisplayTextView.message = message;
+            [self.navigationController pushViewController:messageDisplayTextView animated:YES];
+            break;
         }
             break;
-            
         case XHBubbleMessageMediaTypeVoice: {
             // Mark the voice as read and hide the red dot.
             //message.isRead = YES;
@@ -173,14 +163,11 @@ static NSInteger const kOnePageSize = 10;
             DLog(@"facePath : %@", message.localPositionPhoto);
             XHDisplayLocationViewController *displayLocationViewController = [[XHDisplayLocationViewController alloc] init];
             displayLocationViewController.message = message;
-            disPlayViewController = displayLocationViewController;
+            [self.navigationController pushViewController:displayLocationViewController animated:YES];
             break;
         }
         default:
             break;
-    }
-    if (disPlayViewController) {
-        [self.navigationController pushViewController:disPlayViewController animated:YES];
     }
 }
 - (void)didDoubleSelectedOnTextMessage:(id <XHMessageModel> )message atIndexPath:(NSIndexPath *)indexPath {
@@ -616,7 +603,7 @@ static NSInteger const kOnePageSize = 10;
         }];
     }
 }
-- (void)loadOldMessages{
+- (void)loadOldMessages {
     if (self.messages.count == 0 || self.isLoadingMsg) {
         return;
     } else {
