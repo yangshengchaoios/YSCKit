@@ -37,6 +37,13 @@
     objc_setAssociatedObject(self, @selector(mentioned), @(mentioned), OBJC_ASSOCIATION_ASSIGN);
 }
 
+- (NSDate *)updatedTime {
+    return objc_getAssociatedObject(self, @selector(updatedTime));
+}
+- (void)setUpdatedTime:(NSDate *)updatedTime {
+    objc_setAssociatedObject(self, @selector(updatedTime), updatedTime, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
 - (CDConvType)type {
     return [[self.attributes objectForKey:CONV_TYPE] intValue];
 }
@@ -67,7 +74,12 @@
         [NSException raise:@"invalid conv" format:nil];
     }
     if (members.count == 1) {
-        return members[0];
+        if ([members[0] isEqualToString:[CDChatManager manager].selfId]) {
+            return @"";
+        }
+        else {
+            return members[0];
+        }
     }
     NSString *otherId;
     if ([members[0] isEqualToString:[CDChatManager manager].selfId]) {

@@ -44,8 +44,8 @@ static CDChatManager *instance;
     return self;
 }
 - (NSString *)databasePathWithUserId:(NSString *)userId{
-    NSString *libPath = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES) objectAtIndex:0];
-    return [libPath stringByAppendingPathComponent:[NSString stringWithFormat:@"com.leancloud.leanchatlib.%@.db3", userId]];
+    NSString *libPath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0];
+    return [libPath stringByAppendingPathComponent:[NSString stringWithFormat:@"com.leancloud.leanchatlib.%@.sqlite", userId]];
 }
 //登陆IM
 - (void)openWithClientId:(NSString *)clientId callback:(AVIMBooleanResultBlock)callback {
@@ -271,14 +271,15 @@ static CDChatManager *instance;
 
 #pragma mark - receive message handle
 - (void)receiveMessage:(AVIMTypedMessage *)message conversation:(AVIMConversation *)conversation {
-    [[CDConversationStore store] insertConversation:conversation];
+    [[CDConversationStore store] updateConversation:conversation];
+    [[CDConversationStore store] updateLastMessage:message byConvId:conversation.conversationId];
+    
     if ([self.chattingConversationId isEqualToString:conversation.conversationId] == NO) {
         // 没有在聊天的时候才增加未读数和设置mentioned
-        [[CDConversationStore store] increaseUnreadCountWithConversation:conversation];
+        [[CDConversationStore store] increaseUnreadCountByConvId:conversation.conversationId];
         if ([self isMentionedByMessage:message]) {
-            [[CDConversationStore store] updateMentioned:YES conversation:conversation];
+            [[CDConversationStore store] updateMentioned:YES convId:conversation.conversationId];
         }
-        [[NSNotificationCenter defaultCenter] postNotificationName:kCDNotificationUnreadsUpdated object:nil];
     }
     if (self.chattingConversationId == nil) {
         if (conversation.muted == NO) {
@@ -305,7 +306,7 @@ static CDChatManager *instance;
 // content : "{\"_lctype\":-1,\"_lctext\":\"sdfdf\"}"  sdk 会解析好
 - (void)conversation:(AVIMConversation *)conversation didReceiveTypedMessage:(AVIMTypedMessage *)message {
     if (message.messageId) {
-        if (conversation.creator == nil && [[CDConversationStore store] isConversationExists:conversation] == NO) {
+        if (conversation.creator == nil && [[CDConversationStore store] isConversationExistsByConvId:conversation.conversationId] == NO) {
             [conversation fetchWithCallback:^(BOOL succeeded, NSError *error) {
                 if (error) {
                     DLog(@"%@", error);
@@ -509,6 +510,7 @@ static CDChatManager *instance;
 }
 
 #pragma mark - mention
+//当前消息是否@我
 - (BOOL)isMentionedByMessage:(AVIMTypedMessage *)message {
     if (![message isKindOfClass:[AVIMTextMessage class]]) {
         return NO;
@@ -521,11 +523,6 @@ static CDChatManager *instance;
            return NO;
         }
     }
-}
-
-#pragma mark - database
-- (void)deleteConversation:(AVIMConversation *)conversation {
-    [[CDConversationStore store] deleteConversation:conversation];
 }
 
 @end

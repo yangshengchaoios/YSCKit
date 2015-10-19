@@ -32,6 +32,8 @@ typedef enum : NSUInteger {
  */
 @property (nonatomic, assign) BOOL mentioned;
 
+@property (nonatomic, strong) NSDate *updatedTime;
+
 /**
  *  对话的类型，因为可能是两个人的群聊。所以不能通过成员数量来判断
  *

@@ -207,7 +207,7 @@ static NSString *cellIdentifier = @"ContactCell";
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
     if (editingStyle == UITableViewCellEditingStyleDelete) {
         AVIMConversation *conversation = [self.conversations objectAtIndex:indexPath.row];
-        [[CDConversationStore store] deleteConversation:conversation];
+        [[CDConversationStore store] deleteConversationByConvId:conversation.conversationId];
         [self refresh];
     }
 }

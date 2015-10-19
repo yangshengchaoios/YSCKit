@@ -80,12 +80,10 @@ static NSInteger const kOnePageSize = 10;
 }
 - (void)viewDidDisappear:(BOOL)animated {
     [CDChatManager manager].chattingConversationId = nil;
-    if (self.msgs.count > 0) {
-        //如果有未读消息，且通过推送栏进入本页面后，继续有新消息到达，退出的时候就需要清空conv的未读消息，
-        //因为处于当前页面时不会发送kCDNotificationUnreadsUpdated通知！
-        [self updateConversationAsRead];
-    }
     [[XHAudioPlayerHelper shareInstance] stopAudio];
+    //如果有未读消息，且通过推送栏进入本页面后，继续有新消息到达，退出的时候就需要清空conv的未读消息，
+    //因为处于当前页面时不会发送kCDNotificationUnreadsUpdated通知！
+    [self updateConversationAsRead];
     [super viewDidDisappear:animated];
 }
 - (void)dealloc {
@@ -342,9 +340,9 @@ static NSInteger const kOnePageSize = 10;
 
 #pragma mark - conversations store
 - (void)updateConversationAsRead {
-    [[CDConversationStore store] insertConversation:self.conv];//如果已经存在就不会继续插入，保证有消息就有会话！
-    [[CDConversationStore store] updateUnreadCountToZeroWithConversation:self.conv];
-    [[CDConversationStore store] updateMentioned:NO conversation:self.conv];
+    [[CDConversationStore store] updateConversation:self.conv];//如果已经存在就不会继续插入，保证有消息就有会话！
+    [[CDConversationStore store] updateUnreadCountToZeroByConvId:self.conv.conversationId];
+    [[CDConversationStore store] updateMentioned:NO convId:self.conv.conversationId];
     [[NSNotificationCenter defaultCenter] postNotificationName:kCDNotificationUnreadsUpdated object:nil];
 }
 
@@ -384,6 +382,7 @@ static NSInteger const kOnePageSize = 10;
             [[CDSoundManager manager] playSendSoundIfNeed];
             [self insertMessage:msg];
         }
+        [[CDConversationStore store] updateLastMessage:msg byConvId:self.conv.conversationId];
     }];
 }
 - (void)replaceMesssage:(AVIMTypedMessage *)message atIndexPath:(NSIndexPath *)indexPath {
@@ -559,10 +558,10 @@ static NSInteger const kOnePageSize = 10;
     [[CDChatManager manager] queryTypedMessagesWithConversation:self.conv timestamp:timestamp limit:kOnePageSize block:^(NSArray *msgs, NSError *error) {
         if (error) {
             if (error.code == kAVIMErrorConversationNotFound) {
-                //0. 虽然服务器端的会话已不存在，但本地的会话未读数也要清空！
-                [self updateConversationAsRead];
-                //1. 删除缓存数据库的conv
-                [[CDConversationStore store] deleteConversation:self.conv];
+//                //0. 虽然服务器端的会话已不存在，但本地的会话未读数也要清空！FIXME:还有问题
+//                [self updateConversationAsRead];
+//                //1. 删除缓存数据库的conv
+//                [[CDConversationStore store] deleteConversationByConvId:self.conv.conversationId];
                 //2. 弹出提示语
                 UIAlertView *alertView = [UIAlertView bk_alertViewWithTitle:@"会话未找到"];
                 [alertView bk_setCancelBlock:^{
@@ -597,8 +596,7 @@ static NSInteger const kOnePageSize = 10;
                 self.msgs = allMessages;
                 [self.messageTableView reloadData];
                 [self scrollToBottomAnimated:NO];
-                
-                if (self.msgs.count > 0) {
+                if ([msgs count] > 0) {
                     [self updateConversationAsRead];
                 }
                 
