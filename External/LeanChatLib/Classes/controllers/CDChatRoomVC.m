@@ -305,29 +305,41 @@ static NSInteger const kOnePageSize = 10;
 }
 
 #pragma mark - alert and async utils
+- (BOOL)filterError:(NSError *)error {
+    return [self alertError:error] == NO;
+}
 - (void)alert:(NSString *)msg {
-    UIAlertView *alertView = [[UIAlertView alloc]
-                              initWithTitle:nil message:msg delegate:nil
-                              cancelButtonTitle   :@"确定" otherButtonTitles:nil];
+    [self alert:msg block:nil];
+}
+- (void)alert:(NSString *)msg block:(void (^)(void))block{
+    UIAlertView *alertView = [UIAlertView bk_alertViewWithTitle:msg];
+    [alertView bk_setCancelButtonWithTitle:@"确定" handler:block];
     [alertView show];
 }
 - (BOOL)alertError:(NSError *)error {
     if (error) {
-        if (error.code == kAVIMErrorConnectionLost) {
-            [self alert:@"未能连接聊天服务"];
+        if (error.code == 4303) {
+            [[CDConversationStore store] deleteConversationByConvId:self.conv.conversationId];//删除本地不存在的会话
+            self.conv = nil;
+            WEAKSELF
+            [self alert:@"会话不存在" block:^{
+                [weakSelf bk_performBlock:^(id obj) {
+                    [weakSelf.navigationController popViewControllerAnimated:YES];
+                } afterDelay:0.5];
+            }];
+        }
+        else if (error.code == kAVIMErrorConnectionLost) {
+            [UIView showResultThenHideOnWindow:@"未能连接聊天服务器"];
         }
         else if ([error.domain isEqualToString:NSURLErrorDomain]) {
-            [self alert:@"网络连接发生错误"];
+            [UIView showResultThenHideOnWindow:@"网络连接错误"];
         }
         else {
-            [self alert:[NSString stringWithFormat:@"%@", error]];
+            [self alert:[NSString stringWithFormat:@"alertError: %@", error]];
         }
         return YES;
     }
     return NO;
-}
-- (BOOL)filterError:(NSError *)error {
-    return [self alertError:error] == NO;
 }
 - (void)runInMainQueue:(void (^)())queue {
     dispatch_async(dispatch_get_main_queue(), queue);
@@ -340,9 +352,11 @@ static NSInteger const kOnePageSize = 10;
 
 #pragma mark - conversations store
 - (void)updateConversationAsRead {
-    [[CDConversationStore store] updateConversation:self.conv];//如果已经存在就不会继续插入，保证有消息就有会话！
-    [[CDConversationStore store] updateUnreadCountToZeroByConvId:self.conv.conversationId];
-    [[CDConversationStore store] updateMentioned:NO convId:self.conv.conversationId];
+    if (self.conv) {
+        [[CDConversationStore store] updateConversation:self.conv];//如果已经存在就不会继续插入，保证有消息就有会话！
+        [[CDConversationStore store] updateUnreadCountToZeroByConvId:self.conv.conversationId];
+        [[CDConversationStore store] updateMentioned:NO convId:self.conv.conversationId];
+    }
     [[NSNotificationCenter defaultCenter] postNotificationName:kCDNotificationUnreadsUpdated object:nil];
 }
 
@@ -357,7 +371,7 @@ static NSInteger const kOnePageSize = 10;
         [self sendMsg:msg];
     }
     else {
-        [self alert:@"write image to file error"];
+        [self alert:@"write image to file error" block:nil];
     }
 }
 - (void)sendLocationWithLatitude:(double)latitude longitude:(double)longitude address:(NSString *)address {
@@ -366,8 +380,7 @@ static NSInteger const kOnePageSize = 10;
 }
 - (void)sendMsg:(AVIMTypedMessage *)msg {
     [[CDChatManager manager] sendMessage:msg conversation:self.conv callback:^(BOOL succeeded, NSError *error) {
-        if (error) {
-            // 伪造一个 messageId，重发的成功的时候，根据这个伪造的id把数据库中的改过来
+        if ([self alertError:error]) {// 伪造一个 messageId，重发的成功的时候，根据这个伪造的id把数据库中的改过来
             msg.messageId = [[CDChatManager manager] tempMessageId];
             msg.sendTimestamp = [[NSDate date] timeIntervalSince1970] * 1000;
             if (msg.conversationId == nil) {
@@ -397,14 +410,14 @@ static NSInteger const kOnePageSize = 10;
     [self replaceMesssage:msg atIndexPath:indexPath];
     NSString *recordId = msg.messageId;
     [[CDChatManager manager] sendMessage:msg conversation:self.conv callback:^(BOOL succeeded, NSError *error) {
-        if (error) {
+        if ([self alertError:error]) {
             if (discardIfFailed) {
                 // 服务器连通的情况下重发依然失败，说明消息有问题，如音频文件不存在，删掉这条消息
                 [[CDFailedMessageStore store] deleteFailedMessageByRecordId:recordId];
                 // 显示失败状态。列表里就让它存在吧，反正也重发不出去
                 [self replaceMesssage:msg atIndexPath:indexPath];
-            } else {
-                [self alertError:error];
+            }
+            else {
                 [self replaceMesssage:msg atIndexPath:indexPath];
             }
         }
@@ -557,22 +570,9 @@ static NSInteger const kOnePageSize = 10;
 - (void)queryAndCacheMessagesWithTimestamp:(int64_t)timestamp block:(AVIMArrayResultBlock)block {
     [[CDChatManager manager] queryTypedMessagesWithConversation:self.conv timestamp:timestamp limit:kOnePageSize block:^(NSArray *msgs, NSError *error) {
         if (error) {
-            if (error.code == kAVIMErrorConversationNotFound) {
-//                //0. 虽然服务器端的会话已不存在，但本地的会话未读数也要清空！FIXME:还有问题
-//                [self updateConversationAsRead];
-//                //1. 删除缓存数据库的conv
-//                [[CDConversationStore store] deleteConversationByConvId:self.conv.conversationId];
-                //2. 弹出提示语
-                UIAlertView *alertView = [UIAlertView bk_alertViewWithTitle:@"会话未找到"];
-                [alertView bk_setCancelBlock:^{
-                    [self.navigationController popViewControllerAnimated:YES];
-                }];
-                [alertView show];
-            }
-            else {
-                block(msgs, error);
-            }
-        } else {
+            block(msgs, error);
+        }
+        else {
             [self cacheMsgs:msgs callback:^(BOOL succeeded, NSError *error) {
                 block (msgs, error);
             }];
@@ -627,9 +627,8 @@ static NSInteger const kOnePageSize = 10;
                 [self insertOldMessages:xhMsgs completion: ^{
                     self.isLoadingMsg = NO;
                 }];
-            } else {
-                self.isLoadingMsg = NO;
             }
+            self.isLoadingMsg = NO;
         }];
     }
 }

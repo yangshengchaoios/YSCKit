@@ -63,6 +63,7 @@ typedef CGFloat (^YSCFloatSetBlock)(NSIndexPath *indexPath);
 @property (nonatomic, assign) IBInspectable BOOL enableRefresh;//是否启用下拉刷新(YES)
 @property (nonatomic, assign) IBInspectable BOOL enableLoadMore;//是否启用上拉加载更多(YES)
 @property (nonatomic, assign) IBInspectable BOOL enableTips;//当列表为空时，是否显示tipsView(YES)
+@property (nonatomic, assign) IBInspectable BOOL enableCellEdit;//是否开启删除功能(NO)
 
 #pragma mark - 设置和回传
 @property (nonatomic, copy) YSCBlock successBlock;
@@ -71,6 +72,7 @@ typedef CGFloat (^YSCFloatSetBlock)(NSIndexPath *indexPath);
 @property (nonatomic, copy) YSCObjectIndexResultBlock clickHeaderBlock;
 @property (nonatomic, copy) YSCObjectIndexResultBlock clickFooterBlock;
 @property (nonatomic, copy) YSCObjectIndexPathResultBlock clickCellBlock;
+@property (nonatomic, copy) YSCObjectIndexPathResultBlock deleteCellBlock;
 @property (nonatomic, copy) YSCViewObjectResultBlock layoutHeaderView;
 @property (nonatomic, copy) YSCViewObjectResultBlock layoutCellView;
 @property (nonatomic, copy) YSCViewObjectResultBlock layoutFooterView;

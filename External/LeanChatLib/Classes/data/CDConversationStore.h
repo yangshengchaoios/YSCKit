@@ -21,6 +21,8 @@
 - (void )insertConversation:(AVIMConversation *)conversation;
 //判断会话是否存在本地
 - (BOOL)isConversationExistsByConvId:(NSString *)convId;
+//删除所有会话
+- (void)deleteAllConversions;
 //删除会话
 - (void)deleteConversationByConvId:(NSString *)convId;
 //清空某个会话的未读数

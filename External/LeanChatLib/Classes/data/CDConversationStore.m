@@ -83,7 +83,8 @@
     ReturnNOWhenObjectIsEmpty(convId);
     __block BOOL exists = NO;
     [self.databaseQueue inDatabase:^(FMDatabase *db) {
-        FMResultSet *resultSet = [db executeQuery:@"SELECT * FROM conversations WHERE id = ?" withArgumentsInArray:@[convId]];
+        NSString *sql = [NSString stringWithFormat:@"SELECT * FROM conversations WHERE id = '%@'", Trim(convId)];
+        FMResultSet *resultSet = [db executeQuery:sql];
         if ([resultSet next]) {
             exists = YES;
         }
@@ -91,25 +92,34 @@
     }];
     return exists;
 }
-//删除会话
+//删除所有会话
+- (void)deleteAllConversions {
+    [self.databaseQueue inDatabase:^(FMDatabase *db) {
+        [db executeUpdate:@"DELETE FROM conversations"];
+    }];
+}
+//删除单个会话
 - (void)deleteConversationByConvId:(NSString *)convId {
     ReturnWhenObjectIsEmpty(convId);
     [self.databaseQueue inDatabase:^(FMDatabase *db) {
-        [db executeUpdate:@"DELETE FROM conversations WHERE id = ?" withArgumentsInArray:@[convId]];
+        NSString *sql = [NSString stringWithFormat:@"DELETE FROM conversations WHERE id = '%@'", Trim(convId)];
+        [db executeUpdate:sql];
     }];
 }
 //清空某个会话的未读数
 - (void)updateUnreadCountToZeroByConvId:(NSString *)convId {
     ReturnWhenObjectIsEmpty(convId);
     [self.databaseQueue inDatabase:^(FMDatabase *db) {
-        [db executeUpdate:@"UPDATE conversations SET unreadCount = 0 WHERE id = ?"  withArgumentsInArray:@[convId]];
+        NSString *sql = [NSString stringWithFormat:@"UPDATE conversations SET unreadCount = 0 WHERE id = '%@'", Trim(convId)];
+        [db executeUpdate:sql];
     }];
 }
 //增加未读数
 - (void)increaseUnreadCountByConvId:(NSString *)convId {
     ReturnWhenObjectIsEmpty(convId);
     [self.databaseQueue inDatabase:^(FMDatabase *db) {
-        [db executeUpdate:@"UPDATE conversations SET unreadCount = unreadCount + 1 WHERE id = ?" withArgumentsInArray:@[convId]];
+        NSString *sql = [NSString stringWithFormat:@"UPDATE conversations SET unreadCount = unreadCount + 1 WHERE id = '%@'", Trim(convId)];
+        [db executeUpdate:sql];
     }];
 }
 //更新 mentioned 值，当接收到消息发现 @了我的时候，设为 YES，进入聊天页面，设为 NO
@@ -127,6 +137,7 @@
 }
 //更新会话列表，如果没有就新建
 - (void)updateConversation:(AVIMConversation *)conversation {
+    ReturnWhenObjectIsEmpty(conversation);
     if ([self isConversationExistsByConvId:conversation.conversationId]) {
         [self.databaseQueue inDatabase:^(FMDatabase *db) {
             [db beginTransaction];
@@ -140,6 +151,7 @@
 }
 //更新最后一条消息记录成功发送的时间
 - (void)updateLastMessage:(AVIMTypedMessage *)message byConvId:(NSString *)convId {
+    ReturnWhenObjectIsEmpty(message);
     ReturnWhenObjectIsEmpty(convId);
     [self.databaseQueue inDatabase:^(FMDatabase *db) {
         [db beginTransaction];
@@ -189,16 +201,17 @@
     [self.databaseQueue inDatabase:^(FMDatabase *db) {
         FMResultSet * resultSet = [db executeQuery:@"SELECT * FROM conversations"];
         while ([resultSet next]) {
-            [conversations addObject:[self createConversationFromResultSet:resultSet]];
+            AVIMConversation *conv = [self createConversationFromResultSet:resultSet];
+            if (isNotEmpty(conv)) {
+                [conversations addObject:conv];
+            }
         }
         [resultSet close];
     }];
     return conversations;
 }
 - (AVIMConversation *)selectOneConversationByConvId:(NSString *)convId {
-    if (nil == convId) {
-        return nil;
-    }
+    ReturnNilWhenObjectIsEmpty(convId);
     __block AVIMConversation *conv = nil;
     [self.databaseQueue inDatabase:^(FMDatabase *db) {
         FMResultSet * resultSet = [db executeQuery:@"SELECT * FROM conversations WHERE id = ?" withArgumentsInArray:@[convId]];
@@ -215,11 +228,13 @@
     __block NSMutableArray *retArray = [NSMutableArray array];
     [self.databaseQueue inDatabase:^(FMDatabase *db) {
         NSString *sql = [NSString stringWithFormat:@"SELECT * FROM conversations ORDER BY updatedTime DESC LIMIT %ld,%ld",
-                         pageIndex * pageSize, pageSize];
+                         (long)(pageIndex * pageSize), (long)pageSize];
         FMResultSet *resultSet = [db executeQuery:sql];
         while ([resultSet next]) {
-            AVIMConversation *con = [self createConversationFromResultSet:resultSet];
-            [retArray addObject:con];
+            AVIMConversation *conv = [self createConversationFromResultSet:resultSet];
+            if (isNotEmpty(conv)) {
+                [retArray addObject:conv];
+            }
         }
         [resultSet close];
     }];
@@ -227,22 +242,27 @@
 }
 
 - (NSData *)dataFromMessage:(AVIMTypedMessage *)message {
+    ReturnNilWhenObjectIsEmpty(message);
     return [NSKeyedArchiver archivedDataWithRootObject:message];
 }
-- (AVIMTypedMessage *)messageFromData:(NSData *)data{
+- (AVIMTypedMessage *)messageFromData:(NSData *)data {
+    ReturnNilWhenObjectIsEmpty(data);
     return [NSKeyedUnarchiver unarchiveObjectWithData:data];
 }
 
 - (NSData *)dataFromConversation:(AVIMConversation *)conversation {
+    ReturnNilWhenObjectIsEmpty(conversation);
     AVIMKeyedConversation *keydConversation = [conversation keyedConversation];
     NSData *data = [NSKeyedArchiver archivedDataWithRootObject:keydConversation];
     return data;
 }
-- (AVIMConversation *)conversationFromData:(NSData *)data{
+- (AVIMConversation *)conversationFromData:(NSData *)data {
+    ReturnNilWhenObjectIsEmpty(data);
     AVIMKeyedConversation *keyedConversation = [NSKeyedUnarchiver unarchiveObjectWithData:data];
     return [[AVIMClient defaultClient] conversationWithKeyedConversation:keyedConversation];
 }
 - (AVIMConversation *)createConversationFromResultSet:(FMResultSet *)resultSet {
+    ReturnNilWhenObjectIsEmpty(resultSet);
     AVIMConversation *conversation = [self conversationFromData:[resultSet dataForColumn:kCDConversationTableKeyData]];
     conversation.lastMessage = [self messageFromData:[resultSet dataForColumn:kCDConversationTableKeyLastMessage]];
     conversation.unreadCount = [resultSet intForColumn:kCDConversationTableKeyUnreadCount];

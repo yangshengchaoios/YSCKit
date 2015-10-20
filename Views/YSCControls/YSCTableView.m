@@ -82,6 +82,7 @@
     };
     self.clickHeaderBlock = ^(NSObject *object, NSInteger section) {};
     self.clickCellBlock = ^(NSObject *object, NSIndexPath *indexPath) {};
+    self.deleteCellBlock = ^(NSObject *object, NSIndexPath *indexPath) {};
     self.clickFooterBlock = ^(NSObject *object, NSInteger section) {};
     self.layoutHeaderView = ^(UIView *view, NSObject *object) {};
     self.layoutCellView = ^(UIView *view, NSObject *object) {};
@@ -584,6 +585,22 @@
 }
 - (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath {
     [self resetCellEdgeInsets];
+}
+
+- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
+    if (editingStyle == UITableViewCellEditingStyleDelete) {
+        if (self.deleteCellBlock) {
+            NSArray *array = self.cellDataArray[indexPath.section];
+            self.deleteCellBlock(array[indexPath.row], indexPath);
+        }
+    }
+}
+//NOTE:系统自动多语言返回"删除"
+//- (NSString *)tableView:(UITableView *)tableView titleForDeleteConfirmationButtonForRowAtIndexPath:(NSIndexPath *)indexPath {
+//    return @"删除";
+//}
+- (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
+    return self.enableCellEdit;
 }
 
 @end

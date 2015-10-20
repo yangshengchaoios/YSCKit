@@ -115,7 +115,7 @@ static CDChatManager *instance;
     [q whereKey:kAVIMKeyMember containsAllObjectsInArray:members];
     // 如果没有数组size限制，传[2,3]，可能取回 [1,2,3]
     [q whereKey:kAVIMKeyMember sizeEqualTo:members.count];
-    [q orderByDescending:@"updateAt"];
+    [q orderByDescending:@"lm"];
     q.cachePolicy = kAVCachePolicyNetworkOnly;
     q.limit = 1;
     [q findConversationsWithCallback: ^(NSArray *objects, NSError *error) {
@@ -237,8 +237,8 @@ static CDChatManager *instance;
 
 #pragma mark - remote notification
 - (BOOL)didReceiveRemoteNotification:(NSDictionary *)userInfo {
-    if (userInfo[@"convId"]) {
-        self.remoteNotificationConvid = userInfo[@"convId"];
+    if (userInfo[kParamConvId]) {
+        self.remoteNotificationConvid = userInfo[kParamConvId];
         return YES;
     }
     else {
