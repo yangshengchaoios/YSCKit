@@ -19,14 +19,11 @@
         return;
     }
     else if (1 == type) {
-        if ([NSString isNotUrl:kCheckNewVersionUrl]) {
-            return;
-        }
         if (showMessage) {
             [UIView showHUDLoadingOnWindow:@"正在检测新版本"];
         }
-        [AFNManager getDataFromUrl:kCheckNewVersionUrl
-                           withAPI:@""
+        [AFNManager getDataFromUrl:kResPathAppCommonUrl
+                           withAPI:kResPathCheckNewVersion
                       andDictParam:params
                          modelName:[NewVersionModel class]
                   requestSuccessed: ^(id responseObject) {
