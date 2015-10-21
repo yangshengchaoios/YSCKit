@@ -49,7 +49,7 @@
     return _udid;
 }
 - (NSString *)deviceToken {
-    if (nil == _deviceToken) {
+    if (isEmpty(_deviceToken)) {
         _deviceToken = GetObject(@"DeviceToken");
     }
     return Trim(_deviceToken);
