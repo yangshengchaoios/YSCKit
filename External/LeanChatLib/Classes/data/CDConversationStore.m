@@ -240,6 +240,19 @@
     }];
     return retArray;
 }
+//查询本地是否有会话
+- (BOOL)isConversationExists {
+    __block BOOL exists = NO;
+    [self.databaseQueue inDatabase:^(FMDatabase *db) {
+        NSString *sql = [NSString stringWithFormat:@"SELECT * FROM conversations"];
+        FMResultSet *resultSet = [db executeQuery:sql];
+        if ([resultSet next]) {
+            exists = YES;
+        }
+        [resultSet close];
+    }];
+    return exists;
+}
 
 - (NSData *)dataFromMessage:(AVIMTypedMessage *)message {
     ReturnNilWhenObjectIsEmpty(message);

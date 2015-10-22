@@ -44,6 +44,8 @@
 - (NSInteger)selectUnreadCountByConvId:(NSString *)convId;
 //分页获取本地会话列表
 - (NSArray *)selectConversationsByPageIndex:(NSInteger)pageIndex pageSize:(NSInteger)pageSize;
+//查询本地是否有会话
+- (BOOL)isConversationExists;
 
 //从本地数据库查找所有的对话
 - (NSArray *)selectAllConversations;
