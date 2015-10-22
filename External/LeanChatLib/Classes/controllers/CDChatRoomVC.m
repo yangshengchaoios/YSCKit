@@ -225,7 +225,7 @@ static NSInteger const kOnePageSize = 10;
 //发送文本消息的回调方法
 - (void)didSendText:(NSString *)text fromSender:(NSString *)sender onDate:(NSDate *)date {
     if ([text length] > 0) {
-        AVIMTextMessage *msg = [AVIMTextMessage messageWithText:text attributes:nil];
+        AVIMTextMessage *msg = [AVIMTextMessage messageWithText:[CDEmotionUtils plainStringFromEmojiString:text] attributes:nil];
         [self sendMsg:msg];
         [self finishSendMessageWithBubbleMessageType:XHBubbleMessageMediaTypeText];
     }
