@@ -74,17 +74,16 @@
 
 - (void)addRefreshHeaderView {
 	WeakSelfType blockSelf = self;
-    [self.contentScrollView addLegendHeaderWithRefreshingBlock:^{
+    self.contentScrollView.header = [MJRefreshNormalHeader headerWithRefreshingBlock:^{
         [blockSelf refreshWithSuccessed:blockSelf.successBlock failed:blockSelf.failedBlock];
     }];
 }
 
 - (void)addRefreshFooterView {
 	WeakSelfType blockSelf = self;
-    MJRefreshLegendFooter *footer = [self.contentScrollView addLegendFooterWithRefreshingBlock:^{
+    self.contentScrollView.footer = [MJRefreshBackNormalFooter footerWithRefreshingBlock:^{
         [blockSelf loadMoreWithSuccessed:blockSelf.successBlock failed:blockSelf.failedBlock];
     }];
-    [footer setTitle:@"" forState:MJRefreshFooterStateIdle];//闲置状态文本为空
 }
 
 /**

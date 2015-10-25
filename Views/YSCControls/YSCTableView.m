@@ -146,24 +146,24 @@
     _enableRefresh = enableRefresh;
     if (enableRefresh) {
         WEAKSELF
-        [self addLegendHeaderWithRefreshingBlock:^{
+        self.header = [MJRefreshNormalHeader headerWithRefreshingBlock:^{
             [weakSelf refreshAtPageIndex:kDefaultPageStartIndex];
         }];
     }
     else {
-        [self removeHeader];
+        self.header  = nil;
     }
 }
 - (void)setEnableLoadMore:(BOOL)enableLoadMore {
     _enableLoadMore = enableLoadMore;
     if (enableLoadMore) {
         WEAKSELF
-        [self addLegendFooterWithRefreshingBlock:^{
+        self.footer = [MJRefreshBackNormalFooter footerWithRefreshingBlock:^{
             [weakSelf refreshAtPageIndex:weakSelf.currentPageIndex + 1];
         }];
     }
     else {
-        [self removeFooter];
+        self.footer = nil;
     }
 }
 - (void)setEnableTips:(BOOL)enableTips {

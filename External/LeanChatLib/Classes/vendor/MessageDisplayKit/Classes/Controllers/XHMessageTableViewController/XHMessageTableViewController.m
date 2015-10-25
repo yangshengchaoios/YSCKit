@@ -70,30 +70,42 @@ static CGPoint  delayOffset = {0.0};
 - (void)insertOldMessages:(NSArray *)oldMessages completion:(void (^)())completion {
     WEAKSELF
     [self exChangeMessageDataSourceQueue:^{
-        NSMutableArray *messages = [NSMutableArray arrayWithArray:oldMessages];
-        [messages addObjectsFromArray:weakSelf.messages];
-        
         delayOffset = weakSelf.messageTableView.contentOffset;
-        NSMutableArray *indexPaths = [NSMutableArray arrayWithCapacity:oldMessages.count];
+        NSMutableArray *indexPaths = [[NSMutableArray alloc] initWithCapacity:oldMessages.count];
+        NSMutableIndexSet *indexSets = [[NSMutableIndexSet alloc] init];
         [oldMessages enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
             NSIndexPath *indexPath = [NSIndexPath indexPathForRow:idx inSection:0];
             [indexPaths addObject:indexPath];
             
-            delayOffset.y += [weakSelf calculateCellHeightWithMessage:[messages objectAtIndex:idx] atIndexPath:indexPath];
+            delayOffset.y += [weakSelf calculateCellHeightWithMessage:[oldMessages objectAtIndex:idx] atIndexPath:indexPath];
+            [indexSets addIndex:idx];
         }];
+        
+        NSMutableArray *messages = [[NSMutableArray alloc] initWithArray:weakSelf.messages];
+        [messages insertObjects:oldMessages atIndexes:indexSets];
+        
         
         [weakSelf exMainQueue:^{
             [UIView setAnimationsEnabled:NO];
+            weakSelf.messageTableView.userInteractionEnabled = NO;
             [weakSelf.messageTableView beginUpdates];
             weakSelf.messages = messages;
             [weakSelf.messageTableView insertRowsAtIndexPaths:indexPaths withRowAnimation:UITableViewRowAnimationNone];
+            [weakSelf.messageTableView endUpdates];
+            
+            [UIView setAnimationsEnabled:YES];
             
             [weakSelf.messageTableView setContentOffset:delayOffset animated:NO];
-            [weakSelf.messageTableView endUpdates];
-            [UIView setAnimationsEnabled:YES];
-            completion();
+            weakSelf.messageTableView.userInteractionEnabled = YES;
+            if (completion) {
+                completion();
+            }
         }];
     }];
+}
+
+- (void)insertOldMessages:(NSArray *)oldMessages {
+    [self insertOldMessages:oldMessages completion:nil];
 }
 
 #pragma mark - Propertys
@@ -305,13 +317,13 @@ static CGPoint  delayOffset = {0.0};
     messageTableView.separatorColor = [UIColor clearColor];
     messageTableView.separatorStyle = UITableViewCellSeparatorStyleNone;
     
-    BOOL shouldLoadMoreMessagesScrollToTop = YES;
-    if ([self.delegate respondsToSelector:@selector(shouldLoadMoreMessagesScrollToTop)]) {
-        shouldLoadMoreMessagesScrollToTop = [self.delegate shouldLoadMoreMessagesScrollToTop];
-    }
-    if (shouldLoadMoreMessagesScrollToTop) {
-        messageTableView.tableHeaderView = self.headerContainerView;
-    }
+//    BOOL shouldLoadMoreMessagesScrollToTop = YES;
+//    if ([self.delegate respondsToSelector:@selector(shouldLoadMoreMessagesScrollToTop)]) {
+//        shouldLoadMoreMessagesScrollToTop = [self.delegate shouldLoadMoreMessagesScrollToTop];
+//    }
+//    if (shouldLoadMoreMessagesScrollToTop) {
+//        messageTableView.tableHeaderView = self.headerContainerView;
+//    }
     [self.view addSubview:messageTableView];
     [self.view sendSubviewToBack:messageTableView];
 	_messageTableView = messageTableView;
@@ -424,21 +436,25 @@ static CGPoint  delayOffset = {0.0};
     
     // KVO 检查contentSize
     [self.messageInputView.inputTextView addObserver:self
-                                     forKeyPath:@"contentSize"
-                                        options:NSKeyValueObservingOptionNew
-                                        context:nil];
+                                          forKeyPath:@"contentSize"
+                                             options:NSKeyValueObservingOptionNew
+                                             context:nil];
+    
+    [self.messageInputView.inputTextView setEditable:YES];
 }
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
-    // 取消输入框
-    [self.messageInputView.inputTextView resignFirstResponder];
-    [self setEditing:NO animated:YES];
+    
+    if (self.textViewInputViewType != XHInputViewTypeNormal) {
+        [self layoutOtherMenuViewHiden:YES];
+    }
     
     // remove键盘通知或者手势
     [self.messageTableView disSetupPanGestureControlKeyboardHide:self.allowsPanToDismissKeyboard];
     
     // remove KVO
     [self.messageInputView.inputTextView removeObserver:self forKeyPath:@"contentSize"];
+    [self.messageInputView.inputTextView setEditable:NO];
 }
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -446,6 +462,10 @@ static CGPoint  delayOffset = {0.0};
     // 初始化消息页面布局
     [self initilzer];
     [[XHMessageBubbleView appearance] setFont:[UIFont systemFontOfSize:16.0f]];
+}
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
 }
 - (void)dealloc {
     _messages = nil;
@@ -464,7 +484,13 @@ static CGPoint  delayOffset = {0.0};
 - (BOOL)shouldAutorotate {
     return NO;
 }
-- (UIInterfaceOrientationMask)supportedInterfaceOrientations {
+
+#if __IPHONE_OS_VERSION_MAX_ALLOWED < __IPHONE_9_0
+- (NSUInteger)supportedInterfaceOrientations
+#else
+- (UIInterfaceOrientationMask)supportedInterfaceOrientations
+#endif
+{
     return UIInterfaceOrientationMaskPortrait;
 }
 - (UIInterfaceOrientation)preferredInterfaceOrientationForPresentation {
@@ -705,7 +731,9 @@ static CGPoint  delayOffset = {0.0};
         
         [self scrollToBottomAnimated:NO];
     } completion:^(BOOL finished) {
-        
+        if (hide) {
+            self.textViewInputViewType = XHInputViewTypeNormal;
+        }
     }];
 }
 

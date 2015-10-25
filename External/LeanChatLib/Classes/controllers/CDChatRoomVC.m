@@ -21,6 +21,7 @@
 #import "CDConversationStore.h"
 #import "CDFailedMessageStore.h"
 #import "AVIMEmotionMessage.h"
+#import "MJRefresh.h"
 
 static NSInteger const kOnePageSize = 10;
 
@@ -73,6 +74,13 @@ static NSInteger const kOnePageSize = 10;
     [self loadMessagesWhenInit];
     [self updateStatusView];
     [[XHAudioPlayerHelper shareInstance] setDelegate:self];
+    WEAKSELF
+    MJRefreshNormalHeader *header = [MJRefreshNormalHeader headerWithRefreshingBlock:^{
+        [weakSelf loadOldMessages];
+    }];
+    header.lastUpdatedTimeLabel.hidden = YES;
+    header.stateLabel.hidden = YES;
+    self.messageTableView.header = header;
 }
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
@@ -211,14 +219,6 @@ static NSInteger const kOnePageSize = 10;
 }
 - (NSArray *)emotionManagersAtManager {
     return self.emotionManagers;
-}
-
-#pragma mark - XHMessageTableViewController Delegate
-- (BOOL)shouldLoadMoreMessagesScrollToTop {
-    return YES;
-}
-- (void)loadMoreMessagesScrollTotop {
-    [self loadOldMessages];
 }
 
 #pragma mark - didSend delegate
@@ -615,25 +615,39 @@ static NSInteger const kOnePageSize = 10;
     if (self.messages.count == 0 || self.isLoadingMsg) {
         return;
     } else {
+        WEAKSELF
         self.isLoadingMsg = YES;
         AVIMTypedMessage *msg = [self.msgs objectAtIndex:0];
         int64_t timestamp = msg.sendTimestamp;
         [self queryAndCacheMessagesWithTimestamp:timestamp block:^(NSArray *msgs, NSError *error) {
-            if ([self filterError:error]) {
-                NSMutableArray *xhMsgs = [[self getXHMessages:msgs] mutableCopy];
+            if ([weakSelf filterError:error] && isNotEmpty(msgs)) {
+                NSMutableArray *xhMsgs = [[weakSelf getXHMessages:msgs] mutableCopy];
                 NSMutableArray *newMsgs = [NSMutableArray arrayWithArray:msgs];
-                [newMsgs addObjectsFromArray:self.msgs];
-                self.msgs = newMsgs;
-                [self insertOldMessages:xhMsgs completion: ^{
-                    self.isLoadingMsg = NO;
-                }];
+                [newMsgs addObjectsFromArray:weakSelf.msgs];
+                weakSelf.msgs = newMsgs;
+                if ([xhMsgs count] > 0) {
+                    [weakSelf insertOldMessages:xhMsgs completion: ^{
+                        weakSelf.isLoadingMsg = NO;
+                        [weakSelf.messageTableView.header endRefreshing];
+                    }];
+                }
+                else {
+                    weakSelf.isLoadingMsg = NO;
+                    [weakSelf.messageTableView.header endRefreshing];
+                }
             }
-            self.isLoadingMsg = NO;
+            else {
+                weakSelf.isLoadingMsg = NO;
+                [weakSelf.messageTableView.header endRefreshing];
+            }
         }];
     }
 }
 //缓存消息内容文件，不是消息本身！
 - (void)cacheMsgs:(NSArray *)msgs callback:(AVBooleanResultBlock)callback {
+    if (isEmpty(msgs)) {
+        callback(YES, nil);
+    }
     [self runInGlobalQueue:^{
         NSMutableSet *userIds = [[NSMutableSet alloc] init];
         for (AVIMTypedMessage *msg in msgs) {
@@ -670,17 +684,9 @@ static NSInteger const kOnePageSize = 10;
                 }
             }
         }
-        if ([[CDChatManager manager].userDelegate respondsToSelector:@selector(cacheUserByIds:block:)]) {
-            [[CDChatManager manager].userDelegate cacheUserByIds:userIds block:^(BOOL succeeded, NSError *error) {
-                [self runInMainQueue:^{
-                    callback(succeeded, error);
-                }];
-            }];
-        } else {
-            [self runInMainQueue:^{
-                callback(YES, nil);
-            }];
-        }
+        [self runInMainQueue:^{
+            callback(YES, nil);
+        }];
     }];
 }
 - (void)insertMessage:(AVIMTypedMessage *)message {
