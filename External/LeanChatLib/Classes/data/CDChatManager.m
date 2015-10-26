@@ -17,11 +17,6 @@ static CDChatManager *instance;
 
 @interface CDChatManager () <AVIMClientDelegate, AVIMSignatureDataSource>
 
-//@property (nonatomic, assign, readwrite) BOOL connect;
-//@property (nonatomic, strong) NSString *plistPath;
-//@property (nonatomic, strong) NSMutableDictionary *conversationDatas;
-//@property (nonatomic, assign) NSInteger totalUnreadCount;
-
 @end
 
 @implementation CDChatManager

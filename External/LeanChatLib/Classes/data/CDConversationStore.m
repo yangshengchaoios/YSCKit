@@ -277,10 +277,12 @@
 - (AVIMConversation *)createConversationFromResultSet:(FMResultSet *)resultSet {
     ReturnNilWhenObjectIsEmpty(resultSet);
     AVIMConversation *conversation = [self conversationFromData:[resultSet dataForColumn:kCDConversationTableKeyData]];
-    conversation.lastMessage = [self messageFromData:[resultSet dataForColumn:kCDConversationTableKeyLastMessage]];
-    conversation.unreadCount = [resultSet intForColumn:kCDConversationTableKeyUnreadCount];
-    conversation.mentioned = [resultSet boolForColumn:kCDConversationTableKeyMentioned];
-    conversation.updatedTime = [resultSet dateForColumn:kCDConversationTableKeyUpdatedTime];//最近一条消息的发送时间
+    if (conversation) {
+        conversation.lastMessage = [self messageFromData:[resultSet dataForColumn:kCDConversationTableKeyLastMessage]];
+        conversation.unreadCount = [resultSet intForColumn:kCDConversationTableKeyUnreadCount];
+        conversation.mentioned = [resultSet boolForColumn:kCDConversationTableKeyMentioned];
+        conversation.updatedTime = [resultSet dateForColumn:kCDConversationTableKeyUpdatedTime];//最近一条消息的发送时间
+    }
     return conversation;
 }
 

@@ -11,37 +11,42 @@
 #import "UIImage+Icon.h"
 #import <objc/runtime.h>
 
+static NSString *ObjectTagKeyLastMessage = @"ObjectTagKeyLastMessage";
+static NSString *ObjectTagKeyUnreadCount = @"ObjectTagKeyUnreadCount";
+static NSString *ObjectTagKeyMentioned = @"ObjectTagKeyMentioned";
+static NSString *ObjectTagKeyUpdatedTime = @"ObjectTagKeyUpdatedTime";
+
 @implementation AVIMConversation (Custom)
 
 - (AVIMTypedMessage *)lastMessage {
-    return objc_getAssociatedObject(self, @selector(lastMessage));
+    return objc_getAssociatedObject(self, &ObjectTagKeyLastMessage);
 }
 
-- (void)setLastMessage:(AVIMTypedMessage *)lastMessage {
-    objc_setAssociatedObject(self, @selector(lastMessage), lastMessage, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+- (void)setLastMessage:(AVIMTypedMessage *)_lastMessage {
+    objc_setAssociatedObject(self, &ObjectTagKeyLastMessage, _lastMessage, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
 - (NSInteger)unreadCount {
-    return [objc_getAssociatedObject(self, @selector(unreadCount)) intValue];
+    return [objc_getAssociatedObject(self, @selector(unreadCount)) integerValue];
 }
 
-- (void)setUnreadCount:(NSInteger)unreadCount {
-    objc_setAssociatedObject(self, @selector(unreadCount), @(unreadCount), OBJC_ASSOCIATION_ASSIGN);
+- (void)setUnreadCount:(NSInteger)_unreadCount {
+    objc_setAssociatedObject(self, @selector(unreadCount), @(_unreadCount), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
 - (BOOL)mentioned {
-    return [objc_getAssociatedObject(self, @selector(mentioned)) boolValue];
+    return [objc_getAssociatedObject(self, &ObjectTagKeyMentioned) boolValue];
 }
 
-- (void)setMentioned:(BOOL)mentioned {
-    objc_setAssociatedObject(self, @selector(mentioned), @(mentioned), OBJC_ASSOCIATION_ASSIGN);
+- (void)setMentioned:(BOOL)_mentioned {
+    objc_setAssociatedObject(self, &ObjectTagKeyMentioned, @(_mentioned), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
 - (NSDate *)updatedTime {
-    return objc_getAssociatedObject(self, @selector(updatedTime));
+    return objc_getAssociatedObject(self, &ObjectTagKeyUpdatedTime);
 }
-- (void)setUpdatedTime:(NSDate *)updatedTime {
-    objc_setAssociatedObject(self, @selector(updatedTime), updatedTime, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+- (void)setUpdatedTime:(NSDate *)_updatedTime {
+    objc_setAssociatedObject(self, &ObjectTagKeyUpdatedTime, _updatedTime, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
 - (CDConvType)type {

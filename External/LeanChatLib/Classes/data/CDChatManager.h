@@ -185,12 +185,6 @@ typedef void (^CDRecentConversationsCallback)(NSArray *conversations, NSInteger 
 - (void)findRecentConversationsWithBlock:(CDRecentConversationsCallback)block;
 
 /**
- *  从本地最近对话的数据库中删除对话
- *  @param conversation 要删除的对话
- */
-- (void)deleteConversation:(AVIMConversation *)conversation;
-
-/**
  *  在 ApplicationDelegate 中的 application:didRemoteNotification 调用，来记录推送时的 convid，这样点击弹框打开后进入相应的对话
  *  @param userInfo
  *  @return 是否检测到 convid 做了处理
