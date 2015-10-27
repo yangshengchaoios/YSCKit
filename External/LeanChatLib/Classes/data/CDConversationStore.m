@@ -94,9 +94,17 @@
 }
 //删除所有会话
 - (void)deleteAllConversions {
-    [self.databaseQueue inDatabase:^(FMDatabase *db) {
-        [db executeUpdate:@"DELETE FROM conversations"];
-    }];
+//    [self.databaseQueue inDatabase:^(FMDatabase *db) {
+//        [db executeUpdate:@"DELETE FROM conversations"];
+//    }];
+    //应该删除本地所有会话数据库文件！
+    NSString *libPath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0];
+    NSArray *files = [YSCFileUtils allPathsInDirectoryPath:libPath];
+    for (NSString *filePath in files) {
+        if ([filePath hasPrefix:@"com.leancloud.leanchatlib."]) {
+            [YSCFileUtils deleteFileOrDirectory:[libPath stringByAppendingPathComponent:filePath]];
+        }
+    }
 }
 //删除单个会话
 - (void)deleteConversationByConvId:(NSString *)convId {
