@@ -108,7 +108,7 @@
         
         NSError *error = nil;
         AVAudioSession *audioSession = [AVAudioSession sharedInstance];
-        [audioSession setCategory :AVAudioSessionCategoryPlayAndRecord error:&error];
+        [audioSession setCategory :AVAudioSessionCategoryRecord error:&error];
         if(error) {
             DLog(@"audioSession: %@ %ld %@", [error domain], (long)[error code], [[error userInfo] description]);
             return;
