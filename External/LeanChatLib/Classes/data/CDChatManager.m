@@ -57,7 +57,9 @@ static CDChatManager *instance;
 }
 //注销IM
 - (void)closeWithCallback:(AVBooleanResultBlock)callback {
-    [[AVIMClient defaultClient] closeWithCallback:callback];
+    if (_selfId) {
+        [[AVIMClient defaultClient] closeWithCallback:callback];
+    }
 }
 
 #pragma mark - conversation
