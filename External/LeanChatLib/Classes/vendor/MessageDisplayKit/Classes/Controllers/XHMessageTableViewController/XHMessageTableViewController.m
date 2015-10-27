@@ -103,7 +103,6 @@ static CGPoint  delayOffset = {0.0};
         }];
     }];
 }
-
 - (void)insertOldMessages:(NSArray *)oldMessages {
     [self insertOldMessages:oldMessages completion:nil];
 }
@@ -444,7 +443,7 @@ static CGPoint  delayOffset = {0.0};
 }
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
-    
+    [self finishRecordingWhenErrorBehaviors];
     if (self.textViewInputViewType != XHInputViewTypeNormal) {
         [self layoutOtherMenuViewHiden:YES];
     }
@@ -462,12 +461,14 @@ static CGPoint  delayOffset = {0.0};
     // 初始化消息页面布局
     [self initilzer];
     [[XHMessageBubbleView appearance] setFont:[UIFont systemFontOfSize:16.0f]];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(finishRecordingWhenErrorBehaviors) name:UIApplicationWillResignActiveNotification object:nil];
 }
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
 }
 - (void)dealloc {
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:UIApplicationWillResignActiveNotification object:nil];
     _messages = nil;
     _delegate = nil;
     _dataSource = nil;
@@ -776,6 +777,12 @@ static CGPoint  delayOffset = {0.0};
     [self.voiceRecordHelper cancelledDeleteWithCompletion:^{
         
     }];
+}
+//当其它错误操作发生时，停止录音
+- (void)finishRecordingWhenErrorBehaviors {
+    if (self.messageInputView.isRecording) {
+        [self didFinishRecoingVoiceAction];
+    }
 }
 
 #pragma mark - XHMessageInputView Delegate
