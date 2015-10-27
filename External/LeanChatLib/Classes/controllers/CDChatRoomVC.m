@@ -613,6 +613,7 @@ static NSInteger const kOnePageSize = 10;
 }
 - (void)loadOldMessages {
     if (self.messages.count == 0 || self.isLoadingMsg) {
+        [self.messageTableView.header endRefreshing];
         return;
     } else {
         WEAKSELF
