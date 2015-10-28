@@ -48,6 +48,7 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
 @property (nonatomic, strong) TOCropViewControllerTransitioning *transitionController;
 @property (nonatomic, strong) UIPopoverController *activityPopoverController;
 @property (nonatomic, assign) BOOL inTransition;
+@property (nonatomic, strong) NSMutableArray *ratioArray;
 
 /* Button callback */
 - (void)cancelButtonTapped;
@@ -63,8 +64,7 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
 
 @implementation TOCropViewController
 
-- (instancetype)initWithImage:(UIImage *)image
-{
+- (instancetype)initWithImage:(UIImage *)image ratioArray:(NSArray *)array {
     self = [super init];
     if (self) {
         self.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
@@ -72,9 +72,20 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
         
         _transitionController = [[TOCropViewControllerTransitioning alloc] init];
         _image = image;
+        _ratioArray = [NSMutableArray array];
+        [_ratioArray addObject:@"Original"];
+        [_ratioArray addObject:@"Square"];
+        for (NSString *title in array) {
+            if ([title containsString:@":"]) {
+                [_ratioArray addObject:Trim(title)];
+            }
+        }
     }
     
     return self;
+}
+- (instancetype)initWithImage:(UIImage *)image {
+    return [self initWithImage:image ratioArray:@[@"3:2", @"5:3", @"4:3", @"5:4", @"16:9"]];
 }
 
 - (void)viewDidLoad
@@ -258,14 +269,26 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
                                                              delegate:self
                                                     cancelButtonTitle:NSLocalizedStringFromTable(@"Cancel", @"TOCropViewControllerLocalizable", nil)
                                                destructiveButtonTitle:nil
-                                                    otherButtonTitles:NSLocalizedStringFromTable(@"Original", @"TOCropViewControllerLocalizable", nil),
-                                                                      NSLocalizedStringFromTable(@"Square", @"TOCropViewControllerLocalizable", nil),
-                                                                      verticalCropBox ? @"2:3" : @"3:2",
-                                                                      verticalCropBox ? @"3:5" : @"5:3",
-                                                                      verticalCropBox ? @"3:4" : @"4:3",
-                                                                      verticalCropBox ? @"4:5" : @"5:4",
-                                                                      verticalCropBox ? @"5:7" : @"7:5",
-                                                                      verticalCropBox ? @"9:16" : @"16:9",nil];
+                                                    otherButtonTitles:nil];
+    [actionSheet addButtonWithTitle:NSLocalizedStringFromTable(@"Original", @"TOCropViewControllerLocalizable", nil)];
+    [actionSheet addButtonWithTitle:NSLocalizedStringFromTable(@"Square", @"TOCropViewControllerLocalizable", nil)];
+    
+    //动态添加比例
+    for (NSString *buttonTitle in self.ratioArray) {
+        NSArray *tempArray = [buttonTitle componentsSeparatedByString:@":"];
+        if ([tempArray count] > 1) {
+            if (verticalCropBox) {
+                NSString *tempTitle = [NSString stringWithFormat:@"%@:%@", tempArray[1], tempArray[0]];
+                [actionSheet addButtonWithTitle:tempTitle];
+            }
+            else {
+                [actionSheet addButtonWithTitle:buttonTitle];
+            }
+        }
+        else {
+            NSLog(@"test");
+        }
+    }
     
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
         [actionSheet showFromRect:self.toolbar.clampButtonFrame inView:self.toolbar animated:YES];
@@ -273,37 +296,19 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
         [actionSheet showInView:self.view];
 }
 
-- (void)actionSheet:(UIActionSheet *)actionSheet didDismissWithButtonIndex:(NSInteger)buttonIndex
-{
+- (void)actionSheet:(UIActionSheet *)actionSheet didDismissWithButtonIndex:(NSInteger)buttonIndex {
+    if (buttonIndex == 0) {
+        return;
+    }
+    buttonIndex--;
     CGSize aspectRatio = CGSizeZero;
-    
-    switch (buttonIndex) {
-        case TOCropViewControllerAspectRatioOriginal:
-            aspectRatio = CGSizeZero;
-            break;
-        case TOCropViewControllerAspectRatioSquare:
-            aspectRatio = CGSizeMake(1.0f, 1.0f);
-            break;
-        case TOCropViewControllerAspectRatio3x2:
-            aspectRatio = CGSizeMake(3.0f, 2.0f);
-            break;
-        case TOCropViewControllerAspectRatio5x3:
-            aspectRatio = CGSizeMake(5.0f, 3.0f);
-            break;
-        case TOCropViewControllerAspectRatio4x3:
-            aspectRatio = CGSizeMake(4.0f, 3.0f);
-            break;
-        case TOCropViewControllerAspectRatio5x4:
-            aspectRatio = CGSizeMake(5.0f, 4.0f);
-            break;
-        case TOCropViewControllerAspectRatio7x5:
-            aspectRatio = CGSizeMake(7.0f, 5.0f);
-            break;
-        case TOCropViewControllerAspectRatio16x9:
-            aspectRatio = CGSizeMake(16.0f, 9.0f);
-            break;
-        default:
-            return;
+    if (1 == buttonIndex) {
+        aspectRatio = CGSizeMake(1.0f, 1.0f);
+    }
+    else if (buttonIndex > 1) {
+        NSString *buttonTitle = self.ratioArray[buttonIndex];
+        NSArray *tempArray = [buttonTitle componentsSeparatedByString:@":"];
+        aspectRatio = CGSizeMake([tempArray[0] floatValue], [tempArray[1] floatValue]);
     }
     
     if (self.cropView.cropBoxAspectRatioIsPortrait) {

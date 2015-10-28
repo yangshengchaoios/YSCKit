@@ -104,6 +104,7 @@
  
  @param image The image that will be used to crop.
  */
+- (instancetype)initWithImage:(UIImage *)image ratioArray:(NSArray *)array;
 - (instancetype)initWithImage:(UIImage *)image;
 
 /**
