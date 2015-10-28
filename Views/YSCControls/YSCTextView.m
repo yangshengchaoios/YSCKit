@@ -233,6 +233,7 @@
 - (void)layoutSubviews {
     [super layoutSubviews];
     [self resetKeyboardType];
+    [self layoutIfNeeded];
 }
 
 //定义弹出键盘类型

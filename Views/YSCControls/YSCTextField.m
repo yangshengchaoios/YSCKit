@@ -85,6 +85,7 @@
 - (void)layoutSubviews {
     [super layoutSubviews];
     self.textType = _textType;
+    [self layoutIfNeeded];
 }
 //当输入框内容改变时触发
 //NOTE:彻底解决中文输入高亮超过限制会crash的问题！
