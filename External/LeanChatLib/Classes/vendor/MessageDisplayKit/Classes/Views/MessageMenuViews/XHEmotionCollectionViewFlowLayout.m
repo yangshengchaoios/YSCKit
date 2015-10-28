@@ -14,8 +14,9 @@
     self = [super init];
     if (self) {
         self.scrollDirection = UICollectionViewScrollDirectionHorizontal;
-        self.minimumLineSpacing = kXHEmotionMinimumLineSpacing;
-        self.sectionInset = UIEdgeInsetsMake(kXHEmotionCollectionViewSectionInset, kXHEmotionCollectionViewSectionInset, 0, kXHEmotionCollectionViewSectionInset);
+        self.minimumLineSpacing = AUTOLAYOUT_LENGTH(20);
+        self.minimumInteritemSpacing = (216 - 74 - 3 * AUTOLAYOUT_LENGTH(60) - AUTOLAYOUT_LENGTH(20)) / 2;
+        self.sectionInset = AUTOLAYOUT_EDGEINSETS(20, 10, 0, 10);
         self.collectionView.alwaysBounceVertical = YES;
     }
     return self;

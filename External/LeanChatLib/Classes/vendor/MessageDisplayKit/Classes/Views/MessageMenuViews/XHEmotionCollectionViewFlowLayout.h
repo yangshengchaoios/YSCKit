@@ -7,8 +7,6 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "XHEmotionManager.h"
-#define kXHEmotionCollectionViewSectionInset 15
 
 @interface XHEmotionCollectionViewFlowLayout : UICollectionViewFlowLayout
 

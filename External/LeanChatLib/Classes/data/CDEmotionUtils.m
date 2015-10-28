@@ -94,9 +94,8 @@
     NSMutableArray *emotionManagers = [NSMutableArray array];
     {
         XHEmotionManager *emotionManager = [[XHEmotionManager alloc] init];
-        CGFloat width = 35;
-        emotionManager.estimatedPages = 2;
-        emotionManager.emotionSize = CGSizeMake(width, width);
+        emotionManager.estimatedPages = 3;
+        emotionManager.emotionSize = AUTOLAYOUT_SIZE_WH(60, 60);
         emotionManager.emotionName = @"";//普通
         NSMutableArray *emotions = [NSMutableArray array];
         for (NSInteger j = 0; j < emotionCodes.count; j++) {

@@ -169,7 +169,6 @@
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
     XHEmotionCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:kXHEmotionCollectionViewCellIdentifier forIndexPath:indexPath];
-    
     XHEmotionManager *emotionManager = [self.dataSource emotionManagerForColumn:self.selectedIndex];
     cell.emotion = emotionManager.emotions[indexPath.row];
     cell.emotionSize = emotionManager.emotionSize;

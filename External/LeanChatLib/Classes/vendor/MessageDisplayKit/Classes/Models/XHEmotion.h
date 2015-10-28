@@ -8,9 +8,6 @@
 
 #import <Foundation/Foundation.h>
 
-#define kXHEmotionMinimumLineSpacing 5
-#define kXHEmotionImageViewInset 5
-
 @interface XHEmotion : NSObject
 
 /**
