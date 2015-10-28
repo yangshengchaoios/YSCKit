@@ -162,7 +162,7 @@
 - (void)startRecordingWithStartRecorderCompletion:(XHStartRecorderCompletion)startRecorderCompletion {
     if ([_recorder record]) {
         [self resetTimer];
-        _timer = [NSTimer scheduledTimerWithTimeInterval:0.05 target:self selector:@selector(updateMeters) userInfo:nil repeats:YES];
+        _timer = [NSTimer scheduledTimerWithTimeInterval:0.03 target:self selector:@selector(updateMeters) userInfo:nil repeats:YES];
         if (startRecorderCompletion)
             dispatch_async(dispatch_get_main_queue(), ^{
                 startRecorderCompletion();
