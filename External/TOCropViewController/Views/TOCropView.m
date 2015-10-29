@@ -797,12 +797,12 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 
 - (void)setGridOverlayHidden:(BOOL)gridOverlayHidden
 {
-    _gridOverlayHidden = gridOverlayHidden;
     [self setGridOverlayHidden:_gridOverlayHidden animated:NO];
 }
 
 - (void)setGridOverlayHidden:(BOOL)gridOverlayHidden animated:(BOOL)animated
 {
+    _gridOverlayHidden = gridOverlayHidden;
     self.gridOverlayView.alpha = gridOverlayHidden ? 1.0f : 0.0f;
     
     [UIView animateWithDuration:0.4f animations:^{
@@ -934,7 +934,12 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     CGRect cropBoxFrame = self.cropBoxFrame;
     CGPoint offset = self.scrollView.contentOffset;
     
-    BOOL cropBoxIsPortrait = aspectRatio.width < aspectRatio.height;
+    BOOL cropBoxIsPortrait = NO;
+    if ((NSInteger)aspectRatio.width == 1 && (NSInteger)aspectRatio.height == 1)
+        cropBoxIsPortrait = self.image.size.width > self.image.size.height;
+    else
+        cropBoxIsPortrait = aspectRatio.width < aspectRatio.height;
+    
     BOOL zoomOut = NO;
     if (cropBoxIsPortrait) {
         CGFloat newWidth = cropBoxFrame.size.height * (aspectRatio.width/aspectRatio.height);
@@ -1050,6 +1055,8 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     }
     else {
         newCropFrame.size = (CGSize){floorf(self.cropBoxLastEditedSize.height * scale), floorf(self.cropBoxLastEditedSize.width * scale)};
+        //update last edited size
+        self.cropBoxLastEditedSize = cropBoxFrame.size;
     }
     
     newCropFrame.origin.x = floorf((CGRectGetWidth(self.bounds) - newCropFrame.size.width) * 0.5f);
@@ -1102,6 +1109,12 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     offset.y = floorf(-midPoint.y + cropTargetPoint.y);
     offset.x = MAX(-self.scrollView.contentInset.left, offset.x);
     offset.y = MAX(-self.scrollView.contentInset.top, offset.y);
+    
+    //if the scroll view's new scale is 1 and the new offset is equal to the old, will not trigger the delegate 'scrollViewDidScroll:'
+    //so we should call the method manually to update the foregroundImageView's frame
+    if (offset.x == self.scrollView.contentOffset.x && offset.y == self.scrollView.contentOffset.y && scale == 1) {
+        [self matchForegroundToBackground];
+    }
     self.scrollView.contentOffset = offset;
     
     //If we're animated, play an animation of the snapshot view rotating,

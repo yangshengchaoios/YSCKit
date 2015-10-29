@@ -46,9 +46,13 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
 @property (nonatomic, strong) TOCropView *cropView;
 @property (nonatomic, strong) UIView *snapshotView;
 @property (nonatomic, strong) TOCropViewControllerTransitioning *transitionController;
-@property (nonatomic, strong) UIPopoverController *activityPopoverController;
 @property (nonatomic, assign) BOOL inTransition;
 @property (nonatomic, strong) NSMutableArray *ratioArray;
+
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+@property (nonatomic, strong) UIPopoverController *activityPopoverController;
+#pragma clang diagnostic pop
 
 /* Button callback */
 - (void)cancelButtonTapped;
@@ -76,7 +80,7 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
         [_ratioArray addObject:@"Original"];
         [_ratioArray addObject:@"Square"];
         for (NSString *title in array) {
-            if ([title containsString:@":"]) {
+            if ([title isContains:@":"]) {
                 [_ratioArray addObject:Trim(title)];
             }
         }
@@ -91,7 +95,7 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-
+    
     BOOL landscapeLayout = CGRectGetWidth(self.view.frame) > CGRectGetHeight(self.view.frame);
     self.cropView = [[TOCropView alloc] initWithImage:self.image];
     self.cropView.frame = (CGRect){(landscapeLayout ? 44.0f : 0.0f),0,(CGRectGetWidth(self.view.bounds) - (landscapeLayout ? 44.0f : 0.0f)), (CGRectGetHeight(self.view.bounds)-(landscapeLayout ? 0.0f : 44.0f)) };
@@ -131,7 +135,9 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
     self.inTransition = NO;
     if (animated && [UIApplication sharedApplication].statusBarHidden == NO) {
         [UIView animateWithDuration:0.3f animations:^{ [self setNeedsStatusBarAppearanceUpdate]; }];
-        [self.cropView setGridOverlayHidden:NO animated:YES];
+        
+        if (self.cropView.gridOverlayHidden)
+            [self.cropView setGridOverlayHidden:NO animated:YES];
     }
 }
 
@@ -218,7 +224,7 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
         self.snapshotView.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleRightMargin;
     
     [self.view addSubview:self.snapshotView];
-
+    
     self.toolbar.frame = [self frameForToolBarWithVerticalLayout:UIInterfaceOrientationIsLandscape(toInterfaceOrientation)];
     [self.toolbar layoutIfNeeded];
     
@@ -264,59 +270,54 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
         return;
     }
     
+    //TODO: Completely overhaul this once iOS 7 support is dropped
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
     BOOL verticalCropBox = self.cropView.cropBoxAspectRatioIsPortrait;
-    UIActionSheet *actionSheet = [[UIActionSheet alloc] initWithTitle:nil
-                                                             delegate:self
-                                                    cancelButtonTitle:NSLocalizedStringFromTable(@"Cancel", @"TOCropViewControllerLocalizable", nil)
-                                               destructiveButtonTitle:nil
-                                                    otherButtonTitles:nil];
-    [actionSheet addButtonWithTitle:NSLocalizedStringFromTable(@"Original", @"TOCropViewControllerLocalizable", nil)];
-    [actionSheet addButtonWithTitle:NSLocalizedStringFromTable(@"Square", @"TOCropViewControllerLocalizable", nil)];
+    UIActionSheet *actionSheet = [UIActionSheet bk_actionSheetWithTitle:nil];
+    WEAKSELF
+    [actionSheet bk_addButtonWithTitle:NSLocalizedStringFromTableInBundle(@"Original",@"TOCropViewControllerLocalizable",
+                                                                          [NSBundle bundleForClass:[self class]],nil)
+                               handler:^{
+                                   [weakSelf doCropImageWithSize:CGSizeZero];
+                               }];
+    [actionSheet bk_addButtonWithTitle:NSLocalizedStringFromTableInBundle(@"Square",@"TOCropViewControllerLocalizable",
+                                                                          [NSBundle bundleForClass:[self class]],nil)
+                               handler:^{
+                                   [weakSelf doCropImageWithSize:CGSizeMake(1.0f, 1.0f)];
+                               }];
     
     //动态添加比例
     for (NSString *buttonTitle in self.ratioArray) {
         NSArray *tempArray = [buttonTitle componentsSeparatedByString:@":"];
         if ([tempArray count] > 1) {
+            CGSize newSize = CGSizeMake([tempArray[0] floatValue], [tempArray[1] floatValue]);
+            NSString *newTitle = buttonTitle;
             if (verticalCropBox) {
-                NSString *tempTitle = [NSString stringWithFormat:@"%@:%@", tempArray[1], tempArray[0]];
-                [actionSheet addButtonWithTitle:tempTitle];
+                newSize = CGSizeMake([tempArray[1] floatValue], [tempArray[0] floatValue]);
+                newTitle = [NSString stringWithFormat:@"%@:%@", tempArray[1], tempArray[0]];
             }
-            else {
-                [actionSheet addButtonWithTitle:buttonTitle];
-            }
+            
+            [actionSheet bk_addButtonWithTitle:newTitle
+                                       handler:^{
+                                           [weakSelf doCropImageWithSize:newSize];
+                                       }];
         }
         else {
             NSLog(@"test");
         }
     }
+    [actionSheet bk_setCancelButtonWithTitle:NSLocalizedStringFromTableInBundle(@"Cancel",@"TOCropViewControllerLocalizable",
+                                                                                [NSBundle bundleForClass:[self class]],nil) handler:nil];
     
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
         [actionSheet showFromRect:self.toolbar.clampButtonFrame inView:self.toolbar animated:YES];
     else
         [actionSheet showInView:self.view];
+#pragma clang diagnostic pop
 }
 
-- (void)actionSheet:(UIActionSheet *)actionSheet didDismissWithButtonIndex:(NSInteger)buttonIndex {
-    if (buttonIndex == 0) {
-        return;
-    }
-    buttonIndex--;
-    CGSize aspectRatio = CGSizeZero;
-    if (1 == buttonIndex) {
-        aspectRatio = CGSizeMake(1.0f, 1.0f);
-    }
-    else if (buttonIndex > 1) {
-        NSString *buttonTitle = self.ratioArray[buttonIndex];
-        NSArray *tempArray = [buttonTitle componentsSeparatedByString:@":"];
-        aspectRatio = CGSizeMake([tempArray[0] floatValue], [tempArray[1] floatValue]);
-    }
-    
-    if (self.cropView.cropBoxAspectRatioIsPortrait) {
-        CGFloat width = aspectRatio.width;
-        aspectRatio.width = aspectRatio.height;
-        aspectRatio.height = width;
-    }
-    
+- (void)doCropImageWithSize:(CGSize)aspectRatio {
     [self.cropView setAspectLockEnabledWithAspectRatio:aspectRatio animated:YES];
     self.toolbar.clampButtonGlowing = YES;
 }
@@ -342,7 +343,7 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
 {
     self.transitionController.image = self.image;
     self.transitionController.fromFrame = frame;
-
+    
     __weak typeof (self) weakSelf = self;
     [viewController presentViewController:self animated:YES completion:^ {
         typeof (self) strongSelf = weakSelf;
@@ -362,7 +363,7 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
     self.transitionController.image = image;
     self.transitionController.fromFrame = [self.cropView convertRect:self.cropView.cropBoxFrame toView:self.view];
     self.transitionController.toFrame = frame;
-
+    
     [viewController dismissViewControllerAnimated:YES completion:^ {
         if (completion) {
             completion();
@@ -436,7 +437,7 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
 {
     CGRect cropFrame = self.cropView.croppedImageFrame;
     NSInteger angle = self.cropView.angle;
-
+    
     //If desired, when the user taps done, show an activity sheet
     if (self.showActivitySheetOnDone) {
         TOActivityCroppedImageProvider *imageItem = [[TOActivityCroppedImageProvider alloc] initWithImage:self.image cropFrame:cropFrame angle:angle];
@@ -449,16 +450,40 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
         UIActivityViewController *activityController = [[UIActivityViewController alloc] initWithActivityItems:activityItems applicationActivities:self.applicationActivities];
         activityController.excludedActivityTypes = self.excludedActivityTypes;
         
-        if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone) {
+        if (NSClassFromString(@"UIPopoverPresentationController")) {
+            activityController.modalPresentationStyle = UIModalPresentationPopover;
+            activityController.popoverPresentationController.sourceView = self.toolbar;
+            activityController.popoverPresentationController.sourceRect = self.toolbar.doneButtonFrame;
             [self presentViewController:activityController animated:YES completion:nil];
         }
         else {
-            [self.activityPopoverController dismissPopoverAnimated:NO];
-            self.activityPopoverController = [[UIPopoverController alloc] initWithContentViewController:activityController];
-            [self.activityPopoverController presentPopoverFromRect:self.toolbar.doneButtonFrame inView:self.toolbar permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
+            if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone) {
+                [self presentViewController:activityController animated:YES completion:nil];
+            }
+            else {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+                [self.activityPopoverController dismissPopoverAnimated:NO];
+                self.activityPopoverController = [[UIPopoverController alloc] initWithContentViewController:activityController];
+                [self.activityPopoverController presentPopoverFromRect:self.toolbar.doneButtonFrame inView:self.toolbar permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
+#pragma clang diagnostic pop
+            }
         }
-        
         __weak typeof(activityController) blockController = activityController;
+#if __IPHONE_OS_VERSION_MIN_REQUIRED >= __IPHONE_8_0
+        activityController.completionWithItemsHandler = ^(NSString *activityType, BOOL completed, NSArray *returnedItems, NSError *activityError) {
+            if (!completed)
+                return;
+            
+            if ([self.delegate respondsToSelector:@selector(cropViewController:didFinishCancelled:)]) {
+                [self.delegate cropViewController:self didFinishCancelled:NO];
+            }
+            else {
+                [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
+                blockController.completionWithItemsHandler = nil;
+            }
+        };
+#else
         activityController.completionHandler = ^(NSString *activityType, BOOL completed) {
             if (!completed)
                 return;
@@ -471,6 +496,7 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
                 blockController.completionHandler = nil;
             }
         };
+#endif
         
         return;
     }
