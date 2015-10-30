@@ -33,6 +33,7 @@
                         if (showMessage) {
                             [UIView showResultThenHideOnWindow:errorMessage];
                         }
+                        [YSCCommonUtils checkNewVersionByAppleId:kAppStoreId];
                     }];
     }
     else if (2 == type) {//检测app store上通过审核的新版本
