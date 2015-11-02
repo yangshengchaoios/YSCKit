@@ -46,15 +46,7 @@
 		[self.view bringSubviewToFront:self.titleBarView];
 	}
     else {
-        if ( ! self.isAppeared) {//这里默认是要显示navibar的!
-            [self.navigationController setNavigationBarHidden:NO animated:animated];//IMPORTANT!
-        }
-        //NOTE:只有当前VC需要隐藏navibar的时候才这样写
-        /*- (void)viewWillAppear:(BOOL)animated {
-            self.isAppeared = YES;
-            [super viewWillAppear:animated];
-            [self.navigationController setNavigationBarHidden:YES animated:animated];
-         }*/
+        [self.navigationController setNavigationBarHidden:[self.params[kParamIsHideNavBar] boolValue] animated:animated];
     }
     self.isAppeared = YES;
     [AppConfigManager sharedInstance].currentViewController = self;

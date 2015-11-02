@@ -8,56 +8,42 @@
 
 #import "TQStarRatingView.h"
 
-#define kBACKGROUND_STAR @"star_background"
-#define kFOREGROUND_STAR @"star_foreground"
-#define kNUMBER_OF_STAR  5
-#define kWidthSeperator  5
-
 @interface TQStarRatingView ()
 
 @property (nonatomic, strong) UIView *starBackgroundView;
 @property (nonatomic, strong) UIView *starForegroundView;
 
-@property (nonatomic, strong) NSString *starBackgroundName;
-@property (nonatomic, strong) NSString *starForegroundName;
-@property (nonatomic, assign) NSInteger widthSeperator;
-
 @end
 
 @implementation TQStarRatingView
 
-- (id)initWithFrame:(CGRect)frame
-{
-    return [self initWithFrame:frame numberOfStar:kNUMBER_OF_STAR backgroundName:kBACKGROUND_STAR foregoundName:kFOREGROUND_STAR seperator:kWidthSeperator];
+- (id)initWithCoder:(NSCoder *)aDecoder {
+    self = [super initWithCoder:aDecoder];
+    if (self) {
+        _numberOfStar = kNUMBER_OF_STAR;
+        [self commonInit];
+    }
+    return self;
 }
 
-- (void)awakeFromNib
+- (id)initWithFrame:(CGRect)frame
 {
-    [super awakeFromNib];
-    
-    _numberOfStar = kNUMBER_OF_STAR;
-    _starBackgroundName = kBACKGROUND_STAR;
-    _starForegroundName = kFOREGROUND_STAR;
-    _widthSeperator = kWidthSeperator;
-    [self commonInit];
+    return [self initWithFrame:frame numberOfStar:kNUMBER_OF_STAR];
 }
 
 /**
  *  初始化TQStarRatingView
  *
+ *  @param frame  Rectangles
+ *  @param number 星星个数
+ *
  *  @return TQStarRatingViewObject
  */
 - (id)initWithFrame:(CGRect)frame numberOfStar:(int)number
-     backgroundName:(NSString *)bgName
-      foregoundName:(NSString *)fgName
-          seperator:(NSInteger)seperator
 {
     self = [super initWithFrame:frame];
     if (self) {
-        _starBackgroundName = bgName;
-        _starForegroundName = fgName;
         _numberOfStar = number;
-        _widthSeperator = seperator;
         [self commonInit];
     }
     return self;
@@ -65,8 +51,8 @@
 
 - (void)commonInit
 {
-    self.starBackgroundView = [self buidlStarViewWithImageName:self.starBackgroundName];
-    self.starForegroundView = [self buidlStarViewWithImageName:self.starForegroundName];
+    self.starBackgroundView = [self buidlStarViewWithImageName:kBACKGROUND_STAR];
+    self.starForegroundView = [self buidlStarViewWithImageName:kFOREGROUND_STAR];
     [self addSubview:self.starBackgroundView];
     [self addSubview:self.starForegroundView];
 }
@@ -76,6 +62,9 @@
 
 /**
  *  设置控件分数
+ *
+ *  @param score     分数，必须在 0 － 1 之间
+ *  @param isAnimate 是否启用动画
  */
 - (void)setScore:(float)score withAnimation:(bool)isAnimate
 {
@@ -102,10 +91,8 @@
     {
         score = 1;
     }
-    UIImage *starImage = [UIImage imageNamed:self.starBackgroundName];
-    float numberOfStars = floorf(score);
     
-    CGPoint point = CGPointMake(numberOfStars * (starImage.size.width + self.widthSeperator) + (score-numberOfStars) * starImage.size.width, 0);
+    CGPoint point = CGPointMake(score * self.frame.size.width, 0);
     
     if(isAnimate)
     {
@@ -171,16 +158,10 @@
     view.clipsToBounds = YES;
     for (int i = 0; i < self.numberOfStar; i ++)
     {
-        UIImage *starImage = [UIImage imageNamed:imageName];
-        UIImageView *imageView = [[UIImageView alloc] initWithImage:starImage];
-        
-        imageView.frame = CGRectMake(i*(self.widthSeperator+starImage.size.width),
-                                     0,
-                                     starImage.size.width,
-                                     starImage.size.height);
-        imageView.center = CGPointMake(imageView.center.x, frame.size.height / 2.0f);
+        UIImageView *imageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:imageName]];
+        CGRect imageFrame = CGRectMake(i * frame.size.width / self.numberOfStar, 0, frame.size.width / self.numberOfStar, frame.size.height);
+        imageView.frame = AUTOLAYOUT_CGRECT(imageFrame.origin.x, imageFrame.origin.y, imageFrame.size.width, imageFrame.size.height);
         [view addSubview:imageView];
-        imageView.tag = 100 + i;
     }
     return view;
 }
@@ -196,6 +177,7 @@
 - (void)changeStarForegroundViewWithPoint:(CGPoint)point
 {
     CGPoint p = point;
+    
     if (p.x < 0)
     {
         p.x = 0;
@@ -206,30 +188,11 @@
         p.x = self.frame.size.width;
     }
     
-    float score = 0.0f;
-    for (int i = 0; i < [self.starBackgroundView.subviews count]; i++) {
-        UIImageView *starImageView = (UIImageView *)[self.starBackgroundView viewWithTag:100+i];
-        float left = starImageView.frame.origin.x;
-        float right = starImageView.frame.origin.x + starImageView.frame.size.width;
-        if (left <= point.x && point.x < right) {
-            score = i + (point.x - starImageView.frame.origin.x) / starImageView.frame.size.width;
-            break;
-        }
-        else if (point.x >= right) {
-            if (i < [self.starBackgroundView.subviews count] - 1) {
-                UIImageView *starImageView1 = (UIImageView *)[self.starBackgroundView viewWithTag:101+i];
-                if (point.x < starImageView1.frame.origin.x) {
-                    score = i + 1;
-                    break;
-                }
-            }
-            else {
-                score = i + 1;
-            }
-        }
-    }
-    NSLog(@"score = %f", score);
+    NSString * str = [NSString stringWithFormat:@"%0.2f",p.x / self.frame.size.width];
+    float score = [str floatValue];
+    p.x = score * self.frame.size.width;
     self.starForegroundView.frame = CGRectMake(0, 0, p.x, self.frame.size.height);
+    
     if(self.delegate && [self.delegate respondsToSelector:@selector(starRatingView: score:)])
     {
         [self.delegate starRatingView:self score:score];
