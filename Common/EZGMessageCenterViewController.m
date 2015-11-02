@@ -43,44 +43,67 @@
     }];
     self.isUserChangedIdentifier = [APPDATA bk_addObserverForKeyPath:@"isUserChanged" task:^(id target) {
         if (ISNOTLOGGED) {
+            weakSelf.tableView.tipsEmptyText = @"亲，请登录后查看您的消息！";
             [weakSelf.tableView.headerDataArray removeAllObjects];
             [weakSelf.tableView.cellDataArray removeAllObjects];
             [weakSelf.tableView reloadData];
+            weakSelf.tableView.tipsView.hidden = NO;
         }
         else {
+            weakSelf.tableView.tipsEmptyText = @"亲，暂无您的消息哟！";
             [weakSelf refreshTableView];
         }
     }];
     addNObserver(@selector(refreshTableView), kCDNotificationMessageReceived);//消息到达重新查询会话列表
     addNObserver(@selector(refreshTableView), kCDNotificationUnreadsUpdated);//未读数变化重新查询会话列表
 }
-- (void)refreshWhenDataIsEmpty {
-    [self.tableView refreshWhenCellDataEmpty];
-}
 - (void)refreshTableView {
-    [self refreshConversationsByPageIndex:kDefaultPageStartIndex];
+    if (ISLOGGED) {
+        [self refreshConversationsByPageIndex:kDefaultPageStartIndex];
+    }
+}
+- (void)refreshWhenDataIsEmpty {
+    if (ISLOGGED) {
+        [self.tableView refreshWhenCellDataEmpty];
+    }
 }
 - (void)initTableView {
     WEAKSELF
-    self.tableView.tipsEmptyText = @"亲，暂无您的消息哟！";
+    if (ISLOGGED) {
+        self.tableView.tipsEmptyText = @"亲，暂无您的消息哟！";
+    }
+    else {
+        self.tableView.tipsEmptyText = @"亲，请登录后查看您的消息！";
+    }
+    self.tableView.tipsView.actionButton.hidden = YES;
     self.tableView.cellName = @"EZGMessageCenterCell";
     self.tableView.enableLoadMore = NO;
     self.tableView.enableCellEdit = YES;
     //自定义数据源获取方式
     self.tableView.requestType = RequestTypeCustomResponse;
     self.tableView.header = [MJRefreshNormalHeader headerWithRefreshingBlock:^{
-        if ([weakSelf.tableView.cellDataArray count] == 0) {
-            [APPDATA refreshConversationsFromNetworkByUserId:USERID pageIndex:kDefaultPageStartIndex pageSize:20 block:^(NSArray *objects, NSError *error) {
+        if (ISLOGGED) {
+            if ([weakSelf.tableView.cellDataArray count] == 0) {
+                [APPDATA refreshConversationsFromNetworkByUserId:USERID pageIndex:kDefaultPageStartIndex pageSize:20 block:^(NSArray *objects, NSError *error) {
+                    [weakSelf refreshConversationsByPageIndex:kDefaultPageStartIndex];
+                }];
+            }
+            else {
                 [weakSelf refreshConversationsByPageIndex:kDefaultPageStartIndex];
-            }];
+            }
         }
         else {
-            [weakSelf refreshConversationsByPageIndex:kDefaultPageStartIndex];
+            [weakSelf.tableView refreshAtPageIndex:kDefaultPageStartIndex response:nil error:nil];
         }
     }];
     self.tableView.footer = [MJRefreshBackNormalFooter footerWithRefreshingBlock:^{
         NSInteger pageIndex = weakSelf.tableView.currentPageIndex + 1;
-        [weakSelf refreshConversationsByPageIndex:pageIndex];
+        if (ISLOGGED) {
+            [weakSelf refreshConversationsByPageIndex:pageIndex];
+        }
+        else {
+            [weakSelf.tableView refreshAtPageIndex:pageIndex response:nil error:nil];
+        }
     }];
     self.tableView.successBlock = ^(){ weakSelf.isClicked = NO; };
     self.tableView.failedBlock = ^(){ weakSelf.isClicked = NO; };

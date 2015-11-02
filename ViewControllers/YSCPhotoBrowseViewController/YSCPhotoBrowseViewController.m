@@ -22,11 +22,6 @@
 
 @implementation YSCPhotoBrowseViewController
 
-- (void)viewWillAppear:(BOOL)animated {
-    self.isAppeared = YES;
-    [super viewWillAppear:animated];
-    [self.navigationController setNavigationBarHidden:YES animated:animated];
-}
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
     [[UIApplication sharedApplication] setStatusBarHidden:YES withAnimation:UIStatusBarAnimationSlide];
@@ -37,6 +32,11 @@
 }
 - (void)viewDidLoad {
     [super viewDidLoad];
+    //隐藏naviBar
+    NSMutableDictionary *tempDict = [NSMutableDictionary dictionaryWithDictionary:self.params];
+    tempDict[kParamIsHideNavBar] = @(YES);
+    self.params = tempDict;
+    
     self.view.backgroundColor = [UIColor blackColor];
     [self.indexLabel makeRoundWithRadius:AUTOLAYOUT_LENGTH(40) / 2];
     [self.saveButton makeBorderWithColor:[UIColor lightGrayColor] borderWidth:1];
