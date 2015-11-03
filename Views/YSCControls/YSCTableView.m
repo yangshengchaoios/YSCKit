@@ -603,4 +603,36 @@
     return self.enableCellEdit;
 }
 
+#pragma mark - UIScrollViewDelegate
+- (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView {
+    if (self.willBeginDraggingBlock) {
+        self.willBeginDraggingBlock();
+    }
+}
+- (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate {
+    if (self.didEndDraggingBlock) {
+        self.didEndDraggingBlock();
+    }
+}
+- (void)scrollViewDidScroll:(UIScrollView *)scrollView {
+    if (self.didScrollBlock) {
+        self.didScrollBlock();
+    }
+}
+- (void)scrollViewDidEndScrollingAnimation:(UIScrollView *)scrollView {
+    if (self.didEndScrollingAnimationBlock) {
+        self.didEndScrollingAnimationBlock();
+    }
+}
+- (void)scrollViewWillBeginDecelerating:(UIScrollView *)scrollView {
+    if (self.willBeginDeceleratingBlock) {
+        self.willBeginDeceleratingBlock();
+    }
+}
+- (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView {
+    if (self.didEndDeceleratingBlock) {
+        self.didEndDeceleratingBlock();
+    }
+}
+
 @end

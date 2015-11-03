@@ -80,6 +80,14 @@ typedef CGFloat (^YSCFloatSetBlock)(NSIndexPath *indexPath);
 @property (nonatomic, copy) YSCFloatSetBlock cellHeightBlock;
 @property (nonatomic, copy) YSCFloatSetBlock footerHeightBlock;
 
+#pragma mark - 设置ScrollViewDelegate相关的回调
+@property (nonatomic, copy) YSCBlock willBeginDraggingBlock;
+@property (nonatomic, copy) YSCBlock didEndDraggingBlock;
+@property (nonatomic, copy) YSCBlock didScrollBlock;
+@property (nonatomic, copy) YSCBlock didEndScrollingAnimationBlock;
+@property (nonatomic, copy) YSCBlock willBeginDeceleratingBlock;
+@property (nonatomic, copy) YSCBlock didEndDeceleratingBlock;
+
 //创建对象，不用xib布局时使用
 + (instancetype)CreateYSCTableViewOnView:(UIView *)view;
 
