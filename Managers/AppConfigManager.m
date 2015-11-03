@@ -57,7 +57,7 @@
 
 #pragma mark - AppConfig.plist管理
 
-//UMeng参数值优先级 > 本地参数值
+//在线参数值优先级 > 本地参数值
 - (NSString *)valueOfAppConfig:(NSString *)name {
     ReturnEmptyWhenObjectIsEmpty(name);
     NSString *tempValue = Trim(self.appTempParams[name]);//最终需要返回的参数值

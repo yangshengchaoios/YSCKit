@@ -11,8 +11,6 @@
 #import "YSCPhotoBrowseViewController.h"
 #import "TOCropViewController.h"
 
-#define WidthOfSendImage    640.0f
-
 @interface EZGChatRoomViewController () <UINavigationControllerDelegate, UIImagePickerControllerDelegate,
 ZYQAssetPickerControllerDelegate, TOCropViewControllerDelegate>
 
@@ -38,7 +36,7 @@ ZYQAssetPickerControllerDelegate, TOCropViewControllerDelegate>
     [AppConfigManager sharedInstance].currentViewController = self;
     APPDATA.chatUser = [[ChatUserModel alloc] initWithString:self.conv.attributes[OtherUserInfo] error:nil];
     self.title = Trim(APPDATA.chatUser.realName);
-    if (IsAppTypeC) {
+    if (NO == IsAppTypeC) {//B端才需要更新用户信息
         [self refreshUserInfo];
     }
     
@@ -115,7 +113,7 @@ ZYQAssetPickerControllerDelegate, TOCropViewControllerDelegate>
     }];
 }
 
-#pragma mark - XHMessageTableViewCell delegate
+#pragma mark - XHMessageTableViewCellDelegate
 - (void)multiMediaMessageDidSelectedOnMessage:(id <XHMessageModel> )message atIndexPath:(NSIndexPath *)indexPath onMessageTableViewCell:(XHMessageTableViewCell *)messageTableViewCell {
     if (self.messageInputView.isRecording) {
         return;
@@ -141,7 +139,8 @@ ZYQAssetPickerControllerDelegate, TOCropViewControllerDelegate>
         [super multiMediaMessageDidSelectedOnMessage:message atIndexPath:indexPath onMessageTableViewCell:messageTableViewCell];
     }
 }
-#pragma mark - XHShareMenuView Delegate
+
+#pragma mark - XHShareMenuViewDelegate
 - (void)didSelecteShareMenuItem:(XHShareMenuItem *)shareMenuItem atIndex:(NSInteger)index {
     DLog(@"title : %@   index:%ld", shareMenuItem.title, (long)index);
     if (0 == index) {
@@ -224,6 +223,7 @@ ZYQAssetPickerControllerDelegate, TOCropViewControllerDelegate>
         [self didSendMessageWithPhoto:sendImage];
     }
 }
+
 #pragma mark - UIImagePickerControllerDelegate
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info {
     WEAKSELF
@@ -267,7 +267,7 @@ ZYQAssetPickerControllerDelegate, TOCropViewControllerDelegate>
 }
 //压缩图片大小
 - (UIImage *)resizeImage:(UIImage *)image {
-    CGFloat width = WidthOfSendImage;
+    CGFloat width = SCREEN_WIDTH_SCALE;
     CGFloat height = width * (image.size.height / image.size.width);
     return [YSCImageUtils resizeImage:image toSize:CGSizeMake(width, height)];
 }
