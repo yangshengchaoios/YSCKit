@@ -47,4 +47,12 @@
     return tipsView;
 }
 
+- (void)resetFrameWithEdgeInsets:(UIEdgeInsets)edgeInsets {
+    UIView *contentView = self.superview;
+    self.left = edgeInsets.left;
+    self.top = edgeInsets.top;
+    self.width = contentView.width - edgeInsets.left - edgeInsets.right;
+    self.height = contentView.height - edgeInsets.top - edgeInsets.bottom;
+}
+
 @end

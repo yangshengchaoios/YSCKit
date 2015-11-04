@@ -19,4 +19,6 @@
                              buttonTitle:(NSString *)buttonTitle
                             buttonAction:(YSCBlock)buttonAction;
 
+- (void)resetFrameWithEdgeInsets:(UIEdgeInsets)edgeInsets;
+
 @end

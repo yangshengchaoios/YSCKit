@@ -20,14 +20,7 @@
 
 @implementation EZGMessageCenterViewController
 
-- (void)viewWillAppear:(BOOL)animated {
-    [super viewWillAppear:animated];
-    [EZGUtils FunctionStatisticsByOperaCode:@"khgn" type:@"1"];
-}
 - (void)dealloc {
-    if (self.isS4ModelChangedIdentifier) {
-        [APPDATA bk_removeObserversWithIdentifier:self.isS4ModelChangedIdentifier];
-    }
     if (self.isUserChangedIdentifier) {
         [APPDATA bk_removeObserversWithIdentifier:self.isUserChangedIdentifier];
     }
@@ -37,10 +30,6 @@
     self.title = @"消息中心";
     [self initTableView];
     WEAKSELF
-    //监控是否有修改专属4S店
-    self.isS4ModelChangedIdentifier = [APPDATA bk_addObserverForKeyPath:@"isS4ModelChanged" task:^(id target) {
-        [weakSelf.tableView beginRefreshing];
-    }];
     self.isUserChangedIdentifier = [APPDATA bk_addObserverForKeyPath:@"isUserChanged" task:^(id target) {
         if (ISNOTLOGGED) {
             weakSelf.tableView.tipsEmptyText = @"亲，请登录后查看您的消息！";
