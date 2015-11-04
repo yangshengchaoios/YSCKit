@@ -107,13 +107,14 @@
         
         AVIMConversation *conversation = (AVIMConversation *)object;
         [weakSelf.tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationNone];
-        ChatUserModel *cUser = [[ChatUserModel alloc] initWithString:conversation.attributes[OtherUserInfo] error:nil];
-        NSDictionary *params = @{kParamUserId : Trim(cUser.userId),
-                                 kParamUserName : Trim(cUser.realName),
-                                 kParamAvatarUrl : Trim(cUser.avatarUrl),
-                                 kParamPhoneNumber : Trim(cUser.phoneNumber),
+        ChatUserModel *otherUser = [[ChatUserModel alloc] initWithString:conversation.attributes[OtherUserInfo] error:nil];
+        
+        NSDictionary *params = @{kParamOtherId : Trim(otherUser.userId),
+                                 kParamExtendAttributes : @{kParamBUserInfo : Trim([otherUser toJSONString]),
+                                                            kParamCUserInfo : Trim([USER buildCUserInfo])},
                                  kParamConvId : Trim(conversation.conversationId),
-                                 kParamBlock : refreshCellBlock};
+                                 kParamBlock : refreshCellBlock,
+                                 };
         postNWithInfo(kNotificationOpenChatRoom, params);
     };
     self.tableView.layoutCellView = ^(UIView *view, NSObject *object) {

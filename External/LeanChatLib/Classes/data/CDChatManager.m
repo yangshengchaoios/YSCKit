@@ -108,9 +108,13 @@ static CDChatManager *instance;
         [NSException raise:NSInvalidArgumentException format:@"The array has duplicate value"];
     }
     AVIMConversationQuery *q = [[AVIMClient defaultClient] conversationQuery];
-    [q whereKey:AVIMAttr(CONV_TYPE) equalTo:@(type)];
+    [q whereKey:AVIMAttr(CONV_TYPE) equalTo:@(type)];//普通单聊会话
+    
+    if (attributes[kParamEzgoalType]) {//特殊业务会话
+        [q whereKey:AVIMAttr(kParamEzgoalType) equalTo:attributes[kParamEzgoalType]];
+        [q whereKey:AVIMAttr(kParamEzgoalStatus) equalTo:attributes[kParamEzgoalStatus]];
+    }
     [q whereKey:kAVIMKeyMember containsAllObjectsInArray:members];
-    // 如果没有数组size限制，传[2,3]，可能取回 [1,2,3]
     [q whereKey:kAVIMKeyMember sizeEqualTo:members.count];
     [q orderByDescending:@"lm"];
     q.cachePolicy = kAVCachePolicyNetworkOnly;

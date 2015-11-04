@@ -9,5 +9,5 @@
 #import "CDChatRoomVC.h"
 
 @interface EZGChatRoomViewController : CDChatRoomVC
-@property (copy, nonatomic) YSCResultBlock refreshCellBlock;
+
 @end

@@ -25,6 +25,8 @@
  */
 @property (nonatomic, strong, readonly) NSMutableArray *msgs;
 
+@property (copy, nonatomic) YSCResultBlock refreshCellBlock;
+
 /**
  *  初始化方法
  *  @param conv 要聊天的对话
