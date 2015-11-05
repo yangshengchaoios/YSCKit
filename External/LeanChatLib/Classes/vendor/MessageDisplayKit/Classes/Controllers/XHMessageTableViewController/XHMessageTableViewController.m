@@ -69,15 +69,11 @@ static CGPoint  delayOffset = {0.0};
         [oldMessages enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
             NSIndexPath *indexPath = [NSIndexPath indexPathForRow:idx inSection:0];
             [indexPaths addObject:indexPath];
-            
             delayOffset.y += [weakSelf calculateCellHeightWithMessage:[oldMessages objectAtIndex:idx] atIndexPath:indexPath];
             [indexSets addIndex:idx];
         }];
-        
         NSMutableArray *messages = [[NSMutableArray alloc] initWithArray:weakSelf.messages];
         [messages insertObjects:oldMessages atIndexes:indexSets];
-        
-        
         [weakSelf exMainQueue:^{
             [UIView setAnimationsEnabled:NO];
             weakSelf.messageTableView.userInteractionEnabled = NO;
@@ -85,9 +81,7 @@ static CGPoint  delayOffset = {0.0};
             weakSelf.messages = messages;
             [weakSelf.messageTableView insertRowsAtIndexPaths:indexPaths withRowAnimation:UITableViewRowAnimationNone];
             [weakSelf.messageTableView endUpdates];
-            
             [UIView setAnimationsEnabled:YES];
-            
             [weakSelf.messageTableView setContentOffset:delayOffset animated:NO];
             weakSelf.messageTableView.userInteractionEnabled = YES;
             if (completion) {
@@ -559,14 +553,11 @@ static CGPoint  delayOffset = {0.0};
 //统一计算Cell的高度方法
 - (CGFloat)calculateCellHeightWithMessage:(id <XHMessageModel>)message atIndexPath:(NSIndexPath *)indexPath {
     CGFloat cellHeight = 0;
-    
     BOOL displayTimestamp = YES;
     if ([self.delegate respondsToSelector:@selector(shouldDisplayTimestampForRowAtIndexPath:)]) {
         displayTimestamp = [self.delegate shouldDisplayTimestampForRowAtIndexPath:indexPath];
     }
-    
     cellHeight = [XHMessageTableViewCell calculateCellHeightWithMessage:message displaysTimestamp:displayTimestamp];
-    
     return cellHeight;
 }
 
@@ -927,7 +918,6 @@ static CGPoint  delayOffset = {0.0};
     if (nil == messageTableViewCell) {
         messageTableViewCell = [[XHMessageTableViewCell alloc] initWithMessage:message reuseIdentifier:cellIdentifier];
         messageTableViewCell.delegate = self;
-        [messageTableViewCell setBackgroundColor:tableView.backgroundColor];
     }
     messageTableViewCell.indexPath = indexPath;
     [messageTableViewCell configureCellWithMessage:message displaysTimestamp:displayTimestamp];

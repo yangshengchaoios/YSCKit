@@ -269,7 +269,6 @@ static const CGFloat kXHBubbleMessageViewPadding = 8;
     return self.messageBubbleView.message.bubbleMessageType;
 }
 + (CGFloat)calculateCellHeightWithMessage:(id <XHMessageModel>)message displaysTimestamp:(BOOL)displayTimestamp {
-    
     CGFloat timestampHeight = displayTimestamp ? (kXHTimeStampLabelHeight + kXHLabelPadding * 2) : kXHLabelPadding;
     CGFloat avatarHeight = kXHAvatarImageSize;
     CGFloat userNameHeight = 0;

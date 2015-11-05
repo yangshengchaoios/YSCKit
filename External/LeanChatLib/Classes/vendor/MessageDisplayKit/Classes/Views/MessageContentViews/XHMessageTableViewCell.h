@@ -24,8 +24,6 @@
 - (void)didDoubleSelectedOnTextMessage:(id <XHMessageModel>)message atIndexPath:(NSIndexPath *)indexPath;
 //点击消息发送者的头像回调方法
 - (void)didSelectedAvatorOnMessage:(id <XHMessageModel>)message atIndexPath:(NSIndexPath *)indexPath;
-//Menu Control Selected Item
-- (void)menuDidSelectedAtBubbleMessageMenuSelecteType:(XHBubbleMessageMenuSelecteType)bubbleMessageMenuSelecteType;
 //点击重发消息按钮
 - (void)didRetrySendMessage:(id <XHMessageModel>)message atIndexPath:(NSIndexPath*)indexPath;
 

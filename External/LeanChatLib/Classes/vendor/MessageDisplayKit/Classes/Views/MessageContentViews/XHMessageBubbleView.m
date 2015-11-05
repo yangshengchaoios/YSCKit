@@ -7,36 +7,25 @@
 //
 
 #import "XHMessageBubbleView.h"
-
 #import "XHMessageBubbleHelper.h"
 
 #define kMarginTop 8.0f
 #define kMarginBottom 2.0f
 #define kPaddingTop 12.0f
 #define kBubblePaddingRight 14.0f
-
 #define kVoiceMargin 20.0f
-
 #define kXHArrowMarginWidth 14
 
 @interface XHMessageBubbleView ()
 
 @property (nonatomic, weak, readwrite) SETextView *displayTextView;
-
 @property (nonatomic, weak, readwrite) UIImageView *bubbleImageView;
-
 @property (nonatomic, weak, readwrite) FLAnimatedImageView *emotionImageView;
-
 @property (nonatomic, weak, readwrite) UIImageView *animationVoiceImageView;
-
 @property (nonatomic, weak, readwrite) UIImageView *voiceUnreadDotImageView;
-
 @property (nonatomic, weak, readwrite) XHBubblePhotoImageView *bubblePhotoImageView;
-
 @property (nonatomic, weak, readwrite) UIImageView *videoPlayImageView;
-
 @property (nonatomic, weak, readwrite) UILabel *geolocationsLabel;
-
 @property (nonatomic, strong, readwrite) id <XHMessageModel> message;
 
 @end

@@ -89,6 +89,13 @@
     }
     return self;
 }
+- (id)initWithCoder:(NSCoder *)aDecoder {
+    self = [super initWithCoder:aDecoder];
+    if (self) {
+        
+    }
+    return self;
+}
 
 - (void)dealloc {
     _messagePhoto = nil;

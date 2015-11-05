@@ -194,8 +194,6 @@ static NSInteger const kOnePageSize = 10;
 - (void)didSelectedAvatorOnMessage:(id <XHMessageModel> )message atIndexPath:(NSIndexPath *)indexPath {
     DLog(@"indexPath : %@", indexPath);
 }
-- (void)menuDidSelectedAtBubbleMessageMenuSelecteType:(XHBubbleMessageMenuSelecteType)bubbleMessageMenuSelecteType {
-}
 - (void)didRetrySendMessage:(id <XHMessageModel> )message atIndexPath:(NSIndexPath *)indexPath {
     [self resendMessageAtIndexPath:indexPath discardIfFailed:false];
 }
@@ -232,7 +230,7 @@ static NSInteger const kOnePageSize = 10;
 }
 
 #pragma mark - didSend delegate
-//发送文本消息的回调方法
+//发送文本
 - (void)didSendText:(NSString *)text fromSender:(NSString *)sender onDate:(NSDate *)date {
     if ([text length] > 0) {
         AVIMTextMessage *msg = [AVIMTextMessage messageWithText:[CDEmotionUtils plainStringFromEmojiString:text] attributes:nil];
@@ -240,22 +238,21 @@ static NSInteger const kOnePageSize = 10;
         [self finishSendMessageWithBubbleMessageType:XHBubbleMessageMediaTypeText];
     }
 }
-//发送图片消息的回调方法
+//发送图片
 - (void)didSendPhoto:(UIImage *)photo fromSender:(NSString *)sender onDate:(NSDate *)date {
     [self sendImage:photo];
-    [self finishSendMessageWithBubbleMessageType:XHBubbleMessageMediaTypePhoto];
 }
-// 发送视频消息的回调方法
+//发送视频
 - (void)didSendVideoConverPhoto:(UIImage *)videoConverPhoto videoPath:(NSString *)videoPath fromSender:(NSString *)sender onDate:(NSDate *)date {
     AVIMVideoMessage* sendVideoMessage = [AVIMVideoMessage messageWithText:nil attachedFilePath:videoPath attributes:nil];
     [self sendMsg:sendVideoMessage];
 }
-// 发送语音消息的回调方法
+//发送语音
 - (void)didSendVoice:(NSString *)voicePath voiceDuration:(NSString *)voiceDuration fromSender:(NSString *)sender onDate:(NSDate *)date {
     AVIMTypedMessage *msg = [AVIMAudioMessage messageWithText:nil attachedFilePath:voicePath attributes:nil];
     [self sendMsg:msg];
 }
-// 发送表情消息的回调方法
+//发送表情
 - (void)didSendEmotion:(NSString *)emotion fromSender:(NSString *)sender onDate:(NSDate *)date {
     if ([emotion hasPrefix:@":"]) {
         // 普通表情
@@ -266,16 +263,14 @@ static NSInteger const kOnePageSize = 10;
         [str insertString:emotion atIndex:range.location];
         textView.text = [CDEmotionUtils emojiStringFromString:str];
         textView.selectedRange = NSMakeRange(range.location + emotion.length, 0);
-        [self finishSendMessageWithBubbleMessageType:XHBubbleMessageMediaTypeEmotion];
     } else {
         AVIMEmotionMessage *msg = [AVIMEmotionMessage messageWithEmotionPath:emotion];
         [self sendMsg:msg];
-        [self finishSendMessageWithBubbleMessageType:XHBubbleMessageMediaTypeEmotion];
     }
 }
+//发送地理位置
 - (void)didSendGeoLocationsPhoto:(UIImage *)geoLocationsPhoto geolocations:(NSString *)geolocations location:(CLLocation *)location fromSender:(NSString *)sender onDate:(NSDate *)date {
     [self sendLocationWithLatitude:location.coordinate.latitude longitude:location.coordinate.longitude address:geolocations];
-    [self finishSendMessageWithBubbleMessageType:XHBubbleMessageMediaTypeLocalPosition];
 }
 
 #pragma mark -  ui config
