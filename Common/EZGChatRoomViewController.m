@@ -25,12 +25,6 @@ ZYQAssetPickerControllerDelegate, TOCropViewControllerDelegate>
     [super viewWillAppear:animated];
     [self.navigationController setNavigationBarHidden:NO animated:animated];
 }
-- (void)viewWillDisappear:(BOOL)animated {
-    if (self.refreshCellBlock) {//刷新cell，更新最后一条聊天记录
-        self.refreshCellBlock(nil);
-    }
-    [super viewWillDisappear:animated];
-}
 - (void)viewDidLoad {
     [super viewDidLoad];
     [AppConfigManager sharedInstance].currentViewController = self;

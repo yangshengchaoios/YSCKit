@@ -69,7 +69,8 @@ static NSInteger const kOnePageSize = 10;
     if (0 == self.lastSentTimestamp) {
         self.lastSentTimestamp = [[NSDate date] timeIntervalSince1970] * 1000;
     }
-    [self initBottomMenuAndEmotionView];
+    [self initBottomMenu];
+    [self initEmotionView];
     [self.view addSubview:self.clientStatusView];
     [self loadMessagesWhenInit];
     [self updateStatusView];
@@ -94,6 +95,12 @@ static NSInteger const kOnePageSize = 10;
     [self updateConversationAsRead];
     [super viewDidDisappear:animated];
 }
+- (void)viewWillDisappear:(BOOL)animated {
+    if (self.refreshCellBlock) {//刷新cell，更新最后一条聊天记录
+        self.refreshCellBlock(nil);
+    }
+    [super viewWillDisappear:animated];
+}
 - (void)dealloc {
     [[NSNotificationCenter defaultCenter] removeObserver:self name:kCDNotificationMessageReceived object:nil];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:kCDNotificationMessageDelivered object:nil];
@@ -102,7 +109,8 @@ static NSInteger const kOnePageSize = 10;
 }
 
 #pragma mark - ui init
-- (void)initBottomMenuAndEmotionView {
+//初始化扩展区域
+- (void)initBottomMenu {
     NSMutableArray *shareMenuItems = [NSMutableArray array];
     NSArray *plugIcons = @[@"sharemore_pic", @"sharemore_video", @"sharemore_location"];
     NSArray *plugTitle = @[@"照片", @"拍摄", @"位置"];
@@ -112,7 +120,9 @@ static NSInteger const kOnePageSize = 10;
     }
     self.shareMenuItems = shareMenuItems;
     [self.shareMenuView reloadData];
-    
+}
+//初始化表情管理器
+- (void)initEmotionView {
     _emotionManagers = [CDEmotionUtils emotionManagers];
     self.emotionManagerView.isShowEmotionStoreButton = YES;
     [self.emotionManagerView reloadData];
