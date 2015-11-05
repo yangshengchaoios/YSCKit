@@ -46,11 +46,9 @@
 - (instancetype)initWithMessage:(id <XHMessageModel>)message reuseIdentifier:(NSString *)cellIdentifier;
 
 //根据消息Model配置Cell的显示内容
-- (void)configureCellWithMessage:(id <XHMessageModel>)message
-               displaysTimestamp:(BOOL)displayTimestamp;
+- (void)configureCellWithMessage:(id <XHMessageModel>)message displaysTimestamp:(BOOL)displayTimestamp;
 
 //根据消息Model计算Cell的高度
-+ (CGFloat)calculateCellHeightWithMessage:(id <XHMessageModel>)message
-                        displaysTimestamp:(BOOL)displayTimestamp;
++ (CGFloat)calculateCellHeightWithMessage:(id <XHMessageModel>)message displaysTimestamp:(BOOL)displayTimestamp;
 
 @end

@@ -189,6 +189,7 @@ static const CGFloat kXHBubbleMessageViewPadding = 8;
     
     [self.messageBubbleView configureCellWithMessage:message];
 }
+
 #pragma mark - Gestures
 //统一一个方法隐藏MenuController，多处需要调用
 - (void)setupNormalMenuController {
@@ -267,8 +268,7 @@ static const CGFloat kXHBubbleMessageViewPadding = 8;
 - (XHBubbleMessageType)bubbleMessageType {
     return self.messageBubbleView.message.bubbleMessageType;
 }
-+ (CGFloat)calculateCellHeightWithMessage:(id <XHMessageModel>)message
-                        displaysTimestamp:(BOOL)displayTimestamp {
++ (CGFloat)calculateCellHeightWithMessage:(id <XHMessageModel>)message displaysTimestamp:(BOOL)displayTimestamp {
     
     CGFloat timestampHeight = displayTimestamp ? (kXHTimeStampLabelHeight + kXHLabelPadding * 2) : kXHLabelPadding;
     CGFloat avatarHeight = kXHAvatarImageSize;
