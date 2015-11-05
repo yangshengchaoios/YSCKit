@@ -19,11 +19,8 @@
 @property (nonatomic, weak, readwrite) XHMessageInputView *messageInputView;
 @property (nonatomic, weak, readwrite) XHShareMenuView *shareMenuView;
 @property (nonatomic, weak, readwrite) XHEmotionManagerView *emotionManagerView;
+
 @property (nonatomic, strong, readwrite) XHVoiceRecordHUD *voiceRecordHUD;
-
-@property (nonatomic, strong) UIView *headerContainerView;
-@property (nonatomic, strong) UIActivityIndicatorView *loadMoreActivityIndicatorView;
-
 @property (nonatomic, strong) XHPhotographyHelper *photographyHelper;//管理本机的摄像和图片库的工具对象
 @property (nonatomic, strong) XHVoiceRecordHelper *voiceRecordHelper;//管理录音工具对象
 @end
@@ -59,11 +56,7 @@
     if (indexPath.row >= self.messages.count)
         return;
     [self.messages removeObjectAtIndex:indexPath.row];
-    
-    NSMutableArray *indexPaths = [NSMutableArray arrayWithCapacity:1];
-    [indexPaths addObject:indexPath];
-    
-    [self.messageTableView deleteRowsAtIndexPaths:indexPaths withRowAnimation:UITableViewRowAnimationBottom];
+    [self.messageTableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationBottom];
 }
 static CGPoint  delayOffset = {0.0};
 // http://stackoverflow.com/a/11602040 Keep UITableView static when inserting rows at the top
@@ -113,29 +106,6 @@ static CGPoint  delayOffset = {0.0};
         _messages = [[NSMutableArray alloc] initWithCapacity:0];
     }
     return _messages;
-}
-- (UIView *)headerContainerView {
-    if (!_headerContainerView) {
-        _headerContainerView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, CGRectGetWidth(self.view.bounds), 44)];
-        _headerContainerView.backgroundColor = self.messageTableView.backgroundColor;
-        [_headerContainerView addSubview:self.loadMoreActivityIndicatorView];
-    }
-    return _headerContainerView;
-}
-- (UIActivityIndicatorView *)loadMoreActivityIndicatorView {
-    if (!_loadMoreActivityIndicatorView) {
-        _loadMoreActivityIndicatorView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
-        _loadMoreActivityIndicatorView.center = CGPointMake(CGRectGetWidth(_headerContainerView.bounds) / 2.0, CGRectGetHeight(_headerContainerView.bounds) / 2.0);
-    }
-    return _loadMoreActivityIndicatorView;
-}
-- (void)setLoadingMoreMessage:(BOOL)loadingMoreMessage {
-    _loadingMoreMessage = loadingMoreMessage;
-    if (loadingMoreMessage) {
-        [self.loadMoreActivityIndicatorView startAnimating];
-    } else {
-        [self.loadMoreActivityIndicatorView stopAnimating];
-    }
 }
 - (XHShareMenuView *)shareMenuView {
     if (!_shareMenuView) {
@@ -315,14 +285,6 @@ static CGPoint  delayOffset = {0.0};
 	messageTableView.delegate = self;
     messageTableView.separatorColor = [UIColor clearColor];
     messageTableView.separatorStyle = UITableViewCellSeparatorStyleNone;
-    
-//    BOOL shouldLoadMoreMessagesScrollToTop = YES;
-//    if ([self.delegate respondsToSelector:@selector(shouldLoadMoreMessagesScrollToTop)]) {
-//        shouldLoadMoreMessagesScrollToTop = [self.delegate shouldLoadMoreMessagesScrollToTop];
-//    }
-//    if (shouldLoadMoreMessagesScrollToTop) {
-//        messageTableView.tableHeaderView = self.headerContainerView;
-//    }
     [self.view addSubview:messageTableView];
     [self.view sendSubviewToBack:messageTableView];
 	_messageTableView = messageTableView;
@@ -332,7 +294,7 @@ static CGPoint  delayOffset = {0.0};
     [self setTableViewInsetsWithBottomValue:inputViewHeight];
     
     // 设置整体背景颜色
-    [self setBackgroundColor:[UIColor whiteColor]];
+    [self setBackgroundColor:RGB(228, 231, 233)];
     
     // 输入工具条的frame
     CGRect inputFrame = CGRectMake(0.0f,
@@ -457,15 +419,9 @@ static CGPoint  delayOffset = {0.0};
 }
 - (void)viewDidLoad {
     [super viewDidLoad];
-    // Do any additional setup after loading the view.    
-    // 初始化消息页面布局
     [self initilzer];
     [[XHMessageBubbleView appearance] setFont:[UIFont systemFontOfSize:16.0f]];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(finishRecordingWhenErrorBehaviors) name:UIApplicationWillResignActiveNotification object:nil];
-}
-- (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
 }
 - (void)dealloc {
     [[NSNotificationCenter defaultCenter] removeObserver:self name:UIApplicationWillResignActiveNotification object:nil];
@@ -503,10 +459,8 @@ static CGPoint  delayOffset = {0.0};
     NSString *recorderPath = nil;
     NSDate *now = [NSDate date];
     NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-    dateFormatter.dateFormat = @"yy-MMMM-dd";
-    recorderPath = [[NSString alloc] initWithFormat:@"%@/Documents/", NSHomeDirectory()];
-//    dateFormatter.dateFormat = @"hh-mm-ss";
-    dateFormatter.dateFormat = @"yyyy-MM-dd-hh-mm-ss";
+    recorderPath = [[NSString alloc] initWithFormat:@"%@/Documents/IMRecorderPath", NSHomeDirectory()];
+    dateFormatter.dateFormat = @"yyyy-MM-dd-HH-mm-ss";
     recorderPath = [recorderPath stringByAppendingFormat:@"%@-MySound.aac", [dateFormatter stringFromDate:now]];
     return recorderPath;
 }
@@ -516,7 +470,8 @@ static CGPoint  delayOffset = {0.0};
 - (CGFloat)getTextViewContentH:(UITextView *)textView {
     if ([[[UIDevice currentDevice] systemVersion] floatValue] >= 7.0) {
         return ceilf([textView sizeThatFits:textView.frame.size].height);
-    } else {
+    }
+    else {
         return textView.contentSize.height;
     }
 }
@@ -593,13 +548,10 @@ static CGPoint  delayOffset = {0.0};
 //根据底部高度获取UIEdgeInsets常量
 - (UIEdgeInsets)tableViewInsetsWithBottomValue:(CGFloat)bottom {
     UIEdgeInsets insets = UIEdgeInsetsZero;
-    
     if ([self respondsToSelector:@selector(topLayoutGuide)]) {
         insets.top = 64;
     }
-    
     insets.bottom = bottom;
-    
     return insets;
 }
 
@@ -703,7 +655,6 @@ static CGPoint  delayOffset = {0.0};
                     break;
             }
         } else {
-            
             // 这里需要注意block的执行顺序，因为otherMenuViewFrame是公用的对象，所以对于被隐藏的Menu的frame的origin的y会是最大值
             switch (self.textViewInputViewType) {
                 case XHInputViewTypeEmotion: {
@@ -727,9 +678,7 @@ static CGPoint  delayOffset = {0.0};
         
         InputViewAnimation(hide);
         
-        [self setTableViewInsetsWithBottomValue:self.view.frame.size.height
-         - self.messageInputView.frame.origin.y];
-        
+        [self setTableViewInsetsWithBottomValue:self.view.frame.size.height - self.messageInputView.frame.origin.y];
         [self scrollToBottomAnimated:NO];
     } completion:^(BOOL finished) {
         if (hide) {
@@ -933,20 +882,6 @@ static CGPoint  delayOffset = {0.0};
 }
 
 #pragma mark - UIScrollView Delegate
-- (void)scrollViewDidScroll:(UIScrollView *)scrollView {
-    if ([self.delegate respondsToSelector:@selector(shouldLoadMoreMessagesScrollToTop)]) {
-        BOOL shouldLoadMoreMessages = [self.delegate shouldLoadMoreMessagesScrollToTop];
-        if (shouldLoadMoreMessages) {
-            if (scrollView.contentOffset.y >=0 && scrollView.contentOffset.y <= 44) {
-                if (!self.loadingMoreMessage) {
-                    if ([self.delegate respondsToSelector:@selector(loadMoreMessagesScrollTotop)]) {
-                        [self.delegate loadMoreMessagesScrollTotop];
-                    }
-                }
-            }
-        }
-    }
-}
 - (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView {
 	self.isUserScrolling = YES;
     
@@ -989,15 +924,13 @@ static CGPoint  delayOffset = {0.0};
     
     static NSString *cellIdentifier = @"XHMessageTableViewCell";
     XHMessageTableViewCell *messageTableViewCell = [tableView dequeueReusableCellWithIdentifier:cellIdentifier];
-    if (!messageTableViewCell) {
-        messageTableViewCell = [[XHMessageTableViewCell alloc] initWithMessage:message displaysTimestamp:displayTimestamp reuseIdentifier:cellIdentifier];
+    if (nil == messageTableViewCell) {
+        messageTableViewCell = [[XHMessageTableViewCell alloc] initWithMessage:message reuseIdentifier:cellIdentifier];
         messageTableViewCell.delegate = self;
+        [messageTableViewCell setBackgroundColor:tableView.backgroundColor];
     }
-    
     messageTableViewCell.indexPath = indexPath;
     [messageTableViewCell configureCellWithMessage:message displaysTimestamp:displayTimestamp];
-    [messageTableViewCell setBackgroundColor:tableView.backgroundColor];
-    
     if ([self.delegate respondsToSelector:@selector(configureCell:atIndexPath:)]) {
         [self.delegate configureCell:messageTableViewCell atIndexPath:indexPath];
     }

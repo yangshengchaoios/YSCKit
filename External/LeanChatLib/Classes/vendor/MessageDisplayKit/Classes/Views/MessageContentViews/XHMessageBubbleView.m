@@ -46,39 +46,38 @@
 #pragma mark - Bubble view
 
 + (CGFloat)neededWidthForText:(NSString *)text {
-    CGSize stringSize;
-    stringSize = [text sizeWithFont:[[XHMessageBubbleView appearance] font]
-                     constrainedToSize:CGSizeMake(MAXFLOAT, 19)];
-    return roundf(stringSize.width);
+    CGSize size;
+    UIFont *font = [[XHMessageBubbleView appearance] font];
+#if IOS7_OR_LATER
+    size = [text boundingRectWithSize:CGSizeMake(CGFLOAT_MAX, 19)
+                                options:NSStringDrawingUsesLineFragmentOrigin | NSStringDrawingUsesFontLeading
+                             attributes:@{NSFontAttributeName : font}
+                                context:nil].size;
+#else
+    size = [text sizeWithFont:font constrainedToSize:CGSizeMake(CGFLOAT_MAX, 19) lineBreakMode:NSLineBreakByWordWrapping];
+#endif
+    return roundf(size.width);
 }
-
 + (CGSize)neededSizeForText:(NSString *)text {
     CGFloat maxWidth = CGRectGetWidth([[UIScreen mainScreen] bounds]) * (kIsiPad ? 0.8 : 0.55);
-    
-    CGFloat dyWidth = [XHMessageBubbleView neededWidthForText:text];
-    
+    CGFloat dyWidth = [self neededWidthForText:text];
     CGSize textSize = [SETextView frameRectWithAttributtedString:[[XHMessageBubbleHelper sharedMessageBubbleHelper] bubbleAttributtedStringWithText:text] constraintSize:CGSizeMake(maxWidth, MAXFLOAT) lineSpacing:kXHTextLineSpacing font:[[XHMessageBubbleView appearance] font]].size;
     return CGSizeMake((dyWidth > textSize.width ? textSize.width : dyWidth) + kBubblePaddingRight * 2 + kXHArrowMarginWidth, textSize.height + kMarginTop * 2);
 }
-
 + (CGSize)neededSizeForPhoto:(UIImage *)photo {
-    // 这里需要缩放后的size
+    //TODO:这里需要缩放后的size
     CGSize photoSize = CGSizeMake(120, 120);
     return photoSize;
 }
-
 + (CGSize)neededSizeForVoicePath:(NSString *)voicePath voiceDuration:(NSString *)voiceDuration {
-    // 这里的100只是暂时固定，到时候会根据一个函数来计算
     float gapDuration = (!voiceDuration || voiceDuration.length == 0 ? -1 : [voiceDuration floatValue] - 1.0f);
     CGSize voiceSize = CGSizeMake(90 + (gapDuration > 0 ? (120.0 / (60 - 1) * gapDuration) : 0), 30);
     return voiceSize;
 }
-
 + (CGFloat)calculateCellHeightWithMessage:(id <XHMessageModel>)message {
     CGSize size = [XHMessageBubbleView getBubbleFrameWithMessage:message];
     return size.height + kMarginTop + kMarginBottom;
 }
-
 + (CGSize)getBubbleFrameWithMessage:(id <XHMessageModel>)message {
     CGSize bubbleSize;
     switch (message.messageMediaType) {
@@ -95,7 +94,7 @@
             break;
         }
         case XHBubbleMessageMediaTypeVoice: {
-            // 这里的宽度是不定的，高度是固定的，根据需要根据语音长短来定制啦
+            // 这里的宽度是不定的，高度是固定的，根据需要根据语音长短来定制
             bubbleSize = [XHMessageBubbleView neededSizeForVoicePath:message.voicePath voiceDuration:message.voiceDuration];
             break;
         }
@@ -105,7 +104,7 @@
             break;
         case XHBubbleMessageMediaTypeLocalPosition:
             // 固定大小，必须的
-            bubbleSize = CGSizeMake(119, 119);
+            bubbleSize = AUTOLAYOUT_SIZE_WH(260, 260);
             break;
         default:
             break;
@@ -140,15 +139,11 @@
 }
 
 #pragma mark - Life cycle
-
 - (void)configureCellWithMessage:(id <XHMessageModel>)message {
     _message = message;
-    
     [self configureBubbleImageView:message];
-    
     [self configureMessageDisplayMediaWithMessage:message];
 }
-
 - (void)configureBubbleImageView:(id <XHMessageModel>)message {
     XHBubbleMessageMediaType currentType = message.messageMediaType;
     
@@ -219,7 +214,6 @@
             break;
     }
 }
-
 - (void)configureMessageDisplayMediaWithMessage:(id <XHMessageModel>)message {
     switch (message.messageMediaType) {
         case XHBubbleMessageMediaTypeText:
@@ -252,7 +246,6 @@
     
     [self setNeedsLayout];
 }
-
 - (instancetype)initWithFrame:(CGRect)frame
                       message:(id <XHMessageModel>)message {
     self = [super initWithFrame:frame];
@@ -362,7 +355,6 @@
     _font = nil;
     
 }
-
 - (void)layoutSubviews {
     [super layoutSubviews];
     
@@ -416,7 +408,6 @@
             break;
     }
 }
-
 - (void)resetVoiceDurationLabelFrameWithBubbleFrame:(CGRect)bubbleFrame {
     CGRect voiceFrame = _voiceDurationLabel.frame;
     voiceFrame.origin.x = (self.message.bubbleMessageType == XHBubbleMessageTypeSending ? bubbleFrame.origin.x - _voiceDurationLabel.frame.size.width : bubbleFrame.origin.x + bubbleFrame.size.width);
@@ -424,7 +415,6 @@
     
     _voiceDurationLabel.textAlignment = (self.message.bubbleMessageType == XHBubbleMessageTypeSending ? NSTextAlignmentRight : NSTextAlignmentLeft);
 }
-
 - (void)resetVoiceUnreadDotImageViewFrameWithBubbleFrame:(CGRect)bubbleFrame {
     CGRect voiceUnreadDotFrame = _voiceUnreadDotImageView.frame;
     voiceUnreadDotFrame.origin.x = (self.message.bubbleMessageType == XHBubbleMessageTypeSending ? bubbleFrame.origin.x + _voiceUnreadDotImageView.frame.size.width : bubbleFrame.origin.x + bubbleFrame.size.width - _voiceUnreadDotImageView.frame.size.width * 2);

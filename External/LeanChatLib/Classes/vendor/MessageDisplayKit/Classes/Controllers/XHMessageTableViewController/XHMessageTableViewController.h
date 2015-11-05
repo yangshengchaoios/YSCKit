@@ -117,18 +117,6 @@
  */
 - (BOOL)shouldPreventScrollToBottomWhileUserScrolling;
 
-/**
- *  判断是否支持下拉加载更多消息
- *
- *  @return 返回BOOL值，判定是否拥有这个功能
- */
-- (BOOL)shouldLoadMoreMessagesScrollToTop;
-
-/**
- *  下拉加载更多消息，只有在支持下拉加载更多消息的情况下才会调用。
- */
-- (void)loadMoreMessagesScrollTotop;
-
 - (void)didInputAtSignOnMessageTextView:(XHMessageTextView *)messageInputTextView;
 
 @end
@@ -136,7 +124,6 @@
 @protocol XHMessageTableViewControllerDataSource <NSObject>
 
 @required
-
 - (id<XHMessageModel>)messageForRowAtIndexPath:(NSIndexPath *)indexPath;
 
 @end
@@ -183,10 +170,6 @@
  */
 @property (nonatomic, weak, readonly) XHEmotionManagerView *emotionManagerView;
 
-/**
- *  是否正在加载更多旧的消息数据
- */
-@property (nonatomic, assign) BOOL loadingMoreMessage;
 
 #pragma mark - Message View Controller Default stup
 /**
