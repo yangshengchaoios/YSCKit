@@ -6,8 +6,12 @@
 //  Copyright © 2015年 Builder. All rights reserved.
 //
 
-#import <UIKit/UIKit.h>
+#import "EZGMessageBaseCell.h"
 
-@interface EZGMessageSceneCell : UITableViewCell
+@interface EZGMessageSceneCell : EZGMessageBaseCell
+
+@property (weak, nonatomic) IBOutlet UILabel *sceneTextLabel;
+@property (weak, nonatomic) IBOutlet UILabel *separationLineLabel;
+@property (weak, nonatomic) IBOutlet UIImageView *bubbleSceneImageView;
 
 @end

@@ -24,15 +24,15 @@
                     <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="8lR-L0-YpP">
                         <rect key="frame" x="20" y="80" width="80" height="80"/>
                     </imageView>
-                    <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="lV9-n6-ynA" customClass="XHBubblePhotoImageView">
-                        <rect key="frame" x="113" y="80" width="310" height="128"/>
-                        <subviews>
-                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" image="MessageVideoPlay.png" translatesAutoresizingMaskIntoConstraints="NO" id="UHl-Hc-3QO">
-                                <rect key="frame" x="125" y="34" width="60" height="60"/>
-                            </imageView>
-                        </subviews>
-                        <color key="backgroundColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
-                    </view>
+                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="l9s-VC-4oy">
+                        <rect key="frame" x="117" y="68" width="310" height="128"/>
+                    </imageView>
+                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="afE-cE-3Ad">
+                        <rect key="frame" x="117" y="100" width="310" height="128"/>
+                    </imageView>
+                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" image="MessageVideoPlay.png" translatesAutoresizingMaskIntoConstraints="NO" id="UHl-Hc-3QO">
+                        <rect key="frame" x="242" y="126" width="60" height="60"/>
+                    </imageView>
                     <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="jRN-qf-jF7" customClass="XHMessageStatusView">
                         <rect key="frame" x="431" y="120" width="85" height="40"/>
                         <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
@@ -41,7 +41,8 @@
             </tableViewCellContentView>
             <connections>
                 <outlet property="avatarImageView" destination="8lR-L0-YpP" id="kxL-7s-1Ug"/>
-                <outlet property="bubblePhotoImageView" destination="lV9-n6-ynA" id="rUl-YD-CCN"/>
+                <outlet property="bubbleImageView" destination="l9s-VC-4oy" id="hNe-6H-Q8s"/>
+                <outlet property="bubbleVideoImageView" destination="afE-cE-3Ad" id="9bq-9z-HLu"/>
                 <outlet property="statusView" destination="jRN-qf-jF7" id="giH-IQ-FGv"/>
                 <outlet property="timeStampLabel" destination="E21-t0-OSw" id="HA3-YA-z4E"/>
                 <outlet property="videoPlayImageView" destination="UHl-Hc-3QO" id="fzX-1A-kv0"/>

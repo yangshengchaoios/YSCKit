@@ -6,8 +6,13 @@
 //  Copyright © 2015年 Builder. All rights reserved.
 //
 
-#import <UIKit/UIKit.h>
+#import "EZGMessageBaseCell.h"
 
-@interface EZGMessageCarCell : UITableViewCell
+@interface EZGMessageCarCell : EZGMessageBaseCell
+
+@property (weak, nonatomic) IBOutlet UILabel *carTitleLabel;
+@property (weak, nonatomic) IBOutlet UILabel *separationLineLabel;
+@property (weak, nonatomic) IBOutlet UILabel *carBrandLabel;
+@property (weak, nonatomic) IBOutlet UILabel *carNumberLabel;
 
 @end

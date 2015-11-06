@@ -7,11 +7,10 @@
 //
 
 #import "EZGMessageBaseCell.h"
-#import "XHBubblePhotoImageView.h"
 
 @interface EZGMessageLocationCell : EZGMessageBaseCell
 
-@property (weak, nonatomic) IBOutlet XHBubblePhotoImageView *bubblePhotoImageView;
-@property (weak, nonatomic) IBOutlet UILabel *geolocationsLabel;
+@property (weak, nonatomic) IBOutlet UIImageView *bubbleLocationImageView;
+@property (weak, nonatomic) IBOutlet UILabel *addressLabel;
 
 @end

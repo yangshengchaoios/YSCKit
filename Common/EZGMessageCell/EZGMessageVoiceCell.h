@@ -10,4 +10,7 @@
 
 @interface EZGMessageVoiceCell : EZGMessageBaseCell
 
+@property (weak, nonatomic) IBOutlet UIImageView *animationVoiceImageView;
+@property (weak, nonatomic) IBOutlet UILabel *voiceDurationLabel;
+
 @end

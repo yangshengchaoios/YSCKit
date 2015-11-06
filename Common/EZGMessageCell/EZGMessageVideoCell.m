@@ -7,17 +7,18 @@
 //
 
 #import "EZGMessageVideoCell.h"
-#import "XHMessageVideoConverPhotoFactory.h"
 
 @implementation EZGMessageVideoCell
 
 - (void)awakeFromNib {
     [super awakeFromNib];
+    [self.bubbleImageView addSubview:self.bubbleVideoImageView];
+    self.videoPlayImageView.size = AUTOLAYOUT_SIZE(self.videoPlayImageView.frame.size);
 }
 
 //计算气泡高度
 + (CGSize)BubbleFrameWithMessage:(AVIMVideoMessage *)message {
-    return [self SizeForPhoto:[XHMessageVideoConverPhotoFactory videoConverPhotoWithVideoPath:message.file.localPath]];
+    return [self SizeForPhoto:[self videoConverPhotoWithVideoPath:message.file.localPath]];
 }
 //显示message
 - (void)layoutMessage:(AVIMVideoMessage *)message displaysTimestamp:(BOOL)displayTimestamp {
@@ -26,29 +27,74 @@
     WEAKSELF
     if (message.file && NO == message.file.isDataAvailable) {
         //异步下载图片
-        self.bubblePhotoImageView.messagePhoto = DefaultImage;
+        self.bubbleVideoImageView.image = DefaultImage;
         [message.file getDataInBackgroundWithBlock:^(NSData *data, NSError *error) {
             if (error || data == nil) {
                 NSLog(@"download file error : %@", error);
             }
-            else {//TODO:下载完成后刷新界面
-                UIImage *image = [XHMessageVideoConverPhotoFactory videoConverPhotoWithVideoPath:message.file.localPath];
+            else {
+                UIImage *image = [self.class videoConverPhotoWithVideoPath:message.file.localPath];
                 if (image) {
-                    weakSelf.bubblePhotoImageView.messagePhoto = image;
+                    weakSelf.bubbleVideoImageView.image = image;
                 }
             }
         }];
     }
     else {
-        UIImage *image = [XHMessageVideoConverPhotoFactory videoConverPhotoWithVideoPath:message.file.localPath];
+        UIImage *image = [self.class videoConverPhotoWithVideoPath:message.file.localPath];
         if (image) {
-            self.bubblePhotoImageView.messagePhoto = image;
+            self.bubbleVideoImageView.image = image;
         }
         else {
-            self.bubblePhotoImageView.messagePhoto = DefaultImage;
+            self.bubbleVideoImageView.image = DefaultImage;
         }
-        
     }
+}
+
+//动态计算位置和大小
+- (void)layoutSubviews {
+    [super layoutSubviews];
+    
+    //调整默认位置图片大小和位置
+    self.bubbleVideoImageView.centerY = self.bubbleImageView.centerY;
+    self.bubbleVideoImageView.height = self.bubbleImageView.height - 2.0;
+    self.bubbleVideoImageView.width = self.bubbleImageView.width - kXHBubbleArrowWidth - 2;
+    
+    if (XHBubbleMessageTypeReceiving == [self bubbleMessageType]) {
+        self.bubbleVideoImageView.left = self.bubbleImageView.left - kXHBubbleArrowWidth - 1;
+    }
+    else {
+        self.bubbleVideoImageView.right = self.bubbleImageView.right - kXHBubbleArrowWidth - 1;
+    }
+    
+    //调整播放按钮的位置
+    self.videoPlayImageView.center = self.bubbleVideoImageView.center;
+}
+
+
+//获取视频封面图片
++ (UIImage *)videoConverPhotoWithVideoPath:(NSString *)videoPath {
+    if (!videoPath)
+        return nil;
+    AVURLAsset *asset = [[AVURLAsset alloc] initWithURL:[NSURL fileURLWithPath:videoPath] options:nil];
+    NSParameterAssert(asset);
+    AVAssetImageGenerator *assetImageGenerator = [[AVAssetImageGenerator alloc] initWithAsset:asset];
+    assetImageGenerator.appliesPreferredTrackTransform = YES;
+    assetImageGenerator.apertureMode = AVAssetImageGeneratorApertureModeEncodedPixels;
+    
+    CGImageRef thumbnailImageRef = NULL;
+    CFTimeInterval thumbnailImageTime = 0;
+    NSError *thumbnailImageGenerationError = nil;
+    thumbnailImageRef = [assetImageGenerator copyCGImageAtTime:CMTimeMake(thumbnailImageTime, 60) actualTime:NULL error:&thumbnailImageGenerationError];
+    
+    if (!thumbnailImageRef)
+        NSLog(@"thumbnailImageGenerationError %@", thumbnailImageGenerationError);
+    
+    UIImage *thumbnailImage = thumbnailImageRef ? [[UIImage alloc] initWithCGImage:thumbnailImageRef] : nil;
+    
+    CGImageRelease(thumbnailImageRef);
+    
+    return thumbnailImage;
 }
 
 @end

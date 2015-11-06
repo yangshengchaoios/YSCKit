@@ -9,14 +9,6 @@
 #import "EZGMessageBaseCell.h"
 #import "CDChatManager.h"
 
-#define kXHLabelPadding             AUTOLAYOUT_LENGTH(20)   //timeStampLabel上下间隔
-#define kXHTimeStampLabelHeight     AUTOLAYOUT_LENGTH(40)   //timeStampLabel高度
-#define kXHAvatorPadding            AUTOLAYOUT_LENGTH(20)   //头像与父view左边间隔
-#define kXHAvatarImageSize          AUTOLAYOUT_LENGTH(80)   //头像的长宽
-#define kXHBubbleMessageViewPadding AUTOLAYOUT_LENGTH(10)   //气泡距离头像间隔
-#define kXHStatusViewWidth          AUTOLAYOUT_LENGTH(80)   //
-#define kXHStatusViewHeight         AUTOLAYOUT_LENGTH(40)   //
-
 @implementation EZGMessageBaseCell
 
 - (void)awakeFromNib {
@@ -27,9 +19,13 @@
     self.accessoryType = UITableViewCellAccessoryNone;
     self.accessoryView = nil;
     
-    self.timeStampLabel.font = AUTOLAYOUT_FONT(22);
+    self.bubbleImageView.clipsToBounds = YES;
+    self.timeStampLabel.font = AUTOLAYOUT_FONT(self.timeStampLabel.font.pointSize);
+    self.timeStampLabel.top = kXHLabelPadding;
     self.timeStampLabel.height = kXHTimeStampLabelHeight;
     self.avatarImageView.width = self.avatarImageView.height = kXHAvatarImageSize;
+    self.statusView.width = kXHStatusViewWidth;
+    self.statusView.height = kXHStatusViewHeight;
 }
 
 #pragma mark - 注册与重用
@@ -47,14 +43,14 @@
     return [UINib nibWithNibName:NSStringFromClass(self.class) bundle:nil];
 }
 
-#pragma mark - 计算高度
-//动态计算图片显示的高度，等比例缩放，填满
+#pragma mark - 计算大小
+//动态计算图片显示的大小，等比例缩放，填满
 + (CGSize)SizeForPhoto:(UIImage *)photo {
     //TODO:需要判断空、根据image大小来设置
     CGSize photoSize = CGSizeMake(120, 120);
     return photoSize;
 }
-//计算气泡高度
+//计算气泡大小
 + (CGSize)BubbleFrameWithMessage:(AVIMTypedMessage *)message {
     return CGSizeZero;
 }
@@ -79,47 +75,36 @@
 #pragma mark - 显示内容
 //显示message
 - (void)layoutMessage:(AVIMTypedMessage *)message displaysTimestamp:(BOOL)displayTimestamp {
+    self.typedMessage = message;
+    
     //1. 设置时间
     self.timeStampLabel.hidden = ! displayTimestamp;
     if (displayTimestamp) {
-        NSDate *sendDate = [NSDate dateWithTimeIntervalSince1970:message.sendTimestamp / 1000];;
-        NSString *dateText = [sendDate stringWithFormat:@"yyyy-M-d"];
-        NSString *timeText = [sendDate stringWithFormat:@"HH:mm"];
-        if ([sendDate isThisYear]) {
-            if ([sendDate isToday]) {
-                dateText = NSLocalizedStringFromTable(@"Today", @"MessageDisplayKitString", @"今天");
-            }
-            else if ([sendDate isYesterday]) {
-                dateText = NSLocalizedStringFromTable(@"Yesterday", @"MessageDisplayKitString", @"昨天");
-            }
-            else {
-                dateText = [sendDate stringWithFormat:@"M-d"];
-            }
-        }
-        self.timeStampLabel.text = [NSString stringWithFormat:@"%@ %@",dateText,timeText];
+        self.timeStampLabel.text = [self formatMessageTimeByTimeStamp:message.sendTimestamp];
     }
-    self.typedMessage = message;
-    //设置头像
-    if (XHBubbleMessageTypeSending == [self bubbleMessageType]) {//自己的头像
-        [self.avatarImageView setImageWithURLString:USER.userAvatar];
-    }
-    else {//对方的头像
-        [self.avatarImageView setImageWithURLString:APPDATA.chatUser.avatarUrl];
-    }
-    //设置气泡图片
-}
-
-//判断消息的方向
-- (XHBubbleMessageType)bubbleMessageType {
-    if ([[CDChatManager manager].selfId isEqualToString:self.typedMessage.clientId]) {
-        return XHBubbleMessageTypeSending;
+    
+    //2. 设置头像
+    if (message.attributes[MParamAvatarUrl]) {//如果消息中带有头像地址就直接显示该头像
+        [self.avatarImageView setImageWithURLString:message.attributes[MParamAvatarUrl]];
     }
     else {
-        return XHBubbleMessageTypeReceiving;
+        if (XHBubbleMessageTypeSending == [self bubbleMessageType]) {//自己的头像
+            [self.avatarImageView setImageWithURLString:USER.userAvatar];
+        }
+        else {//对方的头像
+            [self.avatarImageView setImageWithURLString:APPDATA.chatUser.avatarUrl];
+        }
+    }
+    
+    //3. 设置气泡图片
+    if (message.mediaType >= EZGMessageTypeScene) {//自定义消息类型固定为白色背景
+        //TODO:固定为白色
+    }
+    else {
+        
     }
 }
-
-//在显示界面的时候重新根据message来调整元素位置
+//动态计算位置和大小
 - (void)layoutSubviews {
     [super layoutSubviews];
     BOOL displayTimestamp = ! self.timeStampLabel.hidden;
@@ -127,7 +112,6 @@
     //调整timeStampLabel位置
     if (displayTimestamp) {
         [self.timeStampLabel sizeToFit];
-        self.timeStampLabel.top = kXHLabelPadding;
         self.timeStampLabel.centerX = SCREEN_WIDTH / 2;
         self.timeStampLabel.width += 4;
         layoutOriginY += kXHTimeStampLabelHeight + kXHLabelPadding;
@@ -148,23 +132,49 @@
         self.bubbleImageView.left = CGRectGetMaxX(self.avatarImageView.frame) + kXHBubbleMessageViewPadding;
     }
     else {
-        self.bubbleImageView.right = SCREEN_WIDTH - (CGRectGetMinX(self.avatarImageView.frame) + kXHBubbleMessageViewPadding);
+        self.bubbleImageView.right = self.avatarImageView.left - kXHBubbleMessageViewPadding;
     }
     self.bubbleImageView.size = [self.class BubbleFrameWithMessage:self.typedMessage];
     
     //重新调整statusView位置
-    if([self bubbleMessageType] == XHBubbleMessageTypeSending) {
+    if(XHBubbleMessageTypeSending == [self bubbleMessageType]) {
         self.statusView.hidden = NO;
-        CGFloat statusX = CGRectGetMinX(self.messageBubbleView.bubbleFrame) - kXHStatusViewWidth - 3;
-        CGFloat halfH = self.messageBubbleView.bubbleFrame.size.height / 2;
-        CGRect statusFrame = self.statusView.frame;
-        statusFrame.origin.y = layoutOriginY + halfH;
-        statusFrame.origin.x = statusX;
-        self.statusView.frame = statusFrame;
+        self.statusView.centerY = self.bubbleImageView.centerY;
+        self.statusView.right = self.bubbleImageView.left - kXHBubbleMessageViewPadding;
     }
     else {
         self.statusView.hidden = YES;
     }
+}
+//判断消息的方向
+- (XHBubbleMessageType)bubbleMessageType {
+    if ([[CDChatManager manager].selfId isEqualToString:self.typedMessage.clientId]) {
+        return XHBubbleMessageTypeSending;
+    }
+    else {
+        return XHBubbleMessageTypeReceiving;
+    }
+}
+//格式化消息时间
+- (NSString *)formatMessageTimeByTimeStamp:(int64_t)timeStamp {
+    NSDate *sendDate = [NSDate dateWithTimeIntervalSince1970:timeStamp / 1000];
+    return [self formatMessageTimeByDate:sendDate];
+}
+- (NSString *)formatMessageTimeByDate:(NSDate *)messageDate {
+    NSString *dateText = [messageDate stringWithFormat:@"yyyy-M-d"];
+    NSString *timeText = [messageDate stringWithFormat:@"HH:mm"];
+    if ([messageDate isThisYear]) {
+        if ([messageDate isToday]) {
+            dateText = NSLocalizedStringFromTable(@"Today", @"MessageDisplayKitString", @"今天");
+        }
+        else if ([messageDate isYesterday]) {
+            dateText = NSLocalizedStringFromTable(@"Yesterday", @"MessageDisplayKitString", @"昨天");
+        }
+        else {
+            dateText = [messageDate stringWithFormat:@"M-d"];
+        }
+    }
+    return [NSString stringWithFormat:@"%@ %@",dateText,timeText];
 }
 
 @end

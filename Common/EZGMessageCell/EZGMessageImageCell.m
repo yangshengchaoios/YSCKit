@@ -12,9 +12,11 @@
 
 - (void)awakeFromNib {
     [super awakeFromNib];
+    [self.bubbleImageView addSubview:self.bubblePhotoImageView];
 }
 
-//计算气泡高度
+#pragma mark - 计算大小
+//计算气泡大小
 + (CGSize)BubbleFrameWithMessage:(AVIMImageMessage *)message {
     UIImage *image = DefaultImage;
     NSData *data = [message.file getData:nil];
@@ -23,6 +25,8 @@
     }
     return [self SizeForPhoto:image];
 }
+
+#pragma mark - 显示内容
 //显示message
 - (void)layoutMessage:(AVIMImageMessage *)message displaysTimestamp:(BOOL)displayTimestamp {
     [super layoutMessage:message displaysTimestamp:displayTimestamp];
@@ -30,13 +34,13 @@
     WEAKSELF
     if (message.file && NO == message.file.isDataAvailable) {
         //异步下载图片
-        self.bubblePhotoImageView.messagePhoto = DefaultImage;
+        self.bubblePhotoImageView.image = DefaultImage;
         [message.file getDataInBackgroundWithBlock:^(NSData *data, NSError *error) {
             if (error || data == nil) {
                 NSLog(@"download file error : %@", error);
             }
             else {//TODO:下载完成后刷新界面
-                weakSelf.bubblePhotoImageView.messagePhoto = [UIImage imageWithData:data];
+                weakSelf.bubblePhotoImageView.image = [UIImage imageWithData:data];
             }
         }];
     }
@@ -46,7 +50,23 @@
         if (data) {
             image = [UIImage imageWithData:data];
         }
-        self.bubblePhotoImageView.messagePhoto = image;
+        self.bubblePhotoImageView.image = image;
+    }
+}
+
+//动态计算位置和大小
+- (void)layoutSubviews {
+    [super layoutSubviews];
+    
+    self.bubblePhotoImageView.centerY = self.bubbleImageView.centerY;
+    self.bubblePhotoImageView.height = self.bubbleImageView.height - 2.0;
+    self.bubblePhotoImageView.width = self.bubbleImageView.width - kXHBubbleArrowWidth - 2;
+    
+    if (XHBubbleMessageTypeReceiving == [self bubbleMessageType]) {
+        self.bubblePhotoImageView.left = self.bubbleImageView.left - kXHBubbleArrowWidth - 1;
+    }
+    else {
+        self.bubblePhotoImageView.right = self.bubbleImageView.right - kXHBubbleArrowWidth - 1;
     }
 }
 

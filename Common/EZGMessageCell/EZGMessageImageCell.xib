@@ -24,19 +24,22 @@
                     <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="THC-De-kqW">
                         <rect key="frame" x="20" y="80" width="80" height="80"/>
                     </imageView>
-                    <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2CH-w1-Kw9" customClass="XHBubblePhotoImageView">
-                        <rect key="frame" x="113" y="80" width="310" height="128"/>
-                        <color key="backgroundColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
-                    </view>
                     <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="IbW-i6-ERK" customClass="XHMessageStatusView">
                         <rect key="frame" x="431" y="124" width="85" height="40"/>
                         <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                     </view>
+                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="SZx-B0-yaX">
+                        <rect key="frame" x="108" y="105" width="310" height="128"/>
+                    </imageView>
+                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ek4-v5-fCC">
+                        <rect key="frame" x="108" y="73" width="310" height="128"/>
+                    </imageView>
                 </subviews>
             </tableViewCellContentView>
             <connections>
                 <outlet property="avatarImageView" destination="THC-De-kqW" id="w1a-ej-0h9"/>
-                <outlet property="bubblePhotoImageView" destination="2CH-w1-Kw9" id="GMK-AC-8dg"/>
+                <outlet property="bubbleImageView" destination="ek4-v5-fCC" id="Wse-rO-bIX"/>
+                <outlet property="bubblePhotoImageView" destination="SZx-B0-yaX" id="5p2-1j-WYU"/>
                 <outlet property="statusView" destination="IbW-i6-ERK" id="sDD-3K-gtl"/>
                 <outlet property="timeStampLabel" destination="n2Z-o8-L4Q" id="bwN-Ks-x6M"/>
             </connections>

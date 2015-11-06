@@ -24,10 +24,12 @@
                     <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Q1v-6O-Tih">
                         <rect key="frame" x="20" y="80" width="80" height="80"/>
                     </imageView>
-                    <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="8bP-BT-gTK" customClass="XHBubblePhotoImageView">
-                        <rect key="frame" x="113" y="80" width="310" height="128"/>
-                        <color key="backgroundColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
-                    </view>
+                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="mqU-JW-Uas">
+                        <rect key="frame" x="113" y="68" width="310" height="128"/>
+                    </imageView>
+                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="PVy-CM-JH9">
+                        <rect key="frame" x="113" y="100" width="310" height="128"/>
+                    </imageView>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="武侯区桐梓林北路武侯区桐梓林北路武侯区桐梓林北路武侯区桐梓林北路武侯区桐梓林北路武侯区桐梓林北路" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="xaV-Sf-SDH">
                         <rect key="frame" x="113" y="148" width="310" height="60"/>
                         <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="0.29999999999999999" colorSpace="calibratedRGB"/>
@@ -42,9 +44,10 @@
                 </subviews>
             </tableViewCellContentView>
             <connections>
+                <outlet property="addressLabel" destination="xaV-Sf-SDH" id="Elv-Ol-RxY"/>
                 <outlet property="avatarImageView" destination="Q1v-6O-Tih" id="TVC-Y3-O8b"/>
-                <outlet property="bubblePhotoImageView" destination="8bP-BT-gTK" id="r51-O6-fer"/>
-                <outlet property="geolocationsLabel" destination="xaV-Sf-SDH" id="zv2-1c-HhV"/>
+                <outlet property="bubbleImageView" destination="mqU-JW-Uas" id="mG8-J9-31d"/>
+                <outlet property="bubbleLocationImageView" destination="PVy-CM-JH9" id="3Vs-IR-5hu"/>
                 <outlet property="statusView" destination="8KC-tl-ZWP" id="6Dg-Qg-Bov"/>
                 <outlet property="timeStampLabel" destination="gSU-kG-4gP" id="H50-4b-yvv"/>
             </connections>

@@ -7,10 +7,9 @@
 //
 
 #import "EZGMessageBaseCell.h"
-#import "XHBubblePhotoImageView.h"
 
 @interface EZGMessageImageCell : EZGMessageBaseCell
 
-@property (weak, nonatomic) IBOutlet XHBubblePhotoImageView *bubblePhotoImageView;
+@property (weak, nonatomic) IBOutlet UIImageView *bubblePhotoImageView;
 
 @end
