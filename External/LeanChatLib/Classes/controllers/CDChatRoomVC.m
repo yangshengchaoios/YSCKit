@@ -29,8 +29,7 @@ static NSInteger const kOnePageSize = 10;
 
 @property (nonatomic, strong, readwrite) AVIMConversation *conv;
 @property (atomic, assign) BOOL isLoadingMsg;
-@property (nonatomic, strong, readwrite) NSMutableArray *msgs;
-@property (nonatomic, strong) XHMessageTableViewCell *currentSelectedCell;
+@property (nonatomic, strong) EZGMessageBaseCell *currentSelectedCell;
 @property (nonatomic, strong) NSArray *emotionManagers;
 @property (nonatomic, strong) LZStatusView *clientStatusView;
 @property (nonatomic, assign) int64_t lastSentTimestamp;
@@ -49,7 +48,6 @@ static NSInteger const kOnePageSize = 10;
         //self.allowsSendFace = NO;
         //self.allowsSendMultiMedia = NO;
         _isLoadingMsg = NO;
-        self.msgs = [NSMutableArray array];
     }
     return self;
 }
@@ -141,7 +139,7 @@ static NSInteger const kOnePageSize = 10;
 }
 
 #pragma mark - XHMessageTableViewCell delegate
-- (void)multiMediaMessageDidSelectedOnMessage:(id <XHMessageModel> )message atIndexPath:(NSIndexPath *)indexPath onMessageTableViewCell:(XHMessageTableViewCell *)messageTableViewCell {
+- (void)multiMediaMessageDidSelectedOnMessage:(id <XHMessageModel> )message atIndexPath:(NSIndexPath *)indexPath onMessageTableViewCell:(EZGMessageBaseCell *)messageTableViewCell {
     switch (message.messageMediaType) {
         case XHBubbleMessageMediaTypeVideo:
         case XHBubbleMessageMediaTypePhoto: {
@@ -155,18 +153,18 @@ static NSInteger const kOnePageSize = 10;
             // Mark the voice as read and hide the red dot.
             //message.isRead = YES;
 //            messageTableViewCell.messageBubbleView.voiceUnreadDotImageView.hidden = YES;
-            if (self.currentSelectedCell) {
-                [self.currentSelectedCell.messageBubbleView.animationVoiceImageView stopAnimating];
-            }
-            if (self.currentSelectedCell == messageTableViewCell) {
-                [[XHAudioPlayerHelper shareInstance] stopAudio];
-                self.currentSelectedCell = nil;
-            }
-            else {
-                self.currentSelectedCell = messageTableViewCell;
-                [messageTableViewCell.messageBubbleView.animationVoiceImageView startAnimating];
-                [[XHAudioPlayerHelper shareInstance] managerAudioWithFileName:message.voicePath toPlay:YES];
-            }
+//            if (self.currentSelectedCell) {
+//                [self.currentSelectedCell.messageBubbleView.animationVoiceImageView stopAnimating];
+//            }
+//            if (self.currentSelectedCell == messageTableViewCell) {
+//                [[XHAudioPlayerHelper shareInstance] stopAudio];
+//                self.currentSelectedCell = nil;
+//            }
+//            else {
+//                self.currentSelectedCell = messageTableViewCell;
+//                [messageTableViewCell.messageBubbleView.animationVoiceImageView startAnimating];
+//                [[XHAudioPlayerHelper shareInstance] managerAudioWithFileName:message.voicePath toPlay:YES];
+//            }
             break;
         }
             
@@ -203,7 +201,7 @@ static NSInteger const kOnePageSize = 10;
     if (!self.currentSelectedCell) {
         return;
     }
-    [self.currentSelectedCell.messageBubbleView.animationVoiceImageView stopAnimating];
+//    [self.currentSelectedCell.messageBubbleView.animationVoiceImageView stopAnimating];
     self.currentSelectedCell = nil;
 }
 
@@ -212,7 +210,7 @@ static NSInteger const kOnePageSize = 10;
 - (void)prepareRecordingVoiceActionWithCompletion:(BOOL (^)(void))completion {
     [[XHAudioPlayerHelper shareInstance] stopAudio];
     if (self.currentSelectedCell) {
-        [self.currentSelectedCell.messageBubbleView.animationVoiceImageView stopAnimating];
+//        [self.currentSelectedCell.messageBubbleView.animationVoiceImageView stopAnimating];
         self.currentSelectedCell = nil;
     }
     [super prepareRecordingVoiceActionWithCompletion:completion];
@@ -277,26 +275,12 @@ static NSInteger const kOnePageSize = 10;
 // 是否显示时间轴Label的回调方法
 - (BOOL)shouldDisplayTimestampForRowAtIndexPath:(NSIndexPath *)indexPath {
     if (indexPath.row > 0 && indexPath.row < [self.messages count]) {
-        XHMessage *msg = [self.messages objectAtIndex:indexPath.row];
-        XHMessage *lastMsg = [self.messages objectAtIndex:indexPath.row - 1];
-        int interval = [msg.timestamp timeIntervalSinceDate:lastMsg.timestamp];
-        return (interval > 60 * 3);
+        AVIMTypedMessage *msg = [self.messages objectAtIndex:indexPath.row];
+        AVIMTypedMessage *lastMsg = [self.messages objectAtIndex:indexPath.row - 1];
+        return msg.sendTimestamp - lastMsg.sendTimestamp > 60 * 3 * 1000;
     }
     else {
         return YES;
-    }
-}
-// 配置Cell的样式或者字体
-- (void)configureCell:(XHMessageTableViewCell *)cell atIndexPath:(NSIndexPath *)indexPath {
-    if (indexPath.row < [self.messages count]) {
-        XHMessage *msg = [self.messages objectAtIndex:indexPath.row];
-        SETextView *textView = cell.messageBubbleView.displayTextView;
-        if (msg.bubbleMessageType == XHBubbleMessageTypeSending) {
-            [textView setTextColor:[UIColor whiteColor]];
-        }
-        else {
-            [textView setTextColor:[UIColor blackColor]];
-        }
     }
 }
 // 是否支持用户手动滚动
@@ -353,8 +337,6 @@ static NSInteger const kOnePageSize = 10;
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), queue);
 }
 
-#pragma mark - LeanCloud 
-
 #pragma mark - conversations store
 - (void)updateConversationAsRead {
     if (self.conv) {
@@ -404,13 +386,11 @@ static NSInteger const kOnePageSize = 10;
     }];
 }
 - (void)replaceMesssage:(AVIMTypedMessage *)message atIndexPath:(NSIndexPath *)indexPath {
-    self.msgs[indexPath.row] = message;
-    XHMessage *xhMessage = [self getXHMessageByMsg:message];
-    self.messages[indexPath.row] = xhMessage;
+    self.messages[indexPath.row] = message;
     [self.messageTableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
 }
 - (void)resendMessageAtIndexPath:(NSIndexPath *)indexPath discardIfFailed:(BOOL)discardIfFailed {
-    AVIMTypedMessage *msg = self.msgs[indexPath.row];
+    AVIMTypedMessage *msg = self.messages[indexPath.row];
     msg.status = AVIMMessageStatusSending;
     [self replaceMesssage:msg atIndexPath:indexPath];
     NSString *recordId = msg.messageId;
@@ -438,13 +418,12 @@ static NSInteger const kOnePageSize = 10;
     AVIMTypedMessage *message = notification.object;
     if ([message.conversationId isEqualToString:self.conv.conversationId]) {
         //关闭'未读'提示标记>>>>>>>>>>>>>>>>>>>>>>>>>
-        for (int pos = 0; pos < self.msgs.count; pos++) {
-            AVIMTypedMessage *msg = self.msgs[pos];
+        for (int pos = 0; pos < self.messages.count; pos++) {
+            AVIMTypedMessage *msg = self.messages[pos];
             if (AVIMMessageIOTypeOut == msg.ioType &&
                 AVIMMessageStatusDelivered != msg.status) {
                 msg.status = AVIMMessageStatusDelivered;
-                XHMessage *xhMsg = [self getXHMessageByMsg:msg];
-                [self.messages setObject:xhMsg atIndexedSubscript:pos];
+                [self.messages setObject:msg atIndexedSubscript:pos];
                 NSIndexPath *indexPath = [NSIndexPath indexPathForRow:pos inSection:0];
                 [self.messageTableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationNone];
             }
@@ -462,8 +441,8 @@ static NSInteger const kOnePageSize = 10;
     if ([message.conversationId isEqualToString:self.conv.conversationId]) {
         AVIMTypedMessage *foundMessage;
         NSInteger pos;
-        for (pos = 0; pos < self.msgs.count; pos++) {
-            AVIMTypedMessage *msg = self.msgs[pos];
+        for (pos = 0; pos < self.messages.count; pos++) {
+            AVIMTypedMessage *msg = self.messages[pos];
             if ([msg.messageId isEqualToString:message.messageId]) {
                 foundMessage = msg;
                 break;
@@ -471,104 +450,12 @@ static NSInteger const kOnePageSize = 10;
         }
         if (foundMessage !=nil) {
             foundMessage.status = AVIMMessageStatusDelivered;
-            XHMessage *xhMsg = [self getXHMessageByMsg:foundMessage];
-            [self.messages setObject:xhMsg atIndexedSubscript:pos];
+            [self.messages setObject:foundMessage atIndexedSubscript:pos];
             NSIndexPath *indexPath = [NSIndexPath indexPathForRow:pos inSection:0];
             [self.messageTableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationNone];
             [self scrollToBottomAnimated:YES];
         }
     }
-}
-
-#pragma mark - modal convert
-- (NSDate *)getTimestampDate:(int64_t)timestamp {
-    return [NSDate dateWithTimeIntervalSince1970:timestamp / 1000];
-}
-- (XHMessage *)getXHMessageByMsg:(AVIMTypedMessage *)msg {
-    id <CDUserModel> fromUser = [[CDChatManager manager].userDelegate getUserById:msg.clientId];
-    XHMessage *xhMessage;
-    NSDate *time = [self getTimestampDate:msg.sendTimestamp];
-    if (msg.mediaType == kAVIMMessageMediaTypeText) {
-        AVIMTextMessage *textMsg = (AVIMTextMessage *)msg;
-        xhMessage = [[XHMessage alloc] initWithText:[CDEmotionUtils emojiStringFromString:textMsg.text] sender:fromUser.username timestamp:time];
-    }
-    else if (msg.mediaType == kAVIMMessageMediaTypeAudio) {
-        AVIMAudioMessage *audioMsg = (AVIMAudioMessage *)msg;
-        NSString *duration = [NSString stringWithFormat:@"%.0f", audioMsg.duration];
-        xhMessage = [[XHMessage alloc] initWithVoicePath:audioMsg.file.localPath voiceUrl:nil voiceDuration:duration sender:fromUser.username timestamp:time];
-    }
-    else if (msg.mediaType == kAVIMMessageMediaTypeLocation) {
-        AVIMLocationMessage *locationMsg = (AVIMLocationMessage *)msg;
-        xhMessage = [[XHMessage alloc] initWithLocalPositionPhoto:[UIImage imageNamed:@"Fav_Cell_Loc"] geolocations:locationMsg.text location:[[CLLocation alloc] initWithLatitude:locationMsg.latitude longitude:locationMsg.longitude] sender:fromUser.username timestamp:time];
-    }
-    else if (msg.mediaType == kAVIMMessageMediaTypeImage) {
-        AVIMImageMessage *imageMsg = (AVIMImageMessage *)msg;
-        UIImage *image;
-        NSError *error;
-        NSData *data = [imageMsg.file getData:&error];
-        if (error) {
-            DLog(@"get Data error: %@", error);
-        } else {
-            image = [UIImage imageWithData:data];
-        }
-        xhMessage = [[XHMessage alloc] initWithPhoto:image thumbnailUrl:nil originPhotoUrl:nil sender:fromUser.username timestamp:time];
-    }
-    else if (msg.mediaType == kAVIMMessageMediaTypeEmotion) {
-        AVIMEmotionMessage *emotionMsg = (AVIMEmotionMessage *)msg;
-        NSString *path = [[NSBundle mainBundle] pathForResource:emotionMsg.emotionPath ofType:@"gif"];
-        xhMessage = [[XHMessage alloc] initWithEmotionPath:path sender:fromUser.username timestamp:time];
-    }
-    else if (msg.mediaType == kAVIMMessageMediaTypeVideo) {
-        AVIMVideoMessage *videoMsg = (AVIMVideoMessage *)msg;
-        NSString *path = [[CDChatManager manager] videoPathOfMessag:videoMsg];
-        xhMessage = [[XHMessage alloc] initWithVideoConverPhoto:[XHMessageVideoConverPhotoFactory videoConverPhotoWithVideoPath:path] videoPath:path videoUrl:nil sender:fromUser.username timestamp:time];
-    } else {
-        xhMessage = [[XHMessage alloc] initWithText:@"未知消息" sender:fromUser.username timestamp:time];
-        DLog("unkonwMessage");
-    }
-    
-    xhMessage.avator = nil;
-    xhMessage.avatorUrl = [fromUser avatarUrl];
-    
-    if ([[CDChatManager manager].selfId isEqualToString:msg.clientId]) {
-        xhMessage.bubbleMessageType = XHBubbleMessageTypeSending;
-    }
-    else {
-        xhMessage.bubbleMessageType = XHBubbleMessageTypeReceiving;
-    }
-    NSInteger msgStatuses[4] = { AVIMMessageStatusSending, AVIMMessageStatusSent, AVIMMessageStatusDelivered, AVIMMessageStatusFailed };
-    NSInteger xhMessageStatuses[4] = { XHMessageStatusSending, XHMessageStatusSent, XHMessageStatusReceived, XHMessageStatusFailed };
-    
-    if (self.conv.type == CDConvTypeGroup) {
-        if (msg.status == AVIMMessageStatusSent) {
-            msg.status = AVIMMessageStatusDelivered;
-        }
-    }
-    if (xhMessage.bubbleMessageType == XHBubbleMessageTypeSending) {
-        XHMessageStatus status = XHMessageStatusReceived;
-        int i;
-        for (i = 0; i < 4; i++) {
-            if (msgStatuses[i] == msg.status) {
-                status = xhMessageStatuses[i];
-                break;
-            }
-        }
-        xhMessage.status = status;
-    }
-    else {
-        xhMessage.status = XHMessageStatusReceived;
-    }
-    return xhMessage;
-}
-- (NSMutableArray *)getXHMessages:(NSArray *)msgs {
-    NSMutableArray *messages = [[NSMutableArray alloc] init];
-    for (AVIMTypedMessage *msg in msgs) {
-        XHMessage *xhMsg = [self getXHMessageByMsg:msg];
-        if (xhMsg) {
-            [messages addObject:xhMsg];
-        }
-    }
-    return messages;
 }
 
 #pragma mark - query messages
@@ -596,9 +483,7 @@ static NSInteger const kOnePageSize = 10;
                 NSMutableArray *allMessages = [NSMutableArray arrayWithArray:msgs];
                 [allMessages addObjectsFromArray:failedMessages];
                 
-                NSMutableArray *xhMsgs = [self getXHMessages:allMessages];
-                self.messages = xhMsgs;
-                self.msgs = allMessages;
+                self.messages = allMessages;
                 [self.messageTableView reloadData];
                 [self scrollToBottomAnimated:NO];
                 if ([msgs count] > 0) {
@@ -623,16 +508,14 @@ static NSInteger const kOnePageSize = 10;
     } else {
         WEAKSELF
         self.isLoadingMsg = YES;
-        AVIMTypedMessage *msg = [self.msgs objectAtIndex:0];
+        AVIMTypedMessage *msg = self.messages[0];
         int64_t timestamp = msg.sendTimestamp;
         [self queryAndCacheMessagesWithTimestamp:timestamp block:^(NSArray *msgs, NSError *error) {
             if ([weakSelf filterError:error] && isNotEmpty(msgs)) {
-                NSMutableArray *xhMsgs = [[weakSelf getXHMessages:msgs] mutableCopy];
                 NSMutableArray *newMsgs = [NSMutableArray arrayWithArray:msgs];
-                [newMsgs addObjectsFromArray:weakSelf.msgs];
-                weakSelf.msgs = newMsgs;
-                if ([xhMsgs count] > 0) {
-                    [weakSelf insertOldMessages:xhMsgs completion: ^{
+                [newMsgs addObjectsFromArray:weakSelf.messages];
+                if ([msgs count] > 0) {
+                    [weakSelf insertOldMessages:msgs completion: ^{
                         weakSelf.isLoadingMsg = NO;
                         [weakSelf.messageTableView.header endRefreshing];
                     }];
@@ -703,10 +586,8 @@ static NSInteger const kOnePageSize = 10;
     self.isLoadingMsg = YES;
     [self cacheMsgs:@[message] callback:^(BOOL succeeded, NSError *error) {
         if ([self filterError:error]) {
-            XHMessage *xhMessage = [self getXHMessageByMsg:message];
-            [self.msgs addObject:message];
-            [self.messages addObject:xhMessage];
-            NSIndexPath *indexPath = [NSIndexPath indexPathForRow:self.msgs.count -1 inSection:0];
+            [self.messages addObject:message];
+            NSIndexPath *indexPath = [NSIndexPath indexPathForRow:self.messages.count -1 inSection:0];
             [self.messageTableView insertRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationNone];
             [self scrollToBottomAnimated:YES];
         }

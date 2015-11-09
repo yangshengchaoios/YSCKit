@@ -14,7 +14,6 @@
 
 // Views
 #import "XHMessageTableView.h"
-#import "XHMessageTableViewCell.h"
 #import "XHMessageInputView.h"
 #import "XHShareMenuView.h"
 #import "XHEmotionManagerView.h"
@@ -103,14 +102,6 @@
 - (BOOL)shouldDisplayTimestampForRowAtIndexPath:(NSIndexPath *)indexPath;
 
 /**
- *  配置Cell的样式或者字体
- *
- *  @param cell      目标Cell
- *  @param indexPath 目标Cell所在位置IndexPath
- */
-- (void)configureCell:(XHMessageTableViewCell *)cell atIndexPath:(NSIndexPath *)indexPath;
-
-/**
  *  协议回掉是否支持用户手动滚动
  *
  *  @return 返回YES or NO
@@ -128,7 +119,7 @@
 
 @end
 
-@interface XHMessageTableViewController : UIViewController <UITableViewDataSource, UITableViewDelegate, XHMessageTableViewControllerDelegate, XHMessageTableViewControllerDataSource, XHMessageInputViewDelegate, XHMessageTableViewCellDelegate, XHShareMenuViewDelegate, XHEmotionManagerViewDelegate, XHEmotionManagerViewDataSource>
+@interface XHMessageTableViewController : UIViewController <UITableViewDataSource, UITableViewDelegate, XHMessageTableViewControllerDelegate, XHMessageTableViewControllerDataSource, XHMessageInputViewDelegate, XHShareMenuViewDelegate, XHEmotionManagerViewDelegate, XHEmotionManagerViewDataSource>
 
 @property (nonatomic, weak) id <XHMessageTableViewControllerDelegate> delegate;
 @property (nonatomic, weak) id <XHMessageTableViewControllerDataSource> dataSource;

@@ -108,7 +108,7 @@ ZYQAssetPickerControllerDelegate, TOCropViewControllerDelegate>
 }
 
 #pragma mark - XHMessageTableViewCellDelegate
-- (void)multiMediaMessageDidSelectedOnMessage:(id <XHMessageModel> )message atIndexPath:(NSIndexPath *)indexPath onMessageTableViewCell:(XHMessageTableViewCell *)messageTableViewCell {
+- (void)multiMediaMessageDidSelectedOnMessage:(id <XHMessageModel> )message atIndexPath:(NSIndexPath *)indexPath onMessageTableViewCell:(EZGMessageBaseCell *)messageTableViewCell {
     if (self.messageInputView.isRecording) {
         return;
     }
@@ -130,7 +130,7 @@ ZYQAssetPickerControllerDelegate, TOCropViewControllerDelegate>
         [self.navigationController pushViewController:displayLocationViewController animated:YES];
     }
     else {
-        [super multiMediaMessageDidSelectedOnMessage:message atIndexPath:indexPath onMessageTableViewCell:messageTableViewCell];
+//        [super multiMediaMessageDidSelectedOnMessage:message atIndexPath:indexPath onMessageTableViewCell:messageTableViewCell];
     }
 }
 

@@ -426,7 +426,6 @@ static CGPoint  delayOffset = {0.0};
 - (void)viewDidLoad {
     [super viewDidLoad];
     [self initilzer];
-    [[XHMessageBubbleView appearance] setFont:[UIFont systemFontOfSize:16.0f]];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(finishRecordingWhenErrorBehaviors) name:UIApplicationWillResignActiveNotification object:nil];
 }
 - (void)dealloc {
@@ -563,13 +562,43 @@ static CGPoint  delayOffset = {0.0};
 
 #pragma mark - Message Calculate Cell Height
 //统一计算Cell的高度方法
-- (CGFloat)calculateCellHeightWithMessage:(id <XHMessageModel>)message atIndexPath:(NSIndexPath *)indexPath {
+- (CGFloat)calculateCellHeightWithMessage:(AVIMTypedMessage *)message atIndexPath:(NSIndexPath *)indexPath {
     CGFloat cellHeight = 0;
     BOOL displayTimestamp = YES;
     if ([self.delegate respondsToSelector:@selector(shouldDisplayTimestampForRowAtIndexPath:)]) {
         displayTimestamp = [self.delegate shouldDisplayTimestampForRowAtIndexPath:indexPath];
     }
-    cellHeight = [XHMessageTableViewCell calculateCellHeightWithMessage:message displaysTimestamp:displayTimestamp];
+    if (kAVIMMessageMediaTypeText == message.mediaType) {
+        cellHeight = [EZGMessageTextCell HeightOfCellByMessage:message displaysTimestamp:displayTimestamp];
+    }
+    else if (kAVIMMessageMediaTypeAudio == message.mediaType) {
+        cellHeight = [EZGMessageVoiceCell HeightOfCellByMessage:message displaysTimestamp:displayTimestamp];
+    }
+    else if (kAVIMMessageMediaTypeImage == message.mediaType) {
+        cellHeight = [EZGMessageImageCell HeightOfCellByMessage:message displaysTimestamp:displayTimestamp];
+    }
+    else if (kAVIMMessageMediaTypeLocation == message.mediaType) {
+        cellHeight = [EZGMessageLocationCell HeightOfCellByMessage:message displaysTimestamp:displayTimestamp];
+    }
+    else if (kAVIMMessageMediaTypeVideo == message.mediaType) {
+        cellHeight = [EZGMessageVideoCell HeightOfCellByMessage:message displaysTimestamp:displayTimestamp];
+    }
+    else if (EZGMessageTypeScene == message.mediaType) {
+        cellHeight = [EZGMessageSceneCell HeightOfCellByMessage:message displaysTimestamp:displayTimestamp];
+    }
+    else if (EZGMessageTypeCar == message.mediaType) {
+        cellHeight = [EZGMessageCarCell HeightOfCellByMessage:message displaysTimestamp:displayTimestamp];
+    }
+    else if (EZGMessageTypeService == message.mediaType) {
+        cellHeight = [EZGMessageServiceCell HeightOfCellByMessage:message displaysTimestamp:displayTimestamp];
+    }
+    else if (EZGMessageTypeServiceCancel == message.mediaType) {
+        cellHeight = [EZGMessageServiceCancelCell HeightOfCellByMessage:message displaysTimestamp:displayTimestamp];
+    }
+    else if (EZGMessageTypeServiceComment == message.mediaType) {
+        cellHeight = [EZGMessageServiceCommentCell HeightOfCellByMessage:message displaysTimestamp:displayTimestamp];
+    }
+    
     return cellHeight;
 }
 
@@ -907,7 +936,7 @@ static CGPoint  delayOffset = {0.0};
 }
 
 #pragma mark - XHMessageTableViewController DataSource
-- (id <XHMessageModel>)messageForRowAtIndexPath:(NSIndexPath *)indexPath {
+- (AVIMTypedMessage *)messageForRowAtIndexPath:(NSIndexPath *)indexPath {
     return self.messages[indexPath.row];
 }
 
@@ -919,31 +948,51 @@ static CGPoint  delayOffset = {0.0};
     return self.messages.count;
 }
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    id <XHMessageModel> message = [self.dataSource messageForRowAtIndexPath:indexPath];
+    AVIMTypedMessage *message = self.messages[indexPath.row];
     BOOL displayTimestamp = YES;
     if ([self.delegate respondsToSelector:@selector(shouldDisplayTimestampForRowAtIndexPath:)]) {
         displayTimestamp = [self.delegate shouldDisplayTimestampForRowAtIndexPath:indexPath];
     }
     
-    static NSString *cellIdentifier = @"XHMessageTableViewCell";
-    XHMessageTableViewCell *messageTableViewCell = [tableView dequeueReusableCellWithIdentifier:cellIdentifier];
-    if (nil == messageTableViewCell) {
-        messageTableViewCell = [[XHMessageTableViewCell alloc] initWithMessage:message reuseIdentifier:cellIdentifier];
-        messageTableViewCell.delegate = self;
+    EZGMessageBaseCell *cell = nil;
+    if (kAVIMMessageMediaTypeText == message.mediaType) {
+        cell = [EZGMessageTextCell dequeueCellByTableView:tableView];
     }
-    messageTableViewCell.indexPath = indexPath;
-    [messageTableViewCell configureCellWithMessage:message displaysTimestamp:displayTimestamp];
-    if ([self.delegate respondsToSelector:@selector(configureCell:atIndexPath:)]) {
-        [self.delegate configureCell:messageTableViewCell atIndexPath:indexPath];
+    else if (kAVIMMessageMediaTypeAudio == message.mediaType) {
+        cell = [EZGMessageVoiceCell dequeueCellByTableView:tableView];
     }
+    else if (kAVIMMessageMediaTypeImage == message.mediaType) {
+        cell = [EZGMessageImageCell dequeueCellByTableView:tableView];
+    }
+    else if (kAVIMMessageMediaTypeLocation == message.mediaType) {
+        cell = [EZGMessageLocationCell dequeueCellByTableView:tableView];
+    }
+    else if (kAVIMMessageMediaTypeVideo == message.mediaType) {
+        cell = [EZGMessageVideoCell dequeueCellByTableView:tableView];
+    }
+    else if (EZGMessageTypeScene == message.mediaType) {
+        cell = [EZGMessageSceneCell dequeueCellByTableView:tableView];
+    }
+    else if (EZGMessageTypeCar == message.mediaType) {
+        cell = [EZGMessageCarCell dequeueCellByTableView:tableView];
+    }
+    else if (EZGMessageTypeService == message.mediaType) {
+        cell = [EZGMessageServiceCell dequeueCellByTableView:tableView];
+    }
+    else if (EZGMessageTypeServiceCancel == message.mediaType) {
+        cell = [EZGMessageServiceCancelCell dequeueCellByTableView:tableView];
+    }
+    else if (EZGMessageTypeServiceComment == message.mediaType) {
+        cell = [EZGMessageServiceCommentCell dequeueCellByTableView:tableView];
+    }
+    [cell layoutMessage:message displaysTimestamp:displayTimestamp];
     
-    return messageTableViewCell;
+    return cell;
 }
 
 #pragma mark - Table View Delegate
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    id <XHMessageModel> message = [self.dataSource messageForRowAtIndexPath:indexPath];
-    return [self calculateCellHeightWithMessage:message atIndexPath:indexPath];
+    return [self calculateCellHeightWithMessage:self.messages[indexPath.row] atIndexPath:indexPath];
 }
 
 #pragma mark - Key-value Observing
