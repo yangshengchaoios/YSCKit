@@ -11,9 +11,9 @@
 
 @interface EZGMessageServiceCommentCell : EZGMessageBaseCell
 
-@property (weak, nonatomic) IBOutlet UILabel *commentTitleLabel;
-@property (weak, nonatomic) IBOutlet UILabel *separationLineLabel;
-@property (strong, nonatomic) IBOutletCollection(UIImageView) NSArray *rateImageViewArray;
-@property (weak, nonatomic) IBOutlet UILabel *overLabel;
+@property (strong, nonatomic) UILabel *commentTitleLabel;
+@property (strong, nonatomic) UILabel *separationLineLabel;
+@property (strong, nonatomic) NSMutableArray *rateImageViewArray;
+@property (strong, nonatomic) UILabel *overLabel;
 
 @end

@@ -10,7 +10,7 @@
 
 @interface EZGMessageVideoCell : EZGMessageBaseCell
 
-@property (weak, nonatomic) IBOutlet UIImageView *bubbleVideoImageView;
-@property (weak, nonatomic) IBOutlet UIImageView *videoPlayImageView;
+@property (strong, nonatomic) UIImageView *bubbleVideoImageView;
+@property (strong, nonatomic) UIImageView *videoPlayImageView;
 
 @end

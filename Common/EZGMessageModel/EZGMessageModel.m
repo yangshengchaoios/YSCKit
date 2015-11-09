@@ -9,30 +9,45 @@
 #import "EZGMessageModel.h"
 
 @implementation EZGSceneMessage
++ (void)load {
+    [self registerSubclass];
+}
 + (AVIMMessageMediaType)classMediaType {
     return EZGMessageTypeScene;
 }
 @end
 
 @implementation EZGCarMessage
++ (void)load {
+    [self registerSubclass];
+}
 + (AVIMMessageMediaType)classMediaType {
     return EZGMessageTypeCar;
 }
 @end
 
 @implementation EZGServiceMessage
++ (void)load {
+    [self registerSubclass];
+}
 + (AVIMMessageMediaType)classMediaType {
     return EZGMessageTypeService;
 }
 @end
 
 @implementation EZGServiceCancelMessage
++ (void)load {
+    [self registerSubclass];
+}
 + (AVIMMessageMediaType)classMediaType {
     return EZGMessageTypeServiceCancel;
 }
 @end
 
 @implementation EZGServiceCommentMessage
++ (void)load {
+    [self registerSubclass];
+}
 + (AVIMMessageMediaType)classMediaType {
     return EZGMessageTypeServiceComment;
 }

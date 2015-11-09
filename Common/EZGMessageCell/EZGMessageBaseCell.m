@@ -11,36 +11,34 @@
 
 @implementation EZGMessageBaseCell
 
-- (void)awakeFromNib {
-    [super awakeFromNib];
-    self.clipsToBounds = YES;
-    self.backgroundColor = [UIColor clearColor];
-    self.selectionStyle = UITableViewCellSelectionStyleNone;
-    self.accessoryType = UITableViewCellAccessoryNone;
-    self.accessoryView = nil;
-    
-    self.bubbleImageView.clipsToBounds = YES;
-    self.timeStampLabel.font = AUTOLAYOUT_FONT(self.timeStampLabel.font.pointSize);
-    self.timeStampLabel.top = kXHLabelPadding;
-    self.timeStampLabel.height = kXHTimeStampLabelHeight;
-    self.avatarImageView.width = self.avatarImageView.height = kXHAvatarImageSize;
-    self.statusView.width = kXHStatusViewWidth;
-    self.statusView.height = kXHStatusViewHeight;
+- (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier {
+    self = [super initWithStyle:UITableViewCellStyleDefault reuseIdentifier:reuseIdentifier];
+    if (self) {
+        self.clipsToBounds = YES;
+        self.backgroundColor = [UIColor clearColor];
+        self.selectionStyle = UITableViewCellSelectionStyleNone;
+        self.accessoryType = UITableViewCellAccessoryNone;
+        self.accessoryView = nil;
+        
+        self.timeStampLabel = [[UILabel alloc] initWithFrame:CGRectZero];
+        self.avatarImageView = [[UIImageView alloc] initWithFrame:CGRectZero];
+        self.bubbleImageView = [[UIImageView alloc] initWithFrame:CGRectZero];
+        self.statusView = [[XHMessageStatusView alloc] initWithFrame:CGRectZero];
+        [self.contentView addSubview:self.timeStampLabel];
+        [self.contentView addSubview:self.avatarImageView];
+        [self.contentView addSubview:self.bubbleImageView];
+        [self.contentView addSubview:self.statusView];
+    }
+    return self;
 }
 
 #pragma mark - 注册与重用
 + (void)registerCellToTableView: (UITableView *)tableView {
-    [tableView registerNib:[[self class] NibNameOfCell] forCellReuseIdentifier:[[self class] identifier]];
+    [tableView registerClass:self.class forCellReuseIdentifier:NSStringFromClass(self.class)];
 }
 + (instancetype)dequeueCellByTableView :(UITableView *)tableView {
-    EZGMessageBaseCell *cell = [tableView dequeueReusableCellWithIdentifier:[[self class] identifier]];
+    EZGMessageBaseCell *cell = [tableView dequeueReusableCellWithIdentifier:NSStringFromClass(self.class)];
     return cell;
-}
-+ (NSString *)identifier {
-    return NSStringFromClass(self.class);
-}
-+ (UINib *)NibNameOfCell {
-    return [UINib nibWithNibName:NSStringFromClass(self.class) bundle:nil];
 }
 
 #pragma mark - 计算大小
@@ -71,6 +69,22 @@
     CGFloat bubbleHeight = [self BubbleFrameWithMessage:message].height;
     return timestampHeight + MAX(avatarHeight, bubbleHeight) + kXHLabelPadding;
 }
+//计算内容部分的坐标和大小
+//TODO:如何转换成edgeInsets？
+- (CGRect)calculateContentFrame {
+    if (EZGBubbleMessageTypeReceiving == [self bubbleMessageType]) {
+        return CGRectOffset(CGRectInset(self.bubbleImageView.frame,
+                                        AUTOLAYOUT_LENGTH(15) + kXHBubbleMarginHor,
+                                        AUTOLAYOUT_LENGTH(5) + kXHBubbleMarginVer),
+                            AUTOLAYOUT_LENGTH(6), 0);
+    }
+    else {
+        return CGRectOffset(CGRectInset(self.bubbleImageView.frame,
+                                        AUTOLAYOUT_LENGTH(15) + kXHBubbleMarginHor,
+                                        AUTOLAYOUT_LENGTH(5) + kXHBubbleMarginVer),
+                            -AUTOLAYOUT_LENGTH(6), 0);
+    }
+}
 
 #pragma mark - 显示内容
 //显示message
@@ -97,16 +111,32 @@
     }
     
     //3. 设置气泡图片
-    if (message.mediaType >= EZGMessageTypeScene) {//自定义消息类型固定为白色背景
-        //TODO:固定为白色
+    UIEdgeInsets edgeInsets = UIEdgeInsetsMake(30, 28, 85, 28);
+    if (message.mediaType >= EZGMessageTypeScene) {//TODO:自定义消息类型固定为白色背景
+        if (EZGBubbleMessageTypeReceiving == [self bubbleMessageType]) {
+            self.bubbleImageView.image = [[UIImage imageNamed:@"weChatBubble_Receiving_Solid"] resizableImageWithCapInsets:edgeInsets resizingMode:UIImageResizingModeStretch];
+        }
+        else {
+            self.bubbleImageView.image = [[UIImage imageNamed:@"weChatBubble_Sending_Solid"] resizableImageWithCapInsets:edgeInsets resizingMode:UIImageResizingModeStretch];
+        }
     }
     else {
-        
+        if (EZGBubbleMessageTypeReceiving == [self bubbleMessageType]) {
+            self.bubbleImageView.image = [[UIImage imageNamed:@"weChatBubble_Receiving_Solid"] resizableImageWithCapInsets:edgeInsets resizingMode:UIImageResizingModeStretch];
+        }
+        else {
+            self.bubbleImageView.image = [[UIImage imageNamed:@"weChatBubble_Sending_Solid"] resizableImageWithCapInsets:edgeInsets resizingMode:UIImageResizingModeStretch];
+        }
     }
 }
 //动态计算位置和大小
 - (void)layoutSubviews {
     [super layoutSubviews];
+    
+    
+    self.bubbleImageView.clipsToBounds = YES;
+    self.timeStampLabel.font = [UIFont systemFontOfSize:13];
+    self.contentView.backgroundColor = [UIColor randomColor];
     BOOL displayTimestamp = ! self.timeStampLabel.hidden;
     CGFloat layoutOriginY = kXHLabelPadding;
     //调整timeStampLabel位置
@@ -118,29 +148,39 @@
     }
     
     //调整头像位置
+    self.bubbleImageView.clipsToBounds = YES;
+    self.bubbleImageView.backgroundColor = [UIColor redColor];
+    self.timeStampLabel.font = [UIFont systemFontOfSize:13];
+    self.timeStampLabel.top = kXHLabelPadding;
+    self.timeStampLabel.height = kXHTimeStampLabelHeight;
+    self.avatarImageView.width = kXHAvatarImageSize;
+    self.avatarImageView.height = kXHAvatarImageSize;
+    self.statusView.width = kXHStatusViewWidth;
+    self.statusView.height = kXHStatusViewHeight;
+    
     self.avatarImageView.top = layoutOriginY;
     if (EZGBubbleMessageTypeReceiving == [self bubbleMessageType]) {
         self.avatarImageView.left = kXHAvatorPadding;
     }
     else {
-        self.avatarImageView.right = SCREEN_WIDTH - kXHAvatorPadding;
+        self.avatarImageView.left = SCREEN_WIDTH - kXHAvatorPadding - kXHAvatarImageSize;
     }
     
     //重新调整气泡位置和大小
     self.bubbleImageView.top = self.avatarImageView.top;
+    self.bubbleImageView.size = [self.class BubbleFrameWithMessage:self.typedMessage];
     if (EZGBubbleMessageTypeReceiving == [self bubbleMessageType]) {
-        self.bubbleImageView.left = CGRectGetMaxX(self.avatarImageView.frame) + kXHBubbleMessageViewPadding;
+        self.bubbleImageView.left = kXHAvatorPadding + kXHAvatarImageSize + kXHBubbleMessageViewPadding;
     }
     else {
-        self.bubbleImageView.right = self.avatarImageView.left - kXHBubbleMessageViewPadding;
+        self.bubbleImageView.left = self.avatarImageView.left - (kXHBubbleMessageViewPadding + self.bubbleImageView.width);
     }
-    self.bubbleImageView.size = [self.class BubbleFrameWithMessage:self.typedMessage];
     
     //重新调整statusView位置
     if(EZGBubbleMessageTypeSending == [self bubbleMessageType]) {
-        self.statusView.hidden = NO;
+        self.statusView.hidden = YES;
         self.statusView.centerY = self.bubbleImageView.centerY;
-        self.statusView.right = self.bubbleImageView.left - kXHBubbleMessageViewPadding;
+        self.statusView.left = self.bubbleImageView.left - (kXHBubbleMessageViewPadding + kXHStatusViewWidth);
     }
     else {
         self.statusView.hidden = YES;

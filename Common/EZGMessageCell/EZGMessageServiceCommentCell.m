@@ -12,24 +12,45 @@
 
 @implementation EZGMessageServiceCommentCell
 
+- (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier {
+    self = [super initWithStyle:UITableViewCellStyleDefault reuseIdentifier:reuseIdentifier];
+    if (self) {
+        self.commentTitleLabel = [[UILabel alloc] initWithFrame:CGRectZero];
+        self.separationLineLabel = [[UILabel alloc] initWithFrame:CGRectZero];
+        self.rateImageViewArray = [NSMutableArray array];
+        self.overLabel = [[UILabel alloc] initWithFrame:CGRectZero];
+        [self.contentView addSubview:self.commentTitleLabel];
+        [self.contentView addSubview:self.separationLineLabel];
+        [self.contentView addSubview:self.overLabel];
+        for (int i = 0; i < 5; i++) {
+            UIImageView *starImageView = [[UIImageView alloc] initWithFrame:CGRectZero];
+            [self.rateImageViewArray addObject:starImageView];
+            [self.contentView addSubview:starImageView];
+        }
+        
+        self.commentTitleLabel.backgroundColor = [UIColor clearColor];
+        self.commentTitleLabel.textColor = kDefaultTextColorBlack1;
+        self.commentTitleLabel.font = AUTOLAYOUT_FONT(self.commentTitleLabel.font.pointSize);
+        
+        self.separationLineLabel.height = AUTOLAYOUT_LENGTH(1);
+        
+        for (UIImageView *imageView in self.rateImageViewArray) {
+            imageView.width = AUTOLAYOUT_LENGTH(50);
+            imageView.height = AUTOLAYOUT_LENGTH(50);
+        }
+        
+        self.overLabel.backgroundColor = [UIColor clearColor];
+        self.overLabel.textColor = [UIColor whiteColor];
+        self.overLabel.font = AUTOLAYOUT_FONT(self.overLabel.font.pointSize);
+        self.overLabel.width = AUTOLAYOUT_LENGTH(300);
+        self.overLabel.height = AUTOLAYOUT_LENGTH(80);
+    }
+    return self;
+}
+
 - (void)awakeFromNib {
     [super awakeFromNib];
-    self.commentTitleLabel.backgroundColor = [UIColor clearColor];
-    self.commentTitleLabel.textColor = kDefaultTextColorBlack1;
-    self.commentTitleLabel.font = AUTOLAYOUT_FONT(self.commentTitleLabel.font.pointSize);
     
-    self.separationLineLabel.height = AUTOLAYOUT_LENGTH(1);
-    
-    for (UIImageView *imageView in self.rateImageViewArray) {
-        imageView.width = AUTOLAYOUT_LENGTH(50);
-        imageView.height = AUTOLAYOUT_LENGTH(50);
-    }
-    
-    self.overLabel.backgroundColor = [UIColor clearColor];
-    self.overLabel.textColor = [UIColor whiteColor];
-    self.overLabel.font = AUTOLAYOUT_FONT(self.overLabel.font.pointSize);
-    self.overLabel.width = AUTOLAYOUT_LENGTH(300);
-    self.overLabel.height = AUTOLAYOUT_LENGTH(80);
 }
 
 #pragma mark - 计算大小
@@ -66,18 +87,18 @@
     
     //调整标题位置
     [self.commentTitleLabel sizeToFit];
-    self.commentTitleLabel.width = self.bubbleImageView.width - (kXHBubbleMarginLeft + kXHBubbleArrowWidth + kXHBubbleMarginRight);
-    self.commentTitleLabel.top = self.bubbleImageView.top + kXHBubbleMarginTop;
+    self.commentTitleLabel.width = self.bubbleImageView.width - (kXHBubbleMarginHor + kXHBubbleArrowWidth + kXHBubbleMarginHor);
+    self.commentTitleLabel.top = self.bubbleImageView.top + kXHBubbleMarginVer;
     if (EZGBubbleMessageTypeReceiving == [self bubbleMessageType]) {
-        self.commentTitleLabel.left = self.bubbleImageView.left + kXHBubbleArrowWidth + kXHBubbleMarginLeft;
+        self.commentTitleLabel.left = self.bubbleImageView.left + kXHBubbleArrowWidth + kXHBubbleMarginHor;
     }
     else {
-        self.commentTitleLabel.left = self.bubbleImageView.left + kXHBubbleMarginLeft;
+        self.commentTitleLabel.left = self.bubbleImageView.left + kXHBubbleMarginHor;
     }
     
     //调整分割线位置
     self.separationLineLabel.left = self.commentTitleLabel.left;
-    self.separationLineLabel.top = CGRectGetMaxY(self.commentTitleLabel.frame) + kXHBubbleMarginTop;
+    self.separationLineLabel.top = CGRectGetMaxY(self.commentTitleLabel.frame) + kXHBubbleMarginVer;
     self.separationLineLabel.width = self.commentTitleLabel.width;
     
     //调整星星位置

@@ -10,12 +10,20 @@
 
 @implementation EZGMessageLocationCell
 
-- (void)awakeFromNib {
-    [super awakeFromNib];
-    [self.bubbleImageView addSubview:self.bubbleLocationImageView];
-    self.bubbleLocationImageView.clipsToBounds = YES;
-    [self.bubbleLocationImageView addSubview:self.addressLabel];
-    self.addressLabel.font = AUTOLAYOUT_FONT(self.addressLabel.font.pointSize);
+- (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier {
+    self = [super initWithStyle:UITableViewCellStyleDefault reuseIdentifier:reuseIdentifier];
+    if (self) {
+        self.bubbleLocationImageView = [[UIImageView alloc] initWithFrame:CGRectZero];
+        self.addressLabel = [[UILabel alloc] initWithFrame:CGRectZero];
+        [self.contentView addSubview:self.bubbleLocationImageView];
+        [self.contentView addSubview:self.addressLabel];
+        
+        [self.bubbleImageView addSubview:self.bubbleLocationImageView];
+        self.bubbleLocationImageView.clipsToBounds = YES;
+        [self.bubbleLocationImageView addSubview:self.addressLabel];
+        self.addressLabel.font = AUTOLAYOUT_FONT(self.addressLabel.font.pointSize);
+    }
+    return self;
 }
 
 #pragma mark - 计算大小
@@ -44,7 +52,7 @@
         self.bubbleLocationImageView.left = self.bubbleImageView.left - kXHBubbleArrowWidth - 1;
     }
     else {
-        self.bubbleLocationImageView.right = self.bubbleImageView.right - kXHBubbleArrowWidth - 1;
+        self.bubbleLocationImageView.left = self.bubbleLocationImageView.left + 1;
     }
     
     //调整文字大小和位置

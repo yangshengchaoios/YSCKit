@@ -12,6 +12,6 @@
 
 @interface EZGMessageTextCell : EZGMessageBaseCell
 
-@property (weak, nonatomic) IBOutlet SETextView *displayTextView;;  //文本+emoji表情
+@property (strong, nonatomic) SETextView *displayTextView;;  //文本+emoji表情
 
 @end

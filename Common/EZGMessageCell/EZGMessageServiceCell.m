@@ -10,23 +10,35 @@
 
 @implementation EZGMessageServiceCell
 
-- (void)awakeFromNib {
-    [super awakeFromNib];
-    self.serviceTitleLabel.backgroundColor = [UIColor clearColor];
-    self.serviceTitleLabel.textColor = kDefaultTextColorBlack1;
-    self.serviceTitleLabel.font = AUTOLAYOUT_FONT(self.serviceTitleLabel.font.pointSize);
-    
-    self.separationLineLabel.height = AUTOLAYOUT_LENGTH(1);
-    
-    self.serviceDetailLabel.backgroundColor = [UIColor clearColor];
-    self.serviceDetailLabel.textColor = kDefaultTextColorBlack1;
-    self.serviceDetailLabel.font = AUTOLAYOUT_FONT(self.serviceDetailLabel.font.pointSize);
-    
-    self.overLabel.backgroundColor = [UIColor clearColor];
-    self.overLabel.textColor = [UIColor whiteColor];
-    self.overLabel.font = AUTOLAYOUT_FONT(self.overLabel.font.pointSize);
-    self.overLabel.width = AUTOLAYOUT_LENGTH(300);
-    self.overLabel.height = AUTOLAYOUT_LENGTH(80);
+- (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier {
+    self = [super initWithStyle:UITableViewCellStyleDefault reuseIdentifier:reuseIdentifier];
+    if (self) {
+        self.serviceTitleLabel = [[UILabel alloc] initWithFrame:CGRectZero];
+        self.separationLineLabel = [[UILabel alloc] initWithFrame:CGRectZero];
+        self.serviceDetailLabel = [[UILabel alloc] initWithFrame:CGRectZero];
+        self.overLabel = [[UILabel alloc] initWithFrame:CGRectZero];
+        [self.contentView addSubview:self.serviceTitleLabel];
+        [self.contentView addSubview:self.separationLineLabel];
+        [self.contentView addSubview:self.serviceDetailLabel];
+        [self.contentView addSubview:self.overLabel];
+        
+        self.serviceTitleLabel.backgroundColor = [UIColor clearColor];
+        self.serviceTitleLabel.textColor = kDefaultTextColorBlack1;
+        self.serviceTitleLabel.font = AUTOLAYOUT_FONT(self.serviceTitleLabel.font.pointSize);
+        
+        self.separationLineLabel.height = AUTOLAYOUT_LENGTH(1);
+        
+        self.serviceDetailLabel.backgroundColor = [UIColor clearColor];
+        self.serviceDetailLabel.textColor = kDefaultTextColorBlack1;
+        self.serviceDetailLabel.font = AUTOLAYOUT_FONT(self.serviceDetailLabel.font.pointSize);
+        
+        self.overLabel.backgroundColor = [UIColor clearColor];
+        self.overLabel.textColor = [UIColor whiteColor];
+        self.overLabel.font = AUTOLAYOUT_FONT(self.overLabel.font.pointSize);
+        self.overLabel.width = AUTOLAYOUT_LENGTH(300);
+        self.overLabel.height = AUTOLAYOUT_LENGTH(80);
+    }
+    return self;
 }
 
 #pragma mark - 计算大小
@@ -77,19 +89,19 @@
     
     //调整标题位置
     [self.serviceTitleLabel sizeToFit];
-    self.serviceTitleLabel.width = self.bubbleImageView.width - (kXHBubbleMarginLeft + kXHBubbleArrowWidth + kXHBubbleMarginRight);
-    self.serviceTitleLabel.top = self.bubbleImageView.top + kXHBubbleMarginTop;
+    self.serviceTitleLabel.width = self.bubbleImageView.width - (kXHBubbleMarginHor + kXHBubbleArrowWidth + kXHBubbleMarginHor);
+    self.serviceTitleLabel.top = self.bubbleImageView.top + kXHBubbleMarginVer;
     if (EZGBubbleMessageTypeReceiving == [self bubbleMessageType]) {
-        self.serviceTitleLabel.left = self.bubbleImageView.left + kXHBubbleArrowWidth + kXHBubbleMarginLeft;
+        self.serviceTitleLabel.left = self.bubbleImageView.left + kXHBubbleArrowWidth + kXHBubbleMarginHor;
     }
     else {
-        self.serviceTitleLabel.left = self.bubbleImageView.left + kXHBubbleMarginLeft;
+        self.serviceTitleLabel.left = self.bubbleImageView.left + kXHBubbleMarginHor;
     }
     
     //调整分割线位置
     self.separationLineLabel.left = self.serviceTitleLabel.left;
-    self.separationLineLabel.top = CGRectGetMaxY(self.serviceTitleLabel.frame) + kXHBubbleMarginTop;
-    self.separationLineLabel.width = self.bubbleImageView.width - (kXHBubbleMarginLeft + kXHBubbleArrowWidth + kXHBubbleMarginRight);
+    self.separationLineLabel.top = CGRectGetMaxY(self.serviceTitleLabel.frame) + kXHBubbleMarginVer;
+    self.separationLineLabel.width = self.bubbleImageView.width - (kXHBubbleMarginHor + kXHBubbleArrowWidth + kXHBubbleMarginHor);
     
     //调整说明信息位置
     self.serviceDetailLabel.width = self.serviceTitleLabel.width;

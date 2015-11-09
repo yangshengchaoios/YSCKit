@@ -10,7 +10,7 @@
 
 @interface EZGMessageLocationCell : EZGMessageBaseCell
 
-@property (weak, nonatomic) IBOutlet UIImageView *bubbleLocationImageView;
-@property (weak, nonatomic) IBOutlet UILabel *addressLabel;
+@property (strong, nonatomic) UIImageView *bubbleLocationImageView;
+@property (strong, nonatomic) UILabel *addressLabel;
 
 @end

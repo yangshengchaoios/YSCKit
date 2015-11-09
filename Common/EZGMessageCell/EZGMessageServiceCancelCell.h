@@ -10,9 +10,9 @@
 
 @interface EZGMessageServiceCancelCell : EZGMessageBaseCell
 
-@property (weak, nonatomic) IBOutlet UILabel *cancelTitleLabel;
-@property (weak, nonatomic) IBOutlet UILabel *separationLineLabel;
-@property (weak, nonatomic) IBOutlet UIImageView *cancelIconImageView;
-@property (weak, nonatomic) IBOutlet UILabel *cancelDetailLabel;
+@property (strong, nonatomic) UILabel *cancelTitleLabel;
+@property (strong, nonatomic) UILabel *separationLineLabel;
+@property (strong, nonatomic) UIImageView *cancelIconImageView;
+@property (strong, nonatomic) UILabel *cancelDetailLabel;
 
 @end

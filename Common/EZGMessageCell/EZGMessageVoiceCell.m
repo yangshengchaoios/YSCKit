@@ -10,12 +10,34 @@
 
 @implementation EZGMessageVoiceCell
 
-- (void)awakeFromNib {
-    [super awakeFromNib];
-    self.animationVoiceImageView.width = AUTOLAYOUT_LENGTH(40);
-    self.animationVoiceImageView.height = AUTOLAYOUT_LENGTH(40);
-    self.voiceDurationLabel.backgroundColor = [UIColor clearColor];
-    self.voiceDurationLabel.font = AUTOLAYOUT_FONT(self.voiceDurationLabel.font.pointSize);
+- (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier {
+    self = [super initWithStyle:UITableViewCellStyleDefault reuseIdentifier:reuseIdentifier];
+    if (self) {
+        self.animationVoiceImageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 50, 20)];
+        self.voiceDurationLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 200, 20)];
+        [self.contentView addSubview:self.animationVoiceImageView];
+        [self.contentView addSubview:self.voiceDurationLabel];
+        
+        self.animationVoiceImageView.width = AUTOLAYOUT_LENGTH(40);
+        self.animationVoiceImageView.height = AUTOLAYOUT_LENGTH(40);
+        CGRect contentFrame = [self calculateContentFrame];
+        
+        [self.voiceDurationLabel sizeToFit];
+        self.voiceDurationLabel.centerY = CGRectGetMidY(contentFrame);
+        self.animationVoiceImageView.centerY = CGRectGetMidY(contentFrame);
+        
+        if (EZGBubbleMessageTypeReceiving == [self bubbleMessageType]) {
+            self.animationVoiceImageView.left = contentFrame.origin.x;
+            self.voiceDurationLabel.textColor = kDefaultTextColorBlack1;
+            self.voiceDurationLabel.left = CGRectGetMaxX(contentFrame) - self.voiceDurationLabel.width;
+        }
+        else {
+            self.animationVoiceImageView.left = CGRectGetMaxX(contentFrame) - self.animationVoiceImageView.width;
+            self.voiceDurationLabel.textColor = [UIColor blueColor];
+            self.voiceDurationLabel.left = contentFrame.origin.x;
+        }
+    }
+    return self;
 }
 
 #pragma mark - 计算大小
@@ -30,26 +52,12 @@
 //显示message
 - (void)layoutMessage:(AVIMAudioMessage *)message displaysTimestamp:(BOOL)displayTimestamp {
     [super layoutMessage:message displaysTimestamp:displayTimestamp];
-    self.voiceDurationLabel.text = [NSString stringWithFormat:@"%.1f", message.duration];
+    self.voiceDurationLabel.text = [NSString stringWithFormat:@"%.1f\"", message.duration];
     [self resetVoiceAnimations];
 }
 //动态计算位置和大小
 - (void)layoutSubviews {
     [super layoutSubviews];
-    
-    [self.voiceDurationLabel sizeToFit];
-    self.voiceDurationLabel.centerY = self.bubbleImageView.centerY;
-    self.animationVoiceImageView.centerY = self.bubbleImageView.centerY;
-    if (EZGBubbleMessageTypeReceiving == [self bubbleMessageType]) {
-        self.animationVoiceImageView.left = self.bubbleImageView.left + kXHBubbleArrowWidth + kXHBubbleMarginLeft;
-        self.voiceDurationLabel.textColor = kDefaultTextColorBlack1;
-        self.voiceDurationLabel.right = CGRectGetMaxX(self.bubbleImageView.frame) - kXHBubbleMarginRight;
-    }
-    else {
-        self.animationVoiceImageView.right = CGRectGetMaxX(self.bubbleImageView.frame) - (kXHBubbleMarginRight + kXHBubbleArrowWidth);
-        self.voiceDurationLabel.textColor = [UIColor whiteColor];
-        self.voiceDurationLabel.left = self.bubbleImageView.left + kXHBubbleMarginLeft;
-    }
 }
 
 //重置播放的音频动画

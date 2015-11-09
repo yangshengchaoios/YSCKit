@@ -10,10 +10,18 @@
 
 @implementation EZGMessageVideoCell
 
-- (void)awakeFromNib {
-    [super awakeFromNib];
-    [self.bubbleImageView addSubview:self.bubbleVideoImageView];
-    self.videoPlayImageView.size = AUTOLAYOUT_SIZE(self.videoPlayImageView.frame.size);
+- (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier {
+    self = [super initWithStyle:UITableViewCellStyleDefault reuseIdentifier:reuseIdentifier];
+    if (self) {
+        self.bubbleVideoImageView = [[UIImageView alloc] initWithFrame:CGRectZero];
+        self.videoPlayImageView = [[UIImageView alloc] initWithFrame:CGRectZero];
+        [self.contentView addSubview:self.bubbleVideoImageView];
+        [self.contentView addSubview:self.videoPlayImageView];
+        
+        [self.bubbleImageView addSubview:self.bubbleVideoImageView];
+        self.videoPlayImageView.size = AUTOLAYOUT_SIZE(self.videoPlayImageView.frame.size);
+    }
+    return self;
 }
 
 //计算气泡高度

@@ -10,9 +10,13 @@
 
 @implementation EZGMessageImageCell
 
-- (void)awakeFromNib {
-    [super awakeFromNib];
-    [self.bubbleImageView addSubview:self.bubblePhotoImageView];
+- (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier {
+    self = [super initWithStyle:UITableViewCellStyleDefault reuseIdentifier:reuseIdentifier];
+    if (self) {
+        self.bubblePhotoImageView = [[UIImageView alloc] initWithFrame:CGRectZero];
+        [self.contentView addSubview:self.bubbleImageView];
+    }
+    return self;
 }
 
 #pragma mark - 计算大小
@@ -66,7 +70,7 @@
         self.bubblePhotoImageView.left = self.bubbleImageView.left - kXHBubbleArrowWidth - 1;
     }
     else {
-        self.bubblePhotoImageView.right = self.bubbleImageView.right - kXHBubbleArrowWidth - 1;
+        self.bubblePhotoImageView.left = self.bubbleImageView.left + 1;
     }
 }
 

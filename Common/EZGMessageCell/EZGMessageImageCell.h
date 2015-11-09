@@ -10,6 +10,6 @@
 
 @interface EZGMessageImageCell : EZGMessageBaseCell
 
-@property (weak, nonatomic) IBOutlet UIImageView *bubblePhotoImageView;
+@property (strong, nonatomic) UIImageView *bubblePhotoImageView;
 
 @end

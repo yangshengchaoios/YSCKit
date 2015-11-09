@@ -10,8 +10,8 @@
 
 @interface EZGMessageSceneCell : EZGMessageBaseCell
 
-@property (weak, nonatomic) IBOutlet UILabel *sceneTextLabel;
-@property (weak, nonatomic) IBOutlet UILabel *separationLineLabel;
-@property (weak, nonatomic) IBOutlet UIImageView *bubbleSceneImageView;
+@property (strong, nonatomic) UILabel *sceneTextLabel;
+@property (strong, nonatomic) UILabel *separationLineLabel;
+@property (strong, nonatomic) UIImageView *bubbleSceneImageView;
 
 @end

@@ -10,9 +10,9 @@
 
 @interface EZGMessageCarCell : EZGMessageBaseCell
 
-@property (weak, nonatomic) IBOutlet UILabel *carTitleLabel;
-@property (weak, nonatomic) IBOutlet UILabel *separationLineLabel;
-@property (weak, nonatomic) IBOutlet UILabel *carBrandLabel;
-@property (weak, nonatomic) IBOutlet UILabel *carNumberLabel;
+@property (strong, nonatomic) UILabel *carTitleLabel;
+@property (strong, nonatomic) UILabel *separationLineLabel;
+@property (strong, nonatomic) UILabel *carBrandLabel;
+@property (strong, nonatomic) UILabel *carNumberLabel;
 
 @end

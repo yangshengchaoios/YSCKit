@@ -14,19 +14,17 @@
 #define kXHTimeStampLabelHeight     AUTOLAYOUT_LENGTH(40)   //timeStampLabel高度
 #define kXHAvatorPadding            AUTOLAYOUT_LENGTH(20)   //头像与父view左边间隔
 #define kXHAvatarImageSize          AUTOLAYOUT_LENGTH(80)   //头像的长宽
-#define kXHBubbleMessageViewPadding AUTOLAYOUT_LENGTH(10)   //气泡两边间隔
+#define kXHBubbleMessageViewPadding 0//AUTOLAYOUT_LENGTH(10)   //气泡两边间隔
 #define kXHStatusViewWidth          AUTOLAYOUT_LENGTH(80)   //消息发送状态宽度
 #define kXHStatusViewHeight         AUTOLAYOUT_LENGTH(40)   //消息发送状态高度
 
 //气泡内部间隔参数
-#define kXHBubbleMarginTop          AUTOLAYOUT_LENGTH(16)   //内容距离气泡的上边距
-#define kXHBubbleMarginLeft         AUTOLAYOUT_LENGTH(16)   //内容距离气泡的左边距
-#define kXHBubbleMarginBottom       AUTOLAYOUT_LENGTH(16)   //内容距离气泡的下边距
-#define kXHBubbleMarginRight        AUTOLAYOUT_LENGTH(16)   //内容距离气泡的右边距
-#define kXHBubbleArrowWidth         AUTOLAYOUT_LENGTH(14)   //气泡箭头宽度
+#define kXHBubbleMarginVer          AUTOLAYOUT_LENGTH(20)   //内容距离气泡的上下边距
+#define kXHBubbleMarginHor          AUTOLAYOUT_LENGTH(20)   //内容距离气泡的左右边距
+#define kXHBubbleMarginVerOffset    AUTOLAYOUT_LENGTH(5)    //气泡可见边缘的上下边距
+#define kXHBubbleArrowWidth         AUTOLAYOUT_LENGTH(25)   //气泡箭头宽度
+#define kXHBubbleTailWidth          AUTOLAYOUT_LENGTH(13)   //气泡箭头相反方向的边距
 
-// image STRETCH
-#define XH_STRETCH_IMAGE(image, edgeInsets) (CURRENT_SYS_VERSION < 6.0 ? [image stretchableImageWithLeftCapWidth:edgeInsets.left topCapHeight:edgeInsets.top] : [image resizableImageWithCapInsets:edgeInsets resizingMode:UIImageResizingModeStretch])
 
 typedef NS_ENUM(NSInteger, EZGBubbleMessageType) {
     EZGBubbleMessageTypeSending = 0,
@@ -36,11 +34,11 @@ typedef NS_ENUM(NSInteger, EZGBubbleMessageType) {
 
 @interface EZGMessageBaseCell : UITableViewCell
 
-@property (weak, nonatomic) IBOutlet UILabel *timeStampLabel;       //时间戳
-@property (weak, nonatomic) IBOutlet UIImageView *avatarImageView;  //用户头像
-@property (weak, nonatomic) IBOutlet UIImageView *bubbleImageView;  //气泡图片
-@property (weak, nonatomic) IBOutlet XHMessageStatusView *statusView;//发送消息的状态
-@property (weak, nonatomic) AVIMTypedMessage *typedMessage;
+@property (strong, nonatomic) UILabel *timeStampLabel;       //时间戳
+@property (strong, nonatomic) UIImageView *avatarImageView;  //用户头像
+@property (strong, nonatomic) UIImageView *bubbleImageView;  //气泡图片
+@property (strong, nonatomic) XHMessageStatusView *statusView;//发送消息的状态
+@property (strong, nonatomic) AVIMTypedMessage *typedMessage;
 
 #pragma mark - 注册与重用
 + (void)registerCellToTableView: (UITableView *)tableView;
@@ -53,6 +51,8 @@ typedef NS_ENUM(NSInteger, EZGBubbleMessageType) {
 + (CGSize)BubbleFrameWithMessage:(AVIMTypedMessage *)message;
 //计算cell高度
 + (CGFloat)HeightOfCellByMessage:(AVIMTypedMessage *)message displaysTimestamp:(BOOL)displayTimestamp;
+//计算内容部分的坐标和大小
+- (CGRect)calculateContentFrame;
 
 #pragma mark - 显示内容
 //显示message
