@@ -73,7 +73,7 @@
     self.displayTextView.width = MIN(dyWidth, textSize.width);
     self.displayTextView.height = textSize.height;
     self.displayTextView.top = self.bubbleImageView.top + kXHBubbleMarginTop;
-    if (XHBubbleMessageTypeReceiving == [self bubbleMessageType]) {
+    if (EZGBubbleMessageTypeReceiving == [self bubbleMessageType]) {
         self.displayTextView.left = self.bubbleImageView.left + kXHBubbleArrowWidth + kXHBubbleMarginLeft;
         self.displayTextView.textColor = kDefaultTextColorBlack1;
     }

@@ -60,7 +60,7 @@
     self.bubbleVideoImageView.height = self.bubbleImageView.height - 2.0;
     self.bubbleVideoImageView.width = self.bubbleImageView.width - kXHBubbleArrowWidth - 2;
     
-    if (XHBubbleMessageTypeReceiving == [self bubbleMessageType]) {
+    if (EZGBubbleMessageTypeReceiving == [self bubbleMessageType]) {
         self.bubbleVideoImageView.left = self.bubbleImageView.left - kXHBubbleArrowWidth - 1;
     }
     else {

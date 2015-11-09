@@ -68,7 +68,7 @@
     [self.commentTitleLabel sizeToFit];
     self.commentTitleLabel.width = self.bubbleImageView.width - (kXHBubbleMarginLeft + kXHBubbleArrowWidth + kXHBubbleMarginRight);
     self.commentTitleLabel.top = self.bubbleImageView.top + kXHBubbleMarginTop;
-    if (XHBubbleMessageTypeReceiving == [self bubbleMessageType]) {
+    if (EZGBubbleMessageTypeReceiving == [self bubbleMessageType]) {
         self.commentTitleLabel.left = self.bubbleImageView.left + kXHBubbleArrowWidth + kXHBubbleMarginLeft;
     }
     else {

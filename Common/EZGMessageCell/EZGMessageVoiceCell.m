@@ -40,7 +40,7 @@
     [self.voiceDurationLabel sizeToFit];
     self.voiceDurationLabel.centerY = self.bubbleImageView.centerY;
     self.animationVoiceImageView.centerY = self.bubbleImageView.centerY;
-    if (XHBubbleMessageTypeReceiving == [self bubbleMessageType]) {
+    if (EZGBubbleMessageTypeReceiving == [self bubbleMessageType]) {
         self.animationVoiceImageView.left = self.bubbleImageView.left + kXHBubbleArrowWidth + kXHBubbleMarginLeft;
         self.voiceDurationLabel.textColor = kDefaultTextColorBlack1;
         self.voiceDurationLabel.right = CGRectGetMaxX(self.bubbleImageView.frame) - kXHBubbleMarginRight;
@@ -56,7 +56,7 @@
 - (void)resetVoiceAnimations {
     [self.animationVoiceImageView.layer removeAllAnimations];
     NSString *imageSepatorName;
-    if (XHBubbleMessageTypeReceiving == [self bubbleMessageType]) {
+    if (EZGBubbleMessageTypeReceiving == [self bubbleMessageType]) {
         imageSepatorName = @"Receiver";
     }
     else {

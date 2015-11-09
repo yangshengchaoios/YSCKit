@@ -48,7 +48,7 @@
     [self.sceneTextLabel sizeToFit];
     self.sceneTextLabel.width = self.bubbleImageView.width - (kXHBubbleMarginLeft + kXHBubbleArrowWidth + kXHBubbleMarginRight);
     self.sceneTextLabel.top = self.bubbleImageView.top + kXHBubbleMarginTop;
-    if (XHBubbleMessageTypeReceiving == [self bubbleMessageType]) {
+    if (EZGBubbleMessageTypeReceiving == [self bubbleMessageType]) {
         self.sceneTextLabel.left = self.bubbleImageView.left + kXHBubbleArrowWidth + kXHBubbleMarginLeft;
     }
     else {

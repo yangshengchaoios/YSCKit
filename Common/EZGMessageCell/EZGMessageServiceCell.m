@@ -79,7 +79,7 @@
     [self.serviceTitleLabel sizeToFit];
     self.serviceTitleLabel.width = self.bubbleImageView.width - (kXHBubbleMarginLeft + kXHBubbleArrowWidth + kXHBubbleMarginRight);
     self.serviceTitleLabel.top = self.bubbleImageView.top + kXHBubbleMarginTop;
-    if (XHBubbleMessageTypeReceiving == [self bubbleMessageType]) {
+    if (EZGBubbleMessageTypeReceiving == [self bubbleMessageType]) {
         self.serviceTitleLabel.left = self.bubbleImageView.left + kXHBubbleArrowWidth + kXHBubbleMarginLeft;
     }
     else {

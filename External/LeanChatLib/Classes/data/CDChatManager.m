@@ -111,6 +111,7 @@ static CDChatManager *instance;
     [q whereKey:AVIMAttr(CONV_TYPE) equalTo:@(type)];//普通单聊会话
     
     if (attributes[kParamEzgoalType]) {//特殊业务会话
+        [q whereKey:AVIMAttr(kParamS4Id) equalTo:attributes[kParamS4Id]];
         [q whereKey:AVIMAttr(kParamEzgoalType) equalTo:attributes[kParamEzgoalType]];
         [q whereKey:AVIMAttr(kParamEzgoalStatus) equalTo:attributes[kParamEzgoalStatus]];
     }

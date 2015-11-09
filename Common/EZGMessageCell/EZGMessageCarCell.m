@@ -50,7 +50,7 @@
     [self.carTitleLabel sizeToFit];
     self.carTitleLabel.width = self.bubbleImageView.width - (kXHBubbleMarginLeft + kXHBubbleArrowWidth + kXHBubbleMarginRight);
     self.carTitleLabel.top = self.bubbleImageView.top + kXHBubbleMarginTop;
-    if (XHBubbleMessageTypeReceiving == [self bubbleMessageType]) {
+    if (EZGBubbleMessageTypeReceiving == [self bubbleMessageType]) {
         self.carTitleLabel.left = self.bubbleImageView.left + kXHBubbleArrowWidth + kXHBubbleMarginLeft;
     }
     else {

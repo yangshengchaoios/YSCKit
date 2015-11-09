@@ -88,7 +88,7 @@
         [self.avatarImageView setImageWithURLString:message.attributes[MParamAvatarUrl]];
     }
     else {
-        if (XHBubbleMessageTypeSending == [self bubbleMessageType]) {//自己的头像
+        if (EZGBubbleMessageTypeSending == [self bubbleMessageType]) {//自己的头像
             [self.avatarImageView setImageWithURLString:USER.userAvatar];
         }
         else {//对方的头像
@@ -119,7 +119,7 @@
     
     //调整头像位置
     self.avatarImageView.top = layoutOriginY;
-    if (XHBubbleMessageTypeReceiving == [self bubbleMessageType]) {
+    if (EZGBubbleMessageTypeReceiving == [self bubbleMessageType]) {
         self.avatarImageView.left = kXHAvatorPadding;
     }
     else {
@@ -128,7 +128,7 @@
     
     //重新调整气泡位置和大小
     self.bubbleImageView.top = self.avatarImageView.top;
-    if (XHBubbleMessageTypeReceiving == [self bubbleMessageType]) {
+    if (EZGBubbleMessageTypeReceiving == [self bubbleMessageType]) {
         self.bubbleImageView.left = CGRectGetMaxX(self.avatarImageView.frame) + kXHBubbleMessageViewPadding;
     }
     else {
@@ -137,7 +137,7 @@
     self.bubbleImageView.size = [self.class BubbleFrameWithMessage:self.typedMessage];
     
     //重新调整statusView位置
-    if(XHBubbleMessageTypeSending == [self bubbleMessageType]) {
+    if(EZGBubbleMessageTypeSending == [self bubbleMessageType]) {
         self.statusView.hidden = NO;
         self.statusView.centerY = self.bubbleImageView.centerY;
         self.statusView.right = self.bubbleImageView.left - kXHBubbleMessageViewPadding;
@@ -147,12 +147,12 @@
     }
 }
 //判断消息的方向
-- (XHBubbleMessageType)bubbleMessageType {
+- (EZGBubbleMessageType)bubbleMessageType {
     if ([[CDChatManager manager].selfId isEqualToString:self.typedMessage.clientId]) {
-        return XHBubbleMessageTypeSending;
+        return EZGBubbleMessageTypeSending;
     }
     else {
-        return XHBubbleMessageTypeReceiving;
+        return EZGBubbleMessageTypeReceiving;
     }
 }
 //格式化消息时间

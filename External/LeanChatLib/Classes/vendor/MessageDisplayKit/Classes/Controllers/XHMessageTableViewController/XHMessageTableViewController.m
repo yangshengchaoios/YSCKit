@@ -283,6 +283,18 @@ static CGPoint  delayOffset = {0.0};
     [self.view sendSubviewToBack:messageTableView];
 	_messageTableView = messageTableView;
     
+    //注册自定义消息cell
+    [EZGMessageTextCell registerCellToTableView:messageTableView];
+    [EZGMessageVoiceCell registerCellToTableView:messageTableView];
+    [EZGMessageImageCell registerCellToTableView:messageTableView];
+    [EZGMessageLocationCell registerCellToTableView:messageTableView];
+    [EZGMessageVideoCell registerCellToTableView:messageTableView];
+    [EZGMessageSceneCell registerCellToTableView:messageTableView];
+    [EZGMessageCarCell registerCellToTableView:messageTableView];
+    [EZGMessageServiceCell registerCellToTableView:messageTableView];
+    [EZGMessageServiceCancelCell registerCellToTableView:messageTableView];
+    [EZGMessageServiceCommentCell registerCellToTableView:messageTableView];
+    
     // 设置Message TableView 的bottom edg
     CGFloat inputViewHeight = (self.inputViewStyle == XHMessageInputViewStyleFlat) ? 45.0f : 40.0f;
     [self setTableViewInsetsWithBottomValue:inputViewHeight];

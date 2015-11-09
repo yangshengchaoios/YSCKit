@@ -28,6 +28,11 @@
 // image STRETCH
 #define XH_STRETCH_IMAGE(image, edgeInsets) (CURRENT_SYS_VERSION < 6.0 ? [image stretchableImageWithLeftCapWidth:edgeInsets.left topCapHeight:edgeInsets.top] : [image resizableImageWithCapInsets:edgeInsets resizingMode:UIImageResizingModeStretch])
 
+typedef NS_ENUM(NSInteger, EZGBubbleMessageType) {
+    EZGBubbleMessageTypeSending = 0,
+    EZGBubbleMessageTypeReceiving
+};
+
 
 @interface EZGMessageBaseCell : UITableViewCell
 
@@ -53,7 +58,7 @@
 //显示message
 - (void)layoutMessage:(AVIMTypedMessage *)message displaysTimestamp:(BOOL)displayTimestamp;
 //判断消息的方向
-- (XHBubbleMessageType)bubbleMessageType;
+- (EZGBubbleMessageType)bubbleMessageType;
 //格式化消息时间
 - (NSString *)formatMessageTimeByTimeStamp:(int64_t)timeStamp;
 - (NSString *)formatMessageTimeByDate:(NSDate *)messageDate;
