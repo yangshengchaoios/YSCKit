@@ -11,7 +11,6 @@
 // Views
 #import "XHMessageTextView.h"
 #import "XHMessageInputView.h"
-#import "XHMessageDisplayTextView.h"
 #import "XHBubblePhotoImageView.h"
 #import "SETextView.h"
 

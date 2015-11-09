@@ -9,13 +9,13 @@
 #import "XHMessageTableViewCell.h"
 #import "XHMessageStatusView.h"
 
-static const CGFloat kXHLabelPadding = 5.0f;
-static const CGFloat kXHTimeStampLabelHeight = 20.0f;
+//static const CGFloat kXHLabelPadding = 5.0f;
+//static const CGFloat kXHTimeStampLabelHeight = 20.0f;
 
 static const CGFloat kXHAvatorPaddingX = 8.0;
 static const CGFloat kXHAvatorPaddingY = 15;
 
-static const CGFloat kXHBubbleMessageViewPadding = 8;
+//static const CGFloat kXHBubbleMessageViewPadding = 8;
 
 
 @interface XHMessageTableViewCell ()
