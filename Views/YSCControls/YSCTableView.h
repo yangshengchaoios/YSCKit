@@ -96,6 +96,8 @@ typedef CGFloat (^YSCFloatSetBlock)(NSIndexPath *indexPath);
 - (void)beginRefreshingByAnimation:(BOOL)animation;
 //当数据为空时执行下拉刷新
 - (void)refreshWhenCellDataEmpty;
+//清空数据列表
+- (void)clearData;
 
 //开启缓存模式
 - (void)enableCacheWithFileName:(NSString *)fileName;

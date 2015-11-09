@@ -221,6 +221,13 @@
         [self beginRefreshing];
     }
 }
+//清空数据列表
+- (void)clearData {
+    [self.headerDataArray removeAllObjects];
+    [self.cellDataArray removeAllObjects];
+    self.tipsView.hidden = NO;
+    [self reloadData];
+}
 
 //开启缓存模式
 - (void)enableCacheWithFileName:(NSString *)fileName {
