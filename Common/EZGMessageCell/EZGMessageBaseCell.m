@@ -16,18 +16,30 @@
     if (self) {
         self.clipsToBounds = YES;
         self.backgroundColor = [UIColor clearColor];
+        self.contentView.backgroundColor = [UIColor clearColor];
         self.selectionStyle = UITableViewCellSelectionStyleNone;
         self.accessoryType = UITableViewCellAccessoryNone;
         self.accessoryView = nil;
         
-        self.timeStampLabel = [[UILabel alloc] initWithFrame:CGRectZero];
-        self.avatarImageView = [[UIImageView alloc] initWithFrame:CGRectZero];
+        self.timeStampLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, kXHLabelPadding, 0, kXHTimeStampLabelHeight)];
+        self.avatarImageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, kXHAvatarImageSize, kXHAvatarImageSize)];
         self.bubbleImageView = [[UIImageView alloc] initWithFrame:CGRectZero];
-        self.statusView = [[XHMessageStatusView alloc] initWithFrame:CGRectZero];
+        self.statusView = [[XHMessageStatusView alloc] initWithFrame:CGRectMake(0, 0, kXHStatusViewWidth, kXHStatusViewHeight)];
         [self.contentView addSubview:self.timeStampLabel];
         [self.contentView addSubview:self.avatarImageView];
         [self.contentView addSubview:self.bubbleImageView];
         [self.contentView addSubview:self.statusView];
+        
+        self.bubbleImageView.clipsToBounds = YES;
+        self.bubbleImageView.userInteractionEnabled = YES;
+        self.bubbleImageView.backgroundColor = [UIColor clearColor];
+        self.avatarImageView.userInteractionEnabled = YES;
+        self.timeStampLabel.font = [UIFont systemFontOfSize:13];
+        self.timeStampLabel.textColor = [UIColor whiteColor];
+        self.timeStampLabel.textAlignment = NSTextAlignmentCenter;
+        [self.timeStampLabel makeRoundWithRadius:kXHTimeStampLabelHeight / 2];
+        self.timeStampLabel.backgroundColor = RGB(178, 178, 178);
+        self.statusView.backgroundColor = [UIColor clearColor];
     }
     return self;
 }
@@ -90,6 +102,7 @@
 //显示message
 - (void)layoutMessage:(AVIMTypedMessage *)message displaysTimestamp:(BOOL)displayTimestamp {
     self.typedMessage = message;
+    self.statusView.status = message.status;//设置消息状态
     
     //1. 设置时间
     self.timeStampLabel.hidden = ! displayTimestamp;
@@ -103,29 +116,25 @@
     }
     else {
         if (EZGBubbleMessageTypeSending == [self bubbleMessageType]) {//自己的头像
-            [self.avatarImageView setImageWithURLString:USER.userAvatar];
+            [self.avatarImageView setImageWithURLString:USER.userAvatar withFadeIn:NO];
         }
         else {//对方的头像
-            [self.avatarImageView setImageWithURLString:APPDATA.chatUser.avatarUrl];
+            [self.avatarImageView setImageWithURLString:APPDATA.chatUser.avatarUrl withFadeIn:NO];
         }
     }
     
     //3. 设置气泡图片
     UIEdgeInsets edgeInsets = UIEdgeInsetsMake(30, 28, 85, 28);
-    if (message.mediaType >= EZGMessageTypeScene) {//TODO:自定义消息类型固定为白色背景
-        if (EZGBubbleMessageTypeReceiving == [self bubbleMessageType]) {
-            self.bubbleImageView.image = [[UIImage imageNamed:@"weChatBubble_Receiving_Solid"] resizableImageWithCapInsets:edgeInsets resizingMode:UIImageResizingModeStretch];
-        }
-        else {
-            self.bubbleImageView.image = [[UIImage imageNamed:@"weChatBubble_Sending_Solid"] resizableImageWithCapInsets:edgeInsets resizingMode:UIImageResizingModeStretch];
-        }
+    if (EZGBubbleMessageTypeReceiving == [self bubbleMessageType]) {
+        self.bubbleImageView.image = [[UIImage imageNamed:@"EZGoal_Receiving_White"] resizableImageWithCapInsets:edgeInsets resizingMode:UIImageResizingModeStretch];
     }
     else {
-        if (EZGBubbleMessageTypeReceiving == [self bubbleMessageType]) {
-            self.bubbleImageView.image = [[UIImage imageNamed:@"weChatBubble_Receiving_Solid"] resizableImageWithCapInsets:edgeInsets resizingMode:UIImageResizingModeStretch];
+        //只有发送语音和文本消息用蓝色气泡
+        if (kAVIMMessageMediaTypeText == message.mediaType || kAVIMMessageMediaTypeAudio == message.mediaType) {
+            self.bubbleImageView.image = [[UIImage imageNamed:@"EZGoal_Sending_Blue"] resizableImageWithCapInsets:edgeInsets resizingMode:UIImageResizingModeStretch];
         }
         else {
-            self.bubbleImageView.image = [[UIImage imageNamed:@"weChatBubble_Sending_Solid"] resizableImageWithCapInsets:edgeInsets resizingMode:UIImageResizingModeStretch];
+            self.bubbleImageView.image = [[UIImage imageNamed:@"EZGoal_Sending_White"] resizableImageWithCapInsets:edgeInsets resizingMode:UIImageResizingModeStretch];
         }
     }
 }
@@ -133,31 +142,18 @@
 - (void)layoutSubviews {
     [super layoutSubviews];
     
-    
-    self.bubbleImageView.clipsToBounds = YES;
-    self.timeStampLabel.font = [UIFont systemFontOfSize:13];
-    self.contentView.backgroundColor = [UIColor randomColor];
     BOOL displayTimestamp = ! self.timeStampLabel.hidden;
     CGFloat layoutOriginY = kXHLabelPadding;
     //调整timeStampLabel位置
     if (displayTimestamp) {
         [self.timeStampLabel sizeToFit];
         self.timeStampLabel.centerX = SCREEN_WIDTH / 2;
-        self.timeStampLabel.width += 4;
+        self.timeStampLabel.width += AUTOLAYOUT_LENGTH(40);
+        self.timeStampLabel.height = kXHTimeStampLabelHeight;
         layoutOriginY += kXHTimeStampLabelHeight + kXHLabelPadding;
     }
     
     //调整头像位置
-    self.bubbleImageView.clipsToBounds = YES;
-    self.bubbleImageView.backgroundColor = [UIColor redColor];
-    self.timeStampLabel.font = [UIFont systemFontOfSize:13];
-    self.timeStampLabel.top = kXHLabelPadding;
-    self.timeStampLabel.height = kXHTimeStampLabelHeight;
-    self.avatarImageView.width = kXHAvatarImageSize;
-    self.avatarImageView.height = kXHAvatarImageSize;
-    self.statusView.width = kXHStatusViewWidth;
-    self.statusView.height = kXHStatusViewHeight;
-    
     self.avatarImageView.top = layoutOriginY;
     if (EZGBubbleMessageTypeReceiving == [self bubbleMessageType]) {
         self.avatarImageView.left = kXHAvatorPadding;
@@ -178,7 +174,7 @@
     
     //重新调整statusView位置
     if(EZGBubbleMessageTypeSending == [self bubbleMessageType]) {
-        self.statusView.hidden = YES;
+        self.statusView.hidden = NO;
         self.statusView.centerY = self.bubbleImageView.centerY;
         self.statusView.left = self.bubbleImageView.left - (kXHBubbleMessageViewPadding + kXHStatusViewWidth);
     }
@@ -201,7 +197,7 @@
     return [self formatMessageTimeByDate:sendDate];
 }
 - (NSString *)formatMessageTimeByDate:(NSDate *)messageDate {
-    NSString *dateText = [messageDate stringWithFormat:@"yyyy-M-d"];
+    NSString *dateText = [messageDate stringWithFormat:@"yyyy年M月d日"];
     NSString *timeText = [messageDate stringWithFormat:@"HH:mm"];
     if ([messageDate isThisYear]) {
         if ([messageDate isToday]) {
@@ -211,7 +207,7 @@
             dateText = NSLocalizedStringFromTable(@"Yesterday", @"MessageDisplayKitString", @"昨天");
         }
         else {
-            dateText = [messageDate stringWithFormat:@"M-d"];
+            dateText = [messageDate stringWithFormat:@"M月d日"];
         }
     }
     return [NSString stringWithFormat:@"%@ %@",dateText,timeText];

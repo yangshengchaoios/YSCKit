@@ -14,7 +14,9 @@
     self = [super initWithStyle:UITableViewCellStyleDefault reuseIdentifier:reuseIdentifier];
     if (self) {
         self.bubblePhotoImageView = [[UIImageView alloc] initWithFrame:CGRectZero];
-        [self.contentView addSubview:self.bubbleImageView];
+        [self.contentView addSubview:self.bubblePhotoImageView];
+        
+        [self.bubblePhotoImageView makeRoundWithRadius:4];
     }
     return self;
 }
@@ -62,16 +64,9 @@
 - (void)layoutSubviews {
     [super layoutSubviews];
     
-    self.bubblePhotoImageView.centerY = self.bubbleImageView.centerY;
-    self.bubblePhotoImageView.height = self.bubbleImageView.height - 2.0;
-    self.bubblePhotoImageView.width = self.bubbleImageView.width - kXHBubbleArrowWidth - 2;
-    
-    if (EZGBubbleMessageTypeReceiving == [self bubbleMessageType]) {
-        self.bubblePhotoImageView.left = self.bubbleImageView.left - kXHBubbleArrowWidth - 1;
-    }
-    else {
-        self.bubblePhotoImageView.left = self.bubbleImageView.left + 1;
-    }
+    CGRect contentFrame = [self calculateContentFrame];
+    self.bubblePhotoImageView.frame = CGRectInset(contentFrame, -kXHBubbleMarginHor, -kXHBubbleMarginVer);
+    self.bubblePhotoImageView.width -= 3;//FIXME:
 }
 
 @end

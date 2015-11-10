@@ -20,22 +20,7 @@
         
         self.animationVoiceImageView.width = AUTOLAYOUT_LENGTH(40);
         self.animationVoiceImageView.height = AUTOLAYOUT_LENGTH(40);
-        CGRect contentFrame = [self calculateContentFrame];
-        
-        [self.voiceDurationLabel sizeToFit];
-        self.voiceDurationLabel.centerY = CGRectGetMidY(contentFrame);
-        self.animationVoiceImageView.centerY = CGRectGetMidY(contentFrame);
-        
-        if (EZGBubbleMessageTypeReceiving == [self bubbleMessageType]) {
-            self.animationVoiceImageView.left = contentFrame.origin.x;
-            self.voiceDurationLabel.textColor = kDefaultTextColorBlack1;
-            self.voiceDurationLabel.left = CGRectGetMaxX(contentFrame) - self.voiceDurationLabel.width;
-        }
-        else {
-            self.animationVoiceImageView.left = CGRectGetMaxX(contentFrame) - self.animationVoiceImageView.width;
-            self.voiceDurationLabel.textColor = [UIColor blueColor];
-            self.voiceDurationLabel.left = contentFrame.origin.x;
-        }
+        self.voiceDurationLabel.backgroundColor = [UIColor clearColor];
     }
     return self;
 }
@@ -58,6 +43,22 @@
 //动态计算位置和大小
 - (void)layoutSubviews {
     [super layoutSubviews];
+    
+    CGRect contentFrame = [self calculateContentFrame];
+    [self.voiceDurationLabel sizeToFit];
+    self.voiceDurationLabel.centerY = CGRectGetMidY(contentFrame);
+    self.animationVoiceImageView.centerY = CGRectGetMidY(contentFrame);
+    
+    if (EZGBubbleMessageTypeReceiving == [self bubbleMessageType]) {
+        self.animationVoiceImageView.left = contentFrame.origin.x;
+        self.voiceDurationLabel.textColor = [UIColor blackColor];
+        self.voiceDurationLabel.left = CGRectGetMaxX(contentFrame) - self.voiceDurationLabel.width;
+    }
+    else {
+        self.animationVoiceImageView.left = CGRectGetMaxX(contentFrame) - self.animationVoiceImageView.width;
+        self.voiceDurationLabel.textColor = [UIColor whiteColor];
+        self.voiceDurationLabel.left = contentFrame.origin.x;
+    }
 }
 
 //重置播放的音频动画

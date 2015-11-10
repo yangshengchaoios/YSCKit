@@ -19,6 +19,13 @@
     if (self) {
         self.displayTextView = [[SETextView alloc] initWithFrame:CGRectZero];
         [self.contentView addSubview:self.displayTextView];
+        
+        self.displayTextView.backgroundColor = [UIColor clearColor];
+        self.displayTextView.selectable = NO;
+        self.displayTextView.lineSpacing = kXHTextLineSpacing;
+        self.displayTextView.font = kXHFontOfText;
+        self.displayTextView.showsEditingMenuAutomatically = NO;
+        self.displayTextView.highlighted = NO;
     }
     return self;
 }
@@ -62,17 +69,10 @@
 //动态计算位置和大小
 - (void)layoutSubviews {
     [super layoutSubviews];
-    
-    self.displayTextView.backgroundColor = [UIColor randomColor];
-    self.displayTextView.selectable = NO;
-    self.displayTextView.lineSpacing = kXHTextLineSpacing;
-    self.displayTextView.font = kXHFontOfText;
-    self.displayTextView.showsEditingMenuAutomatically = NO;
-    self.displayTextView.highlighted = NO;
     self.displayTextView.frame = [self calculateContentFrame];
     
     if (EZGBubbleMessageTypeReceiving == [self bubbleMessageType]) {
-        self.displayTextView.textColor = kDefaultTextColorBlack1;
+        self.displayTextView.textColor = [UIColor blackColor];
     }
     else {
         self.displayTextView.textColor = [UIColor whiteColor];

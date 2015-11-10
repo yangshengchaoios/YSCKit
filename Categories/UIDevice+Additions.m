@@ -141,6 +141,14 @@
         return @"";
     }
 }
+//获取所有与设备相关的信息
++ (NSString *)deviceInfo {
+    NSMutableString *info = [NSMutableString string];
+    [info appendFormat:@"%@;", [UIDevice currentDevice].name];
+    [info appendFormat:@"%@;", [UIDevice currentDevice].systemName];
+    [info appendFormat:@"%@;", [UIDevice currentDevice].systemVersion];
+    return info;
+}
 
 // 只能判断摄像头是否可用，但不能判断是否被用户禁用了!
 + (BOOL)isCameraAvailable {

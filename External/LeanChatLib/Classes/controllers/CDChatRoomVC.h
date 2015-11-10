@@ -15,23 +15,21 @@
  */
 @interface CDChatRoomVC : XHMessageTableViewController
 
-/**
- *  开放给子类，来对当前对话进行额外操作
- */
 @property (nonatomic, strong, readonly) AVIMConversation *conv;
-
-/**
- *  当前对话的 AVIMTypedMessage Array，开放给子类来定制
- */
 @property (nonatomic, strong, readonly) NSMutableArray *msgs;
-
 @property (copy, nonatomic) YSCResultBlock refreshCellBlock;
 
-/**
- *  初始化方法
- *  @param conv 要聊天的对话
- *  @return
- */
 - (instancetype)initWithConv:(AVIMConversation *)conv;
 
+#pragma mark - EZGMessageTableViewCell action
+- (void)multiMediaMessageDidSelectedOnMessage:(AVIMTypedMessage *)message atIndexPath:(NSIndexPath *)indexPath onMessageTableViewCell:(EZGMessageBaseCell *)messageTableViewCell;
+- (void)didDoubleSelectedOnTextMessage:(AVIMTypedMessage *)message atIndexPath:(NSIndexPath *)indexPath;
+- (void)didSelectedAvatorOnMessage:(AVIMTypedMessage *)message atIndexPath:(NSIndexPath *)indexPath;
+- (void)didRetrySendMessage:(AVIMTypedMessage *)message atIndexPath:(NSIndexPath *)indexPath;
+
+#pragma mark - select share menu item
+//点击扩展功能按钮-发送位置
+- (void)didClickedShareMenuItemSendLocation;
+//点击扩展功能按钮-发送图片
+- (void)didClickedShareMenuItemSendPhoto;
 @end

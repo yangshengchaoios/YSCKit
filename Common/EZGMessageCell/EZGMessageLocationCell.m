@@ -18,10 +18,10 @@
         [self.contentView addSubview:self.bubbleLocationImageView];
         [self.contentView addSubview:self.addressLabel];
         
-        [self.bubbleImageView addSubview:self.bubbleLocationImageView];
-        self.bubbleLocationImageView.clipsToBounds = YES;
-        [self.bubbleLocationImageView addSubview:self.addressLabel];
-        self.addressLabel.font = AUTOLAYOUT_FONT(self.addressLabel.font.pointSize);
+        self.addressLabel.font = [UIFont systemFontOfSize:14];
+        self.addressLabel.numberOfLines = 2;
+        self.addressLabel.textColor = [UIColor whiteColor];
+        [self.bubbleLocationImageView makeRoundWithRadius:4];
     }
     return self;
 }
@@ -43,24 +43,19 @@
 //动态计算位置和大小
 - (void)layoutSubviews {
     [super layoutSubviews];
-    //调整默认位置图片大小和位置
-    self.bubbleLocationImageView.centerY = self.bubbleImageView.centerY;
-    self.bubbleLocationImageView.height = self.bubbleImageView.height - 2.0;
-    self.bubbleLocationImageView.width = self.bubbleImageView.width - kXHBubbleArrowWidth - 2;
     
-    if (EZGBubbleMessageTypeReceiving == [self bubbleMessageType]) {
-        self.bubbleLocationImageView.left = self.bubbleImageView.left - kXHBubbleArrowWidth - 1;
-    }
-    else {
-        self.bubbleLocationImageView.left = self.bubbleLocationImageView.left + 1;
-    }
+    //调整默认位置图片大小和位置
+    CGRect contentFrame = [self calculateContentFrame];
+    self.bubbleLocationImageView.frame = CGRectInset(contentFrame, -kXHBubbleMarginHor, -kXHBubbleMarginVer);
+    self.bubbleLocationImageView.width -= 3;//FIXME:
     
     //调整文字大小和位置
-    self.addressLabel.width = self.bubbleLocationImageView.width - 2;
+    
     [self.addressLabel sizeToFit];
-    self.addressLabel.height += 4;
-    self.addressLabel.left = self.bubbleLocationImageView.left - 1;
-    self.addressLabel.bottom = self.bubbleLocationImageView.bottom - 1;
+    self.addressLabel.width = self.bubbleLocationImageView.width - 2;
+    self.addressLabel.height += 5;
+    self.addressLabel.left = self.bubbleLocationImageView.left + 1;
+    self.addressLabel.top = CGRectGetMaxY(self.bubbleLocationImageView.frame) - 1 - self.addressLabel.height;
 }
 
 @end

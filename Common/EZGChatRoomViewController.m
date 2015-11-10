@@ -8,11 +8,8 @@
 
 #import "EZGChatRoomViewController.h"
 #import "CDConversationStore.h"
-#import "YSCPhotoBrowseViewController.h"
-#import "TOCropViewController.h"
 
-@interface EZGChatRoomViewController () <UINavigationControllerDelegate, UIImagePickerControllerDelegate,
-ZYQAssetPickerControllerDelegate, TOCropViewControllerDelegate>
+@interface EZGChatRoomViewController () <UINavigationControllerDelegate, UIImagePickerControllerDelegate>
 
 @end
 
@@ -107,59 +104,13 @@ ZYQAssetPickerControllerDelegate, TOCropViewControllerDelegate>
     }];
 }
 
-#pragma mark - XHMessageTableViewCellDelegate
-- (void)multiMediaMessageDidSelectedOnMessage:(id <XHMessageModel> )message atIndexPath:(NSIndexPath *)indexPath onMessageTableViewCell:(EZGMessageBaseCell *)messageTableViewCell {
-    if (self.messageInputView.isRecording) {
-        return;
-    }
-    if (XHBubbleMessageMediaTypePhoto == message.messageMediaType) {//点击图片进入图片浏览器
-        YSCPhotoBrowseViewController *photoDetail = (YSCPhotoBrowseViewController *)[UIResponder createBaseViewController:@"YSCPhotoBrowseViewController"];
-        if (isNotEmpty(message.thumbnailUrl)) {
-            photoDetail.params = @{kParamImageUrls : @[Trim(message.thumbnailUrl)]};
-            [self.navigationController pushViewController:photoDetail animated:NO];
-        }
-        else if (isNotEmpty(message.photo)) {
-            photoDetail.params = @{kParamImages : @[message.photo]};
-            [self.navigationController pushViewController:photoDetail animated:NO];
-        }
-    }
-    else if (XHBubbleMessageMediaTypeLocalPosition == message.messageMediaType) {
-        //FIXME: 打开百度地图
-        XHDisplayLocationViewController *displayLocationViewController = [[XHDisplayLocationViewController alloc] init];
-        displayLocationViewController.message = message;
-        [self.navigationController pushViewController:displayLocationViewController animated:YES];
-    }
-    else {
-//        [super multiMediaMessageDidSelectedOnMessage:message atIndexPath:indexPath onMessageTableViewCell:messageTableViewCell];
-    }
-}
-
 #pragma mark - XHShareMenuViewDelegate
+//点击扩展区域的功能按钮
 - (void)didSelecteShareMenuItem:(XHShareMenuItem *)shareMenuItem atIndex:(NSInteger)index {
-    DLog(@"title : %@   index:%ld", shareMenuItem.title, (long)index);
-    if (0 == index) {
-        if ([UIDevice isPhotoLibraryAvailable]) { //打开多图选择器
-            ZYQAssetPickerController *picker = [[ZYQAssetPickerController alloc] init];
-            picker.delegate = self;
-            picker.maximumNumberOfSelection = 9;
-            picker.assetsFilter = [ALAssetsFilter allPhotos];
-            picker.showEmptyGroups = NO;
-            picker.selectionFilter = [NSPredicate predicateWithBlock:^BOOL(id evaluatedObject, NSDictionary *bindings) {
-                if ([[(ALAsset*)evaluatedObject valueForProperty:ALAssetPropertyType] isEqual:ALAssetTypeVideo]) {
-                    NSTimeInterval duration = [[(ALAsset*)evaluatedObject valueForProperty:ALAssetPropertyDuration] doubleValue];
-                    return duration >= 5;
-                }
-                else {
-                    return YES;
-                }
-            }];
-            [self presentViewController:picker animated:YES completion:NULL];
-        }
-        else {
-            [UIView showAlertVieWithMessage:@"请在设置->隐私->照片,打开本应用的权限"];
-        }
+    if (0 == index) {//照片
+        [self didClickedShareMenuItemSendPhoto];
     }
-    else if (1 == index) {
+    else if (1 == index) {//拍摄
         if ([UIDevice isCanUseCamera]) { //打开摄像头，获取的图片要保存到自定义相册EZGoal
             UIImagePickerController *imagePickerController = [[UIImagePickerController alloc] init];
             imagePickerController.delegate = self;
@@ -172,49 +123,8 @@ ZYQAssetPickerControllerDelegate, TOCropViewControllerDelegate>
             [UIView showAlertVieWithMessage:@"请在设置->隐私->相机,打开本应用的权限"];
         }
     }
-    else if (2 == index) {//FIXME: 发送百度地图的位置信息
-        if ([UIDevice isLocationAvaible]) {
-            WEAKSELF
-            [UIView showHUDLoadingOnWindow:@"正在发送位置"];
-            [self.locationHelper getCurrentGeolocationsCompled:^(NSArray *placemarks) {
-                CLPlacemark *placemark = [placemarks lastObject];
-                if (placemark) {
-                    [UIView hideHUDLoadingOnWindow];
-                    NSDictionary *addressDictionary = placemark.addressDictionary;
-                    NSArray *formattedAddressLines = [addressDictionary valueForKey:@"FormattedAddressLines"];
-                    NSString *geoLocations = [formattedAddressLines lastObject];
-                    if (geoLocations) {
-                        [weakSelf didSendGeolocationsMessageWithGeolocaltions:geoLocations location:placemark.location];
-                    }
-                }
-                else {
-                    [UIView hideHUDLoadingOnWindow];
-                    [UIView showAlertVieWithMessage:@"发送位置信息出错，请检查系统设置中是否打开位置服务"];
-                }
-            }];
-        }
-        else {
-            [YSCCommonUtils OpenPrivacyOfSetting];
-        }
-    }
-    else {
-        [super didSelecteShareMenuItem:shareMenuItem atIndex:index];
-    }
-}
-
-
-//----------------------------------------
-//
-// 图片选择器 + 拍照
-//
-//----------------------------------------
-#pragma mark - ZYQAssetPickerControllerDelegate
--(void)assetPickerController:(ZYQAssetPickerController *)picker didFinishPickingAssets:(NSArray *)assets {
-    for (int i = 0; i<assets.count; i++) {
-        ALAsset *asset = assets[i];
-        UIImage *pickedImage = [UIImage imageWithCGImage:asset.defaultRepresentation.fullScreenImage];
-        UIImage *sendImage = [self resizeImage:pickedImage];
-        [self didSendMessageWithPhoto:sendImage];
+    else if (2 == index) {//位置
+        [self didClickedShareMenuItemSendLocation];
     }
 }
 
@@ -231,11 +141,6 @@ ZYQAssetPickerControllerDelegate, TOCropViewControllerDelegate>
         if (pickedImage) {
             [weakSelf didSendMessageWithPhoto:[weakSelf resizeImage:pickedImage]];
             [[ALAssetsLibrary new] saveImage:pickedImage toAlbum:@"EZGoal" completion:nil failure:nil];
-            
-            //裁剪图片
-            //            TOCropViewController *cropController = [[TOCropViewController alloc] initWithImage:pickedImage];
-            //            cropController.delegate = weakSelf;
-            //            [weakSelf presentViewController:cropController animated:YES completion:nil];
         }
         else {
             [UIView showResultThenHideOnWindow:@"未选择图片"];
@@ -245,21 +150,6 @@ ZYQAssetPickerControllerDelegate, TOCropViewControllerDelegate>
 - (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker {
     [picker dismissViewControllerAnimated:YES completion:nil];
 }
-
-#pragma mark - TOCropViewControllerDelegate
-- (void)cropViewController:(TOCropViewController *)cropViewController didCropToImage:(UIImage *)image withRect:(CGRect)cropRect angle:(NSInteger)angle {
-    WEAKSELF
-    [cropViewController dismissViewControllerAnimated:YES completion:^{
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-            [weakSelf didSendMessageWithPhoto:[weakSelf resizeImage:image]];
-        });
-    }];
-    
-}
-- (void)cropViewController:(TOCropViewController *)cropViewController didFinishCancelled:(BOOL)cancelled {
-    [cropViewController dismissViewControllerAnimated:YES completion:nil];
-}
-//压缩图片大小
 - (UIImage *)resizeImage:(UIImage *)image {
     CGFloat width = SCREEN_WIDTH_SCALE;
     CGFloat height = width * (image.size.height / image.size.width);

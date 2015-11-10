@@ -7,6 +7,7 @@
 //
 
 #import "XHDisplayTextViewController.h"
+#import "CDEmotionUtils.h"
 
 @interface XHDisplayTextViewController ()
 
@@ -31,9 +32,9 @@
     return _displayTextView;
 }
 
-- (void)setMessage:(id<XHMessageModel>)message {
+- (void)setMessage:(AVIMTypedMessage *)message {
     _message = message;
-    self.displayTextView.text = [message text];
+    self.displayTextView.text = [CDEmotionUtils emojiStringFromString:[message text]];
 }
 
 #pragma mark - Life cycle
@@ -46,7 +47,6 @@
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
 }
 
 - (void)dealloc {

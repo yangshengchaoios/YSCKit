@@ -12,6 +12,6 @@
 
 @interface XHDisplayTextViewController : XHBaseViewController
 
-@property (nonatomic, strong) id <XHMessageModel> message;
+@property (nonatomic, strong) AVIMTypedMessage *message;
 
 @end

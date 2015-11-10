@@ -22,24 +22,23 @@
 #import "CDFailedMessageStore.h"
 #import "AVIMEmotionMessage.h"
 #import "MJRefresh.h"
+#import "EZGAddressSearchViewController.h"
+#import "YSCPhotoBrowseViewController.h"
 
 static NSInteger const kOnePageSize = 10;
 
-@interface CDChatRoomVC ()
-
+@interface CDChatRoomVC () <UINavigationControllerDelegate, ZYQAssetPickerControllerDelegate>
 @property (nonatomic, strong, readwrite) AVIMConversation *conv;
 @property (atomic, assign) BOOL isLoadingMsg;
-@property (nonatomic, strong) EZGMessageBaseCell *currentSelectedCell;
+@property (atomic, assign) NSInteger currentSelectedIndex;
 @property (nonatomic, strong) NSArray *emotionManagers;
 @property (nonatomic, strong) LZStatusView *clientStatusView;
 @property (nonatomic, assign) int64_t lastSentTimestamp;
-
 @end
 
 @implementation CDChatRoomVC
 
 #pragma mark - life cycle
-
 - (instancetype)init {
     self = [super init];
     if (self) {
@@ -80,6 +79,7 @@ static NSInteger const kOnePageSize = 10;
     header.lastUpdatedTimeLabel.hidden = YES;
     header.stateLabel.hidden = YES;
     self.messageTableView.header = header;
+    self.currentSelectedIndex = -1;
 }
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
@@ -138,80 +138,197 @@ static NSInteger const kOnePageSize = 10;
     self.clientStatusView.hidden = ([AVIMClient defaultClient].status != AVIMClientStatusClosed);
 }
 
-#pragma mark - XHMessageTableViewCell delegate
-- (void)multiMediaMessageDidSelectedOnMessage:(id <XHMessageModel> )message atIndexPath:(NSIndexPath *)indexPath onMessageTableViewCell:(EZGMessageBaseCell *)messageTableViewCell {
-    switch (message.messageMediaType) {
-        case XHBubbleMessageMediaTypeVideo:
-        case XHBubbleMessageMediaTypePhoto: {
-            XHDisplayMediaViewController *messageDisplayTextView = [[XHDisplayMediaViewController alloc] init];
-            messageDisplayTextView.message = message;
-            [self.navigationController pushViewController:messageDisplayTextView animated:YES];
-            break;
+#pragma mark - EZGMessageTableViewCell action
+//单击消息体
+- (void)multiMediaMessageDidSelectedOnMessage:(AVIMTypedMessage *)message atIndexPath:(NSIndexPath *)indexPath onMessageTableViewCell:(EZGMessageBaseCell *)messageTableViewCell {
+    //1. 正在录音过程中不能跳转页面
+    if (self.messageInputView.isRecording) {
+        return;
+    }
+    //2. 单击消息体跳转页面
+    if (kAVIMMessageMediaTypeAudio == message.mediaType) {//播放声音
+        if (self.currentSelectedIndex >= 0) {//停止cell动画
+            EZGMessageVoiceCell *voiceCell = [self.messageTableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:self.currentSelectedIndex inSection:0]];
+            [voiceCell.animationVoiceImageView stopAnimating];
         }
-            break;
-        case XHBubbleMessageMediaTypeVoice: {
-            // Mark the voice as read and hide the red dot.
-            //message.isRead = YES;
-//            messageTableViewCell.messageBubbleView.voiceUnreadDotImageView.hidden = YES;
-//            if (self.currentSelectedCell) {
-//                [self.currentSelectedCell.messageBubbleView.animationVoiceImageView stopAnimating];
-//            }
-//            if (self.currentSelectedCell == messageTableViewCell) {
-//                [[XHAudioPlayerHelper shareInstance] stopAudio];
-//                self.currentSelectedCell = nil;
-//            }
-//            else {
-//                self.currentSelectedCell = messageTableViewCell;
-//                [messageTableViewCell.messageBubbleView.animationVoiceImageView startAnimating];
-//                [[XHAudioPlayerHelper shareInstance] managerAudioWithFileName:message.voicePath toPlay:YES];
-//            }
-            break;
+        
+        if (indexPath.row == self.currentSelectedIndex) {
+            [[XHAudioPlayerHelper shareInstance] stopAudio];//停止播放
+            self.currentSelectedIndex = -1;
         }
-            
-        case XHBubbleMessageMediaTypeEmotion:
-            DLog(@"facePath : %@", message.emotionPath);
-            break;
-            
-        case XHBubbleMessageMediaTypeLocalPosition: {
-            DLog(@"facePath : %@", message.localPositionPhoto);
-            XHDisplayLocationViewController *displayLocationViewController = [[XHDisplayLocationViewController alloc] init];
-            displayLocationViewController.message = message;
-            [self.navigationController pushViewController:displayLocationViewController animated:YES];
-            break;
+        else {//开始cell动画
+            self.currentSelectedIndex = indexPath.row;
+            [[XHAudioPlayerHelper shareInstance] managerAudioWithFileName:message.file.localPath toPlay:YES];
+            [self.messageTableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationNone];
         }
-        default:
-            break;
+    }
+    else if (kAVIMMessageMediaTypeImage == message.mediaType) {//打开图片浏览器
+        YSCPhotoBrowseViewController *photoDetail = (YSCPhotoBrowseViewController *)[UIResponder createBaseViewController:@"YSCPhotoBrowseViewController"];
+        if (isNotEmpty(message.file.localPath)) {
+            photoDetail.params = @{kParamImageUrls : @[Trim(message.file.localPath)]};
+            [self.navigationController pushViewController:photoDetail animated:NO];
+        }
+        else if (message.file.isDataAvailable) {
+            NSData *imageData = [message.file getData];
+            if (imageData) {
+                photoDetail.params = @{kParamImages : @[imageData]};
+                [self.navigationController pushViewController:photoDetail animated:NO];
+            }
+            else {
+                [UIView showResultThenHideOnWindow:@"图片数据问题"];
+            }
+        }
+        else {
+            [UIView showResultThenHideOnWindow:@"图片下载中"];
+        }
+    }
+    else if (kAVIMMessageMediaTypeLocation == message.mediaType) {//查看位置
+        //FIXME: 打开百度地图
+//        XHDisplayLocationViewController *displayLocationViewController = [[XHDisplayLocationViewController alloc] init];
+//        displayLocationViewController.message = message;
+//        [self.navigationController pushViewController:displayLocationViewController animated:YES];
+    }
+    else if (kAVIMMessageMediaTypeVideo == message.mediaType) {
+        //TODO:播放视频
     }
 }
-- (void)didDoubleSelectedOnTextMessage:(id <XHMessageModel> )message atIndexPath:(NSIndexPath *)indexPath {
-    DLog(@"text : %@", message.text);
+//双击文本消息
+- (void)didDoubleSelectedOnTextMessage:(AVIMTypedMessage *)message atIndexPath:(NSIndexPath *)indexPath {
     XHDisplayTextViewController *displayTextViewController = [[XHDisplayTextViewController alloc] init];
     displayTextViewController.message = message;
     [self.navigationController pushViewController:displayTextViewController animated:YES];
 }
-- (void)didSelectedAvatorOnMessage:(id <XHMessageModel> )message atIndexPath:(NSIndexPath *)indexPath {
+//单击头像
+- (void)didSelectedAvatorOnMessage:(AVIMTypedMessage *)message atIndexPath:(NSIndexPath *)indexPath {
     DLog(@"indexPath : %@", indexPath);
 }
-- (void)didRetrySendMessage:(id <XHMessageModel> )message atIndexPath:(NSIndexPath *)indexPath {
+//重发消息
+- (void)didRetrySendMessage:(AVIMTypedMessage *)message atIndexPath:(NSIndexPath *)indexPath {
     [self resendMessageAtIndexPath:indexPath discardIfFailed:false];
+}
+//设置cell
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+    EZGMessageBaseCell *cell = (EZGMessageBaseCell *)[super tableView:tableView cellForRowAtIndexPath:indexPath];
+    AVIMTypedMessage *message = self.messages[indexPath.row];
+    WEAKSELF
+    [cell.bubbleImageView removeAllGestureRecognizers];
+    //1. 单击头像
+    [cell.avatarImageView removeAllGestureRecognizers];
+    [cell.avatarImageView bk_whenTapped:^{
+        [weakSelf didSelectedAvatorOnMessage:message atIndexPath:indexPath];
+    }];
+    //2. 单击重发消息
+    [cell.statusView.retryButton bk_removeEventHandlersForControlEvents:UIControlEventTouchUpInside];
+    [cell.statusView.retryButton bk_addEventHandler:^(id sender) {
+        [weakSelf didRetrySendMessage:message atIndexPath:indexPath];
+    } forControlEvents:UIControlEventTouchUpInside];
+    
+    //3. 点击消息体
+    if (kAVIMMessageMediaTypeText == message.mediaType) {//双击文本消息
+        [cell.bubbleImageView bk_whenDoubleTapped:^{
+            [weakSelf didDoubleSelectedOnTextMessage:message atIndexPath:indexPath];
+        }];
+    }
+    else {//单击其它类型的消息
+        [cell.bubbleImageView bk_whenTapped:^{
+            [weakSelf multiMediaMessageDidSelectedOnMessage:message atIndexPath:indexPath onMessageTableViewCell:cell];
+        }];
+    }
+    
+    //4. 设置音频cell
+    if (kAVIMMessageMediaTypeAudio == message.mediaType) {
+        EZGMessageVoiceCell *voiceCell = (EZGMessageVoiceCell *)cell;
+        if (self.currentSelectedIndex == indexPath.row) {
+            [voiceCell.animationVoiceImageView startAnimating];
+        }
+        else {
+            [voiceCell.animationVoiceImageView stopAnimating];
+        }
+    }
+    return cell;
+}
+
+#pragma mark - select share menu item
+//点击扩展功能按钮-发送位置
+- (void)didClickedShareMenuItemSendLocation {
+    WEAKSELF
+    YSCResultBlock block = ^(NSObject *object) {//发送位置信息
+        if (object) {
+            SearchPoiModel *dataModel = (SearchPoiModel *)object;
+            CLLocation *location = [[CLLocation alloc] initWithLatitude:dataModel.poiLocation.latitude longitude:dataModel.poiLocation.longitude];
+            NSString *locationAddress = isEmpty(dataModel.poiAddress) ? Trim(dataModel.poiName) : Trim(dataModel.poiAddress);
+            [weakSelf didSendGeolocationsMessageWithGeolocaltions:locationAddress location:location];
+        }
+        else {
+            [UIView showResultThenHideOnWindow:@"没有选择位置信息"];
+        }
+    };
+    EZGAddressSearchViewController *viewController = (EZGAddressSearchViewController *)[UIResponder createBaseViewController:@"EZGAddressSearchViewController"];
+    viewController.params = @{kParamBackType : @(BackTypeImage), kParamBlock : block};
+    [self presentViewController:[[UINavigationController alloc] initWithRootViewController:viewController]
+                       animated:YES completion:nil];
+}
+//点击扩展功能按钮-发送图片
+- (void)didClickedShareMenuItemSendPhoto {
+    if ([UIDevice isPhotoLibraryAvailable]) {
+        ZYQAssetPickerController *picker = [[ZYQAssetPickerController alloc] init];
+        picker.delegate = self;
+        picker.maximumNumberOfSelection = 9;//最大同时选择的照片数量
+        picker.assetsFilter = [ALAssetsFilter allPhotos];
+        picker.showEmptyGroups = NO;
+        picker.selectionFilter = [NSPredicate predicateWithBlock:^BOOL(id evaluatedObject, NSDictionary *bindings) {
+            if ([[(ALAsset*)evaluatedObject valueForProperty:ALAssetPropertyType] isEqual:ALAssetTypeVideo]) {
+                NSTimeInterval duration = [[(ALAsset*)evaluatedObject valueForProperty:ALAssetPropertyDuration] doubleValue];
+                return duration >= 5;
+            }
+            else {
+                return YES;
+            }
+        }];
+        [self presentViewController:picker animated:YES completion:NULL];
+    }
+    else {
+        [UIView showAlertVieWithMessage:@"请在设置->隐私->照片,打开本应用的权限"];
+    }
+}
+
+#pragma mark - ZYQAssetPickerControllerDelegate
+- (void)assetPickerController:(ZYQAssetPickerController *)picker didFinishPickingAssets:(NSArray *)assets {
+    for (int i = 0; i<assets.count; i++) {
+        ALAsset *asset = assets[i];
+        UIImage *pickedImage = [UIImage imageWithCGImage:asset.defaultRepresentation.fullScreenImage];
+        UIImage *sendImage = [self resizeImage:pickedImage];
+        [self didSendMessageWithPhoto:sendImage];
+    }
+}
+- (void)assetPickerControllerDidCancel:(ZYQAssetPickerController *)picker {
+    [picker dismissViewControllerAnimated:YES completion:nil];
+}
+- (UIImage *)resizeImage:(UIImage *)image {
+    CGFloat width = SCREEN_WIDTH_SCALE;
+    CGFloat height = width * (image.size.height / image.size.width);
+    return [YSCImageUtils resizeImage:image toSize:CGSizeMake(width, height)];
 }
 
 #pragma mark - XHAudioPlayerHelper Delegate
 - (void)didAudioPlayerStopPlay:(AVAudioPlayer *)audioPlayer {
-    if (!self.currentSelectedCell) {
+    if (self.currentSelectedIndex < 0) {
         return;
     }
-//    [self.currentSelectedCell.messageBubbleView.animationVoiceImageView stopAnimating];
-    self.currentSelectedCell = nil;
+    //停止cell动画
+    EZGMessageVoiceCell *voiceCell = [self.messageTableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:self.currentSelectedIndex inSection:0]];
+    [voiceCell.animationVoiceImageView stopAnimating];
+    self.currentSelectedIndex = -1;
 }
 
 #pragma mark - XHMessageInputView Delegate
 //开始录音
 - (void)prepareRecordingVoiceActionWithCompletion:(BOOL (^)(void))completion {
     [[XHAudioPlayerHelper shareInstance] stopAudio];
-    if (self.currentSelectedCell) {
-//        [self.currentSelectedCell.messageBubbleView.animationVoiceImageView stopAnimating];
-        self.currentSelectedCell = nil;
+    if (self.currentSelectedIndex >= 0) {//停止cell动画
+        EZGMessageVoiceCell *voiceCell = [self.messageTableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:self.currentSelectedIndex inSection:0]];
+        [voiceCell.animationVoiceImageView stopAnimating];
+        self.currentSelectedIndex = -1;
     }
     [super prepareRecordingVoiceActionWithCompletion:completion];
 }
@@ -387,7 +504,7 @@ static NSInteger const kOnePageSize = 10;
 }
 - (void)replaceMesssage:(AVIMTypedMessage *)message atIndexPath:(NSIndexPath *)indexPath {
     self.messages[indexPath.row] = message;
-    [self.messageTableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
+    [self.messageTableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationNone];
 }
 - (void)resendMessageAtIndexPath:(NSIndexPath *)indexPath discardIfFailed:(BOOL)discardIfFailed {
     AVIMTypedMessage *msg = self.messages[indexPath.row];
@@ -586,9 +703,11 @@ static NSInteger const kOnePageSize = 10;
     self.isLoadingMsg = YES;
     [self cacheMsgs:@[message] callback:^(BOOL succeeded, NSError *error) {
         if ([self filterError:error]) {
+            [self.messageTableView beginUpdates];
+            NSIndexPath *indexPath = [NSIndexPath indexPathForRow:self.messages.count inSection:0];
             [self.messages addObject:message];
-            NSIndexPath *indexPath = [NSIndexPath indexPathForRow:self.messages.count -1 inSection:0];
             [self.messageTableView insertRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationNone];
+            [self.messageTableView endUpdates];
             [self scrollToBottomAnimated:YES];
         }
         self.isLoadingMsg = NO;
