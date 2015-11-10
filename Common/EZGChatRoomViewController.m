@@ -94,8 +94,9 @@
     [self.conv update:[updateBuilder dictionary] callback:^(BOOL succeeded, NSError *error) {
         if (isEmpty(error)) {
             [[CDConversationStore store] updateConversation:weakSelf.conv];
-            if (weakSelf.refreshCellBlock) {//已经是最新的会话了，直接刷新cell，更新头像和昵称
-                weakSelf.refreshCellBlock(nil);
+            if (weakSelf.params[kParamBlock]) {//已经是最新的会话了，直接刷新cell，更新头像和昵称
+                YSCResultBlock block = weakSelf.params[kParamBlock];
+                block(nil);
             }
         }
         else {

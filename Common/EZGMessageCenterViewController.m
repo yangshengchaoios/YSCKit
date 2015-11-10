@@ -110,10 +110,10 @@
         ChatUserModel *otherUser = [[ChatUserModel alloc] initWithString:conversation.attributes[OtherUserInfo] error:nil];
         
         NSDictionary *params = @{kParamOtherId : Trim(otherUser.userId),
-                                 kParamExtendAttributes : @{kParamBUserInfo : Trim([otherUser toJSONString]),
-                                                            kParamCUserInfo : Trim([USER buildCUserInfo])},
                                  kParamConvId : Trim(conversation.conversationId),
-                                 kParamBlock : refreshCellBlock,
+                                 kParamChatRoom : @{kParamBlock : refreshCellBlock},
+                                 kParamExtendAttributes : @{kParamBUserInfo : Trim([otherUser toJSONString]),
+                                                            kParamCUserInfo : Trim([USER buildCUserInfo])}
                                  };
         postNWithInfo(kNotificationOpenChatRoom, params);
     };

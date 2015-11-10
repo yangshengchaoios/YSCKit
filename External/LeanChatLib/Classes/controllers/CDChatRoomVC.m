@@ -94,8 +94,9 @@ static NSInteger const kOnePageSize = 10;
     [super viewDidDisappear:animated];
 }
 - (void)viewWillDisappear:(BOOL)animated {
-    if (self.refreshCellBlock) {//刷新cell，更新最后一条聊天记录
-        self.refreshCellBlock(nil);
+    YSCResultBlock block = self.params[kParamBlock];
+    if (block) {
+        block(nil);//刷新cell，更新最后一条聊天记录
     }
     [super viewWillDisappear:animated];
 }

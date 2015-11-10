@@ -17,7 +17,7 @@
 
 @property (nonatomic, strong, readonly) AVIMConversation *conv;
 @property (nonatomic, strong, readonly) NSMutableArray *msgs;
-@property (copy, nonatomic) YSCResultBlock refreshCellBlock;
+@property (nonatomic, strong) NSDictionary *params;
 
 - (instancetype)initWithConv:(AVIMConversation *)conv;
 
