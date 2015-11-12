@@ -15,6 +15,7 @@ typedef void (^YSCObjectIndexResultBlock)(NSObject *object, NSInteger section);
 typedef NSDictionary *(^YSCDictionarySetBlock)(NSInteger pageIndex);
 typedef void (^YSCViewObjectResultBlock)(UIView *view, NSObject *object);
 typedef CGFloat (^YSCFloatSetBlock)(NSIndexPath *indexPath);
+typedef NSString *(^YSCViewStringSetBlock)(NSIndexPath *indexPath);
 
 
 //------------------------------------
@@ -26,7 +27,8 @@ typedef CGFloat (^YSCFloatSetBlock)(NSIndexPath *indexPath);
 //      5. 对数据进行缓存
 //      6. 自定义任意单一确定的数据源
 //      7. 动态设置header、cell、footer的高度
-//  不支持的功能：多种header 或 多种cell 或 多数据源
+//      8. 支持多种header、cell、footer的注册
+//  不支持的功能：多数据源
 //
 //------------------------------------
 @interface YSCTableView : UITableView
@@ -79,6 +81,10 @@ typedef CGFloat (^YSCFloatSetBlock)(NSIndexPath *indexPath);
 @property (nonatomic, copy) YSCFloatSetBlock headerHeightBlock;
 @property (nonatomic, copy) YSCFloatSetBlock cellHeightBlock;
 @property (nonatomic, copy) YSCFloatSetBlock footerHeightBlock;
+
+@property (nonatomic, copy) YSCViewStringSetBlock headerNameBlock;
+@property (nonatomic, copy) YSCViewStringSetBlock cellNameBlock;
+@property (nonatomic, copy) YSCViewStringSetBlock footerNameBlock;
 
 #pragma mark - 设置ScrollViewDelegate相关的回调
 @property (nonatomic, copy) YSCBlock willBeginDraggingBlock;
