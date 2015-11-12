@@ -46,7 +46,7 @@ static NSInteger const kOnePageSize = 10;
         //self.allowsSendVoice = NO;
         //self.allowsSendFace = NO;
         //self.allowsSendMultiMedia = NO;
-        _isLoadingMsg = NO;
+        self.isLoadingMsg = NO;
     }
     return self;
 }
@@ -63,15 +63,14 @@ static NSInteger const kOnePageSize = 10;
     
     NSString *received_convid = [NSString stringWithFormat:@"received_%@", Trim(self.conv.conversationId)];
     self.lastSentTimestamp = [GetCacheObject(received_convid) longLongValue];
-    if (0 == self.lastSentTimestamp) {
-        self.lastSentTimestamp = [[NSDate date] timeIntervalSince1970] * 1000;
-    }
     [self initBottomMenu];
     [self initEmotionView];
     [self.view addSubview:self.clientStatusView];
     [self loadMessagesWhenInit];
     [self updateStatusView];
     [[XHAudioPlayerHelper shareInstance] setDelegate:self];
+    
+    //配置下拉刷新
     WEAKSELF
     MJRefreshNormalHeader *header = [MJRefreshNormalHeader headerWithRefreshingBlock:^{
         [weakSelf loadOldMessages];
@@ -80,6 +79,26 @@ static NSInteger const kOnePageSize = 10;
     header.stateLabel.hidden = YES;
     self.messageTableView.header = header;
     self.currentSelectedIndex = -1;
+    
+    //重新设置返回按钮
+    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithImage:DefaultNaviBarArrowBackImage
+                                                                             style:UIBarButtonItemStylePlain
+                                                                            target:self
+                                                                            action:@selector(backButtonClicked:)];
+}
+- (void)backButtonClicked:(id)sender {
+    if (self.navigationController) {            //如果有navigationBar
+        NSInteger index = [self.navigationController.viewControllers indexOfObject:self];
+        if (index > 0) {                        //不是root，就返回上一级
+            [self.navigationController popViewControllerAnimated:YES];
+        }
+        else {
+            [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
+        }
+    }
+    else {
+        [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
+    }
 }
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
@@ -164,6 +183,14 @@ static NSInteger const kOnePageSize = 10;
         }
     }
     else if (kAVIMMessageMediaTypeImage == message.mediaType) {//打开图片浏览器
+        //关闭音频播放
+        if (kAVIMMessageMediaTypeImage == message.mediaType) {
+            [[XHAudioPlayerHelper shareInstance] stopAudio];
+            EZGMessageVoiceCell *voiceCell = [self.messageTableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:self.currentSelectedIndex inSection:0]];
+            [voiceCell.animationVoiceImageView stopAnimating];
+            self.currentSelectedIndex = -1;
+        }
+        //打开图片浏览器
         YSCPhotoBrowseViewController *photoDetail = (YSCPhotoBrowseViewController *)[UIResponder createBaseViewController:@"YSCPhotoBrowseViewController"];
         if (isNotEmpty(message.file.localPath)) {
             photoDetail.params = @{kParamImageUrls : @[Trim(message.file.localPath)]};
@@ -205,7 +232,7 @@ static NSInteger const kOnePageSize = 10;
 }
 //重发消息
 - (void)didRetrySendMessage:(AVIMTypedMessage *)message atIndexPath:(NSIndexPath *)indexPath {
-    [self resendMessageAtIndexPath:indexPath discardIfFailed:false];
+    [self resendMessage:message atIndexPath:indexPath discardIfFailed:false];
 }
 //设置cell
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -213,30 +240,40 @@ static NSInteger const kOnePageSize = 10;
     AVIMTypedMessage *message = self.messages[indexPath.row];
     WEAKSELF
     [cell.bubbleImageView removeAllGestureRecognizers];
+    
     //1. 单击头像
     [cell.avatarImageView removeAllGestureRecognizers];
     [cell.avatarImageView bk_whenTapped:^{
         [weakSelf didSelectedAvatorOnMessage:message atIndexPath:indexPath];
     }];
+    
     //2. 单击重发消息
     [cell.statusView.retryButton bk_removeEventHandlersForControlEvents:UIControlEventTouchUpInside];
     [cell.statusView.retryButton bk_addEventHandler:^(id sender) {
         [weakSelf didRetrySendMessage:message atIndexPath:indexPath];
     } forControlEvents:UIControlEventTouchUpInside];
     
-    //3. 点击消息体
-    if (kAVIMMessageMediaTypeText == message.mediaType) {//双击文本消息
+    //3. 双击文本消息
+    if (kAVIMMessageMediaTypeText == message.mediaType) {
         [cell.bubbleImageView bk_whenDoubleTapped:^{
             [weakSelf didDoubleSelectedOnTextMessage:message atIndexPath:indexPath];
         }];
     }
-    else {//单击其它类型的消息
-        [cell.bubbleImageView bk_whenTapped:^{
-            [weakSelf multiMediaMessageDidSelectedOnMessage:message atIndexPath:indexPath onMessageTableViewCell:cell];
-        }];
-    }
     
-    //4. 设置音频cell
+    //4. 单击消息体
+    [cell.bubbleImageView bk_whenTapped:^{
+        //关闭menu
+        UIMenuController *menu = [UIMenuController sharedMenuController];
+        if (menu.isMenuVisible) {
+            [menu setMenuVisible:NO animated:YES];
+        }
+        //点击媒体消息
+        [weakSelf multiMediaMessageDidSelectedOnMessage:message atIndexPath:indexPath onMessageTableViewCell:cell];
+    }];
+    //5. 添加长按手势
+    [cell addLongPressGesture];
+    
+    //6. 设置音频cell
     if (kAVIMMessageMediaTypeAudio == message.mediaType) {
         EZGMessageVoiceCell *voiceCell = (EZGMessageVoiceCell *)cell;
         if (self.currentSelectedIndex == indexPath.row) {
@@ -258,7 +295,7 @@ static NSInteger const kOnePageSize = 10;
             SearchPoiModel *dataModel = (SearchPoiModel *)object;
             CLLocation *location = [[CLLocation alloc] initWithLatitude:dataModel.poiLocation.latitude longitude:dataModel.poiLocation.longitude];
             NSString *locationAddress = isEmpty(dataModel.poiAddress) ? Trim(dataModel.poiName) : Trim(dataModel.poiAddress);
-            [weakSelf didSendGeolocationsMessageWithGeolocaltions:locationAddress location:location];
+            [weakSelf didSendGeoLocationsPhoto:nil geolocations:locationAddress location:location fromSender:nil onDate:nil];
         }
         else {
             [UIView showResultThenHideOnWindow:@"没有选择位置信息"];
@@ -299,7 +336,7 @@ static NSInteger const kOnePageSize = 10;
         ALAsset *asset = assets[i];
         UIImage *pickedImage = [UIImage imageWithCGImage:asset.defaultRepresentation.fullScreenImage];
         UIImage *sendImage = [self resizeImage:pickedImage];
-        [self didSendMessageWithPhoto:sendImage];
+        [self didSendPhoto:sendImage fromSender:nil onDate:nil];
     }
 }
 - (void)assetPickerControllerDidCancel:(ZYQAssetPickerController *)picker {
@@ -355,8 +392,18 @@ static NSInteger const kOnePageSize = 10;
     }
 }
 //发送图片
-- (void)didSendPhoto:(UIImage *)photo fromSender:(NSString *)sender onDate:(NSDate *)date {
-    [self sendImage:photo];
+- (void)didSendPhoto:(UIImage *)image fromSender:(NSString *)sender onDate:(NSDate *)date {
+    NSData *imageData = UIImageJPEGRepresentation(image, 0.6);
+    NSString *path = [[CDChatManager manager] tmpPath];
+    NSError *error;
+    [imageData writeToFile:path options:NSDataWritingAtomic error:&error];
+    if (error == nil) {
+        AVIMImageMessage *msg = [AVIMImageMessage messageWithText:nil attachedFilePath:path attributes:nil];
+        [self sendMsg:msg];
+    }
+    else {
+        [self alert:@"write image to file error" block:nil];
+    }
 }
 //发送视频
 - (void)didSendVideoConverPhoto:(UIImage *)videoConverPhoto videoPath:(NSString *)videoPath fromSender:(NSString *)sender onDate:(NSDate *)date {
@@ -365,7 +412,8 @@ static NSInteger const kOnePageSize = 10;
 }
 //发送语音
 - (void)didSendVoice:(NSString *)voicePath voiceDuration:(NSString *)voiceDuration fromSender:(NSString *)sender onDate:(NSDate *)date {
-    AVIMTypedMessage *msg = [AVIMAudioMessage messageWithText:nil attachedFilePath:voicePath attributes:nil];
+    AVIMAudioMessage *msg = [AVIMAudioMessage messageWithText:nil attachedFilePath:voicePath attributes:nil];
+    msg.text = voiceDuration;//NOTE:方便发送的时候显示
     [self sendMsg:msg];
 }
 //发送表情
@@ -386,7 +434,11 @@ static NSInteger const kOnePageSize = 10;
 }
 //发送地理位置
 - (void)didSendGeoLocationsPhoto:(UIImage *)geoLocationsPhoto geolocations:(NSString *)geolocations location:(CLLocation *)location fromSender:(NSString *)sender onDate:(NSDate *)date {
-    [self sendLocationWithLatitude:location.coordinate.latitude longitude:location.coordinate.longitude address:geolocations];
+    AVIMLocationMessage *locMsg = [AVIMLocationMessage messageWithText:geolocations
+                                                              latitude:location.coordinate.latitude
+                                                             longitude:location.coordinate.longitude
+                                                            attributes:nil];
+    [self sendMsg:locMsg];
 }
 
 #pragma mark -  ui config
@@ -466,68 +518,56 @@ static NSInteger const kOnePageSize = 10;
 }
 
 #pragma mark - send message
-- (void)sendImage:(UIImage *)image {
-    NSData *imageData = UIImageJPEGRepresentation(image, 0.6);
-    NSString *path = [[CDChatManager manager] tmpPath];
-    NSError *error;
-    [imageData writeToFile:path options:NSDataWritingAtomic error:&error];
-    if (error == nil) {
-        AVIMImageMessage *msg = [AVIMImageMessage messageWithText:nil attachedFilePath:path attributes:nil];
-        [self sendMsg:msg];
-    }
-    else {
-        [self alert:@"write image to file error" block:nil];
-    }
-}
-- (void)sendLocationWithLatitude:(double)latitude longitude:(double)longitude address:(NSString *)address {
-    AVIMLocationMessage *locMsg = [AVIMLocationMessage messageWithText:address latitude:latitude longitude:longitude attributes:nil];
-    [self sendMsg:locMsg];
-}
 - (void)sendMsg:(AVIMTypedMessage *)msg {
+    msg.status = AVIMMessageStatusSending;
+
+    //>>>>>设置临时消息必要的属性，先在cell中显示出来>>>>>>>>>>>
+    msg.messageId = [[CDChatManager manager] tempMessageId];
+    msg.sendTimestamp = [[NSDate date] timeIntervalSince1970] * 1000;
+    msg.clientId = [CDChatManager manager].selfId;
+    msg.conversationId = self.conv.conversationId;
+    [self insertMessage:msg];
+    NSInteger msgIndex = [self.messages indexOfObject:msg];//先缓存该消息在列表中的位置
+    [[CDConversationStore store] updateLastMessage:msg byConvId:self.conv.conversationId];//更新最后一条消息对象
+    //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+    
+    WEAKSELF
     [[CDChatManager manager] sendMessage:msg conversation:self.conv callback:^(BOOL succeeded, NSError *error) {
-        if ([self alertError:error]) {// 伪造一个 messageId，重发的成功的时候，根据这个伪造的id把数据库中的改过来
-            msg.messageId = [[CDChatManager manager] tempMessageId];
-            msg.sendTimestamp = [[NSDate date] timeIntervalSince1970] * 1000;
-            if (msg.conversationId == nil) {
-                //文件没有保存上会导致 conversationId 为空
-                msg.clientId = [CDChatManager manager].selfId;
-                msg.conversationId = self.conv.conversationId;
-            }
+        if ([weakSelf alertError:error]) {
             [[CDFailedMessageStore store] insertFailedMessage:msg];
-            [[CDSoundManager manager] playSendSoundIfNeed];
-            [self insertMessage:msg];
-        } else {
-            [[CDSoundManager manager] playSendSoundIfNeed];
-            [self insertMessage:msg];
+            msg.status = AVIMMessageStatusFailed;
         }
-        [[CDConversationStore store] updateLastMessage:msg byConvId:self.conv.conversationId];
+        else {
+            msg.status = AVIMMessageStatusSent;
+        }
+        [[CDSoundManager manager] playSendSoundIfNeed];
+        //NOTE:刷新当前message所在的cell
+        NSIndexPath *indexPath = [NSIndexPath indexPathForRow:msgIndex inSection:0];
+        [weakSelf.messageTableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationNone];
     }];
 }
 - (void)replaceMesssage:(AVIMTypedMessage *)message atIndexPath:(NSIndexPath *)indexPath {
     self.messages[indexPath.row] = message;
     [self.messageTableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationNone];
 }
-- (void)resendMessageAtIndexPath:(NSIndexPath *)indexPath discardIfFailed:(BOOL)discardIfFailed {
-    AVIMTypedMessage *msg = self.messages[indexPath.row];
+- (void)resendMessage:(AVIMTypedMessage *)msg atIndexPath:(NSIndexPath *)indexPath discardIfFailed:(BOOL)discardIfFailed {
     msg.status = AVIMMessageStatusSending;
     [self replaceMesssage:msg atIndexPath:indexPath];
-    NSString *recordId = msg.messageId;
+    NSString *recordId = msg.messageId;//NOTE:先缓存该临时消息的id，因为重发成功后messageId是要改变的
+    WEAKSELF
     [[CDChatManager manager] sendMessage:msg conversation:self.conv callback:^(BOOL succeeded, NSError *error) {
-        if ([self alertError:error]) {
-            if (discardIfFailed) {
-                // 服务器连通的情况下重发依然失败，说明消息有问题，如音频文件不存在，删掉这条消息
+        if ([weakSelf alertError:error]) {
+            if (discardIfFailed) {//判断是否需要删除重发失败的消息
                 [[CDFailedMessageStore store] deleteFailedMessageByRecordId:recordId];
-                // 显示失败状态。列表里就让它存在吧，反正也重发不出去
-                [self replaceMesssage:msg atIndexPath:indexPath];
             }
-            else {
-                [self replaceMesssage:msg atIndexPath:indexPath];
-            }
+            msg.status = AVIMMessageStatusFailed;
         }
-        else {
+        else {//重发成功后删除失败消息
             [[CDFailedMessageStore store] deleteFailedMessageByRecordId:recordId];
-            [self replaceMesssage:msg atIndexPath:indexPath];
+            msg.status = AVIMMessageStatusSent;
         }
+        //刷新message所在的cell
+        [weakSelf replaceMesssage:msg atIndexPath:indexPath];
     }];
 }
 
@@ -584,7 +624,7 @@ static NSInteger const kOnePageSize = 10;
         }
         else {
             [self cacheMsgs:msgs callback:^(BOOL succeeded, NSError *error) {
-                block (msgs, error);
+                block(msgs, error);
             }];
         }
     }];
@@ -592,126 +632,91 @@ static NSInteger const kOnePageSize = 10;
 - (void)loadMessagesWhenInit {
     if (self.isLoadingMsg) {
         return;
-    } else {
-        self.isLoadingMsg = YES;
-        [self queryAndCacheMessagesWithTimestamp:0 block:^(NSArray *msgs, NSError *error) {
-            if ([self filterError:error]) {
-                // 失败消息加到末尾，因为 SDK 缓存不保存它们
-                NSArray *failedMessages = [[CDFailedMessageStore store] selectFailedMessagesByConversationId:self.conv.conversationId];
-                NSMutableArray *allMessages = [NSMutableArray arrayWithArray:msgs];
-                [allMessages addObjectsFromArray:failedMessages];
-                
-                self.messages = allMessages;
-                [self.messageTableView reloadData];
-                [self scrollToBottomAnimated:NO];
-                if ([msgs count] > 0) {
-                    [self updateConversationAsRead];
-                }
-                
-                // 如果连接上，则重发所有的失败消息。若夹杂在历史消息中间不好处理
-                if ([CDChatManager manager].connect) {
-                    for (NSInteger row = msgs.count;row < allMessages.count; row ++) {
-                        [self resendMessageAtIndexPath:[NSIndexPath indexPathForRow:row inSection:0] discardIfFailed:YES];
-                    }
+    }
+    self.isLoadingMsg = YES;
+    
+    [self queryAndCacheMessagesWithTimestamp:0 block:^(NSArray *msgs, NSError *error) {
+        if ([self filterError:error]) {
+            // 失败消息加到末尾，因为 SDK 缓存不保存它们
+            NSArray *failedMessages = [[CDFailedMessageStore store] selectFailedMessagesByConversationId:self.conv.conversationId];
+            NSMutableArray *allMessages = [NSMutableArray arrayWithArray:msgs];
+            [allMessages addObjectsFromArray:failedMessages];
+            
+            self.messages = allMessages;
+            [self.messageTableView reloadData];
+            [self scrollToBottomAnimated:NO];
+            if ([msgs count] > 0) {
+                [self updateConversationAsRead];
+            }
+            
+            // 如果连接上，则重发所有的失败消息。若夹杂在历史消息中间不好处理
+            if ([CDChatManager manager].connect) {
+                for (NSInteger i = msgs.count; i < allMessages.count; i++) {
+                    [self resendMessage:allMessages[i] atIndexPath:[NSIndexPath indexPathForRow:i inSection:0] discardIfFailed:YES];
                 }
             }
-            self.isLoadingMsg = NO;
-        }];
-    }
+        }
+        self.isLoadingMsg = NO;
+    }];
 }
 - (void)loadOldMessages {
     if (self.messages.count == 0 || self.isLoadingMsg) {
         [self.messageTableView.header endRefreshing];
         return;
-    } else {
-        WEAKSELF
-        self.isLoadingMsg = YES;
-        AVIMTypedMessage *msg = self.messages[0];
-        int64_t timestamp = msg.sendTimestamp;
-        [self queryAndCacheMessagesWithTimestamp:timestamp block:^(NSArray *msgs, NSError *error) {
-            if ([weakSelf filterError:error] && isNotEmpty(msgs)) {
-                NSMutableArray *newMsgs = [NSMutableArray arrayWithArray:msgs];
-                [newMsgs addObjectsFromArray:weakSelf.messages];
-                if ([msgs count] > 0) {
-                    [weakSelf insertOldMessages:msgs completion: ^{
-                        weakSelf.isLoadingMsg = NO;
-                        [weakSelf.messageTableView.header endRefreshing];
-                    }];
-                }
-                else {
+    }
+    self.isLoadingMsg = YES;
+    AVIMTypedMessage *msg = self.messages[0];
+    int64_t timestamp = msg.sendTimestamp;
+    WEAKSELF
+    [self queryAndCacheMessagesWithTimestamp:timestamp block:^(NSArray *msgs, NSError *error) {
+        if ([weakSelf filterError:error] && isNotEmpty(msgs)) {
+            NSMutableArray *newMsgs = [NSMutableArray arrayWithArray:msgs];
+            [newMsgs addObjectsFromArray:weakSelf.messages];
+            if ([msgs count] > 0) {
+                [weakSelf insertOldMessages:msgs completion: ^{
                     weakSelf.isLoadingMsg = NO;
                     [weakSelf.messageTableView.header endRefreshing];
-                }
+                }];
             }
             else {
                 weakSelf.isLoadingMsg = NO;
                 [weakSelf.messageTableView.header endRefreshing];
             }
-        }];
-    }
+        }
+        else {
+            weakSelf.isLoadingMsg = NO;
+            [weakSelf.messageTableView.header endRefreshing];
+        }
+    }];
 }
 //缓存消息内容文件，不是消息本身！
 - (void)cacheMsgs:(NSArray *)msgs callback:(AVBooleanResultBlock)callback {
     if (isEmpty(msgs)) {
         callback(YES, nil);
     }
-    [self runInGlobalQueue:^{
-        NSMutableSet *userIds = [[NSMutableSet alloc] init];
-        for (AVIMTypedMessage *msg in msgs) {
-            
-            //设置消息是已读的>>>>>>>>>>>>>>>>>>>
-            if (msg.sendTimestamp <= self.lastSentTimestamp &&
-                AVIMMessageIOTypeOut == msg.ioType &&
-                AVIMMessageStatusDelivered != msg.status) {
-                msg.status = AVIMMessageStatusDelivered;
-            }
-            //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-            
-            [userIds addObject:msg.clientId];
-            if (msg.mediaType == kAVIMMessageMediaTypeImage || msg.mediaType == kAVIMMessageMediaTypeAudio) {
-                AVFile *file = msg.file;
-                if (file && file.isDataAvailable == NO) {
-                    NSError *error;
-                    // 下载到本地
-                    NSData *data = [file getData:&error];
-                    if (error || data == nil) {
-                        DLog(@"download file error : %@", error);
-                    }
-                }
-            } else if (msg.mediaType == kAVIMMessageMediaTypeVideo) {
-                NSString *path = [[CDChatManager manager] videoPathOfMessag:(AVIMVideoMessage *)msg];
-                if (![[NSFileManager defaultManager] fileExistsAtPath:path]) {
-                    NSError *error;
-                    NSData *data = [msg.file getData:&error];
-                    if (error) {
-                        DLog(@"download file error : %@", error);
-                    } else {
-                        [data writeToFile:path atomically:YES];
-                    }
-                }
-            }
+    for (AVIMTypedMessage *msg in msgs) {
+        //设置消息是已读的>>>>>>>>>>>>>>>>>>>
+        if (msg.sendTimestamp <= self.lastSentTimestamp &&
+            AVIMMessageIOTypeOut == msg.ioType &&
+            AVIMMessageStatusDelivered != msg.status) {
+            msg.status = AVIMMessageStatusDelivered;
         }
-        [self runInMainQueue:^{
-            callback(YES, nil);
-        }];
-    }];
+        //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+    }
+    callback(YES, nil);
 }
 - (void)insertMessage:(AVIMTypedMessage *)message {
-    if (self.isLoadingMsg) {
-        [self performSelector:@selector(insertMessage:) withObject:message afterDelay:1];
-        return;
-    }
-    self.isLoadingMsg = YES;
+    WEAKSELF
     [self cacheMsgs:@[message] callback:^(BOOL succeeded, NSError *error) {
-        if ([self filterError:error]) {
-            [self.messageTableView beginUpdates];
-            NSIndexPath *indexPath = [NSIndexPath indexPathForRow:self.messages.count inSection:0];
-            [self.messages addObject:message];
-            [self.messageTableView insertRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationNone];
-            [self.messageTableView endUpdates];
-            [self scrollToBottomAnimated:YES];
+        if ([weakSelf filterError:error]) {
+            [weakSelf.messageTableView beginUpdates];
+            NSIndexPath *indexPath = [NSIndexPath indexPathForRow:weakSelf.messages.count inSection:0];
+            [weakSelf.messages addObject:message];
+            [weakSelf.messageTableView insertRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationNone];
+            [weakSelf.messageTableView endUpdates];
+            [weakSelf scrollToBottomAnimated:YES];
         }
-        self.isLoadingMsg = NO;
+        weakSelf.isLoadingMsg = NO;
     }];
 }
 

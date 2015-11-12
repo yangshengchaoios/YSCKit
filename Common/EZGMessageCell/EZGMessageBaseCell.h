@@ -63,4 +63,9 @@ typedef NS_ENUM(NSInteger, EZGBubbleMessageType) {
 - (NSString *)formatMessageTimeByTimeStamp:(int64_t)timeStamp;
 - (NSString *)formatMessageTimeByDate:(NSDate *)messageDate;
 
+
+#pragma mark - Long Press Gesture
+//自动判断是否添加
+- (void)addLongPressGesture;
+
 @end

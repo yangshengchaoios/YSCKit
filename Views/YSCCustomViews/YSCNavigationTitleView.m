@@ -29,6 +29,7 @@
             make.top.equalTo(self.mas_top);
             make.left.equalTo(self.mas_left);
             make.right.equalTo(self.mas_right);
+            make.height.equalTo(@AUTOLAYOUT_LENGTH(50));
         }];
         
         self.subTitleLabel = [[UILabel alloc] initWithFrame:CGRectZero];

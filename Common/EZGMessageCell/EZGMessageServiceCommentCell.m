@@ -72,11 +72,11 @@
     self.commentTitleLabel.text = message.text;
     for (int i = 0; i < [self.rateImageViewArray count]; i++) {
         UIImageView *imageView = self.rateImageViewArray[i];
-        if (i < [message.attributes[MParamRateScore] integerValue]) {
-            imageView.image = [UIImage imageNamed:@""];//黄色星星
+        if (i < message.rateScore) {
+            imageView.image = [UIImage imageNamed:@"foregroundStar"];//黄色星星
         }
         else {
-            imageView.image = [UIImage imageNamed:@""];//灰色星星
+            imageView.image = [UIImage imageNamed:@"backgroundStar"];//灰色星星
         }
     }
     self.overLabel.text = [NSString stringWithFormat:@"%@\r\n本次服务已结束", [self formatMessageTimeByTimeStamp:message.sendTimestamp]];

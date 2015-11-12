@@ -48,7 +48,7 @@
 + (CGSize)BubbleFrameWithMessage:(AVIMTypedMessage *)message {
     NSString *msgText = [CDEmotionUtils emojiStringFromString:message.text];//将原始字符串转换为带emoji的字符串
     CGFloat maxTextWidth = SCREEN_WIDTH - 2 * (kXHAvatorPadding + kXHAvatarImageSize + kXHBubbleMessageViewPadding + kXHBubbleMarginHor) - kXHBubbleArrowWidth - kXHBubbleTailWidth;
-    CGFloat dyWidth = [self neededWidthForText:msgText];
+    CGFloat dyWidth = MAX(AUTOLAYOUT_LENGTH(60), [self neededWidthForText:msgText]);
     NSAttributedString *attrStr = [[XHMessageBubbleHelper sharedMessageBubbleHelper] bubbleAttributtedStringWithText:msgText];
     CGSize textSize = [SETextView frameRectWithAttributtedString:attrStr
                                                   constraintSize:CGSizeMake(maxTextWidth, MAXFLOAT)
@@ -77,6 +77,15 @@
     else {
         self.displayTextView.textColor = [UIColor whiteColor];
     }
+}
+
+#pragma mark - Menu Actions
+- (BOOL)canPerformAction:(SEL)action withSender:(id)sender {
+    return action == @selector(copyed:);
+}
+- (void)copyed:(id)sender {
+    [[UIPasteboard generalPasteboard] setString:Trim(self.displayTextView.text)];
+    [self resignFirstResponder];
 }
 
 @end

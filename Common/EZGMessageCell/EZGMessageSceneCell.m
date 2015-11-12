@@ -34,7 +34,7 @@
 #pragma mark - 计算大小
 //计算气泡大小
 + (CGSize)BubbleFrameWithMessage:(EZGSceneMessage *)message {
-    return AUTOLAYOUT_SIZE_WH(300 + 14, 160);
+    return AUTOLAYOUT_SIZE_WH(300 + 14, 210);
 }
 
 #pragma mark - 显示内容
@@ -43,7 +43,7 @@
     [super layoutMessage:message displaysTimestamp:displayTimestamp];
     self.sceneTextLabel.text = message.text;
     
-    if (EZGSceneTypeSingleCar == [message.attributes[MParamSceneType] integerValue]) {
+    if (EZGSceneTypeSingleCar == message.sceneType) {
         self.bubbleSceneImageView.image = [UIImage imageNamed:@"singlecar"];
     }
     else {

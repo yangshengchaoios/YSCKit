@@ -9,6 +9,7 @@
 #import "EZGMessageModel.h"
 
 @implementation EZGSceneMessage
+@dynamic sceneType;
 + (void)load {
     [self registerSubclass];
 }
@@ -18,6 +19,7 @@
 @end
 
 @implementation EZGCarMessage
+@dynamic carInfo;
 + (void)load {
     [self registerSubclass];
 }
@@ -27,6 +29,8 @@
 @end
 
 @implementation EZGServiceMessage
+@dynamic detailInfo;
+@dynamic serviceType;
 + (void)load {
     [self registerSubclass];
 }
@@ -36,6 +40,7 @@
 @end
 
 @implementation EZGServiceCancelMessage
+@dynamic detailInfo;
 + (void)load {
     [self registerSubclass];
 }
@@ -45,6 +50,7 @@
 @end
 
 @implementation EZGServiceCommentMessage
+@dynamic rateScore;
 + (void)load {
     [self registerSubclass];
 }

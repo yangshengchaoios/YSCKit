@@ -49,7 +49,7 @@
 //计算cell高度
 + (CGFloat)HeightOfCellByMessage:(EZGServiceMessage *)message displaysTimestamp:(BOOL)displayTimestamp {
     CGFloat cellHeight = [super HeightOfCellByMessage:message displaysTimestamp:displayTimestamp];
-    if (EZGServiceTypeOver == [message.attributes[MParamServiceType] integerValue]) {
+    if (EZGServiceTypeOver == message.serviceType) {
         return cellHeight + AUTOLAYOUT_LENGTH(80) + 2 * kXHLabelPadding;
     }
     else {
@@ -62,17 +62,16 @@
 - (void)layoutMessage:(EZGServiceMessage *)message displaysTimestamp:(BOOL)displayTimestamp {
     [super layoutMessage:message displaysTimestamp:displayTimestamp];
     self.serviceTitleLabel.text = message.text;
-    self.serviceDetailLabel.text = message.attributes[MParamDetailInfo];
+    self.serviceDetailLabel.text = Trim(message.detailInfo);
 
     //设置详细内容显示样式
-    EZGServiceType serviceType = [message.attributes[MParamServiceType] integerValue];
-    if (EZGServiceTypeOver == serviceType) {//服务结束(有结束标志！)
+    if (EZGServiceTypeOver == message.serviceType) {//服务结束(有结束标志！)
         self.overLabel.hidden = NO;
         self.overLabel.text = [NSString stringWithFormat:@"%@\r\n本次服务已结束", [self formatMessageTimeByTimeStamp:message.sendTimestamp]];
         self.serviceDetailLabel.textAlignment = NSTextAlignmentCenter;
         self.serviceDetailLabel.numberOfLines = 1;
     }
-    else if (EZGServiceTypeResume == serviceType) {//取消放弃操作
+    else if (EZGServiceTypeResume == message.serviceType) {//取消放弃操作
         self.overLabel.hidden = YES;
         self.serviceDetailLabel.textAlignment = NSTextAlignmentCenter;
         self.serviceDetailLabel.numberOfLines = 1;

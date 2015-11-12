@@ -65,8 +65,24 @@
     [super layoutSubviews];
     
     CGRect contentFrame = [self calculateContentFrame];
-    self.bubblePhotoImageView.frame = CGRectInset(contentFrame, -kXHBubbleMarginHor, -kXHBubbleMarginVer);
-    self.bubblePhotoImageView.width -= 3;//FIXME:
+    self.bubblePhotoImageView.frame = CGRectInset(contentFrame, -kXHBubbleMarginHor + AUTOLAYOUT_LENGTH(5), -kXHBubbleMarginVer);
+    self.bubblePhotoImageView.left -= AUTOLAYOUT_LENGTH(3);//FIXME:标准
+}
+
+#pragma mark - Menu Actions
+#pragma mark - Menu Actions
+- (BOOL)canPerformAction:(SEL)action withSender:(id)sender {
+    return action == @selector(save:);
+}
+- (void)save:(id)sender {
+    //FIXME:判断是否显示图片
+    [self resignFirstResponder];
+    [UIView showHUDLoadingOnWindow:@"正在保存"];
+    [[ALAssetsLibrary new] saveImage:self.bubblePhotoImageView.image toAlbum:@"EZGoal" completion:^(NSURL *assetURL, NSError *error) {
+        [UIView showResultThenHideOnWindow:@"保存成功"];
+    } failure:^(NSError *error) {
+        [UIView showResultThenHideOnWindow:@"保存失败！"];
+    }];//保存至相册
 }
 
 @end

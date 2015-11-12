@@ -24,7 +24,7 @@
     return self;
 }
 
-//计算气泡高度
+//计算气泡大小
 + (CGSize)BubbleFrameWithMessage:(AVIMVideoMessage *)message {
     return [self SizeForPhoto:[self videoConverPhotoWithVideoPath:message.file.localPath]];
 }

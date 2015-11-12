@@ -32,4 +32,6 @@
 - (void)didClickedShareMenuItemSendLocation;
 //点击扩展功能按钮-发送图片
 - (void)didClickedShareMenuItemSendPhoto;
+//发送消息
+- (void)sendMsg:(AVIMTypedMessage *)msg;
 @end

@@ -12,6 +12,10 @@
 
 @implementation LogManager
 
++ (void)saveLogError:(NSError *)error {
+    NSString *errMsg = [NSString stringWithFormat:@"%@", error];
+    [self saveLog:errMsg];
+}
 + (void)saveLog:(NSString *)logString {
     NSString *logDirectory = [STORAGEMANAGER directoryPathOfDocumentsLog];
     NSString *fileName =  [[NSDate date] stringWithFormat:@"yyyy-MM-dd"];

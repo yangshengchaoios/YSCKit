@@ -28,16 +28,17 @@
 #pragma mark - 计算大小
 //计算气泡大小
 + (CGSize)BubbleFrameWithMessage:(AVIMAudioMessage *)message {
-    float duration = message.duration;
+    float duration = (message.duration == 0 ? message.text.floatValue : message.duration);
     float gapDuration = (duration == 0 ? -1 : duration - 1.0f);
-    return CGSizeMake(90 + (gapDuration > 0 ? (120.0 / (60 - 1) * gapDuration) : 0), kXHAvatarImageSize);
+    return CGSizeMake(100 + (gapDuration > 0 ? (120.0 / (60 - 1) * gapDuration) : 0), kXHAvatarImageSize);
 }
 
 #pragma mark - 显示内容
 //显示message
 - (void)layoutMessage:(AVIMAudioMessage *)message displaysTimestamp:(BOOL)displayTimestamp {
     [super layoutMessage:message displaysTimestamp:displayTimestamp];
-    self.voiceDurationLabel.text = [NSString stringWithFormat:@"%.1f\"", message.duration];
+    float duration = (message.duration == 0 ? message.text.floatValue : message.duration);
+    self.voiceDurationLabel.text = [NSString stringWithFormat:@"%.1f\"", duration];
     [self resetVoiceAnimations];
 }
 //动态计算位置和大小

@@ -11,6 +11,9 @@
 
 @implementation EZGMessageBaseCell
 
+- (void)dealloc {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
 - (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier {
     self = [super initWithStyle:UITableViewCellStyleDefault reuseIdentifier:reuseIdentifier];
     if (self) {
@@ -56,9 +59,12 @@
 #pragma mark - 计算大小
 //动态计算图片显示的大小，等比例缩放，填满
 + (CGSize)SizeForPhoto:(UIImage *)photo {
-    //TODO:需要判断空、根据image大小来设置
-    CGSize photoSize = CGSizeMake(120, 120);
-    return photoSize;
+    CGFloat photoWidth = photo.size.width;
+    photoWidth = MIN(photoWidth, AUTOLAYOUT_LENGTH(300));
+    photoWidth = MAX(photoWidth, AUTOLAYOUT_LENGTH(150));
+    CGFloat photoHeight = photoWidth * photo.size.height / photo.size.width;
+    photoHeight = MAX(photoHeight, kXHAvatarImageSize);
+    return CGSizeMake(photoWidth, photoHeight);
 }
 //计算气泡大小
 + (CGSize)BubbleFrameWithMessage:(AVIMTypedMessage *)message {
@@ -211,6 +217,69 @@
         }
     }
     return [NSString stringWithFormat:@"%@ %@",dateText,timeText];
+}
+
+
+
+#pragma mark - Long Press Gesture
+//自动判断是否添加
+- (void)addLongPressGesture {
+    if ([self canPerformAction:@selector(copyed:) withSender:nil] ||
+        [self canPerformAction:@selector(save:) withSender:nil]) {//NOTE:如果子类需要功能，就重写该方法
+        UILongPressGestureRecognizer *longPressGesture = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(longPressGestureRecognizerHandle:)];
+        [self.bubbleImageView addGestureRecognizer:longPressGesture];
+    }
+}
+//统一一个方法隐藏MenuController，多处需要调用
+- (void)setupNormalMenuController {
+    UIMenuController *menu = [UIMenuController sharedMenuController];
+    if (menu.isMenuVisible) {
+        [menu setMenuVisible:NO animated:YES];
+    }
+}
+//长按Cell的手势处理方法，用于显示MenuController的
+- (void)longPressGestureRecognizerHandle:(UILongPressGestureRecognizer *)longPressGestureRecognizer {
+    if (longPressGestureRecognizer.state != UIGestureRecognizerStateBegan || ![self becomeFirstResponder]) {
+        return;
+    }
+    UIMenuItem *copyed = [[UIMenuItem alloc] initWithTitle:NSLocalizedStringFromTable(@"copy", @"MessageDisplayKitString", @"复制") action:@selector(copyed:)];
+    UIMenuItem *transpond = [[UIMenuItem alloc] initWithTitle:NSLocalizedStringFromTable(@"transpond", @"MessageDisplayKitString", @"转发") action:@selector(transpond:)];
+    UIMenuItem *favorites = [[UIMenuItem alloc] initWithTitle:NSLocalizedStringFromTable(@"favorites", @"MessageDisplayKitString", @"收藏") action:@selector(favorites:)];
+    UIMenuItem *more = [[UIMenuItem alloc] initWithTitle:NSLocalizedStringFromTable(@"more", @"MessageDisplayKitString", @"更多") action:@selector(more:)];
+    UIMenuItem *save = [[UIMenuItem alloc] initWithTitle:NSLocalizedStringFromTable(@"save", @"MessageDisplayKitString", @"保存") action:@selector(save:)];
+    
+    UIMenuController *menu = [UIMenuController sharedMenuController];
+    [menu setMenuItems:[NSArray arrayWithObjects:save, copyed, transpond, favorites, more, nil]];
+    [menu setTargetRect:CGRectInset(self.bubbleImageView.frame, 0.0f, 4.0f) inView:self.contentView];
+    [menu setMenuVisible:YES animated:YES];
+}
+
+#pragma mark - Extend Methods
+- (BOOL)canBecomeFirstResponder {
+    return YES;
+}
+- (BOOL)becomeFirstResponder {
+    return [super becomeFirstResponder];
+}
+- (BOOL)canPerformAction:(SEL)action withSender:(id)sender {
+    return NO;
+}
+
+#pragma mark - Menu Actions
+- (void)copyed:(id)sender {
+
+}
+- (void)transpond:(id)sender {
+
+}
+- (void)favorites:(id)sender {
+
+}
+- (void)more:(id)sender {
+
+}
+- (void)save:(id)sender {
+
 }
 
 @end

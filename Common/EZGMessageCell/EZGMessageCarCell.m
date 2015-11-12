@@ -50,7 +50,7 @@
 - (void)layoutMessage:(EZGCarMessage *)message displaysTimestamp:(BOOL)displayTimestamp {
     [super layoutMessage:message displaysTimestamp:displayTimestamp];
     self.carTitleLabel.text = message.text;
-    MyCarModel *carModel = [[MyCarModel alloc] initWithString:message.attributes[MParamCarInfo] error:nil];
+    MyCarModel *carModel = [[MyCarModel alloc] initWithString:Trim(message.carInfo) error:nil];
     self.carBrandLabel.text = [carModel formatCarModelName];
     self.carNumberLabel.text = [carModel formatCarNumber];
 }

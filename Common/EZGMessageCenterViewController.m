@@ -109,9 +109,9 @@
         [weakSelf.tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationNone];
         ChatUserModel *otherUser = [[ChatUserModel alloc] initWithString:conversation.attributes[OtherUserInfo] error:nil];
         
-        NSDictionary *params = @{kParamOtherId : Trim(otherUser.userId),
-                                 kParamConvId : Trim(conversation.conversationId),
-                                 kParamChatRoom : @{kParamBlock : refreshCellBlock},
+        NSDictionary *params = @{kParamOtherId          : Trim(otherUser.userId),
+                                 kParamConversationId   : Trim(conversation.conversationId),
+                                 kParamChatRoom         : @{kParamBlock : refreshCellBlock},
                                  kParamExtendAttributes : @{kParamBUserInfo : Trim([otherUser toJSONString]),
                                                             kParamCUserInfo : Trim([USER buildCUserInfo])}
                                  };

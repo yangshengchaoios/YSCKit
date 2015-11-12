@@ -11,6 +11,7 @@
 
 @interface LogManager : NSObject
 
++ (void)saveLogError:(NSError *)error;
 + (void)saveLog:(NSString *)logString;
 + (void)saveTempLog:(NSString *)logString;
 + (void)saveLog:(NSString *)logString intoFileName:(NSString *)fileName;

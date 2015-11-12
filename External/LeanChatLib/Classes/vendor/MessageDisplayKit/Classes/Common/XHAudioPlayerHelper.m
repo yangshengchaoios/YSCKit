@@ -48,14 +48,12 @@
 //播放转换后wav
 - (void)playAudioWithFileName:(NSString*)fileName {
     if (fileName.length > 0) {
-        
         //不随着静音键和屏幕关闭而静音。code by Aevit
-        [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:nil];
-        
+//        [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:nil];
         if (_playingFileName && [fileName isEqualToString:_playingFileName]) {//上次播放的录音
             if (_player) {
                 [_player play];
-                [[UIDevice currentDevice] setProximityMonitoringEnabled:YES];
+//                [[UIDevice currentDevice] setProximityMonitoringEnabled:YES];
                 if ([self.delegate respondsToSelector:@selector(didAudioPlayerBeginPlay:)]) {
                     [self.delegate didAudioPlayerBeginPlay:_player];
                 }
@@ -78,7 +76,7 @@
             pl.delegate = self;
             [pl play];
             self.player = pl;
-            [[UIDevice currentDevice] setProximityMonitoringEnabled:YES];
+//            [[UIDevice currentDevice] setProximityMonitoringEnabled:YES];
             if ([self.delegate respondsToSelector:@selector(didAudioPlayerBeginPlay:)]) {
                 [self.delegate didAudioPlayerBeginPlay:_player];
             }
@@ -140,8 +138,9 @@
 - (id)init {
     self = [super init];
     if (self) {
-        [self changeProximityMonitorEnableState:YES];
+//        [self changeProximityMonitorEnableState:YES];
         [[UIDevice currentDevice] setProximityMonitoringEnabled:NO];
+        
     }
     return self;
 }

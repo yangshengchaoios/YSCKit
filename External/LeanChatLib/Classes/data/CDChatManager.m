@@ -243,9 +243,7 @@ static CDChatManager *instance;
         self.remoteNotificationConvid = userInfo[kParamConvId];
         return YES;
     }
-    else {
-        self.remoteNotificationConvid = nil;
-    }
+    self.remoteNotificationConvid = nil;
     return NO;
 }
 
