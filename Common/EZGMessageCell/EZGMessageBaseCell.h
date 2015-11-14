@@ -25,6 +25,16 @@
 #define kXHBubbleArrowWidth         AUTOLAYOUT_LENGTH(25)   //气泡箭头宽度
 #define kXHBubbleTailWidth          AUTOLAYOUT_LENGTH(13)   //气泡箭头相反方向的边距
 
+#define kBubbleTextFont             AUTOLAYOUT_FONT(30)
+#define kBubbleTitleFont            AUTOLAYOUT_FONT(24)
+#define kBubbleTitleFontColor       RGB(85, 85, 85)
+#define kBubbleDetailFont           AUTOLAYOUT_FONT(24)
+#define kBubbleDetailFontColor      [UIColor blackColor]
+#define kBubbleServiceWidth         AUTOLAYOUT_LENGTH(300 + 14)//服务特殊会话的气泡宽度
+#define kBubbleServiceTextWidth     (kBubbleServiceWidth - kXHBubbleMarginHor * 2 - kXHBubbleArrowWidth - kXHBubbleTailWidth) // 特殊服务会话的文本最大宽度
+
+//文本最大宽度
+#define kMaxTextWidth               (SCREEN_WIDTH - 2 * (kXHAvatorPadding + kXHAvatarImageSize + kXHBubbleMessageViewPadding + kXHBubbleMarginHor) - kXHBubbleArrowWidth - kXHBubbleTailWidth)
 
 typedef NS_ENUM(NSInteger, EZGBubbleMessageType) {
     EZGBubbleMessageTypeSending = 0,

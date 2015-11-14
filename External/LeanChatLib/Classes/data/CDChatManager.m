@@ -115,6 +115,9 @@ static CDChatManager *instance;
         [q whereKey:AVIMAttr(kParamEzgoalType) equalTo:attributes[kParamEzgoalType]];
         [q whereKey:AVIMAttr(kParamEzgoalStatus) equalTo:attributes[kParamEzgoalStatus]];
     }
+    else {//普通会话
+        [q whereKey:AVIMAttr(kParamEzgoalType) equalTo:@""];
+    }
     [q whereKey:kAVIMKeyMember containsAllObjectsInArray:members];
     [q whereKey:kAVIMKeyMember sizeEqualTo:members.count];
     [q orderByDescending:@"lm"];

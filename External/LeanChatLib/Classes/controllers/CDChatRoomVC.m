@@ -87,6 +87,9 @@ static NSInteger const kOnePageSize = 10;
                                                                             action:@selector(backButtonClicked:)];
 }
 - (void)backButtonClicked:(id)sender {
+    if (self.messageInputView.isRecording) {
+        return ;//正在录音中
+    }
     if (self.navigationController) {            //如果有navigationBar
         NSInteger index = [self.navigationController.viewControllers indexOfObject:self];
         if (index > 0) {                        //不是root，就返回上一级
@@ -211,10 +214,10 @@ static NSInteger const kOnePageSize = 10;
         }
     }
     else if (kAVIMMessageMediaTypeLocation == message.mediaType) {//查看位置
-        //FIXME: 打开百度地图
-//        XHDisplayLocationViewController *displayLocationViewController = [[XHDisplayLocationViewController alloc] init];
-//        displayLocationViewController.message = message;
-//        [self.navigationController pushViewController:displayLocationViewController animated:YES];
+        YSCBaseViewController *mapViewController = (YSCBaseViewController *)[UIResponder createBaseViewController:@"YSCLocationDisplayViewController"];
+        AVIMLocationMessage *locMessage = (AVIMLocationMessage *)message;
+        mapViewController.params = @{kParamBackType : @(BackTypeImage), kParamLatitude : @(locMessage.latitude), kParamLongitude : @(locMessage.longitude)};
+        [self.navigationController pushViewController:mapViewController animated:YES];
     }
     else if (kAVIMMessageMediaTypeVideo == message.mediaType) {
         //TODO:播放视频

@@ -23,18 +23,20 @@
         [self.contentView addSubview:self.carNumberLabel];
         
         self.carTitleLabel.backgroundColor = [UIColor clearColor];
-        self.carTitleLabel.textColor = kDefaultTextColorBlack1;
-        self.carTitleLabel.font = AUTOLAYOUT_FONT(self.carTitleLabel.font.pointSize);
+        self.carTitleLabel.textColor = kBubbleTitleFontColor;
+        self.carTitleLabel.font = kBubbleTitleFont;
         
         self.separationLineLabel.height = AUTOLAYOUT_LENGTH(1);
+        self.separationLineLabel.backgroundColor = kDefaultBorderColor;
         
         self.carBrandLabel.backgroundColor = [UIColor clearColor];
-        self.carBrandLabel.textColor = kDefaultTextColorBlack1;
-        self.carBrandLabel.font = AUTOLAYOUT_FONT(self.carBrandLabel.font.pointSize);
+        self.carBrandLabel.textColor = kBubbleDetailFontColor;
+        self.carBrandLabel.font = kBubbleDetailFont;
+        self.carBrandLabel.numberOfLines = 2;
         
         self.carNumberLabel.backgroundColor = [UIColor clearColor];
-        self.carNumberLabel.textColor = kDefaultTextColorBlack1;
-        self.carNumberLabel.font = AUTOLAYOUT_FONT(self.carNumberLabel.font.pointSize);
+        self.carNumberLabel.textColor = kBubbleDetailFontColor;
+        self.carNumberLabel.font = kBubbleDetailFont;
     }
     return self;
 }
@@ -42,7 +44,19 @@
 #pragma mark - 计算大小
 //计算气泡大小
 + (CGSize)BubbleFrameWithMessage:(EZGCarMessage *)message {
-    return AUTOLAYOUT_SIZE_WH(300 + 14, 160);
+    MyCarModel *carModel = [[MyCarModel alloc] initWithString:Trim(message.attributes[MParamCarInfo]) error:nil];
+    CGFloat titleHeight = [NSString HeightOfNormalString:Trim(message.text)
+                                                maxWidth:kBubbleServiceTextWidth
+                                                withFont:kBubbleTitleFont];
+    CGFloat carBrandHeight = [NSString HeightOfNormalString:Trim([carModel formatCarModelName])
+                                                   maxWidth:kBubbleServiceTextWidth
+                                                   withFont:kBubbleDetailFont];
+    CGFloat carNumberHeight = [NSString HeightOfNormalString:Trim([carModel formatCarNumber])
+                                                   maxWidth:kBubbleServiceTextWidth
+                                                   withFont:kBubbleDetailFont];
+    CGFloat bubbleHeight = titleHeight + carBrandHeight + carNumberHeight + kXHBubbleMarginVer * 3.5;
+    bubbleHeight = MAX(AUTOLAYOUT_LENGTH(160), bubbleHeight);
+    return CGSizeMake(kBubbleServiceWidth, bubbleHeight);
 }
 
 #pragma mark - 显示内容
@@ -50,39 +64,34 @@
 - (void)layoutMessage:(EZGCarMessage *)message displaysTimestamp:(BOOL)displayTimestamp {
     [super layoutMessage:message displaysTimestamp:displayTimestamp];
     self.carTitleLabel.text = message.text;
-    MyCarModel *carModel = [[MyCarModel alloc] initWithString:Trim(message.carInfo) error:nil];
+    MyCarModel *carModel = [[MyCarModel alloc] initWithString:Trim(message.attributes[MParamCarInfo]) error:nil];
     self.carBrandLabel.text = [carModel formatCarModelName];
     self.carNumberLabel.text = [carModel formatCarNumber];
 }
 //动态计算位置和大小
 - (void)layoutSubviews {
     [super layoutSubviews];
+    CGRect contentFrame = [self calculateContentFrame];
     
     //调整标题位置
     [self.carTitleLabel sizeToFit];
-    self.carTitleLabel.width = self.bubbleImageView.width - (kXHBubbleMarginHor + kXHBubbleArrowWidth + kXHBubbleMarginHor);
-    self.carTitleLabel.top = self.bubbleImageView.top + kXHBubbleMarginVer;
-    if (EZGBubbleMessageTypeReceiving == [self bubbleMessageType]) {
-        self.carTitleLabel.left = self.bubbleImageView.left + kXHBubbleArrowWidth + kXHBubbleMarginHor;
-    }
-    else {
-        self.carTitleLabel.left = self.bubbleImageView.left + kXHBubbleMarginHor;
-    }
+    self.carTitleLabel.origin = contentFrame.origin;
+    self.carTitleLabel.width = contentFrame.size.width;
     
     //调整分割线位置
     self.separationLineLabel.left = self.carTitleLabel.left;
-    self.separationLineLabel.top = CGRectGetMaxY(self.carTitleLabel.frame) + kXHBubbleMarginVer;
+    self.separationLineLabel.top = CGRectGetMaxY(self.carTitleLabel.frame) + kXHBubbleMarginVer / 2;
     self.separationLineLabel.width = self.carTitleLabel.width;
     
     //调整车辆信息位置
     [self.carBrandLabel sizeToFit];
     self.carBrandLabel.width = self.carTitleLabel.width;
     self.carBrandLabel.left = self.carTitleLabel.left;
-    self.carBrandLabel.top = self.separationLineLabel.bottom + kXHBubbleMarginVer;
+    self.carBrandLabel.top = self.separationLineLabel.bottom + kXHBubbleMarginVer / 2;
     [self.carNumberLabel sizeToFit];
     self.carNumberLabel.width = self.carTitleLabel.width;
     self.carNumberLabel.left = self.carTitleLabel.left;
-    self.carNumberLabel.top = self.carBrandLabel.bottom + kXHBubbleMarginVer;
+    self.carNumberLabel.top = self.carBrandLabel.bottom + kXHBubbleMarginVer / 2;
 }
 
 @end

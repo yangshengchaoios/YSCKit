@@ -10,6 +10,8 @@
 
 @interface EZGMessageCenterViewController : YSCBaseViewController
 
+@property (nonatomic, weak) IBOutlet YSCTableView *tableView;
+
 - (void)refreshWhenDataIsEmpty;
 
 @end

@@ -26,12 +26,10 @@
         return [[self alloc] init];
     })
 }
-
 - (void)dealloc {
     [NSObject cancelPreviousPerformRequestsWithTarget:self];
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
 }
-
 - (id)init {
 	self = [super init];
 	if (self) {
@@ -72,7 +70,8 @@
     
 	WeakSelfType blockSelf = self;
     NSDate *date = [NSDate date];
-    [AFNManager getDataWithAPI:kResPathAppGetServerTime
+    [AFNManager getDataFromUrl:kResPathAppCommonUrl
+                       withAPI:kResPathGetServerTime
                   andDictParam:nil
                      modelName:nil
               requestSuccessed:^(id responseObject) {
@@ -94,11 +93,9 @@
                       blockSelf.interval = serverTime - localTime;
                       [[NSUserDefaults standardUserDefaults] setDouble:blockSelf.interval forKey:CachedKeyOfInterval];
                   }
-              }
-                requestFailure:^(NSInteger errorCode, NSString *errorMessage) {
-                    
-                    [blockSelf refreshFaild];
-                }];
+              } requestFailure:^(NSInteger errorCode, NSString *errorMessage) {
+                  [blockSelf refreshFaild];
+              }];
 }
 - (void)refreshFaild {
     [NSObject cancelPreviousPerformRequestsWithTarget:self
@@ -108,7 +105,6 @@
 		[self performSelector:@selector(refreshServerTime) withObject:nil afterDelay:30];
 	}
 }
-
 - (void)clearActions {
 	self.isSyncSuccessed = NO;
     [NSObject cancelPreviousPerformRequestsWithTarget:self

@@ -804,6 +804,16 @@
     NSLog(@"%@: W: %.f, H: %.f", self, size.width, size.height);
     return size.width;
 }
++ (CGFloat)HeightOfNormalString:(NSString*)string maxWidth:(CGFloat)width withFont:(UIFont*)font lineSpace:(CGFloat)lineSpace {
+    CGSize size;
+    NSMutableParagraphStyle *paragraphStyle = [[NSMutableParagraphStyle alloc] init];
+    paragraphStyle.lineSpacing = lineSpace;
+    size = [string boundingRectWithSize:CGSizeMake(width, CGFLOAT_MAX)
+                                options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading
+                             attributes:@{NSFontAttributeName : font, NSParagraphStyleAttributeName : paragraphStyle}
+                                context:nil].size;
+    return size.height;
+}
 //判断是否包含表情符号(有问题)
 + (BOOL)isContainsEmoji:(NSString *)string {
     __block BOOL isEomji = NO;

@@ -43,7 +43,7 @@
     [super layoutMessage:message displaysTimestamp:displayTimestamp];
     self.sceneTextLabel.text = message.text;
     
-    if (EZGSceneTypeSingleCar == message.sceneType) {
+    if (EZGSceneTypeSingleCar == [message.attributes[MParamSceneType] integerValue]) {
         self.bubbleSceneImageView.image = [UIImage imageNamed:@"singlecar"];
     }
     else {

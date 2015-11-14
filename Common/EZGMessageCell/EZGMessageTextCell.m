@@ -23,7 +23,7 @@
         self.displayTextView.backgroundColor = [UIColor clearColor];
         self.displayTextView.selectable = NO;
         self.displayTextView.lineSpacing = kXHTextLineSpacing;
-        self.displayTextView.font = kXHFontOfText;
+        self.displayTextView.font = kBubbleTextFont;
         self.displayTextView.showsEditingMenuAutomatically = NO;
         self.displayTextView.highlighted = NO;
     }
@@ -47,11 +47,10 @@
 //计算气泡大小
 + (CGSize)BubbleFrameWithMessage:(AVIMTypedMessage *)message {
     NSString *msgText = [CDEmotionUtils emojiStringFromString:message.text];//将原始字符串转换为带emoji的字符串
-    CGFloat maxTextWidth = SCREEN_WIDTH - 2 * (kXHAvatorPadding + kXHAvatarImageSize + kXHBubbleMessageViewPadding + kXHBubbleMarginHor) - kXHBubbleArrowWidth - kXHBubbleTailWidth;
     CGFloat dyWidth = MAX(AUTOLAYOUT_LENGTH(60), [self neededWidthForText:msgText]);
     NSAttributedString *attrStr = [[XHMessageBubbleHelper sharedMessageBubbleHelper] bubbleAttributtedStringWithText:msgText];
     CGSize textSize = [SETextView frameRectWithAttributtedString:attrStr
-                                                  constraintSize:CGSizeMake(maxTextWidth, MAXFLOAT)
+                                                  constraintSize:CGSizeMake(kMaxTextWidth, MAXFLOAT)
                                                      lineSpacing:kXHTextLineSpacing
                                                             font:kXHFontOfText].size;
     CGFloat bubbleWidth = MIN(dyWidth, textSize.width) + kXHBubbleMarginHor * 2 + kXHBubbleArrowWidth + kXHBubbleTailWidth;

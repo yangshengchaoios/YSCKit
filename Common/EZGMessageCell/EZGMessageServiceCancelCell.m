@@ -51,7 +51,7 @@
 - (void)layoutMessage:(EZGServiceCancelMessage *)message displaysTimestamp:(BOOL)displayTimestamp {
     [super layoutMessage:message displaysTimestamp:displayTimestamp];
     self.cancelTitleLabel.text = Trim(message.text);
-    self.cancelDetailLabel.text = Trim(message.detailInfo);
+    self.cancelDetailLabel.text = Trim(message.attributes[MParamDetailInfo]);
 }
 //动态计算位置和大小
 - (void)layoutSubviews {

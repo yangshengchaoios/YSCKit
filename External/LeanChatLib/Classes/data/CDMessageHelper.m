@@ -80,7 +80,7 @@
     if ([self.attributedStringCache objectForKey:finalText]) {
         return [self.attributedStringCache objectForKey:finalText];
     }
-    UIFont *font = [UIFont systemFontOfSize:13];
+    UIFont *font = AUTOLAYOUT_FONT(22);//[UIFont systemFontOfSize:13];
     NSDictionary *attributes = @{NSForegroundColorAttributeName: [UIColor grayColor], (id)NSFontAttributeName:font};
     NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:finalText attributes:attributes];
     

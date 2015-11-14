@@ -27,6 +27,7 @@
         self.serviceTitleLabel.font = AUTOLAYOUT_FONT(self.serviceTitleLabel.font.pointSize);
         
         self.separationLineLabel.height = AUTOLAYOUT_LENGTH(1);
+        self.separationLineLabel.backgroundColor = kDefaultBorderColor;
         
         self.serviceDetailLabel.backgroundColor = [UIColor clearColor];
         self.serviceDetailLabel.textColor = kDefaultTextColorBlack1;
@@ -49,7 +50,7 @@
 //计算cell高度
 + (CGFloat)HeightOfCellByMessage:(EZGServiceMessage *)message displaysTimestamp:(BOOL)displayTimestamp {
     CGFloat cellHeight = [super HeightOfCellByMessage:message displaysTimestamp:displayTimestamp];
-    if (EZGServiceTypeOver == message.serviceType) {
+    if (EZGServiceTypeOver == [message.attributes[MParamServiceType] integerValue]) {
         return cellHeight + AUTOLAYOUT_LENGTH(80) + 2 * kXHLabelPadding;
     }
     else {
@@ -62,16 +63,16 @@
 - (void)layoutMessage:(EZGServiceMessage *)message displaysTimestamp:(BOOL)displayTimestamp {
     [super layoutMessage:message displaysTimestamp:displayTimestamp];
     self.serviceTitleLabel.text = message.text;
-    self.serviceDetailLabel.text = Trim(message.detailInfo);
+    self.serviceDetailLabel.text = Trim(message.attributes[MParamDetailInfo]);
 
     //设置详细内容显示样式
-    if (EZGServiceTypeOver == message.serviceType) {//服务结束(有结束标志！)
+    if (EZGServiceTypeOver == [message.attributes[MParamServiceType] integerValue]) {//服务结束(有结束标志！)
         self.overLabel.hidden = NO;
         self.overLabel.text = [NSString stringWithFormat:@"%@\r\n本次服务已结束", [self formatMessageTimeByTimeStamp:message.sendTimestamp]];
         self.serviceDetailLabel.textAlignment = NSTextAlignmentCenter;
         self.serviceDetailLabel.numberOfLines = 1;
     }
-    else if (EZGServiceTypeResume == message.serviceType) {//取消放弃操作
+    else if (EZGServiceTypeResume == [message.attributes[MParamServiceType] integerValue]) {//取消放弃操作
         self.overLabel.hidden = YES;
         self.serviceDetailLabel.textAlignment = NSTextAlignmentCenter;
         self.serviceDetailLabel.numberOfLines = 1;

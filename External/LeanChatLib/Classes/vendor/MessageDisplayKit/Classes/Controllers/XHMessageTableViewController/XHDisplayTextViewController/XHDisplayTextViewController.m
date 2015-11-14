@@ -43,8 +43,25 @@
     [super viewDidLoad];
     // Do any additional setup after loading the view.
     self.title = NSLocalizedStringFromTable(@"TextDetail", @"MessageDisplayKitString", @"文本消息");
+    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithImage:DefaultNaviBarArrowBackImage
+                                                                             style:UIBarButtonItemStylePlain
+                                                                            target:self
+                                                                            action:@selector(backButtonClicked:)];
 }
-
+- (void)backButtonClicked:(id)sender {
+    if (self.navigationController) {            //如果有navigationBar
+        NSInteger index = [self.navigationController.viewControllers indexOfObject:self];
+        if (index > 0) {                        //不是root，就返回上一级
+            [self.navigationController popViewControllerAnimated:YES];
+        }
+        else {
+            [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
+        }
+    }
+    else {
+        [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
+    }
+}
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
 }

@@ -72,7 +72,7 @@
     self.commentTitleLabel.text = message.text;
     for (int i = 0; i < [self.rateImageViewArray count]; i++) {
         UIImageView *imageView = self.rateImageViewArray[i];
-        if (i < message.rateScore) {
+        if (i < [message.attributes[MParamRateScore] integerValue]) {
             imageView.image = [UIImage imageNamed:@"foregroundStar"];//黄色星星
         }
         else {

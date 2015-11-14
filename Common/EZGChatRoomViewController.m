@@ -32,24 +32,6 @@
     }
     
     WEAKSELF
-    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] bk_initWithImage:DefaultNaviBarArrowBackImage style:UIBarButtonItemStylePlain handler:^(id sender) {
-        if (weakSelf.messageInputView.isRecording) {
-            return ;//正在录音中
-        }
-        [weakSelf.view endEditing:YES];
-        if (weakSelf.navigationController) {
-            NSInteger index = [self.navigationController.viewControllers indexOfObject:weakSelf];
-            if (index > 0) {
-                [weakSelf.navigationController popViewControllerAnimated:YES];
-            }
-            else {
-                [weakSelf.presentingViewController dismissViewControllerAnimated:YES completion:nil];
-            }
-        }
-        else {
-            [weakSelf.presentingViewController dismissViewControllerAnimated:YES completion:nil];
-        }
-    }];
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] bk_initWithImage:[UIImage imageNamed:@"icon_phone_white"] style:UIBarButtonItemStylePlain handler:^(id sender) {
         if (weakSelf.messageInputView.isRecording) {
             return ;//正在录音中
