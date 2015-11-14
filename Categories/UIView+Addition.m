@@ -310,6 +310,7 @@
 
 #pragma mark - 递归遍历所有子view
 
+
 //重新调整UILabel和UIButton的font
 + (void)resetFontSizeOfView:(UIView *)view {
     ReturnWhenObjectIsEmpty(view);
@@ -317,6 +318,9 @@
 }
 - (void)resetFontSizeOfView {
     for (UIView *subview in self.subviews) {
+        if ([subview respondsToSelector:@selector(setCloseResetFontAndConstraint:)]) {
+            continue;
+        }
         if ([subview isMemberOfClass:[UILabel class]]) {
             UILabel *label = (UILabel *)subview;
             label.font = AUTOLAYOUT_FONT(label.font.pointSize);
@@ -347,6 +351,9 @@
             constraint.constant = AUTOLAYOUT_LENGTH(constraint.constant);
         }
     }
+    if ([self respondsToSelector:@selector(setCloseResetFontAndConstraint:)]) {
+        return;
+    }
     
     if ([self.subviews count] > 0) {
         for (UIView *subView in self.subviews) {
@@ -354,6 +361,7 @@
         }
     }
 }
+
 
 #pragma mark - 计算自动布局的size
 - (void)autoLayoutSize {

@@ -57,6 +57,7 @@
          }*/
     }
     self.isAppeared = YES;
+    APPDATA.currentViewController = self;
 }
 - (void)viewDidAppear:(BOOL)animated {
 	[super viewDidAppear:animated];

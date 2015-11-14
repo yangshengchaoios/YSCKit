@@ -15,6 +15,7 @@ typedef void (^YSCObjectIndexResultBlock)(NSObject *object, NSInteger section);
 typedef NSDictionary *(^YSCDictionarySetBlock)(NSInteger pageIndex);
 typedef void (^YSCViewObjectResultBlock)(UIView *view, NSObject *object);
 typedef CGFloat (^YSCFloatSetBlock)(NSIndexPath *indexPath);
+typedef NSString *(^YSCViewStringSetBlock)(NSIndexPath *indexPath);
 
 
 //------------------------------------
@@ -26,12 +27,14 @@ typedef CGFloat (^YSCFloatSetBlock)(NSIndexPath *indexPath);
 //      5. 对数据进行缓存
 //      6. 自定义任意单一确定的数据源
 //      7. 动态设置header、cell、footer的高度
-//  不支持的功能：多种header 或 多种cell 或 多数据源
+//      8. 支持多种header、cell、footer的注册
+//  不支持的功能：多数据源
 //
 //------------------------------------
 @interface YSCTableView : UITableView
 
-@property (nonatomic, assign) BOOL closeResetFontAndConstraint;//关闭YSCBaseViewController中对该view进行缩放
+//关闭YSCBaseViewController中对该view的subview进行缩放
+@property (nonatomic, assign) BOOL closeResetFontAndConstraint;
 
 #pragma mark - 基本属性
 @property (nonatomic, strong) NSMutableArray *headerDataArray;
@@ -62,6 +65,7 @@ typedef CGFloat (^YSCFloatSetBlock)(NSIndexPath *indexPath);
 @property (nonatomic, assign) IBInspectable BOOL enableRefresh;//是否启用下拉刷新(YES)
 @property (nonatomic, assign) IBInspectable BOOL enableLoadMore;//是否启用上拉加载更多(YES)
 @property (nonatomic, assign) IBInspectable BOOL enableTips;//当列表为空时，是否显示tipsView(YES)
+@property (nonatomic, assign) IBInspectable BOOL enableCellEdit;//是否开启删除功能(NO)
 
 #pragma mark - 设置和回传
 @property (nonatomic, copy) YSCBlock successBlock;
@@ -70,11 +74,25 @@ typedef CGFloat (^YSCFloatSetBlock)(NSIndexPath *indexPath);
 @property (nonatomic, copy) YSCObjectIndexResultBlock clickHeaderBlock;
 @property (nonatomic, copy) YSCObjectIndexResultBlock clickFooterBlock;
 @property (nonatomic, copy) YSCObjectIndexPathResultBlock clickCellBlock;
-@property (nonatomic, copy) YSCViewObjectResultBlock layoutHeader;
-@property (nonatomic, copy) YSCViewObjectResultBlock layoutFooter;
+@property (nonatomic, copy) YSCObjectIndexPathResultBlock deleteCellBlock;
+@property (nonatomic, copy) YSCViewObjectResultBlock layoutHeaderView;
+@property (nonatomic, copy) YSCViewObjectResultBlock layoutCellView;
+@property (nonatomic, copy) YSCViewObjectResultBlock layoutFooterView;
 @property (nonatomic, copy) YSCFloatSetBlock headerHeightBlock;
 @property (nonatomic, copy) YSCFloatSetBlock cellHeightBlock;
 @property (nonatomic, copy) YSCFloatSetBlock footerHeightBlock;
+
+@property (nonatomic, copy) YSCViewStringSetBlock headerNameBlock;
+@property (nonatomic, copy) YSCViewStringSetBlock cellNameBlock;
+@property (nonatomic, copy) YSCViewStringSetBlock footerNameBlock;
+
+#pragma mark - 设置ScrollViewDelegate相关的回调
+@property (nonatomic, copy) YSCBlock willBeginDraggingBlock;
+@property (nonatomic, copy) YSCBlock didEndDraggingBlock;
+@property (nonatomic, copy) YSCBlock didScrollBlock;
+@property (nonatomic, copy) YSCBlock didEndScrollingAnimationBlock;
+@property (nonatomic, copy) YSCBlock willBeginDeceleratingBlock;
+@property (nonatomic, copy) YSCBlock didEndDeceleratingBlock;
 
 //创建对象，不用xib布局时使用
 + (instancetype)CreateYSCTableViewOnView:(UIView *)view;
@@ -84,6 +102,8 @@ typedef CGFloat (^YSCFloatSetBlock)(NSIndexPath *indexPath);
 - (void)beginRefreshingByAnimation:(BOOL)animation;
 //当数据为空时执行下拉刷新
 - (void)refreshWhenCellDataEmpty;
+//清空数据列表
+- (void)clearData;
 
 //开启缓存模式
 - (void)enableCacheWithFileName:(NSString *)fileName;

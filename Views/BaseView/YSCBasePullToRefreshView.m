@@ -132,7 +132,7 @@
 - (void)beginRefreshingAtIndex:(NSInteger)index {
     UIScrollView *contentView = [self contentViewAtIndex:index];
     if (nil != contentView) {
-        [contentView headerBeginRefreshing];
+        [contentView.header beginRefreshing];
     }
 }
 
@@ -143,7 +143,7 @@
 - (void)beginLoadingMoreAtIndex:(NSInteger)index {
     UIScrollView *contentView = [self contentViewAtIndex:index];
     if (nil != contentView) {
-        [contentView footerBeginRefreshing];
+        [contentView.footer beginRefreshing];
     }
 }
 
@@ -555,15 +555,15 @@
             }
             
             if (refreshEnable) {
-                [(UIScrollView *)contentView addHeaderWithCallback:^{
+                ((UIScrollView *)contentView).header = [MJRefreshNormalHeader headerWithRefreshingBlock:^{
                     [blockSelf refreshDataAtIndex:i];
                 }];
                 if (refreshEnableWhenEntered) {
-                    [(UIScrollView *)contentView headerBeginRefreshing];
+                    [((UIScrollView *)contentView).header beginRefreshing];
                 }
             }
             if (loadMoreEnable) {
-                [(UIScrollView *)contentView addFooterWithCallback:^{
+                ((UIScrollView *)contentView).footer = [MJRefreshBackNormalFooter footerWithRefreshingBlock:^{
                     [blockSelf loadMoreDataAtIndex:i];
                 }];
             }

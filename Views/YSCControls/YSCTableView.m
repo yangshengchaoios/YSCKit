@@ -82,9 +82,11 @@
     };
     self.clickHeaderBlock = ^(NSObject *object, NSInteger section) {};
     self.clickCellBlock = ^(NSObject *object, NSIndexPath *indexPath) {};
+    self.deleteCellBlock = ^(NSObject *object, NSIndexPath *indexPath) {};
     self.clickFooterBlock = ^(NSObject *object, NSInteger section) {};
-    self.layoutHeader = ^(UIView *view, NSObject *object) {};
-    self.layoutFooter = ^(UIView *view, NSObject *object) {};
+    self.layoutHeaderView = ^(UIView *view, NSObject *object) {};
+    self.layoutCellView = ^(UIView *view, NSObject *object) {};
+    self.layoutFooterView = ^(UIView *view, NSObject *object) {};
     
     [self initTableView];//初始化tableView
 }
@@ -144,24 +146,24 @@
     _enableRefresh = enableRefresh;
     if (enableRefresh) {
         WEAKSELF
-        [self addLegendHeaderWithRefreshingBlock:^{
+        self.header = [MJRefreshNormalHeader headerWithRefreshingBlock:^{
             [weakSelf refreshAtPageIndex:kDefaultPageStartIndex];
         }];
     }
     else {
-        [self removeHeader];
+        self.header  = nil;
     }
 }
 - (void)setEnableLoadMore:(BOOL)enableLoadMore {
     _enableLoadMore = enableLoadMore;
     if (enableLoadMore) {
         WEAKSELF
-        [self addLegendFooterWithRefreshingBlock:^{
+        self.footer = [MJRefreshBackNormalFooter footerWithRefreshingBlock:^{
             [weakSelf refreshAtPageIndex:weakSelf.currentPageIndex + 1];
         }];
     }
     else {
-        [self removeFooter];
+        self.footer = nil;
     }
 }
 - (void)setEnableTips:(BOOL)enableTips {
@@ -218,6 +220,13 @@
     if (isEmpty(self.cellDataArray)) {
         [self beginRefreshing];
     }
+}
+//清空数据列表
+- (void)clearData {
+    [self.headerDataArray removeAllObjects];
+    [self.cellDataArray removeAllObjects];
+    self.tipsView.hidden = NO;
+    [self reloadData];
 }
 
 //开启缓存模式
@@ -350,7 +359,7 @@
             }
         }
         weakSelf.tipsView.hidden = [NSArray isNotEmpty:weakSelf.cellDataArray];
-
+        
         //最后回调(可能会处理tipsView的显示与否的问题)
         if (error) {
             if (weakSelf.failedBlock) {
@@ -479,8 +488,15 @@
     if (self.headerHeightBlock) {
         return self.headerHeightBlock([NSIndexPath indexPathForRow:0 inSection:section]);
     }
-    if (isNotEmpty(self.headerName) && (section >= 0 && section < [self.headerDataArray count])) {
-        return [NSClassFromString(self.headerName) HeightOfViewByObject:self.headerDataArray[section]];
+    NSString *headerName = self.headerName;
+    if (self.headerNameBlock) {
+        NSString *tempName = self.headerNameBlock([NSIndexPath indexPathForRow:0 inSection:section]);
+        if (isNotEmpty(tempName)) {
+            headerName = tempName;
+        }
+    }
+    if (isNotEmpty(headerName) && [NSClassFromString(headerName) isSubclassOfClass:[YSCBaseTableHeaderFooterView class]]) {
+        return [NSClassFromString(headerName) HeightOfViewByObject:self.headerDataArray[section]];
     }
     else {
         return 0.01;
@@ -488,21 +504,33 @@
 }
 - (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
     YSCBaseTableHeaderFooterView *header = nil;
-    if (isNotEmpty(self.headerName) && (section >= 0 && section < [self.headerDataArray count])) {
-        header = [NSClassFromString(self.headerName) dequeueHeaderFooterByTableView:tableView];
-        NSObject *object = self.headerDataArray[section];
-        [header layoutObject:object];
-        if (self.layoutHeader) {
-            self.layoutHeader(header, object);
+    if ((section >= 0 && section < [self.headerDataArray count])) {
+        NSString *headerName = self.headerName;
+        if (self.headerNameBlock) {
+            NSString *tempName = self.headerNameBlock([NSIndexPath indexPathForRow:0 inSection:section]);
+            if (isNotEmpty(tempName)) {
+                headerName = tempName;
+            }
         }
         
-        WEAKSELF
-        [header removeAllGestureRecognizers];
-        [header bk_whenTapped:^{
-            if (weakSelf.clickHeaderBlock) {
-                weakSelf.clickHeaderBlock(weakSelf.headerDataArray[section], section);
+        if (isNotEmpty(headerName)) {
+            header = [NSClassFromString(headerName) dequeueHeaderFooterByTableView:tableView];
+            NSObject *object = self.headerDataArray[section];
+            if ([header isKindOfClass:[YSCBaseTableHeaderFooterView class]]) {
+                [header layoutObject:object];
             }
-        }];
+            if (self.layoutHeaderView) {
+                self.layoutHeaderView(header, object);
+            }
+            
+            WEAKSELF
+            [header removeAllGestureRecognizers];
+            [header bk_whenTapped:^{
+                if (weakSelf.clickHeaderBlock) {
+                    weakSelf.clickHeaderBlock(weakSelf.headerDataArray[section], section);
+                }
+            }];
+        }
     }
     return header;
 }
@@ -514,19 +542,37 @@
     }
     //2. 单个情况下的高度
     NSArray *array = self.cellDataArray[indexPath.section];
-    if ([NSClassFromString(self.cellName) isSubclassOfClass:[YSCBaseTableViewCell class]]) {
-        return [NSClassFromString(self.cellName) HeightOfCellByObject:array[indexPath.row]];
+    NSString *cellName = self.cellName;
+    if (self.cellNameBlock) {
+        NSString *tempName = self.cellNameBlock(indexPath);
+        if (isNotEmpty(tempName)) {
+            cellName = tempName;
+        }
+    }
+    if (isNotEmpty(cellName) && [NSClassFromString(cellName) isSubclassOfClass:[YSCBaseTableViewCell class]]) {
+        return [NSClassFromString(cellName) HeightOfCellByObject:array[indexPath.row]];
     }
     else {
         return 44;
     }
 }
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    YSCBaseTableViewCell *cell = [NSClassFromString(self.cellName) dequeueCellByTableView:tableView];
+    YSCBaseTableViewCell *cell = nil;
+    NSString *cellName = self.cellName;
+    if (self.cellNameBlock) {
+        NSString *tempName = self.cellNameBlock(indexPath);
+        if (isNotEmpty(tempName)) {
+            cellName = tempName;
+        }
+    }
+    cell = [NSClassFromString(cellName) dequeueCellByTableView:tableView];
     NSArray *array = self.cellDataArray[indexPath.section];
     BaseDataModel *object = array[indexPath.row];
     if ([cell isKindOfClass:[YSCBaseTableViewCell class]]) {
         [cell layoutObject:object];
+    }
+    if (self.layoutCellView) {
+        self.layoutCellView(cell, object);
     }
     cell.selectionStyle = UITableViewCellSelectionStyleNone;
     return cell;
@@ -536,8 +582,15 @@
     if (self.footerHeightBlock) {
         return self.footerHeightBlock([NSIndexPath indexPathForRow:0 inSection:section]);
     }
-    if (isNotEmpty(self.footerName) && (section >= 0 && section < [self.footerDataArray count])) {
-        return [NSClassFromString(self.footerName) HeightOfViewByObject:self.footerDataArray[section]];
+    NSString *footerName = self.footerName;
+    if (self.footerNameBlock) {
+        NSString *tempName = self.footerNameBlock([NSIndexPath indexPathForRow:0 inSection:section]);
+        if (isNotEmpty(tempName)) {
+            footerName = tempName;
+        }
+    }
+    if (isNotEmpty(footerName) && [NSClassFromString(footerName) isSubclassOfClass:[YSCBaseTableHeaderFooterView class]]) {
+        return [NSClassFromString(footerName) HeightOfViewByObject:self.footerDataArray[section]];
     }
     else {
         return 0.01;
@@ -545,21 +598,33 @@
 }
 - (UIView *)tableView:(UITableView *)tableView viewForFooterInSection:(NSInteger)section {
     YSCBaseTableHeaderFooterView *footer = nil;
-    if (isNotEmpty(self.footerName) && (section >= 0 && section < [self.footerDataArray count])) {
-        footer = [NSClassFromString(self.footerName) dequeueHeaderFooterByTableView:tableView];
-        NSObject *object = self.footerDataArray[section];
-        [footer layoutObject:object];
-        if (self.layoutFooter) {
-            self.layoutFooter(footer, object);
+    if ((section >= 0 && section < [self.footerDataArray count])) {
+        NSString *footerName = self.footerName;
+        if (self.footerNameBlock) {
+            NSString *tempName = self.footerNameBlock([NSIndexPath indexPathForRow:0 inSection:section]);
+            if (isNotEmpty(tempName)) {
+                footerName = tempName;
+            }
         }
         
-        WEAKSELF
-        [footer removeAllGestureRecognizers];
-        [footer bk_whenTapped:^{
-            if (weakSelf.clickFooterBlock) {
-                weakSelf.clickFooterBlock(weakSelf.footerDataArray[section], section);
+        if (isNotEmpty(footerName)) {
+            footer = [NSClassFromString(footerName) dequeueHeaderFooterByTableView:tableView];
+            NSObject *object = self.footerDataArray[section];
+            if ([footer isKindOfClass:[YSCBaseTableHeaderFooterView class]]) {
+                [footer layoutObject:object];
             }
-        }];
+            if (self.layoutFooterView) {
+                self.layoutFooterView(footer, object);
+            }
+            
+            WEAKSELF
+            [footer removeAllGestureRecognizers];
+            [footer bk_whenTapped:^{
+                if (weakSelf.clickFooterBlock) {
+                    weakSelf.clickFooterBlock(weakSelf.footerDataArray[section], section);
+                }
+            }];
+        }
     }
     return footer;
 }
@@ -576,6 +641,54 @@
 }
 - (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath {
     [self resetCellEdgeInsets];
+}
+
+- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
+    if (editingStyle == UITableViewCellEditingStyleDelete) {
+        if (self.deleteCellBlock) {
+            NSArray *array = self.cellDataArray[indexPath.section];
+            self.deleteCellBlock(array[indexPath.row], indexPath);
+        }
+    }
+}
+//NOTE:系统自动多语言返回"删除"
+//- (NSString *)tableView:(UITableView *)tableView titleForDeleteConfirmationButtonForRowAtIndexPath:(NSIndexPath *)indexPath {
+//    return @"删除";
+//}
+- (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
+    return self.enableCellEdit;
+}
+
+#pragma mark - UIScrollViewDelegate
+- (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView {
+    if (self.willBeginDraggingBlock) {
+        self.willBeginDraggingBlock();
+    }
+}
+- (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate {
+    if (self.didEndDraggingBlock) {
+        self.didEndDraggingBlock();
+    }
+}
+- (void)scrollViewDidScroll:(UIScrollView *)scrollView {
+    if (self.didScrollBlock) {
+        self.didScrollBlock();
+    }
+}
+- (void)scrollViewDidEndScrollingAnimation:(UIScrollView *)scrollView {
+    if (self.didEndScrollingAnimationBlock) {
+        self.didEndScrollingAnimationBlock();
+    }
+}
+- (void)scrollViewWillBeginDecelerating:(UIScrollView *)scrollView {
+    if (self.willBeginDeceleratingBlock) {
+        self.willBeginDeceleratingBlock();
+    }
+}
+- (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView {
+    if (self.didEndDeceleratingBlock) {
+        self.didEndDeceleratingBlock();
+    }
 }
 
 @end

@@ -43,6 +43,9 @@ typedef void(^PullToRefreshFailed)(void);
 //以下两个方法是为了兼容返回model不规范的情况，子类可以重写
 - (void)getDataByParam:(NSDictionary *)param successed:(RequestSuccessed)successed failed:(RequestFailure)failed;
 - (void)postDataByParam:(NSDictionary *)param successed:(RequestSuccessed)successed failed:(RequestFailure)failed;
+
+//刷新列表
+- (void)reloadByReplacing:(NSArray *)anArray;
 //添加新内容刷新列表
 - (void)reloadByAdding:(NSArray *)anArray;
 

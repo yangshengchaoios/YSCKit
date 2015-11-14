@@ -59,32 +59,31 @@
     
     //判断是否需要刷新功能
     if ([self refreshEnable]) {
-		[self addRefreshHeaderView];
-		//判断是否进入的时候就刷新
-		if ([self shouldRefreshWhenEntered]) {
-			[self.contentScrollView.header beginRefreshing];
-		}
-	}
+        [self addRefreshHeaderView];
+        //判断是否进入的时候就刷新
+        if ([self shouldRefreshWhenEntered]) {
+            [self.contentScrollView.header beginRefreshing];
+        }
+    }
     
-	//判断是否需要加载更多功能
-	if ([self loadMoreEnable]) {
-		[self addRefreshFooterView];
-	}
+    //判断是否需要加载更多功能
+    if ([self loadMoreEnable]) {
+        [self addRefreshFooterView];
+    }
 }
 
 - (void)addRefreshHeaderView {
-	WeakSelfType blockSelf = self;
-    [self.contentScrollView addLegendHeaderWithRefreshingBlock:^{
+    WeakSelfType blockSelf = self;
+    self.contentScrollView.header = [MJRefreshNormalHeader headerWithRefreshingBlock:^{
         [blockSelf refreshWithSuccessed:blockSelf.successBlock failed:blockSelf.failedBlock];
     }];
 }
 
 - (void)addRefreshFooterView {
-	WeakSelfType blockSelf = self;
-    MJRefreshLegendFooter *footer = [self.contentScrollView addLegendFooterWithRefreshingBlock:^{
+    WeakSelfType blockSelf = self;
+    self.contentScrollView.footer = [MJRefreshBackNormalFooter footerWithRefreshingBlock:^{
         [blockSelf loadMoreWithSuccessed:blockSelf.successBlock failed:blockSelf.failedBlock];
     }];
-    [footer setTitle:@"" forState:MJRefreshFooterStateIdle];//闲置状态文本为空
 }
 
 /**
@@ -95,18 +94,18 @@
 - (void)setIsTipsViewHidden:(BOOL)isTipsViewHidden {
     [self setIsTipsViewHidden:isTipsViewHidden withTipText:[self hintStringWhenNoData]];
 }
-- (void)setIsTipsViewHidden:(BOOL)isTipsViewHidden withTipText:(NSString *)tipText {    
+- (void)setIsTipsViewHidden:(BOOL)isTipsViewHidden withTipText:(NSString *)tipText {
     if ([self tipsViewEnable]) {
         WeakSelfType blockSelf = self;
         if (nil == self.tipsView) {
             self.tipsView = [YSCKTipsView CreateYSCTipsViewOnView:[self contentScrollView]
-                                                        edgeInsets:[self tipsViewEdgeInsets]
-                                                       withMessage:tipText
-                                                         iconImage:[UIImage imageNamed:@"icon_failed"]
-                                                       buttonTitle:@"重新加载"
-                                                      buttonAction:^{
-                                                          [blockSelf.contentScrollView.header beginRefreshing];
-                                                      }];
+                                                       edgeInsets:[self tipsViewEdgeInsets]
+                                                      withMessage:tipText
+                                                        iconImage:[UIImage imageNamed:@"icon_failed"]
+                                                      buttonTitle:@"重新加载"
+                                                     buttonAction:^{
+                                                         [blockSelf.contentScrollView.header beginRefreshing];
+                                                     }];
         }
         else {
             self.tipsView.messageLabel.text = tipText;
@@ -122,7 +121,7 @@
  *  下拉刷新
  *
  *  @param successed
- *  @param failed    
+ *  @param failed
  */
 - (void)refreshWithSuccessed:(PullToRefreshSuccessed)successed failed:(PullToRefreshFailed)failed {
     [self refreshWithSuccessed:successed failed:failed withRequestType:RequestTypeGET];
@@ -192,13 +191,13 @@
     }
 }
 - (void)reloadByReplacing:(NSArray *)anArray {
-	[self.dataArray removeAllObjects];
-	[self.dataArray addObjectsFromArray:anArray];
+    [self.dataArray removeAllObjects];
+    [self.dataArray addObjectsFromArray:anArray];
     
-	//保存数组至本地缓存（注意：只保存下拉刷新的数组！）
-	if ([self shouldCacheArray]) {
-		[self saveObject:anArray forKey:KeyOfCachedArray];
-	}
+    //保存数组至本地缓存（注意：只保存下拉刷新的数组！）
+    if ([self shouldCacheArray]) {
+        [self saveObject:anArray forKey:KeyOfCachedArray];
+    }
 }
 
 /**
@@ -208,7 +207,7 @@
  *  @param failed
  */
 - (void)loadMoreWithSuccessed:(PullToRefreshSuccessed)successed failed:(PullToRefreshFailed)failed {
-	[self loadMoreWithSuccessed:successed failed:failed withRequestType:RequestTypeGET];
+    [self loadMoreWithSuccessed:successed failed:failed withRequestType:RequestTypeGET];
 }
 
 - (void)loadMoreWithSuccessed:(PullToRefreshSuccessed)successed failed:(PullToRefreshFailed)failed withRequestType:(RequestType)requestType{
@@ -253,7 +252,7 @@
     
     RequestFailure requestFailureBlock = ^(NSInteger errorCode, NSString *errorMessage){
         [blockSelf.contentScrollView.footer endRefreshing];
-
+        
         //1. 如果没有数据就将错误信息显示在tipsView上
         if ([NSArray isEmpty:blockSelf.dataArray]) {
             [blockSelf setIsTipsViewHidden:NO withTipText:errorMessage];
@@ -295,43 +294,43 @@
 
 
 - (void)reloadByAdding:(NSArray *)anArray {
-	
+    
 }
 
 #pragma mark - 可选的重写方法
 
 //下拉刷新特有的缓存加载方法被基类的loadCache方法调用
 - (NSArray *)loadCacheArray {
-	NSArray *cachedArray = [self cachedObjectForKey:KeyOfCachedArray];
-	if ([cachedArray isKindOfClass:[NSArray class]] && [NSArray isNotEmpty:cachedArray]) {
-		return cachedArray;
-	}
-	else { //没有缓存内容
-		return nil;
-	}
+    NSArray *cachedArray = [self cachedObjectForKey:KeyOfCachedArray];
+    if ([cachedArray isKindOfClass:[NSArray class]] && [NSArray isNotEmpty:cachedArray]) {
+        return cachedArray;
+    }
+    else { //没有缓存内容
+        return nil;
+    }
 }
 
 - (NSArray *)preProcessData:(NSArray *)anArray {
-	return anArray;
+    return anArray;
 }
 
 - (BOOL)shouldCacheArray {
-	return NO;
+    return NO;
 }
 
 - (BOOL)shouldRefreshWhenEntered {
-	return YES;
+    return YES;
 }
 - (BOOL)loadMoreEnable {
-	return YES;
+    return YES;
 }
 
 - (BOOL)refreshEnable {
-	return YES;
+    return YES;
 }
 
 - (NSInteger)cellCount {
-	return [self.dataArray count];
+    return [self.dataArray count];
 }
 
 - (NSString *)prefixOfUrl {
@@ -339,7 +338,7 @@
 }
 
 - (NSString *)hintStringWhenNoData {
-    return kDefaultTipText;
+    return kDefaultTipsEmptyText;
 }
 
 - (BOOL)tipsViewEnable {
@@ -349,15 +348,15 @@
 #pragma mark - 必须重写的方法
 
 - (NSString *)methodWithPath {
-	return @"";
+    return @"";
 }
 
 - (NSString *)nibNameOfCell {
-	return @"";
+    return @"";
 }
 
 - (NSDictionary *)dictParamWithPage:(NSInteger)page {
-	return @{};
+    return @{};
 }
 
 - (Class)modelClassOfData {
@@ -365,7 +364,7 @@
 }
 
 - (UIView *)layoutCellWithData:(id)object atIndexPath:(NSIndexPath *)indexPath {
-	return nil;
+    return nil;
 }
 
 - (void)clickedCell:(id)object atIndexPath:(NSIndexPath *)indexPath {
@@ -381,7 +380,7 @@
     return nil;
 }
 - (void)reloadData {
-
+    
 }
 
 @end

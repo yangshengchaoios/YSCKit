@@ -4,128 +4,44 @@
 //  MJRefreshExample
 //
 //  Created by MJ Lee on 15/3/4.
-//  Copyright (c) 2015年 itcast. All rights reserved.
+//  Copyright (c) 2015年 小码哥. All rights reserved.
 //
 
 #import "UIScrollView+MJRefresh.h"
-#import "MJRefreshGifHeader.h"
-#import "MJRefreshLegendHeader.h"
-#import "MJRefreshGifFooter.h"
-#import "MJRefreshLegendFooter.h"
+#import "MJRefreshHeader.h"
+#import "MJRefreshFooter.h"
 #import <objc/runtime.h>
 
+@implementation NSObject (MJRefresh)
+
++ (void)exchangeInstanceMethod1:(SEL)method1 method2:(SEL)method2
+{
+    method_exchangeImplementations(class_getInstanceMethod(self, method1), class_getInstanceMethod(self, method2));
+}
+
++ (void)exchangeClassMethod1:(SEL)method1 method2:(SEL)method2
+{
+    method_exchangeImplementations(class_getClassMethod(self, method1), class_getClassMethod(self, method2));
+}
+
+@end
+
 @implementation UIScrollView (MJRefresh)
-#pragma mark - 下拉刷新
-- (MJRefreshLegendHeader *)addLegendHeaderWithRefreshingBlock:(void (^)())block dateKey:(NSString *)dateKey
-{
-    MJRefreshLegendHeader *header = [self addLegendHeader];
-    header.refreshingBlock = block;
-    header.dateKey = dateKey;
-    return header;
-}
 
-- (MJRefreshLegendHeader *)addLegendHeaderWithRefreshingTarget:(id)target refreshingAction:(SEL)action dateKey:(NSString *)dateKey
-{
-    MJRefreshLegendHeader *header = [self addLegendHeader];
-    header.refreshingTarget = target;
-    header.refreshingAction = action;
-    header.dateKey = dateKey;
-    return header;
-}
-
-- (MJRefreshLegendHeader *)addLegendHeaderWithRefreshingTarget:(id)target refreshingAction:(SEL)action
-{
-    return [self addLegendHeaderWithRefreshingTarget:target refreshingAction:action dateKey:nil];
-}
-
-- (MJRefreshLegendHeader *)addLegendHeaderWithRefreshingBlock:(void (^)())block
-{
-    return [self addLegendHeaderWithRefreshingBlock:block dateKey:nil];
-}
-
-- (MJRefreshLegendHeader *)addLegendHeader
-{
-    MJRefreshLegendHeader *header = [[MJRefreshLegendHeader alloc] init];
-    self.header = header;
-    
-    return header;
-}
-
-- (MJRefreshGifHeader *)addGifHeaderWithRefreshingBlock:(void (^)())block dateKey:(NSString *)dateKey
-{
-    MJRefreshGifHeader *header = [self addGifHeader];
-    header.refreshingBlock = block;
-    header.dateKey = dateKey;
-    return header;
-}
-
-- (MJRefreshGifHeader *)addGifHeaderWithRefreshingTarget:(id)target refreshingAction:(SEL)action dateKey:(NSString *)dateKey
-{
-    MJRefreshGifHeader *header = [self addGifHeader];
-    header.refreshingTarget = target;
-    header.refreshingAction = action;
-    header.dateKey = dateKey;
-    return header;
-}
-
-- (MJRefreshGifHeader *)addGifHeaderWithRefreshingBlock:(void (^)())block
-{
-    return [self addGifHeaderWithRefreshingBlock:block dateKey:nil];
-}
-
-- (MJRefreshGifHeader *)addGifHeaderWithRefreshingTarget:(id)target refreshingAction:(SEL)action
-{
-    return [self addGifHeaderWithRefreshingTarget:target refreshingAction:action dateKey:nil];
-}
-
-- (MJRefreshGifHeader *)addGifHeader
-{
-    MJRefreshGifHeader *header = [[MJRefreshGifHeader alloc] init];
-    self.header = header;
-    
-    return header;
-}
-
-- (void)removeHeader
-{
-    self.header = nil;
-}
-
-#pragma mark - Property Methods
-#pragma mark gifHeader
-- (MJRefreshGifHeader *)gifHeader
-{
-    if ([self.header isKindOfClass:[MJRefreshGifHeader class]]) {
-        return (MJRefreshGifHeader *)self.header;
-    }
-    
-    return nil;
-}
-
-#pragma mark legendHeader
-- (MJRefreshLegendHeader *)legendHeader
-{
-    if ([self.header isKindOfClass:[MJRefreshLegendHeader class]]) {
-        return (MJRefreshLegendHeader *)self.header;
-    }
-    
-    return nil;
-}
-
-#pragma mark header
-static char MJRefreshHeaderKey;
+#pragma mark - header
+static const char MJRefreshHeaderKey = '\0';
 - (void)setHeader:(MJRefreshHeader *)header
 {
     if (header != self.header) {
+        // 删除旧的，添加新的
         [self.header removeFromSuperview];
-        
-        [self willChangeValueForKey:@"header"];
-        objc_setAssociatedObject(self, &MJRefreshHeaderKey,
-                                 header,
-                                 OBJC_ASSOCIATION_ASSIGN);
-        [self didChangeValueForKey:@"header"];
-        
         [self addSubview:header];
+        
+        // 存储新的
+        [self willChangeValueForKey:@"header"]; // KVO
+        objc_setAssociatedObject(self, &MJRefreshHeaderKey,
+                                 header, OBJC_ASSOCIATION_ASSIGN);
+        [self didChangeValueForKey:@"header"]; // KVO
     }
 }
 
@@ -134,261 +50,93 @@ static char MJRefreshHeaderKey;
     return objc_getAssociatedObject(self, &MJRefreshHeaderKey);
 }
 
-#pragma mark - 上拉刷新
-- (MJRefreshLegendFooter *)addLegendFooterWithRefreshingBlock:(void (^)())block
-{
-    MJRefreshLegendFooter *footer = [self addLegendFooter];
-    footer.refreshingBlock = block;
-    return footer;
-}
-
-- (MJRefreshLegendFooter *)addLegendFooterWithRefreshingTarget:(id)target refreshingAction:(SEL)action
-{
-    MJRefreshLegendFooter *footer = [self addLegendFooter];
-    footer.refreshingTarget = target;
-    footer.refreshingAction = action;
-    return footer;
-}
-
-- (MJRefreshLegendFooter *)addLegendFooter
-{
-    MJRefreshLegendFooter *footer = [[MJRefreshLegendFooter alloc] init];
-    self.footer = footer;
-    
-    return footer;
-}
-
-- (MJRefreshGifFooter *)addGifFooterWithRefreshingBlock:(void (^)())block
-{
-    MJRefreshGifFooter *footer = [self addGifFooter];
-    footer.refreshingBlock = block;
-    return footer;
-}
-
-- (MJRefreshGifFooter *)addGifFooterWithRefreshingTarget:(id)target refreshingAction:(SEL)action
-{
-    MJRefreshGifFooter *footer = [self addGifFooter];
-    footer.refreshingTarget = target;
-    footer.refreshingAction = action;
-    return footer;
-}
-
-- (MJRefreshGifFooter *)addGifFooter
-{
-    MJRefreshGifFooter *footer = [[MJRefreshGifFooter alloc] init];
-    self.footer = footer;
-    
-    return footer;
-}
-
-- (void)removeFooter
-{
-    self.footer = nil;
-}
-
-static char MJRefreshFooterKey;
+#pragma mark - footer
+static const char MJRefreshFooterKey = '\0';
 - (void)setFooter:(MJRefreshFooter *)footer
 {
     if (footer != self.footer) {
+        // 删除旧的，添加新的
         [self.footer removeFromSuperview];
-        
-        [self willChangeValueForKey:@"footer"];
-        objc_setAssociatedObject(self, &MJRefreshFooterKey,
-                                 footer,
-                                 OBJC_ASSOCIATION_ASSIGN);
-        [self didChangeValueForKey:@"footer"];
-        
         [self addSubview:footer];
+        
+        // 存储新的
+        [self willChangeValueForKey:@"footer"]; // KVO
+        objc_setAssociatedObject(self, &MJRefreshFooterKey,
+                                 footer, OBJC_ASSOCIATION_ASSIGN);
+        [self didChangeValueForKey:@"footer"]; // KVO
     }
 }
-
-- (MJRefreshGifFooter *)gifFooter
-{
-    if ([self.footer isKindOfClass:[MJRefreshGifFooter class]]) {
-        return (MJRefreshGifFooter *)self.footer;
-    }
-    return nil;
-}
-
-- (MJRefreshLegendFooter *)legendFooter
-{
-    if ([self.footer isKindOfClass:[MJRefreshLegendFooter class]]) {
-        return (MJRefreshLegendFooter *)self.footer;
-    }
-    return nil;
-}
-
 
 - (MJRefreshFooter *)footer
 {
     return objc_getAssociatedObject(self, &MJRefreshFooterKey);
 }
 
-#pragma mark - swizzle
-+ (void)load
+#pragma mark - other
+- (NSInteger)totalDataCount
 {
-    Method method1 = class_getInstanceMethod([self class], NSSelectorFromString(@"dealloc"));
-    Method method2 = class_getInstanceMethod([self class], @selector(deallocSwizzle));
-    method_exchangeImplementations(method1, method2);
+    NSInteger totalCount = 0;
+    if ([self isKindOfClass:[UITableView class]]) {
+        UITableView *tableView = (UITableView *)self;
+        
+        for (NSInteger section = 0; section<tableView.numberOfSections; section++) {
+            totalCount += [tableView numberOfRowsInSection:section];
+        }
+    } else if ([self isKindOfClass:[UICollectionView class]]) {
+        UICollectionView *collectionView = (UICollectionView *)self;
+        
+        for (NSInteger section = 0; section<collectionView.numberOfSections; section++) {
+            totalCount += [collectionView numberOfItemsInSection:section];
+        }
+    }
+    return totalCount;
 }
 
-- (void)deallocSwizzle
+static const char MJRefreshReloadDataBlockKey = '\0';
+- (void)setReloadDataBlock:(void (^)(NSInteger))reloadDataBlock
 {
-    [self removeFooter];
-    [self removeHeader];
-    
-    [self deallocSwizzle];
+    [self willChangeValueForKey:@"reloadDataBlock"]; // KVO
+    objc_setAssociatedObject(self, &MJRefreshReloadDataBlockKey, reloadDataBlock, OBJC_ASSOCIATION_COPY_NONATOMIC);
+    [self didChangeValueForKey:@"reloadDataBlock"]; // KVO
 }
 
+- (void (^)(NSInteger))reloadDataBlock
+{
+    return objc_getAssociatedObject(self, &MJRefreshReloadDataBlockKey);
+}
+
+- (void)executeReloadDataBlock
+{
+    !self.reloadDataBlock ? : self.reloadDataBlock(self.totalDataCount);
+}
 @end
 
+@implementation UITableView (MJRefresh)
 
-#pragma mark - 1.0.0版本以前的接口
-@implementation UIScrollView(MJRefreshDeprecated)
-#pragma mark - 下拉刷新
-/**
- *  添加一个下拉刷新头部控件
- *
- *  @param callback 回调
- */
-- (void)addHeaderWithCallback:(void (^)())callback
++ (void)load
 {
-    [self addHeaderWithCallback:callback dateKey:nil];
+    [self exchangeInstanceMethod1:@selector(reloadData) method2:@selector(mj_reloadData)];
 }
 
-/**
- *  添加一个下拉刷新头部控件
- *
- *  @param callback 回调
- *  @param dateKey 刷新时间保存的key值
- */
-- (void)addHeaderWithCallback:(void (^)())callback dateKey:(NSString*)dateKey
+- (void)mj_reloadData
 {
-    [self addLegendHeader];
-    self.header.dateKey = dateKey;
-    self.header.refreshingBlock = callback;
+    [self mj_reloadData];
+    
+    [self executeReloadDataBlock];
+}
+@end
+
+@implementation UICollectionView (MJRefresh)
+
++ (void)load
+{
+    [self exchangeInstanceMethod1:@selector(reloadData) method2:@selector(mj_reloadData)];
 }
 
-/**
- *  添加一个下拉刷新头部控件
- *
- *  @param target 目标
- *  @param action 回调方法
- */
-- (void)addHeaderWithTarget:(id)target action:(SEL)action
+- (void)mj_reloadData
 {
-    [self addHeaderWithTarget:target action:action dateKey:nil];
-}
-
-/**
- *  添加一个下拉刷新头部控件
- *
- *  @param target 目标
- *  @param action 回调方法
- *  @param dateKey 刷新时间保存的key值
- */
-- (void)addHeaderWithTarget:(id)target action:(SEL)action dateKey:(NSString*)dateKey
-{
-    [self addLegendHeader];
-    self.header.dateKey = dateKey;
-    [self.header setRefreshingTarget:target refreshingAction:action];
-}
-
-/**
- *  主动让下拉刷新头部控件进入刷新状态
- */
-- (void)headerBeginRefreshing
-{
-    [self.header beginRefreshing];
-}
-
-/**
- *  让下拉刷新头部控件停止刷新状态
- */
-- (void)headerEndRefreshing
-{
-    [self.header endRefreshing];
-}
-
-/**
- *  下拉刷新头部控件的可见性
- */
-- (void)setHeaderHidden:(BOOL)headerHidden
-{
-    self.header.hidden = headerHidden;
-}
-
-- (BOOL)isHeaderHidden
-{
-    return self.header.isHidden;
-}
-
-/**
- *  是否正在下拉刷新
- */
-- (BOOL)isHeaderRefreshing
-{
-    return self.header.isRefreshing;
-}
-
-#pragma mark - 上拉刷新
-/**
- *  添加一个上拉刷新尾部控件
- *
- *  @param callback 回调
- */
-- (void)addFooterWithCallback:(void (^)())callback
-{
-    [self addLegendFooter];
-    self.footer.refreshingBlock = callback;
-}
-
-/**
- *  添加一个上拉刷新尾部控件
- *
- *  @param target 目标
- *  @param action 回调方法
- */
-- (void)addFooterWithTarget:(id)target action:(SEL)action
-{
-    [self addLegendFooter];
-    [self.footer setRefreshingTarget:target refreshingAction:action];
-}
-
-/**
- *  主动让上拉刷新尾部控件进入刷新状态
- */
-- (void)footerBeginRefreshing
-{
-    [self.footer beginRefreshing];
-}
-
-/**
- *  让上拉刷新尾部控件停止刷新状态
- */
-- (void)footerEndRefreshing
-{
-    [self.footer endRefreshing];
-}
-
-/**
- *  上拉刷新头部控件的可见性
- */
-- (void)setFooterHidden:(BOOL)footerHidden
-{
-    self.footer.hidden = footerHidden;
-}
-
-- (BOOL)isFooterHidden
-{
-    return self.footer.isHidden;
-}
-
-/**
- *  是否正在上拉刷新
- */
-- (BOOL)isFooterRefreshing
-{
-    return self.footer.isRefreshing;
+    [self mj_reloadData];
+    
+    [self executeReloadDataBlock];
 }
 @end
