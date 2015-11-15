@@ -30,7 +30,7 @@
 #define kBubbleTitleFontColor       RGB(85, 85, 85)
 #define kBubbleDetailFont           AUTOLAYOUT_FONT(24)
 #define kBubbleDetailFontColor      [UIColor blackColor]
-#define kBubbleServiceWidth         AUTOLAYOUT_LENGTH(300 + 14)//服务特殊会话的气泡宽度
+#define kBubbleServiceWidth         AUTOLAYOUT_LENGTH(340 + 14)//服务特殊会话的气泡宽度
 #define kBubbleServiceTextWidth     (kBubbleServiceWidth - kXHBubbleMarginHor * 2 - kXHBubbleArrowWidth - kXHBubbleTailWidth) // 特殊服务会话的文本最大宽度
 
 //文本最大宽度

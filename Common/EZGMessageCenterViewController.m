@@ -60,7 +60,7 @@
     self.isRescueChangedIdentifier = [APPDATA bk_addObserverForKeyPath:@"isRescueModelChanged" task:^(id target) {
         [weakSelf refreshTableView];
     }];
-    addNObserver(@selector(refreshTableView), kCDNotificationMessageReceived);//消息到达重新查询会话列表
+    addNObserver(@selector(refreshTableView), kNotificationRefreshMessageCenter);//消息到达后被APPDATA拦截处理后再确定是否需要刷新这个列表
     addNObserver(@selector(refreshTableView), kCDNotificationUnreadsUpdated);//未读数变化重新查询会话列表
 }
 //显示救援特殊会话

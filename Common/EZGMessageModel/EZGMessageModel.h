@@ -28,7 +28,7 @@ typedef NS_ENUM(NSInteger, EZGServiceType) {
     EZGServiceTypeStart             = 1,    //服务开始
     EZGServiceTypeFinish            = 2,    //服务完成(等待评价)
     EZGServiceTypeOver              = 3,    //服务结束(有结束标志！)
-    EZGServiceTypeResume            = 4,    //取消放弃操作
+    EZGServiceTypeResume            = 4,    //取消放弃操作(C端不想放弃救援了)
 };
 
 //消息扩展参数名定义
@@ -38,6 +38,7 @@ typedef NS_ENUM(NSInteger, EZGServiceType) {
 #define MParamServiceType               @"serviceType"      //服务类型
 #define MParamRateScore                 @"rateScore"        //评分数
 #define MParamAccidentId                @"accidentId"       //现场记录id
+#define MParamServerTime                @"serverTime"       //发送该消息时服务器的时间（用于：取消救援的时间起点）
 
 #define MParamAvatarUrl                 @"avatarUrl"        //消息对应的头像地址
 

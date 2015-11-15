@@ -29,19 +29,20 @@
         }
         
         self.commentTitleLabel.backgroundColor = [UIColor clearColor];
-        self.commentTitleLabel.textColor = kDefaultTextColorBlack1;
-        self.commentTitleLabel.font = AUTOLAYOUT_FONT(self.commentTitleLabel.font.pointSize);
+        self.commentTitleLabel.textColor = kBubbleTitleFontColor;
+        self.commentTitleLabel.font = kBubbleTitleFont;
         
         self.separationLineLabel.height = AUTOLAYOUT_LENGTH(1);
+        self.separationLineLabel.backgroundColor = kDefaultBorderColor;
         
         for (UIImageView *imageView in self.rateImageViewArray) {
             imageView.width = AUTOLAYOUT_LENGTH(50);
             imageView.height = AUTOLAYOUT_LENGTH(50);
         }
         
-        self.overLabel.backgroundColor = [UIColor clearColor];
+        self.overLabel.backgroundColor = RGBA(0, 0, 0, 0.5);
         self.overLabel.textColor = [UIColor whiteColor];
-        self.overLabel.font = AUTOLAYOUT_FONT(self.overLabel.font.pointSize);
+        self.overLabel.font = AUTOLAYOUT_FONT(22);
         self.overLabel.width = AUTOLAYOUT_LENGTH(300);
         self.overLabel.height = AUTOLAYOUT_LENGTH(80);
     }
@@ -84,26 +85,21 @@
 //动态计算位置和大小
 - (void)layoutSubviews {
     [super layoutSubviews];
+    CGRect contentFrame = [self calculateContentFrame];
     
     //调整标题位置
     [self.commentTitleLabel sizeToFit];
-    self.commentTitleLabel.width = self.bubbleImageView.width - (kXHBubbleMarginHor + kXHBubbleArrowWidth + kXHBubbleMarginHor);
-    self.commentTitleLabel.top = self.bubbleImageView.top + kXHBubbleMarginVer;
-    if (EZGBubbleMessageTypeReceiving == [self bubbleMessageType]) {
-        self.commentTitleLabel.left = self.bubbleImageView.left + kXHBubbleArrowWidth + kXHBubbleMarginHor;
-    }
-    else {
-        self.commentTitleLabel.left = self.bubbleImageView.left + kXHBubbleMarginHor;
-    }
+    self.commentTitleLabel.origin = contentFrame.origin;
+    self.commentTitleLabel.width = contentFrame.size.width;
     
     //调整分割线位置
     self.separationLineLabel.left = self.commentTitleLabel.left;
-    self.separationLineLabel.top = CGRectGetMaxY(self.commentTitleLabel.frame) + kXHBubbleMarginVer;
+    self.separationLineLabel.top = CGRectGetMaxY(self.commentTitleLabel.frame) + kXHBubbleMarginVer / 2;
     self.separationLineLabel.width = self.commentTitleLabel.width;
     
     //调整星星位置
     CGFloat currentStarX = self.commentTitleLabel.left;
-    CGFloat starCenterY = self.separationLineLabel.bottom + (self.bubbleImageView.bottom - self.separationLineLabel.bottom) / 2;
+    CGFloat starCenterY = self.separationLineLabel.bottom + kXHBubbleMarginVer / 2;
     for (UIImageView *imageView in self.rateImageViewArray) {
         imageView.left = currentStarX;
         imageView.centerY = starCenterY;

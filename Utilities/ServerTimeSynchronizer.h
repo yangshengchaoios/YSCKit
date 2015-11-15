@@ -10,7 +10,7 @@
 
 @interface ServerTimeSynchronizer : NSObject
 
-@property (strong, nonatomic) NSString *currentTimeInterval;    //服务器当前的时间戳
+@property (strong, nonatomic) NSString *currentTimeInterval;    //服务器当前的时间戳（秒）
 
 + (instancetype)sharedInstance;
 

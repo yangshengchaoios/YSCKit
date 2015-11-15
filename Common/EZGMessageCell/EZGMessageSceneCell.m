@@ -23,10 +23,13 @@
         [self.contentView addSubview:self.bubbleSceneImageView];
         
         self.sceneTextLabel.backgroundColor = [UIColor clearColor];
-        self.sceneTextLabel.textColor = kDefaultTextColorBlack1;
-        self.sceneTextLabel.font = AUTOLAYOUT_FONT(self.sceneTextLabel.font.pointSize);
+        self.sceneTextLabel.textColor = kBubbleTitleFontColor;
+        self.sceneTextLabel.font = kBubbleTitleFont;
         
         self.separationLineLabel.height = AUTOLAYOUT_LENGTH(1);
+        self.separationLineLabel.backgroundColor = kDefaultBorderColor;
+        
+        self.bubbleSceneImageView.size = AUTOLAYOUT_SIZE_WH(280, 145);
     }
     return self;
 }
@@ -34,7 +37,11 @@
 #pragma mark - 计算大小
 //计算气泡大小
 + (CGSize)BubbleFrameWithMessage:(EZGSceneMessage *)message {
-    return AUTOLAYOUT_SIZE_WH(300 + 14, 210);
+    CGFloat titleHeight = [NSString HeightOfNormalString:Trim(message.text)
+                                                maxWidth:kBubbleServiceTextWidth
+                                                withFont:kBubbleTitleFont];
+    CGFloat bubbleHeight = titleHeight + AUTOLAYOUT_LENGTH(145) + kXHBubbleMarginVer * 3;
+    return CGSizeMake(kBubbleServiceWidth, bubbleHeight);
 }
 
 #pragma mark - 显示内容
@@ -44,37 +51,30 @@
     self.sceneTextLabel.text = message.text;
     
     if (EZGSceneTypeSingleCar == [message.attributes[MParamSceneType] integerValue]) {
-        self.bubbleSceneImageView.image = [UIImage imageNamed:@"singlecar"];
+        self.bubbleSceneImageView.image = [UIImage imageNamed:@"icon_singlecar"];
     }
     else {
-        self.bubbleSceneImageView.image = [UIImage imageNamed:@"multicar"];
+        self.bubbleSceneImageView.image = [UIImage imageNamed:@"icon_multicar"];
     }
 }
 //动态计算位置和大小
 - (void)layoutSubviews {
     [super layoutSubviews];
+    CGRect contentFrame = [self calculateContentFrame];
     
     //调整标题位置
     [self.sceneTextLabel sizeToFit];
-    self.sceneTextLabel.width = self.bubbleImageView.width - (kXHBubbleMarginHor + kXHBubbleArrowWidth + kXHBubbleMarginHor);
-    self.sceneTextLabel.top = self.bubbleImageView.top + kXHBubbleMarginVer;
-    if (EZGBubbleMessageTypeReceiving == [self bubbleMessageType]) {
-        self.sceneTextLabel.left = self.bubbleImageView.left + kXHBubbleArrowWidth + kXHBubbleMarginHor;
-    }
-    else {
-        self.sceneTextLabel.left = self.bubbleImageView.left + kXHBubbleMarginHor;
-    }
+    self.sceneTextLabel.origin = contentFrame.origin;
+    self.sceneTextLabel.width = contentFrame.size.width;
     
     //调整分割线位置
     self.separationLineLabel.left = self.sceneTextLabel.left;
-    self.separationLineLabel.top = CGRectGetMaxY(self.sceneTextLabel.frame) + kXHBubbleMarginVer;
+    self.separationLineLabel.top = CGRectGetMaxY(self.sceneTextLabel.frame) + kXHBubbleMarginVer / 2;
     self.separationLineLabel.width = self.sceneTextLabel.width;
     
     //调整图片位置
-    self.bubbleSceneImageView.top = self.separationLineLabel.bottom + kXHBubbleMarginPhoto;
-    self.bubbleSceneImageView.left = self.separationLineLabel.left - kXHBubbleMarginHor + kXHBubbleMarginPhoto;
-    self.bubbleSceneImageView.width = self.bubbleImageView.width - (kXHBubbleMarginPhoto + kXHBubbleArrowWidth + kXHBubbleMarginPhoto);
-    self.bubbleSceneImageView.height = self.bubbleImageView.bottom - self.separationLineLabel.bottom - 2 * kXHBubbleMarginPhoto;
+    self.bubbleSceneImageView.top = self.separationLineLabel.bottom + kXHBubbleMarginVer / 2;
+    self.bubbleSceneImageView.left = self.sceneTextLabel.left;
 }
 
 @end

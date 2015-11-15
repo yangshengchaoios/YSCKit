@@ -23,19 +23,19 @@
         [self.contentView addSubview:self.overLabel];
         
         self.serviceTitleLabel.backgroundColor = [UIColor clearColor];
-        self.serviceTitleLabel.textColor = kDefaultTextColorBlack1;
-        self.serviceTitleLabel.font = AUTOLAYOUT_FONT(self.serviceTitleLabel.font.pointSize);
+        self.serviceTitleLabel.textColor = kBubbleTitleFontColor;
+        self.serviceTitleLabel.font = kBubbleTitleFont;
         
         self.separationLineLabel.height = AUTOLAYOUT_LENGTH(1);
         self.separationLineLabel.backgroundColor = kDefaultBorderColor;
         
         self.serviceDetailLabel.backgroundColor = [UIColor clearColor];
-        self.serviceDetailLabel.textColor = kDefaultTextColorBlack1;
-        self.serviceDetailLabel.font = AUTOLAYOUT_FONT(self.serviceDetailLabel.font.pointSize);
+        self.serviceDetailLabel.textColor = kBubbleDetailFontColor;
+        self.serviceDetailLabel.font = kBubbleDetailFont;
         
-        self.overLabel.backgroundColor = [UIColor clearColor];
+        self.overLabel.backgroundColor = RGBA(0, 0, 0, 0.5);
         self.overLabel.textColor = [UIColor whiteColor];
-        self.overLabel.font = AUTOLAYOUT_FONT(self.overLabel.font.pointSize);
+        self.overLabel.font = AUTOLAYOUT_FONT(22);
         self.overLabel.width = AUTOLAYOUT_LENGTH(300);
         self.overLabel.height = AUTOLAYOUT_LENGTH(80);
     }
@@ -86,28 +86,23 @@
 //动态计算位置和大小
 - (void)layoutSubviews {
     [super layoutSubviews];
+    CGRect contentFrame = [self calculateContentFrame];
     
     //调整标题位置
     [self.serviceTitleLabel sizeToFit];
-    self.serviceTitleLabel.width = self.bubbleImageView.width - (kXHBubbleMarginHor + kXHBubbleArrowWidth + kXHBubbleMarginHor);
-    self.serviceTitleLabel.top = self.bubbleImageView.top + kXHBubbleMarginVer;
-    if (EZGBubbleMessageTypeReceiving == [self bubbleMessageType]) {
-        self.serviceTitleLabel.left = self.bubbleImageView.left + kXHBubbleArrowWidth + kXHBubbleMarginHor;
-    }
-    else {
-        self.serviceTitleLabel.left = self.bubbleImageView.left + kXHBubbleMarginHor;
-    }
+    self.serviceTitleLabel.origin = contentFrame.origin;
+    self.serviceTitleLabel.width = contentFrame.size.width;
     
     //调整分割线位置
     self.separationLineLabel.left = self.serviceTitleLabel.left;
-    self.separationLineLabel.top = CGRectGetMaxY(self.serviceTitleLabel.frame) + kXHBubbleMarginVer;
-    self.separationLineLabel.width = self.bubbleImageView.width - (kXHBubbleMarginHor + kXHBubbleArrowWidth + kXHBubbleMarginHor);
+    self.separationLineLabel.top = CGRectGetMaxY(self.serviceTitleLabel.frame) + kXHBubbleMarginVer / 2;
+    self.separationLineLabel.width = self.serviceTitleLabel.width;
     
     //调整说明信息位置
-    self.serviceDetailLabel.width = self.serviceTitleLabel.width;
-    self.serviceDetailLabel.height = self.bubbleImageView.bottom - self.separationLineLabel.bottom - 2;
-    self.serviceDetailLabel.centerX = self.separationLineLabel.centerX;
     self.serviceDetailLabel.top = self.separationLineLabel.bottom + 1;
+    self.serviceDetailLabel.left = self.serviceTitleLabel.left;
+    self.serviceDetailLabel.width = self.serviceTitleLabel.width;
+    self.serviceDetailLabel.height = contentFrame.size.height - CGRectGetMaxY(self.separationLineLabel.frame) - 2;
     
     //调整结束信息位置
     self.overLabel.top = self.bubbleImageView.bottom + kXHLabelPadding;

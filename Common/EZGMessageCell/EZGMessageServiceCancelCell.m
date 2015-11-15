@@ -23,14 +23,19 @@
         [self.contentView addSubview:self.cancelDetailLabel];
         
         self.cancelTitleLabel.backgroundColor = [UIColor clearColor];
-        self.cancelTitleLabel.textColor = kDefaultTextColorBlack1;
-        self.cancelTitleLabel.font = AUTOLAYOUT_FONT(self.cancelTitleLabel.font.pointSize);
+        self.cancelTitleLabel.textColor = kBubbleTitleFontColor;
+        self.cancelTitleLabel.font = kBubbleTitleFont;
         
         self.separationLineLabel.height = AUTOLAYOUT_LENGTH(1);
+        self.separationLineLabel.backgroundColor = kDefaultBorderColor;
         
         self.cancelDetailLabel.backgroundColor = [UIColor clearColor];
-        self.cancelDetailLabel.textColor = kDefaultTextColorBlack1;
-        self.cancelDetailLabel.font = AUTOLAYOUT_FONT(self.cancelDetailLabel.font.pointSize);
+        self.cancelDetailLabel.textColor = kBubbleDetailFontColor;
+        self.cancelDetailLabel.font = kBubbleDetailFont;
+        self.cancelDetailLabel.numberOfLines = 2;
+        
+        self.cancelIconImageView.size = AUTOLAYOUT_SIZE_WH(100, 70);
+        self.cancelIconImageView.image = [UIImage imageNamed:@"icon_cancel_rescue"];
     }
     return self;
 }
@@ -56,34 +61,27 @@
 //动态计算位置和大小
 - (void)layoutSubviews {
     [super layoutSubviews];
+    CGRect contentFrame = [self calculateContentFrame];
     
     //调整标题位置
     [self.cancelTitleLabel sizeToFit];
-    self.cancelTitleLabel.width = self.bubbleImageView.width - (kXHBubbleMarginHor + kXHBubbleArrowWidth + kXHBubbleMarginHor);
-    self.cancelTitleLabel.top = self.bubbleImageView.top + kXHBubbleMarginVer;
-    if (EZGBubbleMessageTypeReceiving == [self bubbleMessageType]) {
-        self.cancelTitleLabel.left = self.bubbleImageView.left + kXHBubbleArrowWidth + kXHBubbleMarginHor;
-    }
-    else {
-        self.cancelTitleLabel.left = self.bubbleImageView.left + kXHBubbleMarginHor;
-    }
+    self.cancelTitleLabel.origin = contentFrame.origin;
+    self.cancelTitleLabel.width = contentFrame.size.width;
     
     //调整分割线位置
     self.separationLineLabel.left = self.cancelTitleLabel.left;
-    self.separationLineLabel.top = CGRectGetMaxY(self.cancelTitleLabel.frame) + kXHBubbleMarginVer;
+    self.separationLineLabel.top = CGRectGetMaxY(self.cancelTitleLabel.frame) + kXHBubbleMarginVer / 2;
     self.separationLineLabel.width = self.cancelTitleLabel.width;
     
     //调整icon位置
-    self.cancelIconImageView.left = self.separationLineLabel.left;
-    self.cancelIconImageView.top = self.separationLineLabel.bottom + kXHBubbleMarginVer;
-    self.cancelIconImageView.height = self.bubbleImageView.bottom - self.separationLineLabel.bottom - 2 * kXHBubbleMarginVer;
-    self.cancelIconImageView.width = self.cancelIconImageView.height;
+    self.cancelIconImageView.left = self.cancelTitleLabel.left;
+    self.cancelIconImageView.top = self.separationLineLabel.bottom + kXHBubbleMarginVer / 2;
     
     //调整文字位置
-    self.cancelDetailLabel.left = self.cancelIconImageView.right + kXHBubbleMarginVer;
+    self.cancelDetailLabel.left = self.cancelIconImageView.right;
     self.cancelDetailLabel.top = self.cancelIconImageView.top;
     self.cancelDetailLabel.height = self.cancelIconImageView.height;
-    self.cancelDetailLabel.width = self.separationLineLabel.right - self.cancelDetailLabel.left;
+    self.cancelDetailLabel.width = self.separationLineLabel.width - self.cancelDetailLabel.width;
 }
 
 @end
