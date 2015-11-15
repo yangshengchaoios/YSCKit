@@ -43,6 +43,7 @@
                                    [NSString replaceString:carModel.seriesName byRegex:carModel.brandName to:@""]];
     }
     self.carYearLabel.text = Trim(carModel.modelName);
+    self.carNumberLabel.text = [carModel formatCarNumber];
     if ([carModel.carMileage integerValue] > 0) {
         self.mileAgeLabel.text = [NSString stringWithFormat:@"%ld公里", [carModel.carMileage integerValue]];
     }
