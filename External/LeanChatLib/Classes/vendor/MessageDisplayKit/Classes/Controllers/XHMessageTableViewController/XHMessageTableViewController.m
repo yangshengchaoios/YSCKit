@@ -396,6 +396,18 @@ static CGPoint  delayOffset = {0.0};
     // 设置手势滑动，默认添加一个bar的高度值
     self.messageTableView.messageInputBarHeight = CGRectGetHeight(_messageInputView.bounds);
 }
+//是否显示messageInputView
+- (void)showMessageInputView:(BOOL)show {
+    CGFloat inputViewHeight = (self.inputViewStyle == XHMessageInputViewStyleFlat) ? 45.0f : 40.0f;
+    if (show) {
+        [self setTableViewInsetsWithBottomValue:inputViewHeight];
+        self.messageInputView.top = self.view.frame.size.height - inputViewHeight;
+    }
+    else {
+        [self setTableViewInsetsWithBottomValue:0];
+        self.messageInputView.top = self.view.frame.size.height;
+    }
+}
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     // 设置键盘通知或者手势控制键盘消失

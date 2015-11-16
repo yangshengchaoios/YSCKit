@@ -360,7 +360,7 @@
 - (UINavigationController *)presentNormalViewController:(UIViewController *)viewController {
     [self hideKeyboard];
     UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:viewController];
-    navigationController.navigationController.navigationBar.translucent = NO;
+    navigationController.navigationBar.translucent = NO;
 //    navigationController.interactivePopGestureRecognizer.enabled = YES;//NOTE:关闭系统自带的侧边滑动功能，会与MLTransition冲突！
 //    navigationController.interactivePopGestureRecognizer.delegate = self;
     [self presentViewController:navigationController animated:YES completion:nil];
@@ -378,7 +378,6 @@
 		[self.presentedViewController dismissViewControllerAnimated:YES completion:nil];
 	}
 }
-
 
 #pragma mark -  show & hide HUD
 //在self.view上显示hud
@@ -623,7 +622,6 @@
 }
 
 #pragma mark - UITextFieldDelegate
-
 - (BOOL)textFieldShouldReturn:(UITextField *)textField {
 	[self hideKeyboard];//TODO:在ios8中失效！
 	return YES;
@@ -647,10 +645,21 @@
 }
 
 #pragma mark - Observe KVO
-
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
 
 }
+
+#pragma mark - InterfaceOrientation
+- (BOOL)shouldAutorotate {
+    return NO;
+}
+- (UIInterfaceOrientationMask)supportedInterfaceOrientations {
+    return UIInterfaceOrientationMaskPortrait;
+}
+//使用这个方法是有前提的，就是当前ViewController是通过全屏的Presentation方式展现出来的。
+//- (UIInterfaceOrientation)preferredInterfaceOrientationForPresentation {
+//    return UIInterfaceOrientationPortraitUpsideDown | UIInterfaceOrientationPortrait | UIInterfaceOrientationLandscapeLeft | UIInterfaceOrientationLandscapeRight;
+//}
 
 @end
 

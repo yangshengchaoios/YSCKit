@@ -48,7 +48,7 @@
 #pragma mark - 计算大小
 //计算气泡大小
 + (CGSize)BubbleFrameWithMessage:(EZGServiceCancelMessage *)message {
-    return AUTOLAYOUT_SIZE_WH(300 + 14, 160);
+    return CGSizeMake(kBubbleServiceWidth, AUTOLAYOUT_LENGTH(160));
 }
 
 #pragma mark - 显示内容

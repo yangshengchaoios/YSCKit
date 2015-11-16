@@ -252,4 +252,8 @@
 - (void)didSendMessageWithPhoto:(UIImage *)photo;
 //根据地理位置信息和地理经纬度开始发送地理位置消息
 - (void)didSendGeolocationsMessageWithGeolocaltions:(NSString *)geolcations location:(CLLocation *)location;
+//是否显示messageInputView
+- (void)showMessageInputView:(BOOL)show;
+//根据bottom的数值配置消息列表的内部布局变化
+- (void)setTableViewInsetsWithBottomValue:(CGFloat)bottom;
 @end

@@ -40,9 +40,12 @@
             imageView.height = AUTOLAYOUT_LENGTH(50);
         }
         
-        self.overLabel.backgroundColor = RGBA(0, 0, 0, 0.5);
+        self.overLabel.backgroundColor = RGB(177, 177, 177);
         self.overLabel.textColor = [UIColor whiteColor];
-        self.overLabel.font = AUTOLAYOUT_FONT(22);
+        self.overLabel.numberOfLines = 2;
+        self.overLabel.textAlignment = NSTextAlignmentCenter;
+        [self.overLabel makeRoundWithRadius:5];
+        self.overLabel.font = AUTOLAYOUT_FONT(24);
         self.overLabel.width = AUTOLAYOUT_LENGTH(300);
         self.overLabel.height = AUTOLAYOUT_LENGTH(80);
     }
@@ -57,8 +60,8 @@
 #pragma mark - 计算大小
 //计算气泡大小
 + (CGSize)BubbleFrameWithMessage:(EZGServiceCommentMessage *)message {
-    CGFloat maxTextWidth = SCREEN_WIDTH - 2 * (kXHAvatorPadding + kXHAvatarImageSize + kXHBubbleMessageViewPadding) - kXHBubbleArrowWidth;
-    return AUTOLAYOUT_SIZE_WH(maxTextWidth, 130);
+    CGFloat maxTextWidth = SCREEN_WIDTH - 2 * (kXHAvatorPadding + kXHAvatarImageSize + kXHBubbleMessageViewPadding);
+    return CGSizeMake(maxTextWidth, AUTOLAYOUT_LENGTH(150));
 }
 //计算cell高度
 + (CGFloat)HeightOfCellByMessage:(EZGServiceCommentMessage *)message displaysTimestamp:(BOOL)displayTimestamp {
@@ -98,12 +101,12 @@
     self.separationLineLabel.width = self.commentTitleLabel.width;
     
     //调整星星位置
-    CGFloat currentStarX = self.commentTitleLabel.left;
-    CGFloat starCenterY = self.separationLineLabel.bottom + kXHBubbleMarginVer / 2;
+    CGFloat starX = self.commentTitleLabel.left;
+    CGFloat starY = self.separationLineLabel.bottom + kXHBubbleMarginVer / 2;
     for (UIImageView *imageView in self.rateImageViewArray) {
-        imageView.left = currentStarX;
-        imageView.centerY = starCenterY;
-        currentStarX += imageView.right + SeparationOfStar;
+        imageView.left = starX;
+        imageView.top = starY;
+        starX = CGRectGetMaxX(imageView.frame) + SeparationOfStar;
     }
     
     //调整结束信息位置

@@ -32,27 +32,22 @@
 
 - (NSString *)getMessageTitle:(AVIMTypedMessage *)msg {
     NSString *title;
-    AVIMLocationMessage *locationMsg;
     switch (msg.mediaType) {
-        case kAVIMMessageMediaTypeText:
-            title = [CDEmotionUtils emojiStringFromString:msg.text];
-            break;
         case kAVIMMessageMediaTypeAudio:
             title = @"[声音]";
             break;
         case kAVIMMessageMediaTypeImage:
             title = @"[图片]";
             break;
-        case kAVIMMessageMediaTypeLocation:
-            locationMsg = (AVIMLocationMessage *)msg;
-            title = locationMsg.text;
-            break;
         case kAVIMMessageMediaTypeEmotion:
             title = @"[表情]";
             break;
         case kAVIMMessageMediaTypeVideo:
             title = @"[视频]";
+        case kAVIMMessageMediaTypeText:
+        case kAVIMMessageMediaTypeLocation:
         default:
+            title = [CDEmotionUtils emojiStringFromString:msg.text];
             break;
     }
     return title;
@@ -71,7 +66,8 @@
     NSString *finalText;
     if (conversation.mentioned) {
         finalText = [NSString stringWithFormat:@"%@%@", mentionText, title];
-    } else {
+    }
+    else {
         finalText = title;
     }
     if (finalText == nil) {

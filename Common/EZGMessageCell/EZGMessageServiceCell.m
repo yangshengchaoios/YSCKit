@@ -33,9 +33,12 @@
         self.serviceDetailLabel.textColor = kBubbleDetailFontColor;
         self.serviceDetailLabel.font = kBubbleDetailFont;
         
-        self.overLabel.backgroundColor = RGBA(0, 0, 0, 0.5);
+        self.overLabel.backgroundColor = RGB(177, 177, 177);
         self.overLabel.textColor = [UIColor whiteColor];
-        self.overLabel.font = AUTOLAYOUT_FONT(22);
+        self.overLabel.numberOfLines = 2;
+        self.overLabel.textAlignment = NSTextAlignmentCenter;
+        [self.overLabel makeRoundWithRadius:5];
+        self.overLabel.font = AUTOLAYOUT_FONT(24);
         self.overLabel.width = AUTOLAYOUT_LENGTH(300);
         self.overLabel.height = AUTOLAYOUT_LENGTH(80);
     }
@@ -45,7 +48,7 @@
 #pragma mark - 计算大小
 //计算气泡大小
 + (CGSize)BubbleFrameWithMessage:(EZGServiceMessage *)message {
-    return AUTOLAYOUT_SIZE_WH(300 + 14, 160);
+    return CGSizeMake(kBubbleServiceWidth, AUTOLAYOUT_LENGTH(160));
 }
 //计算cell高度
 + (CGFloat)HeightOfCellByMessage:(EZGServiceMessage *)message displaysTimestamp:(BOOL)displayTimestamp {

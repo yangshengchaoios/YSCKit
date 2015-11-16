@@ -788,7 +788,6 @@
     #else
             size = [string sizeWithFont:font constrainedToSize:CGSizeMake(width, CGFLOAT_MAX) lineBreakMode:NSLineBreakByWordWrapping];
     #endif
-    NSLog(@"%@: W: %.f, H: %.f", self, size.width, size.height);
     return size.height;
 }
 + (CGFloat)WidthOfNormalString:(NSString*)string maxHeight:(CGFloat)height withFont:(UIFont*)font {
@@ -801,7 +800,6 @@
 #else
     size = [string sizeWithFont:font constrainedToSize:CGSizeMake(CGFLOAT_MAX, height) lineBreakMode:NSLineBreakByWordWrapping];
 #endif
-    NSLog(@"%@: W: %.f, H: %.f", self, size.width, size.height);
     return size.width;
 }
 + (CGFloat)HeightOfNormalString:(NSString*)string maxWidth:(CGFloat)width withFont:(UIFont*)font lineSpace:(CGFloat)lineSpace {

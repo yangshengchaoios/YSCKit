@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="9059" systemVersion="14F1021" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="9049"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" id="KGk-i7-Jjw" customClass="EZGScenePhotoListCell">
+            <rect key="frame" x="0.0" y="0.0" width="640" height="380"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="KGk-i7-Jjw" id="H2p-sc-9uM">
+                <rect key="frame" x="0.0" y="0.0" width="640" height="379.5"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="vX7-QJ-cV2">
+                        <rect key="frame" x="0.0" y="0.0" width="640" height="360"/>
+                        <subviews>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="Y9Z-DO-odB">
+                                <rect key="frame" x="0.0" y="0.0" width="640" height="360"/>
+                            </imageView>
+                            <imageView userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="tipimage_multicar_1.png" translatesAutoresizingMaskIntoConstraints="NO" id="jWh-Q7-UJT">
+                                <rect key="frame" x="120" y="55" width="400" height="250"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="400" id="Mmk-KS-CFd"/>
+                                    <constraint firstAttribute="height" constant="250" id="d5h-kJ-vny"/>
+                                </constraints>
+                            </imageView>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="车后方" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="NFf-1P-kZS">
+                                <rect key="frame" x="267" y="25" width="107" height="30"/>
+                                <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="0.20000000000000001" colorSpace="calibratedRGB"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="107" id="9ph-Rj-ga8"/>
+                                    <constraint firstAttribute="height" constant="30" id="M0e-Cd-2XT"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="system" pointSize="22"/>
+                                <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="请您在保证安全下拍摄" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="mvj-l8-Iz0">
+                                <rect key="frame" x="210" y="305" width="220" height="27"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="22"/>
+                                <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                        </subviews>
+                        <color key="backgroundColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="360" id="Lq3-Yf-YuN"/>
+                            <constraint firstItem="Y9Z-DO-odB" firstAttribute="leading" secondItem="vX7-QJ-cV2" secondAttribute="leading" id="VBr-K9-o3n"/>
+                            <constraint firstItem="Y9Z-DO-odB" firstAttribute="top" secondItem="vX7-QJ-cV2" secondAttribute="top" id="a5S-KB-gSJ"/>
+                            <constraint firstItem="mvj-l8-Iz0" firstAttribute="top" secondItem="jWh-Q7-UJT" secondAttribute="bottom" id="fXh-M1-x7s"/>
+                            <constraint firstItem="jWh-Q7-UJT" firstAttribute="top" secondItem="NFf-1P-kZS" secondAttribute="bottom" id="gxU-Ee-Ybj"/>
+                            <constraint firstItem="jWh-Q7-UJT" firstAttribute="centerX" secondItem="vX7-QJ-cV2" secondAttribute="centerX" id="kLN-cG-WOW"/>
+                            <constraint firstItem="mvj-l8-Iz0" firstAttribute="centerX" secondItem="vX7-QJ-cV2" secondAttribute="centerX" id="kgE-rl-Ej2"/>
+                            <constraint firstAttribute="trailing" secondItem="Y9Z-DO-odB" secondAttribute="trailing" id="lqk-bH-HC2"/>
+                            <constraint firstItem="jWh-Q7-UJT" firstAttribute="centerY" secondItem="vX7-QJ-cV2" secondAttribute="centerY" id="m9v-82-UG0"/>
+                            <constraint firstAttribute="bottom" secondItem="Y9Z-DO-odB" secondAttribute="bottom" id="miv-IR-mWO"/>
+                            <constraint firstItem="NFf-1P-kZS" firstAttribute="centerX" secondItem="vX7-QJ-cV2" secondAttribute="centerX" id="xU8-Pk-uab"/>
+                        </constraints>
+                    </view>
+                </subviews>
+                <constraints>
+                    <constraint firstAttribute="trailing" secondItem="vX7-QJ-cV2" secondAttribute="trailing" id="Rr0-2y-Nx7"/>
+                    <constraint firstItem="vX7-QJ-cV2" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" id="aoG-00-hGE"/>
+                    <constraint firstItem="vX7-QJ-cV2" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" id="be9-gK-FKy"/>
+                </constraints>
+            </tableViewCellContentView>
+            <connections>
+                <outlet property="containerView" destination="vX7-QJ-cV2" id="Qcg-vZ-yxk"/>
+                <outlet property="imageDescLabel" destination="NFf-1P-kZS" id="pTF-5u-gF3"/>
+                <outlet property="imageDescWidth" destination="9ph-Rj-ga8" id="9fn-AR-3ox"/>
+                <outlet property="sceneImageView" destination="Y9Z-DO-odB" id="85h-jH-y3m"/>
+                <outlet property="tipImageView" destination="jWh-Q7-UJT" id="qYh-dc-gfL"/>
+                <outlet property="tipLabel" destination="mvj-l8-Iz0" id="wXb-gn-suC"/>
+            </connections>
+            <point key="canvasLocation" x="353" y="229"/>
+        </tableViewCell>
+    </objects>
+    <resources>
+        <image name="tipimage_multicar_1.png" width="370" height="158"/>
+    </resources>
+</document>

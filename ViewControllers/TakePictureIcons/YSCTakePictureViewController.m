@@ -27,8 +27,9 @@
     [super viewWillAppear:animated];
     [[UIApplication sharedApplication] setStatusBarHidden:YES withAnimation:UIStatusBarAnimationSlide];
 }
-- (void)dealloc {
+- (void)viewDidDisappear:(BOOL)animated {
     [[UIApplication sharedApplication] setStatusBarHidden:NO withAnimation:UIStatusBarAnimationSlide];
+    [super viewDidDisappear:animated];
 }
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -39,6 +40,7 @@
     [self.view bringSubviewToFront:self.topView];
     [self.view bringSubviewToFront:self.bottomView];
 }
+
 //执行拍照动作
 - (IBAction)takePictureButtonClicked:(id)sender {
     WeakSelfType blockSelf = self;
@@ -50,5 +52,13 @@
         [blockSelf presentViewController:cropController animated:YES completion:nil];
     }];
 }
+
+#pragma mark - InterfaceOrientation
+//- (BOOL)shouldAutorotate {
+//    return YES;
+//}
+//- (UIInterfaceOrientationMask)supportedInterfaceOrientations {
+//    return UIInterfaceOrientationMaskLandscapeRight;
+//}
 
 @end

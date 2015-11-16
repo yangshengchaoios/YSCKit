@@ -94,6 +94,7 @@
     self.preview = [AVCaptureVideoPreviewLayer layerWithSession:self.session];
     self.preview.frame = aView.bounds;
     self.preview.videoGravity = AVLayerVideoGravityResizeAspectFill;
+    self.preview.position = CGPointMake(CGRectGetMidX(aView.bounds), CGRectGetMidY(aView.bounds));
     [aView.layer addSublayer:self.preview];
 }
 //执行拍照动作

@@ -262,6 +262,9 @@
             else if([responseObject isKindOfClass:[BaseDataModel class]]) {
                 dataArray = @[responseObject];
             }
+            else if([responseObject isKindOfClass:[NSString class]]) {
+                dataArray = @[responseObject];
+            }
             
             //2. 根据组装后的数组刷新列表
             NSArray *newDataArray = nil;
@@ -414,7 +417,7 @@
 }
 //判断cell是否最后一个
 - (BOOL)isLastCellByIndexPath:(NSIndexPath *)indexPath {
-    if (indexPath.section == [self.headerDataArray count] - 1) {
+    if (indexPath.section == [self.cellDataArray count] - 1) {
         NSArray *array = self.cellDataArray[indexPath.section];
         if (indexPath.row == [array count] - 1) {
             return YES;
