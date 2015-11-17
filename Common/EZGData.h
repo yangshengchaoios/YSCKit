@@ -13,11 +13,13 @@
  */
 @interface EZGData : NSObject
 @property (nonatomic, strong) BMKUserLocation *userLocation;
-@property (nonatomic, assign) double currentLongitude;   //当前用户的经度104.7(百度地图)
-@property (nonatomic, assign) double currentLatitude;    //当前用户的维度30.2(百度地图)
+@property (nonatomic, assign) double currentLongitude;          //当前用户的经度104.7(百度地图)
+@property (nonatomic, assign) double currentLatitude;           //当前用户的维度30.2(百度地图)
+@property (nonatomic, strong) NSMutableArray *carNumberArray;   //车牌二维数组
 
 - (id)init;
 + (instancetype)sharedInstance;
+- (void)initCarNumberArray;
 
 #pragma mark - 百度地图
 //开启定位

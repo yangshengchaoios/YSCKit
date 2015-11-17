@@ -49,9 +49,9 @@
 }
 + (NSArray *)carNumberIndexes:(NSString *)carNumber {
     NSMutableArray *indexArray = [NSMutableArray array];
-    for (NSInteger i = 0; i < MIN([APPDATA.carNumberArray count], [carNumber length]); i++) {
+    for (NSInteger i = 0; i < MIN([EZGDATA.carNumberArray count], [carNumber length]); i++) {
         NSString *number = [carNumber substringWithRange:NSMakeRange(i, 1)];
-        NSArray *tempArray = APPDATA.carNumberArray[i];
+        NSArray *tempArray = EZGDATA.carNumberArray[i];
         [indexArray addObject:@([tempArray indexOfObject:number])];
     }
     return indexArray;

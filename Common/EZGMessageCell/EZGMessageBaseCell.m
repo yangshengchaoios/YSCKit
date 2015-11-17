@@ -122,7 +122,7 @@
     }
     else {
         if (EZGBubbleMessageTypeSending == [self bubbleMessageType]) {//自己的头像
-            [self.avatarImageView setImageWithURLString:USER.userAvatar withFadeIn:NO];
+            [self.avatarImageView setImageWithURLString:USERAVATAR withFadeIn:NO];
         }
         else {//对方的头像
             [self.avatarImageView setImageWithURLString:APPDATA.chatUser.avatarUrl withFadeIn:NO];
