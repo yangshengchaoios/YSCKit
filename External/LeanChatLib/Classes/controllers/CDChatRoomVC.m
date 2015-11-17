@@ -22,8 +22,6 @@
 #import "CDFailedMessageStore.h"
 #import "AVIMEmotionMessage.h"
 #import "MJRefresh.h"
-#import "EZGAddressSearchViewController.h"
-#import "YSCPhotoBrowseViewController.h"
 
 static NSInteger const kOnePageSize = 10;
 
@@ -321,7 +319,7 @@ static NSInteger const kOnePageSize = 10;
             self.currentSelectedIndex = -1;
         }
         //打开图片浏览器
-        YSCPhotoBrowseViewController *photoDetail = (YSCPhotoBrowseViewController *)[UIResponder createBaseViewController:@"YSCPhotoBrowseViewController"];
+        YSCBaseViewController *photoDetail = (YSCBaseViewController *)[UIResponder createBaseViewController:@"YSCPhotoBrowseViewController"];
         if (isNotEmpty(message.file.localPath)) {
             photoDetail.params = @{kParamImageUrls : @[Trim(message.file.localPath)]};
             [self.navigationController pushViewController:photoDetail animated:NO];
@@ -401,7 +399,7 @@ static NSInteger const kOnePageSize = 10;
             [UIView showResultThenHideOnWindow:@"没有选择位置信息"];
         }
     };
-    EZGAddressSearchViewController *viewController = (EZGAddressSearchViewController *)[UIResponder createBaseViewController:@"EZGAddressSearchViewController"];
+    YSCBaseViewController *viewController = (YSCBaseViewController *)[UIResponder createBaseViewController:@"EZGAddressSearchViewController"];
     viewController.params = @{kParamBackType : @(BackTypeImage), kParamBlock : block};
     [self presentViewController:[[UINavigationController alloc] initWithRootViewController:viewController]
                        animated:YES completion:nil];
