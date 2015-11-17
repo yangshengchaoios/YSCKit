@@ -7,11 +7,20 @@
 //
 
 #import "YSCBaseViewController.h"
+#import "AVIMConversation+Custom.h"
+#import "CDConversationStore.h"
+#import "EZGMessageCenterCell.h"
+#import "CDChatManager.h"
 
 @interface EZGMessageCenterViewController : YSCBaseViewController
 
 @property (nonatomic, weak) IBOutlet YSCTableView *tableView;
 
-- (void)refreshWhenDataIsEmpty;
+//初始化列表
+- (void)initTableView;
+//刷新列表
+- (void)refreshTableView;
+//刷新最近的对话
+- (void)refreshConversationsByPageIndex:(NSInteger)pageIndex;
 
 @end
