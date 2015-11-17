@@ -30,6 +30,8 @@
 #pragma mark - select share menu item
 //点击扩展功能按钮-发送位置
 - (void)didClickedShareMenuItemSendLocation;
+//点击扩展功能按钮-发送拍摄照片
+- (void)didClickedShareMenuItemCamera;
 //点击扩展功能按钮-发送图片
 - (void)didClickedShareMenuItemSendPhoto;
 //发送消息

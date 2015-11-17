@@ -27,7 +27,7 @@
 
 static NSInteger const kOnePageSize = 10;
 
-@interface CDChatRoomVC () <UINavigationControllerDelegate, ZYQAssetPickerControllerDelegate>
+@interface CDChatRoomVC () <UINavigationControllerDelegate, UIImagePickerControllerDelegate, ZYQAssetPickerControllerDelegate>
 @property (nonatomic, strong, readwrite) AVIMConversation *conv;
 @property (atomic, assign) BOOL isLoadingMsg;
 @property (atomic, assign) NSInteger currentSelectedIndex;
@@ -161,7 +161,134 @@ static NSInteger const kOnePageSize = 10;
     self.clientStatusView.hidden = ([AVIMClient defaultClient].status != AVIMClientStatusClosed);
 }
 
+#pragma mark -  ui config
+// 是否显示时间轴Label的回调方法
+- (BOOL)shouldDisplayTimestampForRowAtIndexPath:(NSIndexPath *)indexPath {
+    if (indexPath.row > 0 && indexPath.row < [self.messages count]) {
+        AVIMTypedMessage *msg = [self.messages objectAtIndex:indexPath.row];
+        AVIMTypedMessage *lastMsg = [self.messages objectAtIndex:indexPath.row - 1];
+        return msg.sendTimestamp - lastMsg.sendTimestamp > 60 * 3 * 1000;
+    }
+    else {
+        return YES;
+    }
+}
+// 是否支持用户手动滚动
+- (BOOL)shouldPreventScrollToBottomWhileUserScrolling {
+    return YES;
+}
+
+#pragma mark - @ reference other
+- (void)didInputAtSignOnMessageTextView:(XHMessageTextView *)messageInputTextView {
+    
+}
+
+#pragma mark - alert and async utils
+- (BOOL)filterError:(NSError *)error {
+    return [self alertError:error] == NO;
+}
+- (void)alert:(NSString *)msg {
+    [self alert:msg block:nil];
+}
+- (void)alert:(NSString *)msg block:(void (^)(void))block{
+    UIAlertView *alertView = [UIAlertView bk_alertViewWithTitle:msg];
+    [alertView bk_setCancelButtonWithTitle:@"确定" handler:block];
+    [alertView show];
+}
+- (BOOL)alertError:(NSError *)error {
+    if (error) {
+        if (error.code == 4303) {
+            [[CDConversationStore store] deleteConversationByConvId:self.conv.conversationId];//删除本地不存在的会话
+            self.conv = nil;
+            WEAKSELF
+            [self alert:@"会话不存在" block:^{
+                [weakSelf bk_performBlock:^(id obj) {
+                    [weakSelf.navigationController popViewControllerAnimated:YES];
+                } afterDelay:0.5];
+            }];
+        }
+        else if (error.code == kAVIMErrorConnectionLost) {
+            [UIView showResultThenHideOnWindow:@"未能连接聊天服务器"];
+        }
+        else if ([error.domain isEqualToString:NSURLErrorDomain]) {
+            [UIView showResultThenHideOnWindow:@"网络连接错误"];
+        }
+        else {
+            [self alert:[NSString stringWithFormat:@"alertError: %@", error]];
+        }
+        return YES;
+    }
+    return NO;
+}
+- (void)runInMainQueue:(void (^)())queue {
+    dispatch_async(dispatch_get_main_queue(), queue);
+}
+- (void)runInGlobalQueue:(void (^)())queue {
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), queue);
+}
+
+#pragma mark - conversations store
+- (void)updateConversationAsRead {
+    if (self.conv) {
+        [[CDConversationStore store] updateConversation:self.conv];//如果已经存在就不会继续插入，保证有消息就有会话！
+        [[CDConversationStore store] updateUnreadCountToZeroByConvId:self.conv.conversationId];
+        [[CDConversationStore store] updateMentioned:NO convId:self.conv.conversationId];
+    }
+    [[NSNotificationCenter defaultCenter] postNotificationName:kCDNotificationUnreadsUpdated object:nil];
+}
+
 #pragma mark - EZGMessageTableViewCell action
+//设置cell
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+    EZGMessageBaseCell *cell = (EZGMessageBaseCell *)[super tableView:tableView cellForRowAtIndexPath:indexPath];
+    AVIMTypedMessage *message = self.messages[indexPath.row];
+    WEAKSELF
+    [cell.bubbleImageView removeAllGestureRecognizers];
+    
+    //1. 单击头像
+    [cell.avatarImageView removeAllGestureRecognizers];
+    [cell.avatarImageView bk_whenTapped:^{
+        [weakSelf didSelectedAvatorOnMessage:message atIndexPath:indexPath];
+    }];
+    
+    //2. 单击重发消息
+    [cell.statusView.retryButton bk_removeEventHandlersForControlEvents:UIControlEventTouchUpInside];
+    [cell.statusView.retryButton bk_addEventHandler:^(id sender) {
+        [weakSelf didRetrySendMessage:message atIndexPath:indexPath];
+    } forControlEvents:UIControlEventTouchUpInside];
+    
+    //3. 双击文本消息
+    if (kAVIMMessageMediaTypeText == message.mediaType) {
+        [cell.bubbleImageView bk_whenDoubleTapped:^{
+            [weakSelf didDoubleSelectedOnTextMessage:message atIndexPath:indexPath];
+        }];
+    }
+    
+    //4. 单击消息体
+    [cell.bubbleImageView bk_whenTapped:^{
+        //关闭menu
+        UIMenuController *menu = [UIMenuController sharedMenuController];
+        if (menu.isMenuVisible) {
+            [menu setMenuVisible:NO animated:YES];
+        }
+        //点击媒体消息
+        [weakSelf multiMediaMessageDidSelectedOnMessage:message atIndexPath:indexPath onMessageTableViewCell:cell];
+    }];
+    //5. 添加长按手势
+    [cell addLongPressGesture];
+    
+    //6. 设置音频cell
+    if (kAVIMMessageMediaTypeAudio == message.mediaType) {
+        EZGMessageVoiceCell *voiceCell = (EZGMessageVoiceCell *)cell;
+        if (self.currentSelectedIndex == indexPath.row) {
+            [voiceCell.animationVoiceImageView startAnimating];
+        }
+        else {
+            [voiceCell.animationVoiceImageView stopAnimating];
+        }
+    }
+    return cell;
+}
 //单击消息体
 - (void)multiMediaMessageDidSelectedOnMessage:(AVIMTypedMessage *)message atIndexPath:(NSIndexPath *)indexPath onMessageTableViewCell:(EZGMessageBaseCell *)messageTableViewCell {
     //1. 正在录音过程中不能跳转页面
@@ -237,58 +364,28 @@ static NSInteger const kOnePageSize = 10;
 - (void)didRetrySendMessage:(AVIMTypedMessage *)message atIndexPath:(NSIndexPath *)indexPath {
     [self resendMessage:message atIndexPath:indexPath discardIfFailed:false];
 }
-//设置cell
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    EZGMessageBaseCell *cell = (EZGMessageBaseCell *)[super tableView:tableView cellForRowAtIndexPath:indexPath];
-    AVIMTypedMessage *message = self.messages[indexPath.row];
-    WEAKSELF
-    [cell.bubbleImageView removeAllGestureRecognizers];
-    
-    //1. 单击头像
-    [cell.avatarImageView removeAllGestureRecognizers];
-    [cell.avatarImageView bk_whenTapped:^{
-        [weakSelf didSelectedAvatorOnMessage:message atIndexPath:indexPath];
-    }];
-    
-    //2. 单击重发消息
-    [cell.statusView.retryButton bk_removeEventHandlersForControlEvents:UIControlEventTouchUpInside];
-    [cell.statusView.retryButton bk_addEventHandler:^(id sender) {
-        [weakSelf didRetrySendMessage:message atIndexPath:indexPath];
-    } forControlEvents:UIControlEventTouchUpInside];
-    
-    //3. 双击文本消息
-    if (kAVIMMessageMediaTypeText == message.mediaType) {
-        [cell.bubbleImageView bk_whenDoubleTapped:^{
-            [weakSelf didDoubleSelectedOnTextMessage:message atIndexPath:indexPath];
-        }];
-    }
-    
-    //4. 单击消息体
-    [cell.bubbleImageView bk_whenTapped:^{
-        //关闭menu
-        UIMenuController *menu = [UIMenuController sharedMenuController];
-        if (menu.isMenuVisible) {
-            [menu setMenuVisible:NO animated:YES];
-        }
-        //点击媒体消息
-        [weakSelf multiMediaMessageDidSelectedOnMessage:message atIndexPath:indexPath onMessageTableViewCell:cell];
-    }];
-    //5. 添加长按手势
-    [cell addLongPressGesture];
-    
-    //6. 设置音频cell
-    if (kAVIMMessageMediaTypeAudio == message.mediaType) {
-        EZGMessageVoiceCell *voiceCell = (EZGMessageVoiceCell *)cell;
-        if (self.currentSelectedIndex == indexPath.row) {
-            [voiceCell.animationVoiceImageView startAnimating];
-        }
-        else {
-            [voiceCell.animationVoiceImageView stopAnimating];
-        }
-    }
-    return cell;
-}
 
+
+
+
+//================================================
+//
+//  扩展功能
+//
+//================================================
+#pragma mark - XHShareMenuViewDelegate
+//点击扩展区域的功能按钮
+- (void)didSelecteShareMenuItem:(XHShareMenuItem *)shareMenuItem atIndex:(NSInteger)index {
+    if (0 == index) {//照片
+        [self didClickedShareMenuItemSendPhoto];
+    }
+    else if (1 == index) {//拍摄
+        [self didClickedShareMenuItemCamera];
+    }
+    else if (2 == index) {//位置
+        [self didClickedShareMenuItemSendLocation];
+    }
+}
 #pragma mark - select share menu item
 //点击扩展功能按钮-发送位置
 - (void)didClickedShareMenuItemSendLocation {
@@ -308,6 +405,20 @@ static NSInteger const kOnePageSize = 10;
     viewController.params = @{kParamBackType : @(BackTypeImage), kParamBlock : block};
     [self presentViewController:[[UINavigationController alloc] initWithRootViewController:viewController]
                        animated:YES completion:nil];
+}
+//点击扩展功能按钮-发送拍摄照片
+- (void)didClickedShareMenuItemCamera {
+    if ([UIDevice isCanUseCamera]) { //打开摄像头，获取的图片要保存到自定义相册EZGoal
+        UIImagePickerController *imagePickerController = [[UIImagePickerController alloc] init];
+        imagePickerController.delegate = self;
+        imagePickerController.allowsEditing = NO;
+        imagePickerController.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
+        imagePickerController.sourceType = UIImagePickerControllerSourceTypeCamera;
+        [self presentViewController:imagePickerController animated:YES completion:nil];
+    }
+    else {
+        [UIView showAlertVieWithMessage:@"请在设置->隐私->相机,打开本应用的权限"];
+    }
 }
 //点击扩展功能按钮-发送图片
 - (void)didClickedShareMenuItemSendPhoto {
@@ -332,7 +443,28 @@ static NSInteger const kOnePageSize = 10;
         [UIView showAlertVieWithMessage:@"请在设置->隐私->照片,打开本应用的权限"];
     }
 }
-
+#pragma mark - UIImagePickerControllerDelegate
+- (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info {
+    WEAKSELF
+    [picker dismissViewControllerAnimated:YES completion:^{
+        UIImage *pickedImage = [info objectForKey:UIImagePickerControllerEditedImage];
+        if ( ! pickedImage) {
+            pickedImage = [info objectForKey:UIImagePickerControllerOriginalImage];
+        }
+        
+        //处理获得的图片对象
+        if (pickedImage) {
+            [weakSelf didSendMessageWithPhoto:[weakSelf resizeImage:pickedImage]];
+            [[ALAssetsLibrary new] saveImage:pickedImage toAlbum:@"EZGoal" completion:nil failure:nil];
+        }
+        else {
+            [UIView showResultThenHideOnWindow:@"未选择图片"];
+        }
+    }];
+}
+- (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker {
+    [picker dismissViewControllerAnimated:YES completion:nil];
+}
 #pragma mark - ZYQAssetPickerControllerDelegate
 - (void)assetPickerController:(ZYQAssetPickerController *)picker didFinishPickingAssets:(NSArray *)assets {
     for (int i = 0; i<assets.count; i++) {
@@ -351,6 +483,13 @@ static NSInteger const kOnePageSize = 10;
     return [YSCImageUtils resizeImage:image toSize:CGSizeMake(width, height)];
 }
 
+
+
+//================================================
+//
+//  toolBar相关delegate
+//
+//================================================
 #pragma mark - XHAudioPlayerHelper Delegate
 - (void)didAudioPlayerStopPlay:(AVAudioPlayer *)audioPlayer {
     if (self.currentSelectedIndex < 0) {
@@ -385,6 +524,13 @@ static NSInteger const kOnePageSize = 10;
     return self.emotionManagers;
 }
 
+
+
+//================================================
+//
+// 消息收发
+//
+//================================================
 #pragma mark - didSend delegate
 //发送文本
 - (void)didSendText:(NSString *)text fromSender:(NSString *)sender onDate:(NSDate *)date {
@@ -442,82 +588,6 @@ static NSInteger const kOnePageSize = 10;
                                                              longitude:location.coordinate.longitude
                                                             attributes:nil];
     [self sendMsg:locMsg];
-}
-
-#pragma mark -  ui config
-// 是否显示时间轴Label的回调方法
-- (BOOL)shouldDisplayTimestampForRowAtIndexPath:(NSIndexPath *)indexPath {
-    if (indexPath.row > 0 && indexPath.row < [self.messages count]) {
-        AVIMTypedMessage *msg = [self.messages objectAtIndex:indexPath.row];
-        AVIMTypedMessage *lastMsg = [self.messages objectAtIndex:indexPath.row - 1];
-        return msg.sendTimestamp - lastMsg.sendTimestamp > 60 * 3 * 1000;
-    }
-    else {
-        return YES;
-    }
-}
-// 是否支持用户手动滚动
-- (BOOL)shouldPreventScrollToBottomWhileUserScrolling {
-    return YES;
-}
-
-#pragma mark - @ reference other
-- (void)didInputAtSignOnMessageTextView:(XHMessageTextView *)messageInputTextView {
-    
-}
-
-#pragma mark - alert and async utils
-- (BOOL)filterError:(NSError *)error {
-    return [self alertError:error] == NO;
-}
-- (void)alert:(NSString *)msg {
-    [self alert:msg block:nil];
-}
-- (void)alert:(NSString *)msg block:(void (^)(void))block{
-    UIAlertView *alertView = [UIAlertView bk_alertViewWithTitle:msg];
-    [alertView bk_setCancelButtonWithTitle:@"确定" handler:block];
-    [alertView show];
-}
-- (BOOL)alertError:(NSError *)error {
-    if (error) {
-        if (error.code == 4303) {
-            [[CDConversationStore store] deleteConversationByConvId:self.conv.conversationId];//删除本地不存在的会话
-            self.conv = nil;
-            WEAKSELF
-            [self alert:@"会话不存在" block:^{
-                [weakSelf bk_performBlock:^(id obj) {
-                    [weakSelf.navigationController popViewControllerAnimated:YES];
-                } afterDelay:0.5];
-            }];
-        }
-        else if (error.code == kAVIMErrorConnectionLost) {
-            [UIView showResultThenHideOnWindow:@"未能连接聊天服务器"];
-        }
-        else if ([error.domain isEqualToString:NSURLErrorDomain]) {
-            [UIView showResultThenHideOnWindow:@"网络连接错误"];
-        }
-        else {
-            [self alert:[NSString stringWithFormat:@"alertError: %@", error]];
-        }
-        return YES;
-    }
-    return NO;
-}
-- (void)runInMainQueue:(void (^)())queue {
-    dispatch_async(dispatch_get_main_queue(), queue);
-}
-- (void)runInGlobalQueue:(void (^)())queue {
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), queue);
-}
-
-#pragma mark - conversations store
-- (void)updateConversationAsRead {
-    if (self.conv) {
-        [[CDConversationStore store] updateConversation:self.conv];//如果已经存在就不会继续插入，保证有消息就有会话！
-        [[CDConversationStore store] updateUnreadCountToZeroByConvId:self.conv.conversationId];
-        [[CDConversationStore store] updateMentioned:NO convId:self.conv.conversationId];
-    }
-    [[NSNotificationCenter defaultCenter] postNotificationName:kCDNotificationUnreadsUpdated object:nil];
 }
 
 #pragma mark - send message

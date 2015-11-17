@@ -10,6 +10,64 @@
 
 @implementation EZGManager
 
+#pragma mark - 车牌号相关
+//今日限号
++ (NSArray *)TodayLimitedNumbers {
+    NSMutableArray *limitedArray = [NSMutableArray array];
+    NSInteger weekDay = [NSDate date].weekday - 1;
+    if (weekDay == 1) {
+        [limitedArray addObjectsFromArray:@[@"1", @"6"]];
+    }
+    else if (weekDay == 2) {
+        [limitedArray addObjectsFromArray:@[@"2", @"7"]];
+    }
+    else if (weekDay == 3) {
+        [limitedArray addObjectsFromArray:@[@"3", @"8"]];
+    }
+    else if (weekDay == 4) {
+        [limitedArray addObjectsFromArray:@[@"4", @"9"]];
+    }
+    else if (weekDay == 5) {
+        [limitedArray addObjectsFromArray:@[@"5", @"0"]];
+    }
+    return limitedArray;
+}
++ (BOOL)CheckIfLimitedByCarNumber:(NSString *)carNumber {
+    ReturnNOWhenObjectIsEmpty(carNumber)
+    BOOL isLimited = NO;
+    NSArray *numberArray = [EZGManager TodayLimitedNumbers];
+    for (NSInteger i = [carNumber length] - 1; i > 0; i--) {
+        NSString *number = [carNumber substringWithRange:NSMakeRange(i, 1)];
+        if ([NSString isMatchRegex:@"^[0-9]\\d*$" withString:number]) {
+            if ([numberArray containsObject:number]) {
+                isLimited = YES;
+            }
+            break;
+        }
+    }
+    return isLimited;
+}
++ (NSArray *)carNumberIndexes:(NSString *)carNumber {
+    NSMutableArray *indexArray = [NSMutableArray array];
+    for (NSInteger i = 0; i < MIN([APPDATA.carNumberArray count], [carNumber length]); i++) {
+        NSString *number = [carNumber substringWithRange:NSMakeRange(i, 1)];
+        NSArray *tempArray = APPDATA.carNumberArray[i];
+        [indexArray addObject:@([tempArray indexOfObject:number])];
+    }
+    return indexArray;
+}
+//车牌号最后一位数字，-1表示没数字
++ (NSInteger)lastNumberOfCarNumber:(NSString *)carNumber {
+    NSInteger lastNumber = -1;
+    for (NSInteger i = [carNumber length] - 1; i > 0; i--) {
+        NSString *number = [carNumber substringWithRange:NSMakeRange(i, 1)];
+        if ([NSString isMatchRegex:@"^[0-9]\\d*$" withString:number]) {
+            lastNumber = [number integerValue];
+            break;
+        }
+    }
+    return lastNumber;
+}
 //格式化车牌号
 + (NSString *)formatCarNumber:(NSString *)carNumber {
     if ([NSString isMatchRegex:kRegexCarNumber withString:carNumber]) {
@@ -22,7 +80,8 @@
     }
 }
 
-//格式化救援耗时
+
+#pragma mark - 格式化救援耗时
 + (NSString *)formatRescueTimePassed:(NSDate *)startDate {
     return [self formatRescueTimePassed:startDate endDate:[NSDate date]];
 }

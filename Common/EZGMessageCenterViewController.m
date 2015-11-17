@@ -124,7 +124,7 @@
     self.tableView.header = [MJRefreshNormalHeader headerWithRefreshingBlock:^{
         if (ISLOGGED) {
             if ([weakSelf.tableView.cellDataArray count] == 0) {
-                [APPDATA refreshConversationsFromNetworkByUserId:USERID pageIndex:kDefaultPageStartIndex pageSize:20 block:^(NSArray *objects, NSError *error) {
+                [EZGDATA refreshConversationsFromNetworkByUserId:USERID pageIndex:kDefaultPageStartIndex pageSize:20 block:^(NSArray *objects, NSError *error) {
                     [weakSelf refreshConversationsByPageIndex:kDefaultPageStartIndex];
                 }];
             }
