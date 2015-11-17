@@ -31,6 +31,12 @@ typedef NS_ENUM(NSInteger, EZGServiceType) {
     EZGServiceTypeResume            = 4,    //取消放弃操作(C端不想放弃救援了)
 };
 
+//ezgoalType参数值定义(用于区分普通聊天会话)
+static const NSString *EzgoalTypeRescue         = @"BRescueRepresent";
+static const NSString *EzgoalTypeReservation    = @"BReservationRepresent";
+static const NSString *EzgoalTypeCustomer       = @"BCustomerRepresent";
+static const NSString *EzgoalTypeSalePerson     = @"BSalePersonRepresent";
+
 //消息扩展参数名定义
 #define MParamSceneType                 @"sceneType"        //现场照片类型
 #define MParamCarInfo                   @"carInfo"          //爱车模型
@@ -39,41 +45,46 @@ typedef NS_ENUM(NSInteger, EZGServiceType) {
 #define MParamRateScore                 @"rateScore"        //评分数
 #define MParamAccidentId                @"accidentId"       //现场记录id
 #define MParamServerTime                @"serverTime"       //发送该消息时服务器的时间（用于：取消救援的时间起点）
-
 #define MParamAvatarUrl                 @"avatarUrl"        //消息对应的头像地址
 
+//自定义消息cell
+#import "EZGMessageBaseCell.h"
+#import "EZGMessageTextCell.h"
+#import "EZGMessageVoiceCell.h"
+#import "EZGMessageImageCell.h"
+#import "EZGMessageLocationCell.h"
+#import "EZGMessageVideoCell.h"
+#import "EZGMessageSceneCell.h"
+#import "EZGMessageCarCell.h"
+#import "EZGMessageServiceCell.h"
+#import "EZGMessageServiceCancelCell.h"
+#import "EZGMessageServiceCommentCell.h"
 
 
-#pragma mark - 自定义消息模型
+//========================================
+//
+//  自定义消息模型
+//
+//========================================
 //现场记录的消息(包括单车和多车)
 @interface EZGSceneMessage : AVIMTypedMessage <AVIMTypedMessageSubclassing>
-//@property (nonatomic, assign) EZGSceneType sceneType;
 @end
-
 
 //爱车信息消息
 @interface EZGCarMessage : AVIMTypedMessage <AVIMTypedMessageSubclassing>
-//@property (nonatomic, strong) NSString *carInfo;
 @end
-
 
 //包括
 //1.服务开始消息(成功发送位置信息后由B端自动发出)
 //2.服务结束：正常结束后需要用户评价、取消服务的结束就直接关闭沟通功能
 //3.服务过程中的特殊消息(如取消放弃救援...)
 @interface EZGServiceMessage : AVIMTypedMessage <AVIMTypedMessageSubclassing>
-//@property (nonatomic, strong) NSString *detailInfo;
-//@property (nonatomic, assign) EZGServiceType serviceType;
 @end
-
 
 //服务申请取消消息(C端申请取消)
 @interface EZGServiceCancelMessage : AVIMTypedMessage <AVIMTypedMessageSubclassing>
-//@property (nonatomic, strong) NSString *detailInfo;
 @end
-
 
 //评论消息(由C端发出)
 @interface EZGServiceCommentMessage : AVIMTypedMessage <AVIMTypedMessageSubclassing>
-//@property (nonatomic, assign) NSInteger rateScore;//评分数 1-5
 @end

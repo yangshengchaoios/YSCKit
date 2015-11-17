@@ -24,9 +24,6 @@
 + (AVIMMessageMediaType)classMediaType {
     return EZGMessageTypeCar;
 }
-- (NSString *)carInfo {
-    return Trim(self.attributes[@"carInfo"]);
-}
 @end
 
 @implementation EZGServiceMessage
