@@ -16,14 +16,14 @@
 @interface EZGMessageCenterViewController ()
 @property (nonatomic, weak) IBOutlet UIView *headerView;
 @property (nonatomic, weak) IBOutlet UILabel *staffNameLabel;
-@property (weak, nonatomic) IBOutlet UILabel *timePassedLabel;
-@property (weak, nonatomic) IBOutlet UILabel *lastMessageLabel;
-@property (weak, nonatomic) IBOutlet UIView *badgeBkgView;//专门用来放badgeView的
-@property (strong, nonatomic) JSBadgeView *badgeView;
+@property (nonatomic, weak) IBOutlet UILabel *timePassedLabel;
+@property (nonatomic, weak) IBOutlet UILabel *lastMessageLabel;
+@property (nonatomic, weak) IBOutlet UIView *badgeBkgView;//专门用来放badgeView的
+@property (nonatomic, strong) JSBadgeView *badgeView;
 
-@property (weak, nonatomic) IBOutlet NSLayoutConstraint *tableViewTop;//170  0
+@property (nonatomic, weak) IBOutlet NSLayoutConstraint *tableViewTop;//170  0
 @property (nonatomic, strong) NSString *isUserChangedIdentifier;
-@property (strong, nonatomic) NSString *isRescueChangedIdentifier;
+@property (nonatomic, strong) NSString *isRescueChangedIdentifier;
 @end
 
 @implementation EZGMessageCenterViewController
