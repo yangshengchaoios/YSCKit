@@ -118,21 +118,15 @@
 #pragma mark - 属性设置
 - (void)setCellName:(NSString *)cellName {
     _cellName = cellName;
-    if (isNotEmpty(cellName)) {
-        [NSClassFromString(self.cellName) registerCellToTableView:self];
-    }
+    [self registerCellName:cellName];
 }
 - (void)setHeaderName:(NSString *)headerName {
     _headerName = headerName;
-    if (isNotEmpty(headerName)) {
-        [NSClassFromString(self.headerName) registerHeaderFooterToTableView:self];
-    }
+    [self registerHeaderName:headerName];
 }
 - (void)setFooterName:(NSString *)footerName {
     _footerName = footerName;
-    if (isNotEmpty(footerName)) {
-        [NSClassFromString(self.footerName) registerHeaderFooterToTableView:self];
-    }
+    [self registerFooterName:footerName];
 }
 - (void)setCellSeperatorLeft:(CGFloat)cellSeperatorLeft {
     _cellSeperatorLeft = AUTOLAYOUT_LENGTH(cellSeperatorLeft);
@@ -190,6 +184,22 @@
 
 
 #pragma mark - 外部可调用的方法
+//注册header、cell、footer
+- (void)registerHeaderName:(NSString *)headerName {
+    if (isNotEmpty(headerName)) {
+        [NSClassFromString(headerName) registerHeaderFooterToTableView:self];
+    }
+}
+- (void)registerCellName:(NSString *)cellName {
+    if (isNotEmpty(cellName)) {
+        [NSClassFromString(cellName) registerCellToTableView:self];
+    }
+}
+- (void)registerFooterName:(NSString *)footerName {
+    if (isNotEmpty(footerName)) {
+        [NSClassFromString(footerName) registerHeaderFooterToTableView:self];
+    }
+}
 //创建对象，不用xib布局时使用
 + (instancetype)CreateYSCTableViewOnView:(UIView *)view {
     YSCTableView *tableView = [[YSCTableView alloc] initWithFrame:view.bounds];

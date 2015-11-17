@@ -96,7 +96,10 @@ typedef NSString *(^YSCViewStringSetBlock)(NSIndexPath *indexPath);
 
 //创建对象，不用xib布局时使用
 + (instancetype)CreateYSCTableViewOnView:(UIView *)view;
-
+//注册header、cell、footer
+- (void)registerHeaderName:(NSString *)headerName;
+- (void)registerCellName:(NSString *)cellName;
+- (void)registerFooterName:(NSString *)footerName;
 //启动刷新(能加载一次缓存)
 - (void)beginRefreshing;
 - (void)beginRefreshingByAnimation:(BOOL)animation;
