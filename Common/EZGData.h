@@ -39,8 +39,6 @@
 + (void)saveInstallationWithDeviceToken:(NSData *)deviceTokenData;
 //更新_Installation，保证同一个userId只能对应一个deviceToken
 - (void)updateInstallationToEnsureUniqueUserId:(NSString *)userId;
-//更新_Installation的badge字段
-- (void)updateInstallationBadge:(NSInteger)badge;
 //刷新用户的最近会话列表(分页显示)
 - (void)refreshConversationsByPageIndex:(NSInteger)pageIndex pageSize:(NSInteger)pageSize block:(AVIMArrayResultBlock)block;
 - (void)refreshConversationsFromNetworkByUserId:(NSString *)userId pageIndex:(NSInteger)pageIndex pageSize:(NSInteger)pageSize block:(AVIMArrayResultBlock)block;

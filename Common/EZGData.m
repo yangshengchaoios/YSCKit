@@ -261,16 +261,6 @@
         }
     }];
 }
-//更新_Installation的badge字段
-- (void)updateInstallationBadge:(NSInteger)badge {
-    AVInstallation *currentInstallation = [AVInstallation currentInstallation];
-    currentInstallation.badge = badge;
-    [currentInstallation saveInBackgroundWithBlock:^(BOOL succeeded, NSError *error) {
-        if (error) {
-            NSLog(@"AVInstallation saveInBackgroundWithBlock error:%@", error);
-        }
-    }];
-}
 //刷新用户最近的会话列表
 - (void)refreshConversationsByPageIndex:(NSInteger)pageIndex pageSize:(NSInteger)pageSize block:(AVIMArrayResultBlock)block {
     [self refreshConversationsFromNetworkByUserId:USERID pageIndex:pageIndex pageSize:pageSize block:block];
