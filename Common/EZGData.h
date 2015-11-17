@@ -41,11 +41,14 @@
 + (void)saveInstallationWithDeviceToken:(NSData *)deviceTokenData;
 //更新_Installation，保证同一个userId只能对应一个deviceToken
 - (void)updateInstallationToEnsureUniqueUserId:(NSString *)userId;
+
 //刷新用户的最近会话列表(分页显示)
 - (void)refreshConversationsByPageIndex:(NSInteger)pageIndex pageSize:(NSInteger)pageSize block:(AVIMArrayResultBlock)block;
-- (void)refreshConversationsFromNetworkByUserId:(NSString *)userId pageIndex:(NSInteger)pageIndex pageSize:(NSInteger)pageSize block:(AVIMArrayResultBlock)block;
+//刷新用户最近的特殊会话列表
+- (void)refreshConversationsByEzgoalType:(NSString *)ezgoalType pageIndex:(NSInteger)pageIndex pageSize:(NSInteger)pageSize block:(AVIMArrayResultBlock)block;
 //根据对方id数组查询会话列表
 - (void)searchConversationsFromNetworkByOtherIds:(NSArray *)otherIds block:(AVIMArrayResultBlock)block;
+
 //触发消息：打开聊天窗口
 - (void)openChatRoomByNotification:(NSNotification *)notification;
 //打开会话框

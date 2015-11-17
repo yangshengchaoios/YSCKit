@@ -41,9 +41,7 @@
     self.tableView.header = [MJRefreshNormalHeader headerWithRefreshingBlock:^{
         if (ISLOGGED) {
             if ([weakSelf.tableView.cellDataArray count] == 0) {
-                [EZGDATA refreshConversationsFromNetworkByUserId:USERID pageIndex:kDefaultPageStartIndex pageSize:20 block:^(NSArray *objects, NSError *error) {
-                    [weakSelf refreshConversationsByPageIndex:kDefaultPageStartIndex];
-                }];
+                [weakSelf refreshConversationsFromInternet];
             }
             else {
                 [weakSelf refreshConversationsByPageIndex:kDefaultPageStartIndex];
@@ -72,13 +70,9 @@
                 [weakSelf.tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationNone];
             }
         };
-        
         AVIMConversation *conversation = (AVIMConversation *)object;
         [weakSelf.tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationNone];
-        ChatUserModel *otherUser = [[ChatUserModel alloc] initWithString:conversation.attributes[OtherUserInfo] error:nil];
-        
-        NSDictionary *params = @{kParamOtherId          : Trim(otherUser.userId),
-                                 kParamConversationId   : Trim(conversation.conversationId),
+        NSDictionary *params = @{kParamConversationId   : Trim(conversation.conversationId),
                                  kParamChatRoom         : @{kParamBlock : refreshCellBlock}};
         postNWithInfo(kNotificationOpenChatRoom, params);
     };
@@ -109,16 +103,22 @@
     };
 }
 
-//刷新会话
+//刷新会话（被通知激活）
 - (void)refreshTableView {
     if (ISLOGGED) {
         [self refreshConversationsByPageIndex:kDefaultPageStartIndex];
     }
 }
-//刷新最近的对话
+//刷新最近的对话（分页机制）
 - (void)refreshConversationsByPageIndex:(NSInteger)pageIndex {
     NSArray *array = [[CDConversationStore store] selectConversationsByPageIndex:pageIndex pageSize:100];
     [self.tableView refreshAtPageIndex:pageIndex response:array error:nil];
 }
-
+//从IM服务器刷新会话列表
+- (void)refreshConversationsFromInternet {
+    WEAKSELF
+    [EZGDATA refreshConversationsByPageIndex:kDefaultPageStartIndex pageSize:20 block:^(NSArray *objects, NSError *error) {
+        [weakSelf refreshConversationsByPageIndex:kDefaultPageStartIndex];
+    }];
+}
 @end

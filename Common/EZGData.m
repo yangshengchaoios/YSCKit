@@ -205,7 +205,7 @@
         [EZGDATA updateInstallationToEnsureUniqueUserId:USERID];
         //刷新最近N条会话列表，目的是方便关闭进程的APP从推送栏点击推送消息进入，打开聊天窗口更快速
         if (NO == [[CDConversationStore store] isConversationExists]) {
-            [EZGDATA refreshConversationsFromNetworkByUserId:USERID pageIndex:kDefaultPageStartIndex pageSize:20 block:nil];
+            [EZGDATA refreshConversationsByPageIndex:kDefaultPageStartIndex pageSize:20 block:nil];
         }
     }];
     [AppData synchronizeDeviceTokenWithUser];
@@ -275,18 +275,37 @@
         }
     }];
 }
-//刷新用户最近的会话列表
+
+
+//刷新用户最近的普通会话列表
 - (void)refreshConversationsByPageIndex:(NSInteger)pageIndex pageSize:(NSInteger)pageSize block:(AVIMArrayResultBlock)block {
-    [self refreshConversationsFromNetworkByUserId:USERID pageIndex:pageIndex pageSize:pageSize block:block];
+    [self refreshConversationsByEzgoalType:nil pageIndex:pageIndex pageSize:pageIndex block:block];
 }
-- (void)refreshConversationsFromNetworkByUserId:(NSString *)userId pageIndex:(NSInteger)pageIndex pageSize:(NSInteger)pageSize block:(AVIMArrayResultBlock)block {
-    ReturnWhenObjectIsEmpty(userId);
+//刷新用户最近的特殊会话列表
+- (void)refreshConversationsByEzgoalType:(NSString *)ezgoalType pageIndex:(NSInteger)pageIndex pageSize:(NSInteger)pageSize block:(AVIMArrayResultBlock)block {
     AVIMConversationQuery *query = [[AVIMClient defaultClient] conversationQuery];
     query.cachePolicy = kAVCachePolicyNetworkOnly;
     [query orderByDescending:@"lm"];
     [query whereKey:AVIMAttr(CONV_TYPE) equalTo:@(CDConvTypeSingle)];
-    [query whereKey:kAVIMKeyMember containedIn:@[userId]];
+    [query whereKey:kAVIMKeyMember containedIn:@[USERID]];
     [query whereKey:kAVIMKeyMember sizeEqualTo:2];
+    
+    //查询条件ezgoalType: nil-所有会话  empty-普通会话 notempty-特殊会话
+    if (isNotEmpty(ezgoalType)) {
+        [query whereKey:AVIMAttr(kParamEzgoalType) equalTo:Trim(ezgoalType)];
+        [query whereKey:AVIMAttr(kParamS4Id) equalTo:S4ID];
+        if ([EzgoalTypeRescue isEqualToString:ezgoalType]) {//查询有效的救援会话
+            [query whereKey:AVIMAttr(kParamEzgoalStatus) containedIn:@[@(RescueStatusTypeUnProcess),
+                                                                       @(RescueStatusTypeProcessing),
+                                                                       @(RescueStatusTypeCancelByC)]];
+        }
+        else if ([EzgoalTypeReservation isEqualToString:ezgoalType]) {//查询有效的预约会话
+            //TODO:
+        }
+    }
+    else if (nil != ezgoalType) {//只查询普通会话
+        [query whereKey:AVIMAttr(kParamEzgoalType) equalTo:@""];
+    }
     query.skip = MAX(0, pageIndex - 1) * pageSize;
     query.limit = pageSize;
     [self searchByConversationQuery:query block:block];
@@ -321,7 +340,7 @@
 
 //触发消息：打开聊天窗口
 //自动判断普通会话与特殊会话类型
-//userInfo中只需要传入四个参数：kParamRescueId、kParamConversationId、kParamChatRoom(dict)、kParamExtendAttributes(dict)
+//userInfo中只需要传入五个参数：kParamOtherId、kParamRescueId、kParamConversationId、kParamChatRoom(dict)、kParamExtendAttributes(dict)
 - (void)openChatRoomByNotification:(NSNotification *)notification {
     [self resetClicked];
     NSDictionary *userInfo = notification.userInfo;
