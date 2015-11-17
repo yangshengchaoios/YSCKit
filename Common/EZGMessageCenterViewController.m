@@ -17,10 +17,6 @@
 - (void)dealloc {
     NSLog(@"%@ deallocing...", NSStringFromClass(self.class));
 }
-- (void)viewWillAppear:(BOOL)animated {
-    [super viewWillAppear:animated];
-    [self.tableView beginRefreshing];//方便子类重写initTableView，所以要延迟刷新
-}
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.title = @"消息中心";
@@ -36,7 +32,7 @@
     else {
         self.tableView.tipsEmptyText = @"亲，请登录后查看您的消息！";
     }
-    [self.tableView registerCellName:@"EZGMessageCenterCell"];
+    self.tableView.cellName = @"EZGMessageCenterCell";
     self.tableView.tipsView.actionButton.hidden = YES;
     self.tableView.enableLoadMore = NO;
     self.tableView.enableCellEdit = YES;
@@ -90,7 +86,7 @@
         //启动最后一条聊天记录刷新线程
         EZGMessageCenterCell *cell = (EZGMessageCenterCell *)view;
         AVIMConversation *conversation = (AVIMConversation *)object;
-        if (nil == conversation.lastMessage) {
+        if (isNotEmpty(conversation) && nil == conversation.lastMessage) {
             [conversation queryMessagesWithLimit:1 callback:^(NSArray *objects, NSError *error) {
                 if (isNotEmpty(objects)) {
                     [[CDConversationStore store] updateLastMessage:objects[0] byConvId:conversation.conversationId];
