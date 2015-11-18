@@ -77,16 +77,18 @@
         postNWithInfo(kNotificationOpenChatRoom, params);
     };
     self.tableView.layoutCellView = ^(UIView *view, NSObject *object) {
-        //启动最后一条聊天记录刷新线程
-        EZGMessageCenterCell *cell = (EZGMessageCenterCell *)view;
-        AVIMConversation *conversation = (AVIMConversation *)object;
-        if (isNotEmpty(conversation) && nil == conversation.lastMessage) {
-            [conversation queryMessagesWithLimit:1 callback:^(NSArray *objects, NSError *error) {
-                if (isNotEmpty(objects)) {
-                    [[CDConversationStore store] updateLastMessage:objects[0] byConvId:conversation.conversationId];
-                    [cell layoutConversationByConvId:conversation.conversationId];
-                }
-            }];
+        if ([view isKindOfClass:[EZGMessageCenterCell class]]) {
+            //启动最后一条聊天记录刷新线程
+            EZGMessageCenterCell *cell = (EZGMessageCenterCell *)view;
+            AVIMConversation *conversation = (AVIMConversation *)object;
+            if (isNotEmpty(conversation) && nil == conversation.lastMessage) {
+                [conversation queryMessagesWithLimit:1 callback:^(NSArray *objects, NSError *error) {
+                    if (isNotEmpty(objects)) {
+                        [[CDConversationStore store] updateLastMessage:objects[0] byConvId:conversation.conversationId];
+                        [cell layoutConversationByConvId:conversation.conversationId];
+                    }
+                }];
+            }
         }
     };
     self.tableView.deleteCellBlock = ^(NSObject *object, NSIndexPath *indexPath) {
@@ -111,13 +113,13 @@
 }
 //刷新最近的对话（分页机制）
 - (void)refreshConversationsByPageIndex:(NSInteger)pageIndex {
-    NSArray *array = [[CDConversationStore store] selectConversationsByPageIndex:pageIndex pageSize:100];
+    NSArray *array = [[CDConversationStore store] selectConversationsByPageIndex:pageIndex pageSize:50];
     [self.tableView refreshAtPageIndex:pageIndex response:array error:nil];
 }
 //从IM服务器刷新会话列表
 - (void)refreshConversationsFromInternet {
     WEAKSELF
-    [EZGDATA refreshConversationsByPageIndex:kDefaultPageStartIndex pageSize:20 block:^(NSArray *objects, NSError *error) {
+    [EZGDATA refreshConversationsByPageIndex:kDefaultPageStartIndex pageSize:50 block:^(NSArray *objects, NSError *error) {
         [weakSelf refreshConversationsByPageIndex:kDefaultPageStartIndex];
     }];
 }

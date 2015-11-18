@@ -18,7 +18,11 @@
 #define kCDConversationTableKeyUnreadCount @"unreadCount"
 #define kCDConversationTableKeyMentioned @"mentioned"
 #define kCDConversationTableKeyLastMessage @"lastMessage"
+//新增字段
 #define kCDConversationTableKeyUpdatedTime @"updatedTime"
+#define kCDConversationTableKeyEzgoalType @"ezgoalType"
+#define kCDConversationTableKeyEzgoalStatus @"ezgoalStatus"
+#define kCDConversationTableKeyRescueId @"rescueId"
 
 #define kCDConversatoinTableCreateSQL                                       \
     @"CREATE TABLE IF NOT EXISTS " kCDConversationTableName @" ("           \
@@ -27,7 +31,10 @@
         kCDConversationTableKeyUnreadCount  @" INTEGER DEFAULT 0, "         \
         kCDConversationTableKeyMentioned    @" BOOL DEFAULT FALSE, "        \
         kCDConversationTableKeyLastMessage  @" BLOB NOT NULL, "             \
-        kCDConversationTableKeyUpdatedTime  @" DATETIME DEFAULT NULL "      \
+        kCDConversationTableKeyUpdatedTime  @" DATETIME DEFAULT NULL, "     \
+        kCDConversationTableKeyEzgoalType   @" VARCHAR(200) DEFAULT NULL, " \
+        kCDConversationTableKeyEzgoalStatus @" INTEGER DEFAULT 0, "         \
+        kCDConversationTableKeyRescueId     @" VARCHAR(200) DEFAULT NULL "  \
     @")"
 
 #define kCDConversationTableInsertSQL                           \
@@ -37,8 +44,11 @@
         kCDConversationTableKeyUnreadCount      @", "           \
         kCDConversationTableKeyMentioned        @", "           \
         kCDConversationTableKeyLastMessage      @", "           \
-        kCDConversationTableKeyUpdatedTime                      \
-    @") VALUES(?, ?, ?, ?, ?, ?)"
+        kCDConversationTableKeyUpdatedTime      @", "           \
+        kCDConversationTableKeyEzgoalType       @", "           \
+        kCDConversationTableKeyEzgoalStatus     @", "           \
+        kCDConversationTableKeyRescueId                         \
+    @") VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)"
 
 @interface CDConversationStore ()
 @property (nonatomic, strong) FMDatabaseQueue *databaseQueue;
@@ -75,7 +85,11 @@
         if (nil == lastDate) {
             lastDate = [NSDate date];
         }
-        [db executeUpdate:kCDConversationTableInsertSQL withArgumentsInArray:@[conversation.conversationId, data, @0, @(NO), @"", lastDate]];
+        [db executeUpdate:kCDConversationTableInsertSQL
+     withArgumentsInArray:@[conversation.conversationId, data, @0, @(NO), @"", lastDate,
+                            Trim(conversation.ezgoalType),
+                            @(conversation.ezgoalStatus),
+                            Trim(conversation.rescueId)]];
     }];
 }
 //判断会话是否存在本地
@@ -83,8 +97,7 @@
     ReturnNOWhenObjectIsEmpty(convId);
     __block BOOL exists = NO;
     [self.databaseQueue inDatabase:^(FMDatabase *db) {
-        NSString *sql = [NSString stringWithFormat:@"SELECT * FROM conversations WHERE id = '%@'", Trim(convId)];
-        FMResultSet *resultSet = [db executeQuery:sql];
+        FMResultSet *resultSet = [db executeQuery:@"SELECT * FROM conversations WHERE id = ?" withArgumentsInArray:@[convId]];
         if ([resultSet next]) {
             exists = YES;
         }
@@ -94,10 +107,12 @@
 }
 //删除所有会话
 - (void)deleteAllConversions {
-//    [self.databaseQueue inDatabase:^(FMDatabase *db) {
-//        [db executeUpdate:@"DELETE FROM conversations"];
-//    }];
-    //应该删除本地所有会话数据库文件！
+    [self.databaseQueue inDatabase:^(FMDatabase *db) {
+        [db executeUpdate:@"DELETE FROM conversations"];
+    }];
+}
+//删除本地所有会话数据库文件！
+- (void)deleteAllConversionFiles {
     NSString *libPath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0];
     NSArray *files = [YSCFileUtils allPathsInDirectoryPath:libPath];
     for (NSString *filePath in files) {
@@ -110,24 +125,21 @@
 - (void)deleteConversationByConvId:(NSString *)convId {
     ReturnWhenObjectIsEmpty(convId);
     [self.databaseQueue inDatabase:^(FMDatabase *db) {
-        NSString *sql = [NSString stringWithFormat:@"DELETE FROM conversations WHERE id = '%@'", Trim(convId)];
-        [db executeUpdate:sql];
+        [db executeUpdate:@"DELETE FROM conversations WHERE id = ?" withArgumentsInArray:@[convId]];
     }];
 }
 //清空某个会话的未读数
 - (void)updateUnreadCountToZeroByConvId:(NSString *)convId {
     ReturnWhenObjectIsEmpty(convId);
     [self.databaseQueue inDatabase:^(FMDatabase *db) {
-        NSString *sql = [NSString stringWithFormat:@"UPDATE conversations SET unreadCount = 0 WHERE id = '%@'", Trim(convId)];
-        [db executeUpdate:sql];
+        [db executeUpdate:@"UPDATE conversations SET unreadCount = 0 WHERE id = ?" withArgumentsInArray:@[convId]];
     }];
 }
 //增加未读数
 - (void)increaseUnreadCountByConvId:(NSString *)convId {
     ReturnWhenObjectIsEmpty(convId);
     [self.databaseQueue inDatabase:^(FMDatabase *db) {
-        NSString *sql = [NSString stringWithFormat:@"UPDATE conversations SET unreadCount = unreadCount + 1 WHERE id = '%@'", Trim(convId)];
-        [db executeUpdate:sql];
+        [db executeUpdate:@"UPDATE conversations SET unreadCount = unreadCount + 1 WHERE id = ?" withArgumentsInArray:@[convId]];
     }];
 }
 //更新 mentioned 值，当接收到消息发现 @了我的时候，设为 YES，进入聊天页面，设为 NO
@@ -149,7 +161,13 @@
     if ([self isConversationExistsByConvId:conversation.conversationId]) {
         [self.databaseQueue inDatabase:^(FMDatabase *db) {
             [db beginTransaction];
-            [db executeUpdate:@"UPDATE conversations SET data = ? WHERE id = ?", [self dataFromConversation:conversation], conversation.conversationId];
+            [db executeUpdate:@"UPDATE conversations SET data = ?, ezgoalType = ?, ezgoalStatus = ?, rescueId = ? WHERE id = ?"
+        withArgumentsInArray :@[[self dataFromConversation:conversation],
+                                Trim(conversation.ezgoalType),
+                                @(conversation.ezgoalStatus),
+                                Trim(conversation.rescueId),
+                                conversation.conversationId
+                                ]];
             [db commit];
         }];
     }
@@ -163,17 +181,29 @@
     ReturnWhenObjectIsEmpty(convId);
     [self.databaseQueue inDatabase:^(FMDatabase *db) {
         [db beginTransaction];
-        [db executeUpdate:@"UPDATE conversations SET lastMessage = ?, updatedTime = ? WHERE id = ?",
-         [self dataFromMessage:message], [NSDate dateWithTimeIntervalSince1970:message.sendTimestamp / 1000], convId];
+        [db executeUpdate:@"UPDATE conversations SET lastMessage = ?, updatedTime = ? WHERE id = ?"
+    withArgumentsInArray :@[[self dataFromMessage:message],
+                            [NSDate dateWithTimeIntervalSince1970:message.sendTimestamp / 1000],
+                            convId]];
         [db commit];
     }];
 }
 
-//从本地数据库查找未读消息总数
-- (NSInteger)selectTotalUnreadCount {
+//根据传入参数查询对应类型会话的未读数
+//nil - 所有未读数
+//empty - 普通会话未读数
+//not empty - 特殊会话的未读数
+- (NSInteger)totalUnreadCountByEzgoalType:(NSString *)ezgoalType {
     __block NSInteger totalUnreadCount = 0;
     [self.databaseQueue inDatabase:^(FMDatabase *db) {
-        FMResultSet *resultSet = [db executeQuery:@"SELECT * FROM conversations WHERE unreadCount > 0"];
+        FMResultSet *resultSet = nil;
+        if (nil != ezgoalType) {
+            [db executeQuery:@"SELECT * FROM conversations WHERE unreadCount > 0 AND ezgoalType = ?" withArgumentsInArray:@[Trim(ezgoalType)]];
+        }
+        else {
+            [db executeQuery:@"SELECT * FROM conversations WHERE unreadCount > 0"];
+        }
+        
         while ([resultSet next]) {
             NSInteger unreadCount = [resultSet intForColumn:kCDConversationTableKeyUnreadCount];
             if (unreadCount > 0) {
@@ -230,14 +260,42 @@
     }];
     return conv;
 }
-//分页获取本地会话列表
+//根据rescueId查询会话
+- (AVIMConversation *)selectOneConversationByRescueId:(NSString *)rescueId {
+    ReturnNilWhenObjectIsEmpty(rescueId);
+    __block AVIMConversation *conv = nil;
+    [self.databaseQueue inDatabase:^(FMDatabase *db) {
+        FMResultSet * resultSet = [db executeQuery:@"SELECT * FROM conversations WHERE rescueId = ?" withArgumentsInArray:@[rescueId]];
+        if ([resultSet next]) {
+            conv = [self createConversationFromResultSet:resultSet];
+        }
+        [resultSet close];
+    }];
+    return conv;
+}
+
+//分页获取本地所有会话列表
 - (NSArray *)selectConversationsByPageIndex:(NSInteger)pageIndex pageSize:(NSInteger)pageSize {
+    return [self selectConversationsByEzgoalType:nil pageIndex:pageIndex pageSize:pageSize];
+}
+//根据传入参数查询本地特殊类型的会话列表
+//nil - 所有未读数
+//empty - 普通会话未读数
+//not empty - 特殊会话的未读数
+- (NSArray *)selectConversationsByEzgoalType:(NSString *)ezgoalType pageIndex:(NSInteger)pageIndex pageSize:(NSInteger)pageSize {
     pageIndex--;
     __block NSMutableArray *retArray = [NSMutableArray array];
     [self.databaseQueue inDatabase:^(FMDatabase *db) {
-        NSString *sql = [NSString stringWithFormat:@"SELECT * FROM conversations ORDER BY updatedTime DESC LIMIT %ld,%ld",
-                         (long)(pageIndex * pageSize), (long)pageSize];
-        FMResultSet *resultSet = [db executeQuery:sql];
+        FMResultSet *resultSet = nil;
+        if (nil != ezgoalType) {
+            resultSet = [db executeQuery:@"SELECT * FROM conversations WHERE ezgoalType = ? ORDER BY updatedTime DESC LIMIT ?,?"
+                    withArgumentsInArray:@[Trim(ezgoalType), @(pageIndex * pageSize), @(pageSize)]];
+        }
+        else {
+            resultSet = [db executeQuery:@"SELECT * FROM conversations ORDER BY updatedTime DESC LIMIT ?,?"
+                    withArgumentsInArray:@[@(pageIndex * pageSize), @(pageSize)]];
+        }
+        
         while ([resultSet next]) {
             AVIMConversation *conv = [self createConversationFromResultSet:resultSet];
             if (isNotEmpty(conv)) {

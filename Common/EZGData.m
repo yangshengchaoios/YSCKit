@@ -277,9 +277,9 @@
 }
 
 
-//刷新用户最近的普通会话列表
+//刷新用户最近的所有会话列表
 - (void)refreshConversationsByPageIndex:(NSInteger)pageIndex pageSize:(NSInteger)pageSize block:(AVIMArrayResultBlock)block {
-    [self refreshConversationsByEzgoalType:nil pageIndex:pageIndex pageSize:pageIndex block:block];
+    [self refreshConversationsByEzgoalType:nil pageIndex:pageIndex pageSize:pageSize block:block];
 }
 //刷新用户最近的特殊会话列表
 - (void)refreshConversationsByEzgoalType:(NSString *)ezgoalType pageIndex:(NSInteger)pageIndex pageSize:(NSInteger)pageSize block:(AVIMArrayResultBlock)block {
@@ -352,11 +352,13 @@
     //1. 优先根据conversationId查找会话对象
     AVIMConversation *conversation = nil;
     if (isNotEmpty(userInfo[kParamConversationId])) {
+        //根据conversationId查找本地会话
         conversation = [[CDConversationStore store] selectOneConversationByConvId:Trim(userInfo[kParamConversationId])];
+        
         if (conversation) {//找到了本地会话
             [self openChatRoomByConversion:conversation byParams:paramsChatRoom];
         }
-        else {//查找网络会话
+        else {//根据conversationId查找网络会话
             [[CDChatManager manager] fecthConvWithConvid:Trim(userInfo[kParamConversationId]) callback:^(AVIMConversation *conversation, NSError *error) {
                 if (error) {
                     conversation = nil;
@@ -373,19 +375,12 @@
     //2. 根据rescueId查找会话对象
     else if (isNotEmpty(userInfo[kParamRescueId])) {
         //根据rescueId查找本地会话
-        NSArray *tempArray = [[CDConversationStore store] selectAllConversations];
-        for (AVIMConversation *conv in tempArray) {
-            if ([conv.attributes[kParamRescueId] isEqualToString:userInfo[kParamRescueId]]) {
-                conversation = conv;
-                break;
-            }
-        }
+        conversation = [[CDConversationStore store] selectOneConversationByRescueId:Trim(userInfo[kParamRescueId])];
         
-        //根据rescueId查找网络会话
-        if (conversation) {
+        if (conversation) {//找到了本地会话
             [self openChatRoomByConversion:conversation byParams:paramsChatRoom];
         }
-        else {//查找网络会话
+        else {//根据rescueId查找网络会话
             AVIMConversationQuery *q = [[AVIMClient defaultClient] conversationQuery];
             q.cachePolicy = kAVCachePolicyNetworkOnly;
             [q whereKey:AVIMAttr(kParamRescueId) equalTo:userInfo[kParamRescueId]];
@@ -412,7 +407,8 @@
         if (nil == extendAttributes[kParamEzgoalType]) {
             NSArray *tempArray = [[CDConversationStore store] selectAllConversations];
             for (AVIMConversation *conv in tempArray) {
-                if ([conv.otherId isEqualToString:userInfo[kParamOtherId]] && isEmpty(conv.attributes[kParamEzgoalType])) {
+                if ([conv.otherId isEqualToString:userInfo[kParamOtherId]] &&
+                    isEmpty(conv.ezgoalType)) {
                     conversation = conv;
                     break;
                 }
@@ -500,7 +496,7 @@
     }
     else {//进入聊天会话窗口
         CDChatRoomVC *chatRoom = nil;
-        if (conversation.attributes[kParamEzgoalType]) {//进入特殊会话窗口
+        if (isNotEmpty(conversation.ezgoalType)) {//进入特殊会话窗口
             chatRoom = [[EZGRescueChatRoomViewController alloc] initWithConv:conversation];
         }
         else {//进入普通会话窗口
@@ -603,7 +599,8 @@
     }];
 }
 //拦截消息到达通知
-- (void)messageReceived:(AVIMTypedMessage *)message {
+- (void)messageReceived:(NSNotification *)notification {
+    AVIMTypedMessage *message = notification.object;
     if ( ! [message isKindOfClass:[AVIMTypedMessage class]]) {
         return;
     }
@@ -640,7 +637,7 @@
             AVIMConversation *conv = [[CDConversationStore store] selectOneConversationByConvId:message.conversationId];
             //更新本地救援模型
             if ([message.conversationId isEqualToString:APPDATA.rescueModel.conversationId] ||
-                [conv.attributes[kParamRescueId] isEqualToString:APPDATA.rescueModel.rescueId]) {
+                [conv.rescueId isEqualToString:APPDATA.rescueModel.rescueId]) {
                 APPDATA.rescueModel.rescueStatus = rescueStatus;
                 SaveObjectByFile(APPDATA.rescueModel, kCachedRescueModel, kParamAppModel);
             }

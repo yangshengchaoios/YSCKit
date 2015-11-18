@@ -79,6 +79,8 @@
         return;
     }
     
+    //TODO:改为间隔时间
+    
     AVQuery *query = [AVOSDevice query];
     [query whereKey:@"udid" equalTo:[AppConfigManager sharedInstance].udid];
     [query findObjectsInBackgroundWithBlock:^(NSArray *objects, NSError *error) {

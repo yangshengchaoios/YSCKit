@@ -40,7 +40,7 @@
     CGFloat titleHeight = [NSString HeightOfNormalString:Trim(message.text)
                                                 maxWidth:kBubbleServiceTextWidth
                                                 withFont:kBubbleTitleFont];
-    CGFloat bubbleHeight = titleHeight + AUTOLAYOUT_LENGTH(145) + kXHBubbleMarginVer * 3;
+    CGFloat bubbleHeight = titleHeight + AUTOLAYOUT_LENGTH(145) + kXHBubbleMarginVer * 3 + kXHBubbleMarginVerOffset * 2;
     return CGSizeMake(kBubbleServiceWidth, bubbleHeight);
 }
 

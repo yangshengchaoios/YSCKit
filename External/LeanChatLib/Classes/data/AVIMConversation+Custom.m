@@ -52,7 +52,15 @@ static NSString *ObjectTagKeyUpdatedTime = @"ObjectTagKeyUpdatedTime";
 - (CDConvType)type {
     return [[self.attributes objectForKey:CONV_TYPE] intValue];
 }
-
+- (NSString *)ezgoalType {
+    return Trim(self.attributes[kParamEzgoalType]);
+}
+- (RescueStatusType)ezgoalStatus {
+    return [self.attributes[kParamEzgoalStatus] integerValue];
+}
+- (NSString *)rescueId {
+    return Trim(self.attributes[kParamRescueId]);
+}
 + (NSString *)nameOfUserIds:(NSArray *)userIds {
     NSMutableArray *names = [NSMutableArray array];
     for (int i = 0; i < userIds.count; i++) {

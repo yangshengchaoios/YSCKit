@@ -32,6 +32,7 @@
         self.serviceDetailLabel.backgroundColor = [UIColor clearColor];
         self.serviceDetailLabel.textColor = kBubbleDetailFontColor;
         self.serviceDetailLabel.font = kBubbleDetailFont;
+        self.serviceDetailLabel.numberOfLines = 0;
         
         self.overLabel.backgroundColor = RGB(177, 177, 177);
         self.overLabel.textColor = [UIColor whiteColor];
@@ -48,7 +49,15 @@
 #pragma mark - 计算大小
 //计算气泡大小
 + (CGSize)BubbleFrameWithMessage:(EZGServiceMessage *)message {
-    return CGSizeMake(kBubbleServiceWidth, AUTOLAYOUT_LENGTH(160));
+    CGFloat titleHeight = [NSString HeightOfNormalString:Trim(message.text)
+                                                maxWidth:kBubbleServiceTextWidth
+                                                withFont:kBubbleTitleFont];
+    CGFloat detailInfoHeight = [NSString HeightOfNormalString:Trim(message.attributes[MParamDetailInfo])
+                                                   maxWidth:kBubbleServiceTextWidth
+                                                   withFont:kBubbleDetailFont];
+    CGFloat bubbleHeight = titleHeight + detailInfoHeight + kXHBubbleMarginVerOffset * 2 + kXHBubbleMarginVer * 1.5 + 2;
+    bubbleHeight = MAX(AUTOLAYOUT_LENGTH(160), bubbleHeight);
+    return CGSizeMake(kBubbleServiceWidth, bubbleHeight);
 }
 //计算cell高度
 + (CGFloat)HeightOfCellByMessage:(EZGServiceMessage *)message displaysTimestamp:(BOOL)displayTimestamp {
@@ -73,17 +82,14 @@
         self.overLabel.hidden = NO;
         self.overLabel.text = [NSString stringWithFormat:@"%@\r\n本次服务已结束", [self formatMessageTimeByTimeStamp:message.sendTimestamp]];
         self.serviceDetailLabel.textAlignment = NSTextAlignmentCenter;
-        self.serviceDetailLabel.numberOfLines = 1;
     }
     else if (EZGServiceTypeResume == [message.attributes[MParamServiceType] integerValue]) {//取消放弃操作
         self.overLabel.hidden = YES;
         self.serviceDetailLabel.textAlignment = NSTextAlignmentCenter;
-        self.serviceDetailLabel.numberOfLines = 1;
     }
     else {
         self.overLabel.hidden = YES;
         self.serviceDetailLabel.textAlignment = NSTextAlignmentLeft;
-        self.serviceDetailLabel.numberOfLines = 2;
     }
 }
 //动态计算位置和大小
@@ -102,10 +108,11 @@
     self.separationLineLabel.width = self.serviceTitleLabel.width;
     
     //调整说明信息位置
+    [self.serviceDetailLabel sizeToFit];
     self.serviceDetailLabel.top = self.separationLineLabel.bottom + 1;
     self.serviceDetailLabel.left = self.serviceTitleLabel.left;
     self.serviceDetailLabel.width = self.serviceTitleLabel.width;
-    self.serviceDetailLabel.height = contentFrame.size.height - CGRectGetMaxY(self.separationLineLabel.frame) - 2;
+    self.serviceDetailLabel.height = self.bubbleImageView.bottom - self.separationLineLabel.bottom - kXHBubbleMarginVerOffset - 2;
     
     //调整结束信息位置
     self.overLabel.top = self.bubbleImageView.bottom + kXHLabelPadding;

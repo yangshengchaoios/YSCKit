@@ -15,7 +15,7 @@ typedef void (^YSCObjectIndexResultBlock)(NSObject *object, NSInteger section);
 typedef NSDictionary *(^YSCDictionarySetBlock)(NSInteger pageIndex);
 typedef void (^YSCViewObjectResultBlock)(UIView *view, NSObject *object);
 typedef CGFloat (^YSCFloatSetBlock)(NSIndexPath *indexPath);
-typedef NSString *(^YSCViewStringSetBlock)(NSIndexPath *indexPath);
+typedef NSString *(^YSCNameStringSetBlock)(NSObject *object, NSIndexPath *indexPath);
 
 
 //------------------------------------
@@ -82,9 +82,9 @@ typedef NSString *(^YSCViewStringSetBlock)(NSIndexPath *indexPath);
 @property (nonatomic, copy) YSCFloatSetBlock cellHeightBlock;
 @property (nonatomic, copy) YSCFloatSetBlock footerHeightBlock;
 
-@property (nonatomic, copy) YSCViewStringSetBlock headerNameBlock;
-@property (nonatomic, copy) YSCViewStringSetBlock cellNameBlock;
-@property (nonatomic, copy) YSCViewStringSetBlock footerNameBlock;
+@property (nonatomic, copy) YSCNameStringSetBlock headerNameBlock;
+@property (nonatomic, copy) YSCNameStringSetBlock cellNameBlock;
+@property (nonatomic, copy) YSCNameStringSetBlock footerNameBlock;
 
 #pragma mark - 设置ScrollViewDelegate相关的回调
 @property (nonatomic, copy) YSCBlock willBeginDraggingBlock;

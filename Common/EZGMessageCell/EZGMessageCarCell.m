@@ -54,7 +54,7 @@
     CGFloat carNumberHeight = [NSString HeightOfNormalString:Trim([carModel formatCarNumber])
                                                    maxWidth:kBubbleServiceTextWidth
                                                    withFont:kBubbleDetailFont];
-    CGFloat bubbleHeight = titleHeight + carBrandHeight + carNumberHeight + kXHBubbleMarginVer * 3.5;
+    CGFloat bubbleHeight = titleHeight + carBrandHeight + carNumberHeight + kXHBubbleMarginVer * 3.5 + kXHBubbleMarginVerOffset * 2;
     bubbleHeight = MAX(AUTOLAYOUT_LENGTH(160), bubbleHeight);
     return CGSizeMake(kBubbleServiceWidth, bubbleHeight);
 }

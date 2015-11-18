@@ -501,15 +501,21 @@
     if (self.headerHeightBlock) {
         return self.headerHeightBlock([NSIndexPath indexPathForRow:0 inSection:section]);
     }
-    NSString *headerName = self.headerName;
-    if (self.headerNameBlock) {
-        NSString *tempName = self.headerNameBlock([NSIndexPath indexPathForRow:0 inSection:section]);
-        if (isNotEmpty(tempName)) {
-            headerName = tempName;
+    if ((section >= 0 && section < [self.headerDataArray count])) {
+        NSString *headerName = self.headerName;
+        NSObject *headerObject = self.headerDataArray[section];
+        if (self.headerNameBlock) {
+            NSString *tempName = self.headerNameBlock(headerObject, [NSIndexPath indexPathForRow:0 inSection:section]);
+            if (isNotEmpty(tempName)) {
+                headerName = tempName;
+            }
         }
-    }
-    if (isNotEmpty(headerName) && [NSClassFromString(headerName) isSubclassOfClass:[YSCBaseTableHeaderFooterView class]]) {
-        return [NSClassFromString(headerName) HeightOfViewByObject:self.headerDataArray[section]];
+        if (isNotEmpty(headerName) && [NSClassFromString(headerName) isSubclassOfClass:[YSCBaseTableHeaderFooterView class]]) {
+            return [NSClassFromString(headerName) HeightOfViewByObject:headerObject];
+        }
+        else {
+            return 0.01;
+        }
     }
     else {
         return 0.01;
@@ -519,8 +525,9 @@
     YSCBaseTableHeaderFooterView *header = nil;
     if ((section >= 0 && section < [self.headerDataArray count])) {
         NSString *headerName = self.headerName;
+        NSObject *headerObject = self.headerDataArray[section];
         if (self.headerNameBlock) {
-            NSString *tempName = self.headerNameBlock([NSIndexPath indexPathForRow:0 inSection:section]);
+            NSString *tempName = self.headerNameBlock(headerObject, [NSIndexPath indexPathForRow:0 inSection:section]);
             if (isNotEmpty(tempName)) {
                 headerName = tempName;
             }
@@ -528,19 +535,18 @@
         
         if (isNotEmpty(headerName)) {
             header = [NSClassFromString(headerName) dequeueHeaderFooterByTableView:tableView];
-            NSObject *object = self.headerDataArray[section];
             if ([header isKindOfClass:[YSCBaseTableHeaderFooterView class]]) {
-                [header layoutObject:object];
+                [header layoutObject:headerObject];
             }
             if (self.layoutHeaderView) {
-                self.layoutHeaderView(header, object);
+                self.layoutHeaderView(header, headerObject);
             }
             
             WEAKSELF
             [header removeAllGestureRecognizers];
             [header bk_whenTapped:^{
                 if (weakSelf.clickHeaderBlock) {
-                    weakSelf.clickHeaderBlock(weakSelf.headerDataArray[section], section);
+                    weakSelf.clickHeaderBlock(headerObject, section);
                 }
             }];
         }
@@ -555,15 +561,16 @@
     }
     //2. 单个情况下的高度
     NSArray *array = self.cellDataArray[indexPath.section];
+    NSObject *cellObject = array[indexPath.row];
     NSString *cellName = self.cellName;
     if (self.cellNameBlock) {
-        NSString *tempName = self.cellNameBlock(indexPath);
+        NSString *tempName = self.cellNameBlock(cellObject, indexPath);
         if (isNotEmpty(tempName)) {
             cellName = tempName;
         }
     }
     if (isNotEmpty(cellName) && [NSClassFromString(cellName) isSubclassOfClass:[YSCBaseTableViewCell class]]) {
-        return [NSClassFromString(cellName) HeightOfCellByObject:array[indexPath.row]];
+        return [NSClassFromString(cellName) HeightOfCellByObject:cellObject];
     }
     else {
         return 44;
@@ -571,21 +578,22 @@
 }
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     YSCBaseTableViewCell *cell = nil;
+    NSArray *array = self.cellDataArray[indexPath.section];
+    NSObject *cellObject = array[indexPath.row];
     NSString *cellName = self.cellName;
     if (self.cellNameBlock) {
-        NSString *tempName = self.cellNameBlock(indexPath);
+        NSString *tempName = self.cellNameBlock(cellObject, indexPath);
         if (isNotEmpty(tempName)) {
             cellName = tempName;
         }
     }
     cell = [NSClassFromString(cellName) dequeueCellByTableView:tableView];
-    NSArray *array = self.cellDataArray[indexPath.section];
-    BaseDataModel *object = array[indexPath.row];
+    
     if ([cell isKindOfClass:[YSCBaseTableViewCell class]]) {
-        [cell layoutObject:object];
+        [cell layoutObject:cellObject];
     }
     if (self.layoutCellView) {
-        self.layoutCellView(cell, object);
+        self.layoutCellView(cell, cellObject);
     }
     cell.selectionStyle = UITableViewCellSelectionStyleNone;
     return cell;
@@ -595,15 +603,21 @@
     if (self.footerHeightBlock) {
         return self.footerHeightBlock([NSIndexPath indexPathForRow:0 inSection:section]);
     }
-    NSString *footerName = self.footerName;
-    if (self.footerNameBlock) {
-        NSString *tempName = self.footerNameBlock([NSIndexPath indexPathForRow:0 inSection:section]);
-        if (isNotEmpty(tempName)) {
-            footerName = tempName;
+    if ((section >= 0 && section < [self.footerDataArray count])) {
+        NSString *footerName = self.footerName;
+        NSObject *footerObject = self.footerDataArray[section];
+        if (self.footerNameBlock) {
+            NSString *tempName = self.footerNameBlock(footerObject, [NSIndexPath indexPathForRow:0 inSection:section]);
+            if (isNotEmpty(tempName)) {
+                footerName = tempName;
+            }
         }
-    }
-    if (isNotEmpty(footerName) && [NSClassFromString(footerName) isSubclassOfClass:[YSCBaseTableHeaderFooterView class]]) {
-        return [NSClassFromString(footerName) HeightOfViewByObject:self.footerDataArray[section]];
+        if (isNotEmpty(footerName) && [NSClassFromString(footerName) isSubclassOfClass:[YSCBaseTableHeaderFooterView class]]) {
+            return [NSClassFromString(footerName) HeightOfViewByObject:footerObject];
+        }
+        else {
+            return 0.01;
+        }
     }
     else {
         return 0.01;
@@ -613,8 +627,9 @@
     YSCBaseTableHeaderFooterView *footer = nil;
     if ((section >= 0 && section < [self.footerDataArray count])) {
         NSString *footerName = self.footerName;
+        NSObject *footerObject = self.footerDataArray[section];
         if (self.footerNameBlock) {
-            NSString *tempName = self.footerNameBlock([NSIndexPath indexPathForRow:0 inSection:section]);
+            NSString *tempName = self.footerNameBlock(footerObject, [NSIndexPath indexPathForRow:0 inSection:section]);
             if (isNotEmpty(tempName)) {
                 footerName = tempName;
             }
@@ -622,19 +637,18 @@
         
         if (isNotEmpty(footerName)) {
             footer = [NSClassFromString(footerName) dequeueHeaderFooterByTableView:tableView];
-            NSObject *object = self.footerDataArray[section];
             if ([footer isKindOfClass:[YSCBaseTableHeaderFooterView class]]) {
-                [footer layoutObject:object];
+                [footer layoutObject:footerObject];
             }
             if (self.layoutFooterView) {
-                self.layoutFooterView(footer, object);
+                self.layoutFooterView(footer, footerObject);
             }
             
             WEAKSELF
             [footer removeAllGestureRecognizers];
             [footer bk_whenTapped:^{
                 if (weakSelf.clickFooterBlock) {
-                    weakSelf.clickFooterBlock(weakSelf.footerDataArray[section], section);
+                    weakSelf.clickFooterBlock(footerObject, section);
                 }
             }];
         }
