@@ -32,7 +32,6 @@
     else {
         self.tableView.tipsEmptyText = @"亲，请登录后查看您的消息！";
     }
-    self.tableView.cellName = @"EZGMessageCenterCell";
     self.tableView.tipsView.actionButton.hidden = YES;
     self.tableView.enableLoadMore = NO;
     self.tableView.enableCellEdit = YES;
