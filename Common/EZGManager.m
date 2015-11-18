@@ -10,6 +10,12 @@
 
 @implementation EZGManager
 
+//判断救援状态是否还在处理中
++ (BOOL)checkRescueStatusIsProcessing:(RescueStatusType)rescueStatus {
+    return (RescueStatusTypeUnProcess == rescueStatus ||
+            RescueStatusTypeProcessing == rescueStatus ||
+            RescueStatusTypeCancelByC == rescueStatus);
+}
 #pragma mark - 车牌号相关
 //今日限号
 + (NSArray *)TodayLimitedNumbers {
