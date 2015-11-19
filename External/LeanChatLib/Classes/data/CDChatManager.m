@@ -48,7 +48,7 @@ static CDChatManager *instance;
     NSString *dbPath = [self databasePathWithUserId:_selfId];
     [[CDConversationStore store] setupStoreWithDatabasePath:dbPath];
     [[CDFailedMessageStore store] setupStoreWithDatabasePath:dbPath];
-    [[AVIMClient defaultClient] openWithClientId:clientId callback:^(BOOL succeeded, NSError *error) {
+    [[AVIMClient defaultClient] openWithClientId:clientId tag:@"Mobile" callback:^(BOOL succeeded, NSError *error) {
         [self updateConnectStatus];
         if (callback) {
             callback(succeeded, error);
@@ -351,6 +351,12 @@ static CDChatManager *instance;
 }
 - (void)conversation:(AVIMConversation *)conversation kickedByClientId:(NSString *)clientId {
     DLog();
+}
+- (void)client:(AVIMClient *)client didOfflineWithError:(NSError *)error {
+    if ([error code]  == 4111) {//单点登录
+        NSDictionary *param = @{kParamMessage : @"您的账号已在其它设备上登录", kParamUserId : Trim(client.clientId)};
+        postNWithInfo(kNotificationLoginExpired, param);
+    }
 }
 
 #pragma mark - signature
