@@ -590,7 +590,7 @@
     AVIMConversationUpdateBuilder *updateBuilder = [conversation newUpdateBuilder];
     updateBuilder.attributes = tempDict;
     [conversation update:[updateBuilder dictionary] callback:^(BOOL succeeded, NSError *error) {
-//        [[CDConversationStore store] updateConversation:conversation];
+        [[CDConversationStore store] updateConversation:conversation];
         if (block) {
             block(error);
         }
