@@ -475,8 +475,6 @@
 //统一入口：进入聊天对话界面
 - (void)openChatRoomByConversion:(AVIMConversation *)conversation byParams:(NSDictionary *)params {
     ReturnWhenObjectIsEmpty(conversation);
-    [[CDConversationStore store] updateConversation:conversation];//更新conversation
-    
     UIViewController *currentViewController = [AppConfigManager sharedInstance].currentViewController;
     ReturnWhenObjectIsEmpty(currentViewController);
     if ([currentViewController isKindOfClass:NSClassFromString(@"CDChatRoomVC")]) {//如果处于聊天界面，但不是即将打开的会话，则需要先关闭再打开
@@ -592,7 +590,7 @@
     AVIMConversationUpdateBuilder *updateBuilder = [conversation newUpdateBuilder];
     updateBuilder.attributes = tempDict;
     [conversation update:[updateBuilder dictionary] callback:^(BOOL succeeded, NSError *error) {
-        [[CDConversationStore store] updateConversation:conversation];
+//        [[CDConversationStore store] updateConversation:conversation];
         if (block) {
             block(error);
         }
@@ -601,40 +599,58 @@
 //拦截消息到达通知
 - (void)messageReceived:(NSNotification *)notification {
     AVIMTypedMessage *message = notification.object;
-    if ( ! [message isKindOfClass:[AVIMTypedMessage class]]) {
+    if ( ! [message isKindOfClass:[AVIMTypedMessage class]] || message.mediaType < EZGMessageTypeScene) {
+        postN(kNotificationRefreshMessageCenter);//刷新消息中心
         return;
     }
-    if (message.mediaType >= EZGMessageTypeScene) {//如果到达特殊类型的消息
-        RescueStatusType rescueStatus = 0;//默认不修改
-        if (EZGMessageTypeServiceCancel == message.mediaType) {
-            //B端处理：conversation的ezgoalType修改为RescueStatusTypeCancelByC
-            rescueStatus = RescueStatusTypeCancelByC;
+    
+    //特殊类型的消息
+    RescueStatusType rescueStatus = 0;//默认不修改
+    BOOL isUpdatedByC = YES;//C端需要调用接口更新救援任务状态
+    if (EZGMessageTypeServiceCancel == message.mediaType) {//C端发出之前需要先修改救援任务状态
+        //B端处理：conversation的ezgoalType修改为RescueStatusTypeCancelByC
+        rescueStatus = RescueStatusTypeCancelByC;
+    }
+    else if (EZGMessageTypeServiceComment == message.mediaType) {//C端发出之前需要先修改救援任务状态
+        //B端处理：conversation的ezgoalType修改为RescueStatusTypeConfirm
+        rescueStatus = RescueStatusTypeConfirm;
+    }
+    else if (EZGMessageTypeService == message.mediaType) {//救援过程中的业务数据往来
+        if (EZGServiceTypeStart == [message.attributes[MParamServiceType] integerValue]) {
+            //C端处理：conversation的ezgoalType修改为RescueStatusTypeProcessing
+            rescueStatus = RescueStatusTypeProcessing;
+            isUpdatedByC = NO;
         }
-        else if (EZGMessageTypeServiceComment == message.mediaType) {
-            //B端处理：conversation的ezgoalType修改为RescueStatusTypeConfirm
-            rescueStatus = RescueStatusTypeConfirm;
+        else if (EZGServiceTypeFinish == [message.attributes[MParamServiceType] integerValue]) {
+            //C端处理：conversation的ezgoalType修改为RescueStatusTypeFinished
+            rescueStatus = RescueStatusTypeFinished;
+            isUpdatedByC = NO;
         }
-        else if (EZGMessageTypeService == message.mediaType) {//救援过程中的业务数据往来
-            if (EZGServiceTypeStart == [message.attributes[MParamServiceType] integerValue]) {
-                //C端处理：conversation的ezgoalType修改为RescueStatusTypeProcessing
-                rescueStatus = RescueStatusTypeProcessing;
-            }
-            else if (EZGServiceTypeFinish == [message.attributes[MParamServiceType] integerValue]) {
-                //C端处理：conversation的ezgoalType修改为RescueStatusTypeFinished
-                rescueStatus = RescueStatusTypeFinished;
-            }
-            else if (EZGServiceTypeOver == [message.attributes[MParamServiceType] integerValue]) {
-                //C端处理：conversation的ezgoalType修改为RescueStatusTypeCancelByB
-                rescueStatus = RescueStatusTypeCancelByB;
-            }
-            else if (EZGServiceTypeResume == [message.attributes[MParamServiceType] integerValue]) {
-                //B端处理：conversation的ezgoalType修改为RescueStatusTypeProcessing
-                rescueStatus = RescueStatusTypeProcessing;
-            }
+        else if (EZGServiceTypeOver == [message.attributes[MParamServiceType] integerValue]) {
+            //C端处理：conversation的ezgoalType修改为RescueStatusTypeCancelByB
+            rescueStatus = RescueStatusTypeCancelByB;
+            isUpdatedByC = NO;
         }
-        
-        if (rescueStatus != 0) {//有修改
-            AVIMConversation *conv = [[CDConversationStore store] selectOneConversationByConvId:message.conversationId];
+        else if (EZGServiceTypeResume == [message.attributes[MParamServiceType] integerValue]) {//C端发出之前需要先修改救援任务状态
+            //B端处理：conversation的ezgoalType修改为RescueStatusTypeProcessing
+            rescueStatus = RescueStatusTypeProcessing;
+        }
+    }
+    
+    if (rescueStatus != 0) {//有修改
+        AVIMConversation *conv = [[CDConversationStore store] selectOneConversationByConvId:message.conversationId];
+        //更新救援任务状态
+        if ((IsAppTypeC && isUpdatedByC) || (IsAppTypeB && ! isUpdatedByC)) {
+            [RescueModel updateRescueInfo:@{kParamRescueId : conv.rescueId, kParamRescueStatus : @(rescueStatus)} block:^(NSObject *object, NSError *error) {
+                //更新conversation
+                [EZGDATA updateConversation:conv byParams:@{kParamEzgoalStatus : @(rescueStatus)} block:^(NSObject *object) {
+                    postN(kNotificationRefreshMessageCenter);//刷新消息中心
+                    APPDATA.isRescueModelChanged = YES;//通知会话页面，报告conv的状态已经更新了
+                    //FIXME:更新失败的处理？？？
+                }];
+            }];
+        }
+        else {
             //更新本地救援模型
             if ([message.conversationId isEqualToString:APPDATA.rescueModel.conversationId] ||
                 [conv.rescueId isEqualToString:APPDATA.rescueModel.rescueId]) {
@@ -647,9 +663,6 @@
                 APPDATA.isRescueModelChanged = YES;//通知会话页面，报告conv的状态已经更新了
                 //FIXME:更新失败的处理？？？
             }];
-        }
-        else {
-            postN(kNotificationRefreshMessageCenter);//刷新消息中心
         }
     }
     else {

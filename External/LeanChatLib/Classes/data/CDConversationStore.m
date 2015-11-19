@@ -166,9 +166,9 @@
                                 Trim(conversation.ezgoalType),
                                 @(conversation.ezgoalStatus),
                                 Trim(conversation.rescueId),
-                                conversation.conversationId
-                                ]];
-            [db commit];
+                                conversation.conversationId]];
+            BOOL isSuccess = [db commit];
+            NSLog(@"isSuccess:%d", isSuccess);
         }];
     }
     else {
@@ -185,7 +185,8 @@
     withArgumentsInArray :@[[self dataFromMessage:message],
                             [NSDate dateWithTimeIntervalSince1970:message.sendTimestamp / 1000],
                             convId]];
-        [db commit];
+        BOOL isSuccess = [db commit];
+        NSLog(@"isSuccess:%d", isSuccess);
     }];
 }
 

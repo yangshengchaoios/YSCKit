@@ -324,21 +324,21 @@
     //        return [mutablePairs componentsJoinedByString:@"&"];
     //    }];
 	if (RequestTypeGET == requestType) {
-		NSLog(@"getting data...");
+		NSLog(@"getting data from url[%@]", newUrlString);
 		[manager   GET:newUrlString
 		    parameters:newDictParam
 		       success:requestSuccessed1
 		       failure:requestFailure1];
 	}
 	else if (RequestTypePOST == requestType) {
-		NSLog(@"posting data...");
+        NSLog(@"posting data to url[%@]", newUrlString);
 		[manager  POST:newUrlString
 		    parameters:newDictParam
 		       success:requestSuccessed1
 		       failure:requestFailure1];
 	}
 	else if (RequestTypeUploadFile == requestType) {
-		NSLog(@"uploading data...");
+        NSLog(@"uploading data to url[%@]", newUrlString);
 		[manager       POST:newUrlString
                  parameters:newDictParam
   constructingBodyWithBlock: ^(id < AFMultipartFormData > formData) {
@@ -350,7 +350,7 @@
                     failure:requestFailure1];
 	}
     else if (RequestTypePostBodyData == requestType) {
-        NSLog(@"posting bodydata...");
+        NSLog(@"posting bodydata to url[%@]", newUrlString);
         NSMutableURLRequest *mutableRequest = [manager.requestSerializer requestWithMethod:@"POST" URLString:newUrlString parameters:nil error:nil];
         mutableRequest.HTTPBody = [bodyParam dataUsingEncoding:manager.requestSerializer.stringEncoding];
         [mutableRequest setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];

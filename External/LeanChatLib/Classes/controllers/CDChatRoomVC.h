@@ -20,6 +20,8 @@
 @property (nonatomic, strong) NSDictionary *params;
 
 - (instancetype)initWithConv:(AVIMConversation *)conv;
+//重置conv
+- (void)resetConversation;
 
 #pragma mark - EZGMessageTableViewCell action
 - (void)multiMediaMessageDidSelectedOnMessage:(AVIMTypedMessage *)message atIndexPath:(NSIndexPath *)indexPath onMessageTableViewCell:(EZGMessageBaseCell *)messageTableViewCell;

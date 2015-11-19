@@ -407,6 +407,7 @@ static CGPoint  delayOffset = {0.0};
         [self setTableViewInsetsWithBottomValue:0];
         self.messageInputView.top = self.view.frame.size.height;
     }
+    [self scrollToBottomAnimated:YES];
 }
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];

@@ -53,6 +53,10 @@ static NSInteger const kOnePageSize = 10;
     self.conv = conv;
     return self;
 }
+//重置conv
+- (void)resetConversation {
+    self.conv = [[CDConversationStore store] selectOneConversationByConvId:self.conv.conversationId];
+}
 - (void)viewDidLoad {
     [super viewDidLoad];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(receiveMessage:) name:kCDNotificationMessageReceived object:nil];
