@@ -8,6 +8,8 @@
 
 #import "EZGMessageLocationCell.h"
 
+#define kHeightOfMap         230     //地图高度
+
 @implementation EZGMessageLocationCell
 
 - (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier {
@@ -18,8 +20,8 @@
         [self.contentView addSubview:self.bubbleLocationImageView];
         [self.contentView addSubview:self.addressLabel];
         
-        self.addressLabel.backgroundColor = RGBA(0, 0, 0, 0.3);
-        self.addressLabel.font = [UIFont systemFontOfSize:14];
+        self.addressLabel.backgroundColor = RGBA(0, 0, 0, 0.5);
+        self.addressLabel.font = kBubbleDetailFont;
         self.addressLabel.numberOfLines = 2;
         self.addressLabel.textColor = [UIColor whiteColor];
         [self.bubbleLocationImageView makeRoundWithRadius:3];
@@ -30,14 +32,19 @@
 #pragma mark - 计算大小
 //计算内容大小(不包括气泡四周的边距)
 + (CGSize)ContentSizeWithMessage:(AVIMLocationMessage *)message {
-    return [self SizeForPhoto:[UIImage imageNamed:@"Fav_Cell_Loc"]];
+    return CGSizeMake(kBubbleServiceWidth, AUTOLAYOUT_LENGTH(kHeightOfMap));
 }
 
 #pragma mark - 显示内容
 //显示message
 - (void)layoutMessage:(AVIMLocationMessage *)message displaysTimestamp:(BOOL)displayTimestamp {
     [super layoutMessage:message displaysTimestamp:displayTimestamp];
-    self.bubbleLocationImageView.image = [UIImage imageNamed:@"Fav_Cell_Loc"];
+    NSInteger mapLevel = [message.attributes[MParamMapLevel] integerValue];
+    if (0 == mapLevel) {
+        mapLevel = 15;
+    }
+    NSString *locationUrl = [NSString stringWithFormat:@"http://api.map.baidu.com/staticimage?markers=%f,%f&zoom=%ld&width=%.0f&height=%d", message.longitude, message.latitude, mapLevel, kBubbleServiceWidth / AUTOLAYOUT_SCALE, kHeightOfMap];
+    [self.bubbleLocationImageView setImageWithURLString:locationUrl withFadeIn:NO];
     self.addressLabel.text = Trim(message.text);
 }
 

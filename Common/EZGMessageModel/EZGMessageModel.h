@@ -46,6 +46,7 @@ static const NSString *EzgoalTypeSalePerson     = @"BSalePersonRepresent";
 #define MParamAccidentId                @"accidentId"       //现场记录id
 #define MParamServerTime                @"serverTime"       //发送该消息时服务器的时间（用于：取消救援的时间起点）
 #define MParamAvatarUrl                 @"avatarUrl"        //消息对应的头像地址
+#define MParamMapLevel                  @"mapLevel"         //地图的放大系数
 
 //自定义消息cell
 #import "EZGMessageBaseCell.h"

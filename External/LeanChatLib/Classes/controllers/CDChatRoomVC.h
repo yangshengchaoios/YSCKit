@@ -36,6 +36,8 @@
 - (void)didClickedShareMenuItemCamera;
 //点击扩展功能按钮-发送图片
 - (void)didClickedShareMenuItemSendPhoto;
+//根据地理位置信息和地理经纬度开始发送地理位置消息
+- (void)didSendGeolocationsMessageWithGeolocaltions:(NSString *)geolocations location:(CLLocation *)location level:(NSInteger)level;
 //发送消息
 - (void)sendMsg:(AVIMTypedMessage *)msg;
 @end

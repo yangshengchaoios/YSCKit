@@ -60,7 +60,7 @@
 //动态计算图片显示的大小，等比例缩放，填满
 + (CGSize)SizeForPhoto:(UIImage *)photo {
     CGFloat photoWidth = photo.size.width;
-    photoWidth = MIN(photoWidth, AUTOLAYOUT_LENGTH(300));
+    photoWidth = MIN(photoWidth, kBubbleServiceWidth);
     photoWidth = MAX(photoWidth, AUTOLAYOUT_LENGTH(150));
     CGFloat photoHeight = photoWidth * photo.size.height / photo.size.width;
     photoHeight = MAX(kXHAvatarImageSize, photoHeight);

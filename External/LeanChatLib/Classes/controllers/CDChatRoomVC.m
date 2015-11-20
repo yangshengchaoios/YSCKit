@@ -180,11 +180,6 @@ static NSInteger const kOnePageSize = 10;
     return YES;
 }
 
-#pragma mark - @ reference other
-- (void)didInputAtSignOnMessageTextView:(XHMessageTextView *)messageInputTextView {
-    
-}
-
 #pragma mark - alert and async utils
 - (BOOL)filterError:(NSError *)error {
     return [self alertError:error] == NO;
@@ -397,7 +392,7 @@ static NSInteger const kOnePageSize = 10;
             SearchPoiModel *dataModel = (SearchPoiModel *)object;
             CLLocation *location = [[CLLocation alloc] initWithLatitude:dataModel.poiLocation.latitude longitude:dataModel.poiLocation.longitude];
             NSString *locationAddress = isEmpty(dataModel.poiAddress) ? Trim(dataModel.poiName) : Trim(dataModel.poiAddress);
-            [weakSelf didSendGeoLocationsPhoto:nil geolocations:locationAddress location:location fromSender:nil onDate:nil];
+            [weakSelf didSendGeolocationsMessageWithGeolocaltions:locationAddress location:location level:dataModel.level];
         }
         else {
             [UIView showResultThenHideOnWindow:@"没有选择位置信息"];
@@ -473,7 +468,7 @@ static NSInteger const kOnePageSize = 10;
         ALAsset *asset = assets[i];
         UIImage *pickedImage = [UIImage imageWithCGImage:asset.defaultRepresentation.fullScreenImage];
         UIImage *sendImage = [self resizeImage:pickedImage];
-        [self didSendPhoto:sendImage fromSender:nil onDate:nil];
+        [self didSendMessageWithPhoto:sendImage];
     }
 }
 - (void)assetPickerControllerDidCancel:(ZYQAssetPickerController *)picker {
@@ -533,34 +528,43 @@ static NSInteger const kOnePageSize = 10;
 // 消息收发
 //
 //================================================
-#pragma mark - didSend delegate
-//发送文本
-- (void)didSendText:(NSString *)text fromSender:(NSString *)sender onDate:(NSDate *)date {
-    if ([text length] > 0) {
-        AVIMTextMessage *msg = [AVIMTextMessage messageWithText:[CDEmotionUtils plainStringFromEmojiString:text] attributes:nil];
-        [self sendMsg:msg];
-        [self finishSendMessageWithBubbleMessageType:XHBubbleMessageMediaTypeText];
+#pragma mark - Message Send
+//根据文本开始发送文本消息
+- (void)didSendMessageWithText:(NSString *)text {
+    if (isEmpty(text)) {
+        [UIView showResultThenHideOnWindow:@"消息内容不能为空"];
+        return;
     }
+    AVIMTextMessage *msg = [AVIMTextMessage messageWithText:[CDEmotionUtils plainStringFromEmojiString:text] attributes:nil];
+    [self sendMsg:msg];
+    [self finishSendMessageWithBubbleMessageType:XHBubbleMessageMediaTypeText];
 }
-//发送图片
-- (void)didSendPhoto:(UIImage *)image fromSender:(NSString *)sender onDate:(NSDate *)date {
-    NSData *imageData = UIImageJPEGRepresentation(image, 0.6);
+//根据图片开始发送图片消息
+- (void)didSendMessageWithPhoto:(UIImage *)photo {
+    NSData *imageData = UIImageJPEGRepresentation(photo, 0.6);
     AVFile *imageFile = [AVFile fileWithData:imageData];
     AVIMImageMessage *msg = [AVIMImageMessage messageWithText:nil file:imageFile attributes:nil];
     [self sendMsg:msg];
 }
-//发送视频
-- (void)didSendVideoConverPhoto:(UIImage *)videoConverPhoto videoPath:(NSString *)videoPath fromSender:(NSString *)sender onDate:(NSDate *)date {
-    AVIMVideoMessage* sendVideoMessage = [AVIMVideoMessage messageWithText:nil attachedFilePath:videoPath attributes:nil];
-    [self sendMsg:sendVideoMessage];
-}
-//发送语音
-- (void)didSendVoice:(NSString *)voicePath voiceDuration:(NSString *)voiceDuration fromSender:(NSString *)sender onDate:(NSDate *)date {
+//根据录音路径开始发送语音消息
+- (void)didSendMessageWithVoice:(NSString *)voicePath voiceDuration:(NSString*)voiceDuration {
     AVIMAudioMessage *msg = [AVIMAudioMessage messageWithText:nil attachedFilePath:voicePath attributes:nil];
     [self sendMsg:msg];
 }
+//根据地理位置信息和地理经纬度开始发送地理位置消息
+- (void)didSendGeolocationsMessageWithGeolocaltions:(NSString *)geolocations location:(CLLocation *)location level:(NSInteger)level {
+    if (0 == level) {
+        level = 15;
+    }
+    AVIMLocationMessage *locMsg = [AVIMLocationMessage messageWithText:geolocations
+                                                              latitude:location.coordinate.latitude
+                                                             longitude:location.coordinate.longitude
+                                                            attributes:@{MParamMapLevel : @(level)}];
+    [self sendMsg:locMsg];
+    
+}
 //发送表情
-- (void)didSendEmotion:(NSString *)emotion fromSender:(NSString *)sender onDate:(NSDate *)date {
+- (void)didSendEmotionMessageWithEmotion:(NSString *)emotion {
     if ([emotion hasPrefix:@":"]) {
         // 普通表情
         UITextView *textView = self.messageInputView.inputTextView;
@@ -574,14 +578,6 @@ static NSInteger const kOnePageSize = 10;
         AVIMEmotionMessage *msg = [AVIMEmotionMessage messageWithEmotionPath:emotion];
         [self sendMsg:msg];
     }
-}
-//发送地理位置
-- (void)didSendGeoLocationsPhoto:(UIImage *)geoLocationsPhoto geolocations:(NSString *)geolocations location:(CLLocation *)location fromSender:(NSString *)sender onDate:(NSDate *)date {
-    AVIMLocationMessage *locMsg = [AVIMLocationMessage messageWithText:geolocations
-                                                              latitude:location.coordinate.latitude
-                                                             longitude:location.coordinate.longitude
-                                                            attributes:nil];
-    [self sendMsg:locMsg];
 }
 
 #pragma mark - send message

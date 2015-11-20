@@ -66,7 +66,7 @@
                                                 withFont:kBubbleTitleFont];
     CGFloat contentHeight = titleHeight + kXHBubbleMarginVer * 1 + AUTOLAYOUT_LENGTH(1);
     contentHeight = MAX(AUTOLAYOUT_LENGTH(140), contentHeight);
-    return CGSizeMake(kMaxContentWidth, contentHeight);
+    return CGSizeMake(kMaxContentWidth - (kXHBubbleArrowWidth - kXHBubbleTailWidth), contentHeight);
 }
 //计算cell高度
 + (CGFloat)HeightOfCellByMessage:(EZGServiceCommentMessage *)message displaysTimestamp:(BOOL)displayTimestamp {

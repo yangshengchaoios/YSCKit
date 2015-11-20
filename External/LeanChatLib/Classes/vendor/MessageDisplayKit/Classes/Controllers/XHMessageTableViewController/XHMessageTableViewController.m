@@ -233,10 +233,7 @@ static CGPoint  delayOffset = {0.0};
 #pragma mark - Previte Method
 - (BOOL)shouldAllowScroll {
     if (self.isUserScrolling) {
-        if ([self.delegate respondsToSelector:@selector(shouldPreventScrollToBottomWhileUserScrolling)]
-            && [self.delegate shouldPreventScrollToBottomWhileUserScrolling]) {
-            return NO;
-        }
+        return NO;
     }
     
     return YES;
@@ -251,9 +248,6 @@ static CGPoint  delayOffset = {0.0};
     _allowsSendMultiMedia = YES;
     _allowsSendFace = YES;
     _inputViewStyle = XHMessageInputViewStyleFlat;
-    
-    self.delegate = self;
-    self.dataSource = self;
 }
 - (id)init {
     self = [super init];
@@ -444,8 +438,6 @@ static CGPoint  delayOffset = {0.0};
 - (void)dealloc {
     [[NSNotificationCenter defaultCenter] removeObserver:self name:UIApplicationWillResignActiveNotification object:nil];
     _messages = nil;
-    _delegate = nil;
-    _dataSource = nil;
     _messageTableView.delegate = nil;
     _messageTableView.dataSource = nil;
     _messageTableView = nil;
@@ -577,10 +569,7 @@ static CGPoint  delayOffset = {0.0};
 //统一计算Cell的高度方法
 - (CGFloat)calculateCellHeightWithMessage:(AVIMTypedMessage *)message atIndexPath:(NSIndexPath *)indexPath {
     CGFloat cellHeight = 0;
-    BOOL displayTimestamp = YES;
-    if ([self.delegate respondsToSelector:@selector(shouldDisplayTimestampForRowAtIndexPath:)]) {
-        displayTimestamp = [self.delegate shouldDisplayTimestampForRowAtIndexPath:indexPath];
-    }
+    BOOL displayTimestamp = [self shouldDisplayTimestampForRowAtIndexPath:indexPath];
     if (kAVIMMessageMediaTypeText == message.mediaType) {
         cellHeight = [EZGMessageTextCell HeightOfCellByMessage:message displaysTimestamp:displayTimestamp];
     }
@@ -614,50 +603,42 @@ static CGPoint  delayOffset = {0.0};
     
     return cellHeight;
 }
+//是否显示时间轴Label的回调方法
+- (BOOL)shouldDisplayTimestampForRowAtIndexPath:(NSIndexPath *)indexPath {
+    return YES;
+}
 
-#pragma mark - Message Send helper Method
+#pragma mark - Message Send
 //根据文本开始发送文本消息
 - (void)didSendMessageWithText:(NSString *)text {
     DLog(@"send text : %@", text);
-    if ([self.delegate respondsToSelector:@selector(didSendText:fromSender:onDate:)]) {
-        [self.delegate didSendText:text fromSender:self.messageSender onDate:[NSDate date]];
-    }
+    
 }
 //根据图片开始发送图片消息
 - (void)didSendMessageWithPhoto:(UIImage *)photo {
     DLog(@"send photo : %@", photo);
-    if ([self.delegate respondsToSelector:@selector(didSendPhoto:fromSender:onDate:)]) {
-        [self.delegate didSendPhoto:photo fromSender:self.messageSender onDate:[NSDate date]];
-    }
-}
-//根据视频的封面和视频的路径开始发送视频消息
-- (void)didSendMessageWithVideoConverPhoto:(UIImage *)videoConverPhoto videoPath:(NSString *)videoPath  {
-    DLog(@"send videoPath : %@  videoConverPhoto : %@", videoPath, videoConverPhoto);
-    if ([self.delegate respondsToSelector:@selector(didSendVideoConverPhoto:videoPath:fromSender:onDate:)]) {
-        [self.delegate didSendVideoConverPhoto:videoConverPhoto videoPath:videoPath fromSender:self.messageSender onDate:[NSDate date]];
-    }
+    
 }
 //根据录音路径开始发送语音消息
 - (void)didSendMessageWithVoice:(NSString *)voicePath voiceDuration:(NSString*)voiceDuration {
     DLog(@"send voicePath : %@", voicePath);
-    if ([self.delegate respondsToSelector:@selector(didSendVoice:voiceDuration:fromSender:onDate:)]) {
-        [self.delegate didSendVoice:voicePath voiceDuration:voiceDuration fromSender:self.messageSender onDate:[NSDate date]];
-    }
-}
-//根据第三方gif表情路径开始发送表情消息
-- (void)didSendEmotionMessageWithEmotion:(NSString *)emotion {
-    DLog(@"send emotion : %@", emotion);
-    if ([self.delegate respondsToSelector:@selector(didSendEmotion:fromSender:onDate:)]) {
-        [self.delegate didSendEmotion:emotion fromSender:self.messageSender onDate:[NSDate date]];
-    }
+    
 }
 //根据地理位置信息和地理经纬度开始发送地理位置消息
-- (void)didSendGeolocationsMessageWithGeolocaltions:(NSString *)geolcations location:(CLLocation *)location {
-    DLog(@"send geolcations : %@", geolcations);
-    if ([self.delegate respondsToSelector:@selector(didSendGeoLocationsPhoto:geolocations:location:fromSender:onDate:)]) {
-        [self.delegate didSendGeoLocationsPhoto:[UIImage imageNamed:@"Fav_Cell_Loc"] geolocations:geolcations location:location fromSender:self.messageSender onDate:[NSDate date]];
-    }
+- (void)didSendGeolocationsMessageWithGeolocaltions:(NSString *)geolocations location:(CLLocation *)location {
+    DLog(@"send geolcations : %@", geolocations);
+    
 }
+//发送表情
+- (void)didSendEmotionMessageWithEmotion:(NSString *)emotion {
+    DLog(@"send emotion : %@", emotion);
+}
+//根据视频的封面和视频的路径开始发送视频消息(未启用)
+- (void)didSendMessageWithVideoConverPhoto:(UIImage *)videoConverPhoto videoPath:(NSString *)videoPath  {
+    DLog(@"send videoPath : %@  videoConverPhoto : %@", videoPath, videoConverPhoto);
+    
+}
+
 
 #pragma mark - Other Menu View Frame Helper Mehtod
 //根据显示或隐藏的需求对所有第三方Menu进行管理
@@ -798,15 +779,10 @@ static CGPoint  delayOffset = {0.0};
 }
 - (void)didInputAtSign:(XHMessageTextView *)messageInputTextView {
     DLog(@"didInputAtSign");
-    if ([self.delegate respondsToSelector:@selector(didInputAtSignOnMessageTextView:)]) {
-        [self.delegate didInputAtSignOnMessageTextView:messageInputTextView];
-    }
 }
 - (void)didSendTextAction:(NSString *)text {
     DLog(@"text : %@", text);
-    if ([self.delegate respondsToSelector:@selector(didSendText:fromSender:onDate:)]) {
-        [self.delegate didSendText:text fromSender:self.messageSender onDate:[NSDate date]];
-    }
+    [self didSendMessageWithText:text];
 }
 - (void)didSelectedMultipleMediaAction {
     DLog(@"didSelectedMultipleMediaAction");
@@ -943,16 +919,6 @@ static CGPoint  delayOffset = {0.0};
     self.isUserScrolling = NO;
 }
 
-#pragma mark - XHMessageTableViewController Delegate
-- (BOOL)shouldPreventScrollToBottomWhileUserScrolling {
-    return YES;
-}
-
-#pragma mark - XHMessageTableViewController DataSource
-- (AVIMTypedMessage *)messageForRowAtIndexPath:(NSIndexPath *)indexPath {
-    return self.messages[indexPath.row];
-}
-
 #pragma mark - Table View Data Source
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
     return 1;
@@ -962,10 +928,7 @@ static CGPoint  delayOffset = {0.0};
 }
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     AVIMTypedMessage *message = self.messages[indexPath.row];
-    BOOL displayTimestamp = YES;
-    if ([self.delegate respondsToSelector:@selector(shouldDisplayTimestampForRowAtIndexPath:)]) {
-        displayTimestamp = [self.delegate shouldDisplayTimestampForRowAtIndexPath:indexPath];
-    }
+    BOOL displayTimestamp = [self shouldDisplayTimestampForRowAtIndexPath:indexPath];
     
     EZGMessageBaseCell *cell = nil;
     if (kAVIMMessageMediaTypeText == message.mediaType) {
