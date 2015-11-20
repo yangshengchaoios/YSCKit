@@ -564,7 +564,6 @@ static NSInteger const kOnePageSize = 10;
 //发送语音
 - (void)didSendVoice:(NSString *)voicePath voiceDuration:(NSString *)voiceDuration fromSender:(NSString *)sender onDate:(NSDate *)date {
     AVIMAudioMessage *msg = [AVIMAudioMessage messageWithText:nil attachedFilePath:voicePath attributes:nil];
-    msg.text = voiceDuration;//NOTE:方便发送的时候显示
     [self sendMsg:msg];
 }
 //发送表情

@@ -75,7 +75,7 @@
     
     //调整图片位置
     self.bubbleSceneImageView.top = self.separationLineLabel.bottom + kXHBubbleMarginVer / 2;
-    self.bubbleSceneImageView.left = self.sceneTextLabel.left;
+    self.bubbleSceneImageView.centerX = self.separationLineLabel.centerX;
 }
 
 @end

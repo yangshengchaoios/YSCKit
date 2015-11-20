@@ -189,8 +189,6 @@
 }
 
 - (void)stopRecordingWithStopRecorderCompletion:(XHStopRecorderCompletion)stopRecorderCompletion {
-    [self getVoiceDuration:_recordPath];
-    
     _isPause = NO;
     [self stopBackgroundTask];
     [self stopRecord];
@@ -265,11 +263,9 @@
     });
 }
 
-- (void)getVoiceDuration:(NSString*)recordPath {
-    AVAudioPlayer *play = [[AVAudioPlayer alloc] initWithContentsOfURL:[NSURL fileURLWithPath:recordPath] error:nil];
-    DLog(@"时长:%f", play.duration);
-    self.recordDuration = [NSString stringWithFormat:@"%.1f", play.duration];
-    //    return play.duration;
+- (NSString *)recordDuration {
+    AVAudioPlayer *play = [[AVAudioPlayer alloc] initWithContentsOfURL:[NSURL fileURLWithPath:_recordPath] error:nil];
+    return [NSString stringWithFormat:@"%.1f", play.duration];
 }
 
 @end

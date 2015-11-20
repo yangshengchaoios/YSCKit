@@ -24,10 +24,10 @@ typedef void(^XHPeakPowerForChannel)(float peakPowerForChannel);
 @property (nonatomic, copy) XHRecordProgress recordProgress;
 @property (nonatomic, copy) XHPeakPowerForChannel peakPowerForChannel;
 @property (nonatomic, copy, readonly) NSString *recordPath;
-@property (nonatomic, copy) NSString *recordDuration;
 @property (nonatomic) float minRecordTime; // 默认 1秒为最小
 @property (nonatomic) float maxRecordTime; // 默认 60秒为最大
 @property (nonatomic, readonly) NSTimeInterval currentTimeInterval;
+@property (nonatomic, copy) NSString *recordDuration;//将currentTimeInterval转换成字符串
 
 - (void)prepareRecordingWithPath:(NSString *)path prepareRecorderCompletion:(XHPrepareRecorderCompletion)prepareRecorderCompletion;
 - (void)startRecordingWithStartRecorderCompletion:(XHStartRecorderCompletion)startRecorderCompletion;

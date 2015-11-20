@@ -37,8 +37,10 @@
 //显示message
 - (void)layoutMessage:(AVIMAudioMessage *)message displaysTimestamp:(BOOL)displayTimestamp {
     [super layoutMessage:message displaysTimestamp:displayTimestamp];
-    float duration = (message.duration == 0 ? message.text.floatValue : message.duration);
-    self.voiceDurationLabel.text = [NSString stringWithFormat:@"%.1f\"", duration];
+    self.voiceDurationLabel.hidden = (message.duration <= 0);
+    if (message.duration > 0) {
+        self.voiceDurationLabel.text = [NSString stringWithFormat:@"%.1f\"", message.duration];
+    }
     [self resetVoiceAnimations];
 }
 //动态计算位置和大小
