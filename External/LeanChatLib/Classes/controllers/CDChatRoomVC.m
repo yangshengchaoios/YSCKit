@@ -545,16 +545,9 @@ static NSInteger const kOnePageSize = 10;
 //发送图片
 - (void)didSendPhoto:(UIImage *)image fromSender:(NSString *)sender onDate:(NSDate *)date {
     NSData *imageData = UIImageJPEGRepresentation(image, 0.6);
-    NSString *path = [[CDChatManager manager] tmpPath];
-    NSError *error;
-    [imageData writeToFile:path options:NSDataWritingAtomic error:&error];
-    if (error == nil) {
-        AVIMImageMessage *msg = [AVIMImageMessage messageWithText:nil attachedFilePath:path attributes:nil];
-        [self sendMsg:msg];
-    }
-    else {
-        [self alert:@"write image to file error" block:nil];
-    }
+    AVFile *imageFile = [AVFile fileWithData:imageData];
+    AVIMImageMessage *msg = [AVIMImageMessage messageWithText:nil file:imageFile attributes:nil];
+    [self sendMsg:msg];
 }
 //发送视频
 - (void)didSendVideoConverPhoto:(UIImage *)videoConverPhoto videoPath:(NSString *)videoPath fromSender:(NSString *)sender onDate:(NSDate *)date {

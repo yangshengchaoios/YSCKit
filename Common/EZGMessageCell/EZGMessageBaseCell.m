@@ -63,6 +63,7 @@
     photoWidth = MIN(photoWidth, AUTOLAYOUT_LENGTH(300));
     photoWidth = MAX(photoWidth, AUTOLAYOUT_LENGTH(150));
     CGFloat photoHeight = photoWidth * photo.size.height / photo.size.width;
+    photoHeight = MAX(kXHAvatarImageSize, photoHeight);
     return CGSizeMake(photoWidth, photoHeight);
 }
 //计算内容大小(不包括气泡四周的边距)

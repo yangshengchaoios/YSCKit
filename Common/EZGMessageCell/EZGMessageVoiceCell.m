@@ -55,7 +55,7 @@
     
     if (EZGBubbleMessageTypeReceiving == [self bubbleMessageType]) {
         self.animationVoiceImageView.left = contentFrame.origin.x;
-        self.voiceDurationLabel.textColor = RGB(136, 136, 136);
+        self.voiceDurationLabel.textColor = [UIColor blackColor];
         self.voiceDurationLabel.left = CGRectGetMaxX(contentFrame) - self.voiceDurationLabel.width;
     }
     else {
