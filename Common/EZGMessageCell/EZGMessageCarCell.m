@@ -42,8 +42,8 @@
 }
 
 #pragma mark - 计算大小
-//计算气泡大小
-+ (CGSize)BubbleFrameWithMessage:(EZGCarMessage *)message {
+//计算内容大小(不包括气泡四周的边距)
++ (CGSize)ContentSizeWithMessage:(EZGCarMessage *)message {
     MyCarModel *carModel = [[MyCarModel alloc] initWithString:Trim(message.attributes[MParamCarInfo]) error:nil];
     CGFloat titleHeight = [NSString HeightOfNormalString:Trim(message.text)
                                                 maxWidth:kBubbleServiceTextWidth
@@ -54,7 +54,7 @@
     CGFloat carNumberHeight = [NSString HeightOfNormalString:Trim([carModel formatCarNumber])
                                                    maxWidth:kBubbleServiceTextWidth
                                                    withFont:kBubbleDetailFont];
-    CGFloat bubbleHeight = titleHeight + carBrandHeight + carNumberHeight + kXHBubbleMarginVer * 3.5 + kXHBubbleMarginVerOffset * 2;
+    CGFloat bubbleHeight = titleHeight + carBrandHeight + carNumberHeight + kXHBubbleMarginVer * 2.5;
     bubbleHeight = MAX(AUTOLAYOUT_LENGTH(160), bubbleHeight);
     return CGSizeMake(kBubbleServiceWidth, bubbleHeight);
 }

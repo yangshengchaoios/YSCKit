@@ -14,7 +14,6 @@
 #define kXHTimeStampLabelHeight     AUTOLAYOUT_LENGTH(40)   //timeStampLabel高度
 #define kXHAvatorPadding            AUTOLAYOUT_LENGTH(20)   //头像与父view左边间隔
 #define kXHAvatarImageSize          AUTOLAYOUT_LENGTH(80)   //头像的长宽
-#define kXHBubbleMessageViewPadding 0//AUTOLAYOUT_LENGTH(10)   //气泡两边间隔
 #define kXHStatusViewWidth          AUTOLAYOUT_LENGTH(80)   //消息发送状态宽度
 #define kXHStatusViewHeight         AUTOLAYOUT_LENGTH(40)   //消息发送状态高度
 
@@ -22,19 +21,19 @@
 #define kXHBubbleMarginVer          AUTOLAYOUT_LENGTH(20)   //内容距离气泡的上下边距
 #define kXHBubbleMarginHor          AUTOLAYOUT_LENGTH(20)   //内容距离气泡的左右边距
 #define kXHBubbleMarginVerOffset    AUTOLAYOUT_LENGTH(5)    //气泡可见边缘的上下边距
-#define kXHBubbleArrowWidth         AUTOLAYOUT_LENGTH(25)   //气泡箭头宽度
-#define kXHBubbleTailWidth          AUTOLAYOUT_LENGTH(13)   //气泡箭头相反方向的边距
+#define kXHBubbleArrowWidth         AUTOLAYOUT_LENGTH(28)   //气泡箭头宽度
+#define kXHBubbleTailWidth          AUTOLAYOUT_LENGTH(10)   //气泡箭头相反方向的边距
 
 #define kBubbleTextFont             AUTOLAYOUT_FONT(30)
 #define kBubbleTitleFont            AUTOLAYOUT_FONT(24)
 #define kBubbleTitleFontColor       RGB(85, 85, 85)
 #define kBubbleDetailFont           AUTOLAYOUT_FONT(24)
 #define kBubbleDetailFontColor      [UIColor blackColor]
-#define kBubbleServiceWidth         AUTOLAYOUT_LENGTH(340 + 14)//服务特殊会话的气泡宽度
-#define kBubbleServiceTextWidth     (kBubbleServiceWidth - kXHBubbleMarginHor * 2 - kXHBubbleArrowWidth - kXHBubbleTailWidth) // 特殊服务会话的文本最大宽度
+#define kBubbleServiceWidth         AUTOLAYOUT_LENGTH(340)  //服务特殊会话的内容宽度(不包括气泡两边的箭头宽度)
+#define kBubbleServiceTextWidth     (kBubbleServiceWidth - 2 * kXHBubbleMarginHor - kXHBubbleArrowWidth - kXHBubbleTailWidth) // 特殊服务会话的文本最大宽度
 
-//文本最大宽度
-#define kMaxTextWidth               (SCREEN_WIDTH - 2 * (kXHAvatorPadding + kXHAvatarImageSize + kXHBubbleMessageViewPadding + kXHBubbleMarginHor) - kXHBubbleArrowWidth - kXHBubbleTailWidth)
+//内容最大宽度(包括了内容两边与气泡的间隔)
+#define kMaxContentWidth            (SCREEN_WIDTH - 2 * (kXHAvatorPadding + kXHAvatarImageSize) - kXHBubbleArrowWidth - kXHBubbleTailWidth)
 
 typedef NS_ENUM(NSInteger, EZGBubbleMessageType) {
     EZGBubbleMessageTypeSending = 0,
@@ -57,11 +56,13 @@ typedef NS_ENUM(NSInteger, EZGBubbleMessageType) {
 #pragma mark - 计算大小
 //动态计算图片显示的大小，等比例缩放，填满
 + (CGSize)SizeForPhoto:(UIImage *)photo;
-//计算气泡大小
-+ (CGSize)BubbleFrameWithMessage:(AVIMTypedMessage *)message;
+//计算内容大小(不包括气泡四周的边距)
++ (CGSize)ContentSizeWithMessage:(AVIMTypedMessage *)message;
+//计算气泡大小(包括气泡四周的边距)
++ (CGSize)BubbleSizeWithMessage:(AVIMTypedMessage *)message;
 //计算cell高度
 + (CGFloat)HeightOfCellByMessage:(AVIMTypedMessage *)message displaysTimestamp:(BOOL)displayTimestamp;
-//计算内容部分的坐标和大小
+//计算内容部分的坐标和大小(不包括与气泡边线的间隔)
 - (CGRect)calculateContentFrame;
 
 #pragma mark - 显示内容

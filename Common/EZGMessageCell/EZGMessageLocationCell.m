@@ -18,17 +18,18 @@
         [self.contentView addSubview:self.bubbleLocationImageView];
         [self.contentView addSubview:self.addressLabel];
         
+        self.addressLabel.backgroundColor = RGBA(0, 0, 0, 0.3);
         self.addressLabel.font = [UIFont systemFontOfSize:14];
         self.addressLabel.numberOfLines = 2;
         self.addressLabel.textColor = [UIColor whiteColor];
-        [self.bubbleLocationImageView makeRoundWithRadius:4];
+        [self.bubbleLocationImageView makeRoundWithRadius:3];
     }
     return self;
 }
 
 #pragma mark - 计算大小
-//计算气泡大小
-+ (CGSize)BubbleFrameWithMessage:(AVIMLocationMessage *)message {
+//计算内容大小(不包括气泡四周的边距)
++ (CGSize)ContentSizeWithMessage:(AVIMLocationMessage *)message {
     return [self SizeForPhoto:[UIImage imageNamed:@"Fav_Cell_Loc"]];
 }
 
@@ -47,15 +48,13 @@
     //调整默认位置图片大小和位置
     CGRect contentFrame = [self calculateContentFrame];
     self.bubbleLocationImageView.frame = CGRectInset(contentFrame, -kXHBubbleMarginHor, -kXHBubbleMarginVer);
-    self.bubbleLocationImageView.width -= 3;//FIXME:
     
     //调整文字大小和位置
-    
     [self.addressLabel sizeToFit];
-    self.addressLabel.width = self.bubbleLocationImageView.width - 2;
+    self.addressLabel.width = self.bubbleLocationImageView.width;
     self.addressLabel.height += 5;
-    self.addressLabel.left = self.bubbleLocationImageView.left + 1;
-    self.addressLabel.top = CGRectGetMaxY(self.bubbleLocationImageView.frame) - 1 - self.addressLabel.height;
+    self.addressLabel.left = self.bubbleLocationImageView.left;
+    self.addressLabel.top = self.bubbleLocationImageView.bottom - self.addressLabel.height;
 }
 
 @end

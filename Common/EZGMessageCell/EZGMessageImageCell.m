@@ -16,14 +16,14 @@
         self.bubblePhotoImageView = [[UIImageView alloc] initWithFrame:CGRectZero];
         [self.contentView addSubview:self.bubblePhotoImageView];
         
-        [self.bubblePhotoImageView makeRoundWithRadius:4];
+        [self.bubblePhotoImageView makeRoundWithRadius:3];
     }
     return self;
 }
 
 #pragma mark - 计算大小
-//计算气泡大小
-+ (CGSize)BubbleFrameWithMessage:(AVIMImageMessage *)message {
+//计算内容大小(不包括气泡四周的边距)
++ (CGSize)ContentSizeWithMessage:(AVIMImageMessage *)message {
     UIImage *image = DefaultImage;
     NSData *data = [message.file getData:nil];
     if (data) {
@@ -65,8 +65,7 @@
     [super layoutSubviews];
     
     CGRect contentFrame = [self calculateContentFrame];
-    self.bubblePhotoImageView.frame = CGRectInset(contentFrame, -kXHBubbleMarginHor + AUTOLAYOUT_LENGTH(5), -kXHBubbleMarginVer);
-    self.bubblePhotoImageView.left -= AUTOLAYOUT_LENGTH(3);//FIXME:标准
+    self.bubblePhotoImageView.frame = CGRectInset(contentFrame, -kXHBubbleMarginHor, -kXHBubbleMarginVer);
 }
 
 #pragma mark - Menu Actions

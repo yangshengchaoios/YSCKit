@@ -26,8 +26,8 @@
 }
 
 #pragma mark - 计算大小
-//计算气泡大小
-+ (CGSize)BubbleFrameWithMessage:(AVIMAudioMessage *)message {
+//计算内容大小(不包括气泡四周的边距)
++ (CGSize)ContentSizeWithMessage:(AVIMAudioMessage *)message {
     float duration = (message.duration == 0 ? message.text.floatValue : message.duration);
     float gapDuration = (duration == 0 ? -1 : duration - 1.0f);
     return CGSizeMake(100 + (gapDuration > 0 ? (120.0 / (60 - 1) * gapDuration) : 0), kXHAvatarImageSize);
@@ -73,10 +73,11 @@
         imageSepatorName = @"Sender";
     }
     NSMutableArray *images = [NSMutableArray arrayWithCapacity:4];
-    for (NSInteger i = 0; i < 4; i ++) {
-        UIImage *image = [UIImage imageNamed:[imageSepatorName stringByAppendingFormat:@"VoiceNodePlaying00%ld", (long)i]];
-        if (image)
+    for (int i = 0; i < 4; i ++) {
+        UIImage *image = [UIImage imageNamed:[imageSepatorName stringByAppendingFormat:@"VoiceNodePlaying00%d", i]];
+        if (image) {
             [images addObject:image];
+        }
     }
     self.animationVoiceImageView.image = [UIImage imageNamed:[imageSepatorName stringByAppendingString:@"VoiceNodePlaying"]];
     self.animationVoiceImageView.animationImages = images;

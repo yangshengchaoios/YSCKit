@@ -31,6 +31,7 @@
         self.commentTitleLabel.backgroundColor = [UIColor clearColor];
         self.commentTitleLabel.textColor = kBubbleTitleFontColor;
         self.commentTitleLabel.font = kBubbleTitleFont;
+        self.commentTitleLabel.numberOfLines = 2;
         
         self.separationLineLabel.height = AUTOLAYOUT_LENGTH(1);
         self.separationLineLabel.backgroundColor = kDefaultBorderColor;
@@ -58,10 +59,14 @@
 }
 
 #pragma mark - 计算大小
-//计算气泡大小
-+ (CGSize)BubbleFrameWithMessage:(EZGServiceCommentMessage *)message {
-    CGFloat maxTextWidth = SCREEN_WIDTH - 2 * (kXHAvatorPadding + kXHAvatarImageSize + kXHBubbleMessageViewPadding);
-    return CGSizeMake(maxTextWidth, AUTOLAYOUT_LENGTH(150));
+//计算内容大小(不包括气泡四周的边距)
++ (CGSize)ContentSizeWithMessage:(EZGServiceCommentMessage *)message {
+    CGFloat titleHeight = [NSString HeightOfNormalString:Trim(message.text)
+                                                maxWidth:kBubbleServiceTextWidth
+                                                withFont:kBubbleTitleFont];
+    CGFloat contentHeight = titleHeight + kXHBubbleMarginVer * 1 + AUTOLAYOUT_LENGTH(1);
+    contentHeight = MAX(AUTOLAYOUT_LENGTH(140), contentHeight);
+    return CGSizeMake(kMaxContentWidth, contentHeight);
 }
 //计算cell高度
 + (CGFloat)HeightOfCellByMessage:(EZGServiceCommentMessage *)message displaysTimestamp:(BOOL)displayTimestamp {

@@ -25,6 +25,7 @@
         self.sceneTextLabel.backgroundColor = [UIColor clearColor];
         self.sceneTextLabel.textColor = kBubbleTitleFontColor;
         self.sceneTextLabel.font = kBubbleTitleFont;
+        self.sceneTextLabel.numberOfLines = 2;
         
         self.separationLineLabel.height = AUTOLAYOUT_LENGTH(1);
         self.separationLineLabel.backgroundColor = kDefaultBorderColor;
@@ -35,12 +36,12 @@
 }
 
 #pragma mark - 计算大小
-//计算气泡大小
-+ (CGSize)BubbleFrameWithMessage:(EZGSceneMessage *)message {
+//计算内容大小(不包括气泡四周的边距)
++ (CGSize)ContentSizeWithMessage:(EZGSceneMessage *)message {
     CGFloat titleHeight = [NSString HeightOfNormalString:Trim(message.text)
                                                 maxWidth:kBubbleServiceTextWidth
                                                 withFont:kBubbleTitleFont];
-    CGFloat bubbleHeight = titleHeight + AUTOLAYOUT_LENGTH(145) + kXHBubbleMarginVer * 3 + kXHBubbleMarginVerOffset * 2;
+    CGFloat bubbleHeight = titleHeight + AUTOLAYOUT_LENGTH(145) + kXHBubbleMarginVer * 1 + AUTOLAYOUT_LENGTH(1);
     return CGSizeMake(kBubbleServiceWidth, bubbleHeight);
 }
 

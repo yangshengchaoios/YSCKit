@@ -23,9 +23,8 @@
     }
     return self;
 }
-
-//计算气泡大小
-+ (CGSize)BubbleFrameWithMessage:(AVIMVideoMessage *)message {
+//计算内容大小(不包括气泡四周的边距)
++ (CGSize)ContentSizeWithMessage:(AVIMVideoMessage *)message {
     return [self SizeForPhoto:[self videoConverPhotoWithVideoPath:message.file.localPath]];
 }
 //显示message

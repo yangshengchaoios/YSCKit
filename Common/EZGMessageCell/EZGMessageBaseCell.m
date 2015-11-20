@@ -63,12 +63,17 @@
     photoWidth = MIN(photoWidth, AUTOLAYOUT_LENGTH(300));
     photoWidth = MAX(photoWidth, AUTOLAYOUT_LENGTH(150));
     CGFloat photoHeight = photoWidth * photo.size.height / photo.size.width;
-    photoHeight = MAX(photoHeight, kXHAvatarImageSize);
     return CGSizeMake(photoWidth, photoHeight);
 }
-//计算气泡大小
-+ (CGSize)BubbleFrameWithMessage:(AVIMTypedMessage *)message {
-    return CGSizeZero;
+//计算内容大小(不包括气泡四周的边距)
++ (CGSize)ContentSizeWithMessage:(AVIMTypedMessage *)message {
+    return AUTOLAYOUT_SIZE_WH(60, kXHAvatarImageSize);
+}
+//计算气泡大小(包括气泡四周的边距)
++ (CGSize)BubbleSizeWithMessage:(AVIMTypedMessage *)message {
+    CGSize contentSize = [self ContentSizeWithMessage:message];
+    return CGSizeMake(contentSize.width + kXHBubbleArrowWidth + kXHBubbleTailWidth,
+                      contentSize.height + 2 * kXHBubbleMarginVerOffset);
 }
 //计算cell高度
 + (CGFloat)HeightOfCellByMessage:(AVIMTypedMessage *)message displaysTimestamp:(BOOL)displayTimestamp {
@@ -83,24 +88,23 @@
     }
     
     CGFloat timestampHeight = displayTimestamp ? (kXHTimeStampLabelHeight + kXHLabelPadding * 2) : kXHLabelPadding;
-    CGFloat avatarHeight = kXHAvatarImageSize;
-    CGFloat bubbleHeight = [self BubbleFrameWithMessage:message].height;
+    CGFloat avatarHeight = kXHAvatarImageSize + 2 * kXHBubbleMarginVerOffset;
+    CGFloat bubbleHeight = [self BubbleSizeWithMessage:message].height;
     return timestampHeight + MAX(avatarHeight, bubbleHeight) + kXHLabelPadding;
 }
-//计算内容部分的坐标和大小
-//TODO:如何转换成edgeInsets？
+//计算内容部分的坐标和大小(不包括与气泡边线的间隔)
 - (CGRect)calculateContentFrame {
     if (EZGBubbleMessageTypeReceiving == [self bubbleMessageType]) {
-        return CGRectOffset(CGRectInset(self.bubbleImageView.frame,
-                                        AUTOLAYOUT_LENGTH(15) + kXHBubbleMarginHor,
-                                        AUTOLAYOUT_LENGTH(5) + kXHBubbleMarginVer),
-                            AUTOLAYOUT_LENGTH(6), 0);
+        return CGRectMake(self.bubbleImageView.left + kXHBubbleArrowWidth + kXHBubbleMarginHor,
+                          self.bubbleImageView.top + kXHBubbleMarginVerOffset + kXHBubbleMarginVer,
+                          self.bubbleImageView.width - kXHBubbleArrowWidth - kXHBubbleTailWidth - 2 * kXHBubbleMarginHor,
+                          self.bubbleImageView.height - 2 * kXHBubbleMarginVerOffset - 2 * kXHBubbleMarginVer);
     }
     else {
-        return CGRectOffset(CGRectInset(self.bubbleImageView.frame,
-                                        AUTOLAYOUT_LENGTH(15) + kXHBubbleMarginHor,
-                                        AUTOLAYOUT_LENGTH(5) + kXHBubbleMarginVer),
-                            -AUTOLAYOUT_LENGTH(6), 0);
+        return CGRectMake(self.bubbleImageView.left + kXHBubbleTailWidth + kXHBubbleMarginHor,
+                          self.bubbleImageView.top + kXHBubbleMarginVerOffset + kXHBubbleMarginVer,
+                          self.bubbleImageView.width - kXHBubbleArrowWidth - kXHBubbleTailWidth - 2 * kXHBubbleMarginHor,
+                          self.bubbleImageView.height - 2 * kXHBubbleMarginVerOffset - 2 * kXHBubbleMarginVer);
     }
 }
 
@@ -169,20 +173,20 @@
     }
     
     //重新调整气泡位置和大小
-    self.bubbleImageView.top = self.avatarImageView.top;
-    self.bubbleImageView.size = [self.class BubbleFrameWithMessage:self.typedMessage];
+    self.bubbleImageView.top = self.avatarImageView.top - kXHBubbleMarginVerOffset;//NOTE:气泡边线与边界有5个像素透明高度
+    self.bubbleImageView.size = [self.class BubbleSizeWithMessage:self.typedMessage];
     if (EZGBubbleMessageTypeReceiving == [self bubbleMessageType]) {
-        self.bubbleImageView.left = kXHAvatorPadding + kXHAvatarImageSize + kXHBubbleMessageViewPadding;
+        self.bubbleImageView.left = kXHAvatorPadding + kXHAvatarImageSize;
     }
     else {
-        self.bubbleImageView.left = self.avatarImageView.left - (kXHBubbleMessageViewPadding + self.bubbleImageView.width);
+        self.bubbleImageView.left = self.avatarImageView.left - self.bubbleImageView.width;
     }
     
     //重新调整statusView位置
     if(EZGBubbleMessageTypeSending == [self bubbleMessageType]) {
         self.statusView.hidden = NO;
         self.statusView.centerY = self.bubbleImageView.centerY;
-        self.statusView.left = self.bubbleImageView.left - (kXHBubbleMessageViewPadding + kXHStatusViewWidth);
+        self.statusView.left = self.bubbleImageView.left - kXHStatusViewWidth;
     }
     else {
         self.statusView.hidden = YES;
