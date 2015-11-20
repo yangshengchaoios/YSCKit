@@ -21,6 +21,7 @@
         self.animationVoiceImageView.width = AUTOLAYOUT_LENGTH(40);
         self.animationVoiceImageView.height = AUTOLAYOUT_LENGTH(40);
         self.voiceDurationLabel.backgroundColor = [UIColor clearColor];
+        self.voiceDurationLabel.font = AUTOLAYOUT_FONT(26);
     }
     return self;
 }
@@ -30,7 +31,7 @@
 + (CGSize)ContentSizeWithMessage:(AVIMAudioMessage *)message {
     float duration = (message.duration == 0 ? message.text.floatValue : message.duration);
     float gapDuration = (duration == 0 ? -1 : duration - 1.0f);
-    return CGSizeMake(100 + (gapDuration > 0 ? (120.0 / (60 - 1) * gapDuration) : 0), kXHAvatarImageSize);
+    return CGSizeMake(80 + (gapDuration > 0 ? (120.0 / (60 - 1) * gapDuration) : 0), kXHAvatarImageSize);
 }
 
 #pragma mark - 显示内容
@@ -54,7 +55,7 @@
     
     if (EZGBubbleMessageTypeReceiving == [self bubbleMessageType]) {
         self.animationVoiceImageView.left = contentFrame.origin.x;
-        self.voiceDurationLabel.textColor = [UIColor blackColor];
+        self.voiceDurationLabel.textColor = RGB(136, 136, 136);
         self.voiceDurationLabel.left = CGRectGetMaxX(contentFrame) - self.voiceDurationLabel.width;
     }
     else {
