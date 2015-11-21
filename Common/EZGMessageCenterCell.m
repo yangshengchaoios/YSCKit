@@ -56,7 +56,7 @@
 }
 - (JSBadgeView *)badgeView {
     if (nil == _badgeView) {
-        _badgeView = [[JSBadgeView alloc] initWithParentView:self.badgeBkgView alignment:JSBadgeViewAlignmentCenterRight];
+        _badgeView = [[JSBadgeView alloc] initWithParentView:self.badgeBkgView alignment:JSBadgeViewAlignmentCenter];
     }
     return _badgeView;
 }

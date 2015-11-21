@@ -199,10 +199,11 @@
     [self.databaseQueue inDatabase:^(FMDatabase *db) {
         FMResultSet *resultSet = nil;
         if (nil != ezgoalType) {
-            [db executeQuery:@"SELECT * FROM conversations WHERE unreadCount > 0 AND ezgoalType = ?" withArgumentsInArray:@[Trim(ezgoalType)]];
+            resultSet = [db executeQuery:@"SELECT unreadCount FROM conversations WHERE unreadCount > 0 AND ezgoalType = ?"
+                    withArgumentsInArray:@[Trim(ezgoalType)]];
         }
         else {
-            [db executeQuery:@"SELECT * FROM conversations WHERE unreadCount > 0"];
+            resultSet = [db executeQuery:@"SELECT unreadCount FROM conversations WHERE unreadCount > 0"];
         }
         
         while ([resultSet next]) {
@@ -238,7 +239,7 @@
 - (NSArray *)selectAllConversations {
     NSMutableArray *conversations = [NSMutableArray array];
     [self.databaseQueue inDatabase:^(FMDatabase *db) {
-        FMResultSet * resultSet = [db executeQuery:@"SELECT * FROM conversations"];
+        FMResultSet *resultSet = [db executeQuery:@"SELECT * FROM conversations"];
         while ([resultSet next]) {
             AVIMConversation *conv = [self createConversationFromResultSet:resultSet];
             if (isNotEmpty(conv)) {
@@ -253,7 +254,7 @@
     ReturnNilWhenObjectIsEmpty(convId);
     __block AVIMConversation *conv = nil;
     [self.databaseQueue inDatabase:^(FMDatabase *db) {
-        FMResultSet * resultSet = [db executeQuery:@"SELECT * FROM conversations WHERE id = ?" withArgumentsInArray:@[convId]];
+        FMResultSet *resultSet = [db executeQuery:@"SELECT * FROM conversations WHERE id = ?" withArgumentsInArray:@[convId]];
         if ([resultSet next]) {
             conv = [self createConversationFromResultSet:resultSet];
         }
@@ -266,7 +267,7 @@
     ReturnNilWhenObjectIsEmpty(rescueId);
     __block AVIMConversation *conv = nil;
     [self.databaseQueue inDatabase:^(FMDatabase *db) {
-        FMResultSet * resultSet = [db executeQuery:@"SELECT * FROM conversations WHERE rescueId = ?" withArgumentsInArray:@[rescueId]];
+        FMResultSet *resultSet = [db executeQuery:@"SELECT * FROM conversations WHERE rescueId = ?" withArgumentsInArray:@[rescueId]];
         if ([resultSet next]) {
             conv = [self createConversationFromResultSet:resultSet];
         }

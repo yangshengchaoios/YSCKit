@@ -59,6 +59,7 @@ static NSInteger const kOnePageSize = 10;
 }
 - (void)viewDidLoad {
     [super viewDidLoad];
+    self.isAppeared = NO;
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(receiveMessage:) name:kCDNotificationMessageReceived object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onMessageDelivered:) name:kCDNotificationMessageDelivered object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateStatusView) name:kCDNotificationConnectivityUpdated object:nil];
@@ -110,12 +111,17 @@ static NSInteger const kOnePageSize = 10;
     [CDChatManager manager].chattingConversationId = self.conv.conversationId;
 }
 - (void)viewDidDisappear:(BOOL)animated {
+    self.isAppeared = NO;
     [CDChatManager manager].chattingConversationId = nil;
     [[XHAudioPlayerHelper shareInstance] stopAudio];
     //如果有未读消息，且通过推送栏进入本页面后，继续有新消息到达，退出的时候就需要清空conv的未读消息，
     //因为处于当前页面时不会发送kCDNotificationUnreadsUpdated通知！
     [self updateConversationAsRead];
     [super viewDidDisappear:animated];
+}
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    self.isAppeared = YES;
 }
 - (void)viewWillDisappear:(BOOL)animated {
     YSCResultBlock block = self.params[kParamBlock];

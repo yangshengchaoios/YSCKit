@@ -199,10 +199,8 @@
     }
     [[CDChatManager manager] openWithClientId:USERID callback:^(BOOL succeeded, NSError *error) {
         if (nil == error) {
-            postN(kCDNotificationMessageReceived);
+            postN(kCDNotificationUnreadsUpdated);//重新计算未读数
         }
-        //删除所有该用户在其它设备上的登陆情况
-        [EZGDATA updateInstallationToEnsureUniqueUserId:USERID];
         //刷新最近N条会话列表，目的是方便关闭进程的APP从推送栏点击推送消息进入，打开聊天窗口更快速
         if (NO == [[CDConversationStore store] isConversationExists]) {
             [EZGDATA refreshConversationsByPageIndex:kDefaultPageStartIndex pageSize:20 block:nil];

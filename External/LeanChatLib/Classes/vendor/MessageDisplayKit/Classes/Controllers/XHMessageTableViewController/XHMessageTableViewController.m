@@ -290,7 +290,7 @@ static CGPoint  delayOffset = {0.0};
     [EZGMessageServiceCommentCell registerCellToTableView:messageTableView];
     
     // 设置Message TableView 的bottom edg
-    CGFloat inputViewHeight = (self.inputViewStyle == XHMessageInputViewStyleFlat) ? 45.0f : 40.0f;
+    CGFloat inputViewHeight = 45.0f;
     [self setTableViewInsetsWithBottomValue:inputViewHeight];
     
     // 设置整体背景颜色
@@ -386,22 +386,8 @@ static CGPoint  delayOffset = {0.0};
     
     _messageInputView = inputView;
     
-    
     // 设置手势滑动，默认添加一个bar的高度值
     self.messageTableView.messageInputBarHeight = CGRectGetHeight(_messageInputView.bounds);
-}
-//是否显示messageInputView
-- (void)showMessageInputView:(BOOL)show {
-    CGFloat inputViewHeight = (self.inputViewStyle == XHMessageInputViewStyleFlat) ? 45.0f : 40.0f;
-    if (show) {
-        [self setTableViewInsetsWithBottomValue:inputViewHeight];
-        self.messageInputView.top = self.view.frame.size.height - inputViewHeight;
-    }
-    else {
-        [self setTableViewInsetsWithBottomValue:0];
-        self.messageInputView.top = self.view.frame.size.height;
-    }
-    [self scrollToBottomAnimated:YES];
 }
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];

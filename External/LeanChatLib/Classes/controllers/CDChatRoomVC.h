@@ -18,6 +18,7 @@
 @property (nonatomic, strong, readonly) AVIMConversation *conv;
 @property (nonatomic, strong, readonly) NSMutableArray *msgs;
 @property (nonatomic, strong) NSDictionary *params;
+@property (nonatomic, assign) BOOL isAppeared;
 
 - (instancetype)initWithConv:(AVIMConversation *)conv;
 //重置conv

@@ -95,8 +95,6 @@ XHEmotionManagerViewDelegate, XHEmotionManagerViewDataSource>
 //根据视频的封面和视频的路径开始发送视频消息(未启用)
 - (void)didSendMessageWithVideoConverPhoto:(UIImage *)videoConverPhoto videoPath:(NSString *)videoPath;
 
-//是否显示messageInputView
-- (void)showMessageInputView:(BOOL)show;
 //根据bottom的数值配置消息列表的内部布局变化
 - (void)setTableViewInsetsWithBottomValue:(CGFloat)bottom;
 @end
