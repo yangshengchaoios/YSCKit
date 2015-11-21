@@ -97,4 +97,6 @@ XHEmotionManagerViewDelegate, XHEmotionManagerViewDataSource>
 
 //根据bottom的数值配置消息列表的内部布局变化
 - (void)setTableViewInsetsWithBottomValue:(CGFloat)bottom;
+//根据显示或隐藏的需求对所有第三方Menu进行管理
+- (void)layoutOtherMenuViewHiden:(BOOL)hide;
 @end
