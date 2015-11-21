@@ -373,13 +373,13 @@ static NSInteger const kOnePageSize = 10;
 #pragma mark - XHShareMenuViewDelegate
 //点击扩展区域的功能按钮
 - (void)didSelecteShareMenuItem:(XHShareMenuItem *)shareMenuItem atIndex:(NSInteger)index {
-    if (0 == index) {//照片
+    if ([@"照片" isEqualToString:shareMenuItem.title]) {
         [self didClickedShareMenuItemSendPhoto];
     }
-    else if (1 == index) {//拍摄
+    else if ([@"拍摄" isEqualToString:shareMenuItem.title]) {
         [self didClickedShareMenuItemCamera];
     }
-    else if (2 == index) {//位置
+    else if ([@"位置" isEqualToString:shareMenuItem.title]) {
         [self didClickedShareMenuItemSendLocation];
     }
 }
