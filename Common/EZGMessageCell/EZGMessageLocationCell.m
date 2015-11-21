@@ -8,7 +8,8 @@
 
 #import "EZGMessageLocationCell.h"
 
-#define kHeightOfMap         230     //地图高度
+#define kHeightOfMap                230                 //地图高度
+#define kDefaultMapImageName        @"default_image"    //TODO:修改默认地图图片名称
 
 @implementation EZGMessageLocationCell
 
@@ -44,7 +45,7 @@
         mapLevel = 15;
     }
     NSString *locationUrl = [NSString stringWithFormat:@"http://api.map.baidu.com/staticimage?markers=%f,%f&zoom=%ld&width=%.0f&height=%d", message.longitude, message.latitude, mapLevel, kBubbleServiceWidth / AUTOLAYOUT_SCALE, kHeightOfMap];
-    [self.bubbleLocationImageView setImageWithURLString:locationUrl withFadeIn:NO];
+    [self.bubbleLocationImageView setImageWithURLString:locationUrl placeholderImageName:kDefaultMapImageName withFadeIn:NO];
     self.addressLabel.text = Trim(message.text);
 }
 

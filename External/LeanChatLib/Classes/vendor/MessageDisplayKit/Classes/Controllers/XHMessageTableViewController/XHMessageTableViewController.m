@@ -939,6 +939,11 @@ static CGPoint  delayOffset = {0.0};
     }
     else if (kAVIMMessageMediaTypeImage == message.mediaType) {
         cell = [EZGMessageImageCell dequeueCellByTableView:tableView];
+        EZGMessageImageCell *imageCell = (EZGMessageImageCell *)cell;
+        WEAKSELF
+        imageCell.block = ^{
+            [weakSelf.messageTableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationNone];
+        };
     }
     else if (kAVIMMessageMediaTypeLocation == message.mediaType) {
         cell = [EZGMessageLocationCell dequeueCellByTableView:tableView];

@@ -8,6 +8,8 @@
 
 #import "EZGMessageImageCell.h"
 
+#define kDefaultMessageImage        [UIImage imageNamed:@"default_image"]//TODO:替换默认图片
+
 @implementation EZGMessageImageCell
 
 - (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier {
@@ -24,10 +26,19 @@
 #pragma mark - 计算大小
 //计算内容大小(不包括气泡四周的边距)
 + (CGSize)ContentSizeWithMessage:(AVIMImageMessage *)message {
-    UIImage *image = DefaultImage;
-    NSData *data = [message.file getData:nil];
-    if (data) {
-        image = [UIImage imageWithData:data];
+    UIImage *image = kDefaultMessageImage;
+    if (message.file.isDataAvailable) {
+        NSData *data = [message.file getData:nil];
+        if (data) {
+            message.text = @"1";
+            image = [UIImage imageWithData:data];
+        }
+        else {
+            message.text = @"0";//NOTE:需要做好标记，等下次成功获取后重新计算高度
+        }
+    }
+    else {
+        message.text = @"0";//NOTE:需要做好标记，等下载完成后重新计算高度
     }
     return [self SizeForPhoto:image];
 }
@@ -38,25 +49,33 @@
     [super layoutMessage:message displaysTimestamp:displayTimestamp];
     
     WEAKSELF
-    if (message.file && NO == message.file.isDataAvailable) {
-        //异步下载图片
-        self.bubblePhotoImageView.image = DefaultImage;
-        [message.file getDataInBackgroundWithBlock:^(NSData *data, NSError *error) {
-            if (error || data == nil) {
-                NSLog(@"download file error : %@", error);
-            }
-            else {//TODO:下载完成后刷新界面
-                weakSelf.bubblePhotoImageView.image = [UIImage imageWithData:data];
-            }
-        }];
-    }
-    else {
-        UIImage *image = DefaultImage;
+    if (message.file.isDataAvailable) {
+        UIImage *image = kDefaultMessageImage;
         NSData *data = [message.file getData:nil];
         if (data) {
             image = [UIImage imageWithData:data];
+            //NOTE:这里要刷新cell，重新计算cell高度
+            if ([@"0" isEqualToString:Trim(message.text)]) {
+                if (self.block) {
+                    self.block();
+                }
+            }
+            message.text = @"1";//关闭重新刷新cell的开关
         }
         self.bubblePhotoImageView.image = image;
+    }
+    else {
+        //异步下载图片
+        self.bubblePhotoImageView.image = kDefaultMessageImage;
+        [message.file getDataInBackgroundWithBlock:^(NSData *data, NSError *error) {
+            if (data) {
+                message.text = @"1";//关闭重新刷新cell的开关
+                weakSelf.bubblePhotoImageView.image = [UIImage imageWithData:data];
+                if (weakSelf.block) {//NOTE:下载完成后刷新cell，重新计算cell高度
+                    weakSelf.block();
+                }
+            }
+        }];
     }
 }
 

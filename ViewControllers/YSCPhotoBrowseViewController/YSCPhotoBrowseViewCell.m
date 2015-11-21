@@ -27,6 +27,7 @@
         self.photoImageView.hidden = YES;
         if ([NSString isNotUrl:dataModel.imageUrl]) {
             UIImage *cacheImage = [UIImage imageWithContentsOfFile:dataModel.imageUrl];
+            self.savedImage = cacheImage;
             if (cacheImage) {
                 self.photoImageView.hidden = NO;
                 self.photoImageView.image = cacheImage;

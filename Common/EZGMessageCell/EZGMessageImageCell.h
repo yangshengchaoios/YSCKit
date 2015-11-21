@@ -11,5 +11,5 @@
 @interface EZGMessageImageCell : EZGMessageBaseCell
 
 @property (strong, nonatomic) UIImageView *bubblePhotoImageView;
-
+@property (copy, nonatomic) YSCBlock block;
 @end

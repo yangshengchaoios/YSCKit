@@ -15,6 +15,7 @@
 @property (weak, nonatomic) IBOutlet YSCPhotoBrowseView *photoBrowseView;
 @property (weak, nonatomic) IBOutlet UILabel *indexLabel;
 @property (weak, nonatomic) IBOutlet UIButton *saveButton;
+@property (weak, nonatomic) IBOutlet UIButton *closeButton;
 @property (strong, nonatomic) NSMutableArray *dataArray;
 @property (assign, nonatomic) NSInteger currentIndex;
 
@@ -40,6 +41,9 @@
     self.view.backgroundColor = [UIColor blackColor];
     [self.indexLabel makeRoundWithRadius:AUTOLAYOUT_LENGTH(40) / 2];
     [self.saveButton makeBorderWithColor:[UIColor lightGrayColor] borderWidth:1];
+    [self.closeButton makeBorderWithColor:[UIColor lightGrayColor] borderWidth:1];
+//    [self.saveButton makeRoundWithRadius:AUTOLAYOUT_LENGTH(60) / 2];
+//    [self.closeButton makeRoundWithRadius:AUTOLAYOUT_LENGTH(60) / 2];
     
     //1. 初始化数据源模型数组
     self.dataArray = [NSMutableArray array];
@@ -98,6 +102,9 @@
     else {
         [UIView showResultThenHideOnWindow:@"图片为空"];
     }
+}
+- (IBAction)closeButtonClicked:(id)sender {
+    [self.navigationController popViewControllerAnimated:NO];
 }
 // 写到文件的完成时执行
 - (void)image:(UIImage *)image didFinishSavingWithError:(NSError *)error contextInfo:(void *)contextInfo {

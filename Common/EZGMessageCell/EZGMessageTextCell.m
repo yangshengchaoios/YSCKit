@@ -9,8 +9,7 @@
 #import "EZGMessageTextCell.h"
 #import "CDEmotionUtils.h"
 
-#define kXHTextLineSpacing  AUTOLAYOUT_LENGTH(5)
-#define kXHFontOfText       [UIFont systemFontOfSize:16]
+#define kTextLineSpacing  AUTOLAYOUT_LENGTH(5)
 
 @implementation EZGMessageTextCell
 
@@ -22,7 +21,7 @@
         
         self.displayTextView.backgroundColor = [UIColor clearColor];
         self.displayTextView.selectable = NO;
-        self.displayTextView.lineSpacing = kXHTextLineSpacing;
+        self.displayTextView.lineSpacing = kTextLineSpacing;
         self.displayTextView.font = kBubbleTextFont;
         self.displayTextView.showsEditingMenuAutomatically = NO;
         self.displayTextView.highlighted = NO;
@@ -39,8 +38,8 @@
     NSAttributedString *attrStr = [[XHMessageBubbleHelper sharedMessageBubbleHelper] bubbleAttributtedStringWithText:msgText];
     CGSize textSize = [SETextView frameRectWithAttributtedString:attrStr
                                                   constraintSize:CGSizeMake(kMaxContentWidth - 2 * kXHBubbleMarginHor, MAXFLOAT)
-                                                     lineSpacing:kXHTextLineSpacing
-                                                            font:kXHFontOfText].size;
+                                                     lineSpacing:kTextLineSpacing
+                                                            font:kBubbleTextFont].size;
     CGFloat bubbleWidth = MIN(msgTextWidth, textSize.width) + kXHBubbleMarginHor * 2;
     CGFloat bubbleHeight = MAX(kXHAvatarImageSize, textSize.height + kXHBubbleMarginVer * 2);
     return CGSizeMake(bubbleWidth, bubbleHeight);
