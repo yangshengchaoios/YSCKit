@@ -57,7 +57,7 @@
     CGFloat detailInfoHeight = [NSString HeightOfNormalString:Trim(message.attributes[MParamDetailInfo])
                                                    maxWidth:kBubbleServiceTextWidth
                                                    withFont:kBubbleDetailFont];
-    CGFloat contentHeight = titleHeight + detailInfoHeight + kXHBubbleMarginVer * 0.5 + AUTOLAYOUT_LENGTH(1);
+    CGFloat contentHeight = titleHeight + detailInfoHeight + kXHBubbleMarginVer * 3 + AUTOLAYOUT_LENGTH(1);
     contentHeight = MAX(AUTOLAYOUT_LENGTH(160), contentHeight);
     return CGSizeMake(kBubbleServiceWidth, contentHeight);
 }
@@ -99,15 +99,15 @@
     
     //调整分割线位置
     self.separationLineLabel.left = self.serviceTitleLabel.left;
-    self.separationLineLabel.top = CGRectGetMaxY(self.serviceTitleLabel.frame) + kXHBubbleMarginVer / 2;
+    self.separationLineLabel.top = self.serviceTitleLabel.bottom + kXHBubbleMarginVer / 2;
     self.separationLineLabel.width = self.serviceTitleLabel.width;
     
     //调整说明信息位置
     [self.serviceDetailLabel sizeToFit];
-    self.serviceDetailLabel.top = self.separationLineLabel.bottom;
+    self.serviceDetailLabel.top = self.separationLineLabel.bottom + kXHBubbleMarginVer / 2;
     self.serviceDetailLabel.left = self.serviceTitleLabel.left;
     self.serviceDetailLabel.width = self.serviceTitleLabel.width;
-    self.serviceDetailLabel.height = CGRectGetMaxY(contentFrame) - self.separationLineLabel.bottom;
+    self.serviceDetailLabel.height = CGRectGetMaxY(contentFrame) - self.serviceDetailLabel.top;
     
     //调整结束信息位置
     self.overLabel.top = self.bubbleImageView.bottom + kXHLabelPadding;

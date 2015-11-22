@@ -16,6 +16,7 @@
 + (UIImage *)adjustImage:(UIImage *)image withQuality:(ImageQuality)quality;
 
 //调整图片大小
++ (UIImage *)resizeImage:(UIImage *)image;
 + (UIImage *)resizeImage:(UIImage *)image toSize:(CGSize)size;
 + (UIImage *)resizeImage:(UIImage *)image toSize:(CGSize)size scale:(BOOL)scale;
 

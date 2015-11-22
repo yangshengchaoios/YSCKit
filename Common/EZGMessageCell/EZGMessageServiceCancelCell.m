@@ -52,8 +52,7 @@
     CGFloat titleHeight = [NSString HeightOfNormalString:Trim(message.text)
                                                 maxWidth:kBubbleServiceTextWidth
                                                 withFont:kBubbleTitleFont];
-    CGFloat contentHeight = titleHeight + kXHBubbleMarginVer * 1 + AUTOLAYOUT_LENGTH(1);
-    contentHeight = MAX(AUTOLAYOUT_LENGTH(150), contentHeight);
+    CGFloat contentHeight = titleHeight + kXHBubbleMarginVer * 3 + AUTOLAYOUT_LENGTH(70 + 1);
     return CGSizeMake(kBubbleServiceWidth, contentHeight);
 }
 
@@ -76,7 +75,7 @@
     
     //调整分割线位置
     self.separationLineLabel.left = self.cancelTitleLabel.left;
-    self.separationLineLabel.top = CGRectGetMaxY(self.cancelTitleLabel.frame) + kXHBubbleMarginVer / 2;
+    self.separationLineLabel.top = self.cancelTitleLabel.bottom + kXHBubbleMarginVer / 2;
     self.separationLineLabel.width = self.cancelTitleLabel.width;
     
     //调整icon位置

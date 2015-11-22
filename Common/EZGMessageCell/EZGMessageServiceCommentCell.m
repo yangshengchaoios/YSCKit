@@ -8,8 +8,6 @@
 
 #import "EZGMessageServiceCommentCell.h"
 
-#define SeparationOfStar        AUTOLAYOUT_LENGTH(20) //两个星星之间的间隔
-
 @implementation EZGMessageServiceCommentCell
 
 - (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier {
@@ -64,7 +62,7 @@
     CGFloat titleHeight = [NSString HeightOfNormalString:Trim(message.text)
                                                 maxWidth:kBubbleServiceTextWidth
                                                 withFont:kBubbleTitleFont];
-    CGFloat contentHeight = titleHeight + kXHBubbleMarginVer * 1 + AUTOLAYOUT_LENGTH(1);
+    CGFloat contentHeight = titleHeight + kXHBubbleMarginVer * 3 + AUTOLAYOUT_LENGTH(1);
     contentHeight = MAX(AUTOLAYOUT_LENGTH(140), contentHeight);
     return CGSizeMake(kMaxContentWidth - (kXHBubbleArrowWidth - kXHBubbleTailWidth), contentHeight);
 }
@@ -102,16 +100,17 @@
     
     //调整分割线位置
     self.separationLineLabel.left = self.commentTitleLabel.left;
-    self.separationLineLabel.top = CGRectGetMaxY(self.commentTitleLabel.frame) + kXHBubbleMarginVer / 2;
+    self.separationLineLabel.top = self.commentTitleLabel.bottom + kXHBubbleMarginVer / 2;
     self.separationLineLabel.width = self.commentTitleLabel.width;
     
     //调整星星位置
     CGFloat starX = self.commentTitleLabel.left;
     CGFloat starY = self.separationLineLabel.bottom + kXHBubbleMarginVer / 2;
+    CGFloat separater = (self.separationLineLabel.width - [self.rateImageViewArray count] * AUTOLAYOUT_LENGTH(50)) / 4.0f;
     for (UIImageView *imageView in self.rateImageViewArray) {
         imageView.left = starX;
         imageView.top = starY;
-        starX = CGRectGetMaxX(imageView.frame) + SeparationOfStar;
+        starX = CGRectGetMaxX(imageView.frame) + separater;
     }
     
     //调整结束信息位置

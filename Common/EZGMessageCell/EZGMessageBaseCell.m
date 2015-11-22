@@ -93,7 +93,7 @@
     CGFloat bubbleHeight = [self BubbleSizeWithMessage:message].height;
     return timestampHeight + MAX(avatarHeight, bubbleHeight) + kXHLabelPadding;
 }
-//计算内容部分的坐标和大小(不包括与气泡边线的间隔)
+//计算内容部分的坐标和大小(不包括内容与气泡边线的间隔)
 - (CGRect)calculateContentFrame {
     if (EZGBubbleMessageTypeReceiving == [self bubbleMessageType]) {
         return CGRectMake(self.bubbleImageView.left + kXHBubbleArrowWidth + kXHBubbleMarginHor,

@@ -474,8 +474,8 @@ static NSInteger const kOnePageSize = 10;
         
         //处理获得的图片对象
         if (pickedImage) {
-            [weakSelf didSendMessageWithPhoto:[weakSelf resizeImage:pickedImage]];
             [[ALAssetsLibrary new] saveImage:pickedImage toAlbum:@"EZGoal" completion:nil failure:nil];
+            [weakSelf didSendMessageWithPhoto:[YSCImageUtils resizeImage:pickedImage]];
         }
         else {
             [UIView showResultThenHideOnWindow:@"未选择图片"];
@@ -490,17 +490,12 @@ static NSInteger const kOnePageSize = 10;
     for (int i = 0; i<assets.count; i++) {
         ALAsset *asset = assets[i];
         UIImage *pickedImage = [UIImage imageWithCGImage:asset.defaultRepresentation.fullScreenImage];
-        UIImage *sendImage = [self resizeImage:pickedImage];
+        UIImage *sendImage = [YSCImageUtils resizeImage:pickedImage];
         [self didSendMessageWithPhoto:sendImage];
     }
 }
 - (void)assetPickerControllerDidCancel:(ZYQAssetPickerController *)picker {
     [picker dismissViewControllerAnimated:YES completion:nil];
-}
-- (UIImage *)resizeImage:(UIImage *)image {
-    CGFloat width = SCREEN_WIDTH_SCALE;
-    CGFloat height = width * (image.size.height / image.size.width);
-    return [YSCImageUtils resizeImage:image toSize:CGSizeMake(width, height)];
 }
 
 

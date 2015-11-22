@@ -54,7 +54,7 @@
     CGFloat carNumberHeight = [NSString HeightOfNormalString:Trim([carModel formatCarNumber])
                                                    maxWidth:kBubbleServiceTextWidth
                                                    withFont:kBubbleDetailFont];
-    CGFloat bubbleHeight = titleHeight + carBrandHeight + carNumberHeight + kXHBubbleMarginVer * 2.5;
+    CGFloat bubbleHeight = titleHeight + carBrandHeight + carNumberHeight + kXHBubbleMarginVer * 3.5;
     bubbleHeight = MAX(AUTOLAYOUT_LENGTH(160), bubbleHeight);
     return CGSizeMake(kBubbleServiceWidth, bubbleHeight);
 }
@@ -80,7 +80,7 @@
     
     //调整分割线位置
     self.separationLineLabel.left = self.carTitleLabel.left;
-    self.separationLineLabel.top = CGRectGetMaxY(self.carTitleLabel.frame) + kXHBubbleMarginVer / 2;
+    self.separationLineLabel.top = self.carTitleLabel.bottom + kXHBubbleMarginVer / 2;
     self.separationLineLabel.width = self.carTitleLabel.width;
     
     //调整车辆信息位置

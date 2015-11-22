@@ -30,7 +30,9 @@
         self.separationLineLabel.height = AUTOLAYOUT_LENGTH(1);
         self.separationLineLabel.backgroundColor = kDefaultBorderColor;
         
-        self.bubbleSceneImageView.size = AUTOLAYOUT_SIZE_WH(280, 145);
+        CGFloat sceneWidth = kBubbleServiceWidth - AUTOLAYOUT_LENGTH(10);
+        CGFloat sceneHeight = sceneWidth * 145.0f / 280.0f;
+        self.bubbleSceneImageView.size = CGSizeMake(sceneWidth, sceneHeight);
     }
     return self;
 }
@@ -41,7 +43,9 @@
     CGFloat titleHeight = [NSString HeightOfNormalString:Trim(message.text)
                                                 maxWidth:kBubbleServiceTextWidth
                                                 withFont:kBubbleTitleFont];
-    CGFloat bubbleHeight = titleHeight + AUTOLAYOUT_LENGTH(145) + kXHBubbleMarginVer * 1 + AUTOLAYOUT_LENGTH(1);
+    CGFloat sceneWidth = kBubbleServiceWidth - AUTOLAYOUT_LENGTH(10);
+    CGFloat sceneHeight = sceneWidth * 145.0f / 280.0f;
+    CGFloat bubbleHeight = titleHeight + sceneHeight + kXHBubbleMarginVer * 2.25 + AUTOLAYOUT_LENGTH(1);
     return CGSizeMake(kBubbleServiceWidth, bubbleHeight);
 }
 
@@ -70,7 +74,7 @@
     
     //调整分割线位置
     self.separationLineLabel.left = self.sceneTextLabel.left;
-    self.separationLineLabel.top = CGRectGetMaxY(self.sceneTextLabel.frame) + kXHBubbleMarginVer / 2;
+    self.separationLineLabel.top = self.sceneTextLabel.bottom + kXHBubbleMarginVer / 2;
     self.separationLineLabel.width = self.sceneTextLabel.width;
     
     //调整图片位置

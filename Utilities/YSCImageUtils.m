@@ -60,6 +60,11 @@
 }
 
 //调整图片大小
++ (UIImage *)resizeImage:(UIImage *)image {
+    CGFloat width = SCREEN_WIDTH_SCALE;
+    CGFloat height = width * (image.size.height / image.size.width);
+    return [self resizeImage:image toSize:CGSizeMake(width, height)];
+}
 + (UIImage *)resizeImage:(UIImage *)image toSize:(CGSize)size {
     return [self resizeImage:image toSize:size scale:NO];
 }
