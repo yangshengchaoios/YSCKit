@@ -24,7 +24,6 @@
 }
 - (void)viewDidLoad {
     [super viewDidLoad];
-    [AppConfigManager sharedInstance].currentViewController = self;
     APPDATA.chatUser = [[ChatUserModel alloc] initWithString:self.conv.attributes[OtherUserInfo] error:nil];
     self.title = Trim(APPDATA.chatUser.realName);
     [self updateUserInfo];

@@ -60,6 +60,7 @@ static NSInteger const kOnePageSize = 10;
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.isAppeared = NO;
+    [AppConfigManager sharedInstance].currentViewController = self;
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(receiveMessage:) name:kCDNotificationMessageReceived object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onMessageDelivered:) name:kCDNotificationMessageDelivered object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateStatusView) name:kCDNotificationConnectivityUpdated object:nil];
