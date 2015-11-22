@@ -641,14 +641,18 @@
         AVIMConversation *conv = [[CDConversationStore store] selectOneConversationByConvId:message.conversationId];
         //更新救援任务状态
         if ((IsAppTypeC && isUpdatedByC) || (IsAppTypeB && ! isUpdatedByC)) {
-            [RescueModel updateRescueInfo:@{kParamRescueId : conv.rescueId, kParamRescueStatus : @(rescueStatus)} block:^(NSObject *object, NSError *error) {
-                //更新conversation
-                [EZGDATA updateConversation:conv byParams:@{kParamEzgoalStatus : @(rescueStatus)} block:^(NSObject *object) {
-                    postN(kNotificationRefreshMessageCenter);//刷新消息中心
-                    APPDATA.isRescueModelChanged = YES;//通知会话页面，报告conv的状态已经更新了
-                    //FIXME:更新失败的处理？？？
-                }];
-            }];
+            [RescueModel updateRescueInfo:@{kParamRescueId : Trim(conv.rescueId),
+                                            kParamS4Id : Trim(conv.s4Id),
+                                            kParamRescueStatus : @(rescueStatus)
+                                            }
+                                    block:^(NSObject *object, NSError *error) {
+                                        //更新conversation
+                                        [EZGDATA updateConversation:conv byParams:@{kParamEzgoalStatus : @(rescueStatus)} block:^(NSObject *object) {
+                                            postN(kNotificationRefreshMessageCenter);//刷新消息中心
+                                            APPDATA.isRescueModelChanged = YES;//通知会话页面，报告conv的状态已经更新了
+                                            //FIXME:更新失败的处理？？？
+                                        }];
+                                    }];
         }
         else {
             //更新本地救援模型

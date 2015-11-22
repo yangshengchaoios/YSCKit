@@ -61,6 +61,9 @@ static NSString *ObjectTagKeyUpdatedTime = @"ObjectTagKeyUpdatedTime";
 - (NSString *)rescueId {
     return Trim(self.attributes[kParamRescueId]);
 }
+- (NSString *)s4Id {
+    return Trim(self.attributes[kParamS4Id]);
+}
 + (NSString *)nameOfUserIds:(NSArray *)userIds {
     NSMutableArray *names = [NSMutableArray array];
     for (int i = 0; i < userIds.count; i++) {

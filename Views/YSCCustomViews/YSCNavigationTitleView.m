@@ -11,7 +11,7 @@
 @implementation YSCNavigationTitleView
 
 + (instancetype)CreateTitleViewByWidth:(CGFloat)width {
-    YSCNavigationTitleView *titleView = [[YSCNavigationTitleView alloc] initWithFrame:AUTOLAYOUT_CGRECT(0, 0, width, 80)];
+    YSCNavigationTitleView *titleView = [[YSCNavigationTitleView alloc] initWithFrame:AUTOLAYOUT_CGRECT(0, 0, width, 75)];
     return titleView;
 }
 
@@ -29,7 +29,7 @@
             make.top.equalTo(self.mas_top);
             make.left.equalTo(self.mas_left);
             make.right.equalTo(self.mas_right);
-            make.height.equalTo(@AUTOLAYOUT_LENGTH(50));
+            make.height.equalTo(@AUTOLAYOUT_LENGTH(45));
         }];
         
         self.subTitleLabel = [[UILabel alloc] initWithFrame:CGRectZero];
