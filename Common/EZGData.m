@@ -436,6 +436,7 @@
                                                      [UIView showAlertVieWithMessage:@"建立会话失败，请检查网络连接！"];
                                                  }
                                                  else {// 跳转到 ChatView 页面进行聊天
+                                                     [[CDConversationStore store] updateConversation:conversation];//将会话保存在本地
                                                      [EZGDATA openChatRoomByConversion:conversation byParams:params];
                                                  }
                                              }];
@@ -477,10 +478,12 @@
     ReturnWhenObjectIsEmpty(currentViewController);
     if ([currentViewController isKindOfClass:NSClassFromString(@"CDChatRoomVC")]) {//如果处于聊天界面，但不是即将打开的会话，则需要先关闭再打开
         if (NO == [conversation.conversationId isEqualToString:[CDChatManager manager].chattingConversationId]) {
-            [currentViewController.navigationController popViewControllerAnimated:NO];
-            [self bk_performBlock:^(id obj) {
-                [EZGDATA openChatRoomByConversion:conversation byParams:params];
-            } afterDelay:1];
+            CDChatRoomVC *chatRoom = (CDChatRoomVC *)currentViewController;
+            [chatRoom closeCurrentViewControllerAnimated:NO block:^{
+                [EZGDATA bk_performBlock:^(id obj) {//TODO:test
+                    [EZGDATA openChatRoomByConversion:conversation byParams:params];
+                } afterDelay:1];
+            }];
         }
     }
     else if ([currentViewController isKindOfClass:NSClassFromString(@"EZGFastRescueViewController")]) {//需要关闭快速救援入口窗口
@@ -505,7 +508,6 @@
         }
         else {
             UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:chatRoom];
-            navigationController.navigationController.navigationBar.translucent = NO;
             [currentViewController presentViewController:navigationController animated:YES completion:nil];
         }
     }

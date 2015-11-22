@@ -21,6 +21,8 @@
 @property (nonatomic, assign) BOOL isAppeared;
 
 - (instancetype)initWithConv:(AVIMConversation *)conv;
+//关闭当前会话页面
+- (void)closeCurrentViewControllerAnimated:(BOOL)animated block:(YSCBlock)block;
 //重置conv
 - (void)resetConversation;
 

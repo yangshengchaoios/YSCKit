@@ -423,7 +423,16 @@
 
 //判断是否为空
 - (BOOL)isCellDataEmpty {
-    return [self.cellDataArray count] == 0;
+    if (isEmpty(self.cellDataArray)) {
+        return YES;
+    }
+    //如果有空数组
+    for (NSArray *array in self.cellDataArray) {
+        if (isNotEmpty(array)) {
+            return NO;
+        }
+    }
+    return YES;
 }
 //判断cell是否最后一个
 - (BOOL)isLastCellByIndexPath:(NSIndexPath *)indexPath {

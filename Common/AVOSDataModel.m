@@ -75,12 +75,17 @@
     return self;
 }
 + (void)uploadDeviceInfo {
-    if (1 != [kUploadDeviceInfo integerValue]) {
+    NSDate *lastUploadDate = GetCacheObject(@"lastUploadDeviceInfoDate");
+    NSInteger intervalMinutes = [kUploadDeviceInfoInterval integerValue];
+    if (nil == lastUploadDate) {
+        lastUploadDate = [NSDate dateWithMinutesBeforeNow:2 * intervalMinutes];
+    }
+    NSInteger currentMinutes = [[NSDate date] minutesAfterDate:lastUploadDate];
+    if (currentMinutes < intervalMinutes) {
+        NSLog(@"pause uploading device info...");
         return;
     }
-    
-    //TODO:改为间隔时间
-    
+    //保存设备信息
     AVQuery *query = [AVOSDevice query];
     [query whereKey:@"udid" equalTo:[AppConfigManager sharedInstance].udid];
     [query findObjectsInBackgroundWithBlock:^(NSArray *objects, NSError *error) {
@@ -95,7 +100,9 @@
         if (device && isNotEmpty(device.udid)) {
             device.appVersion = ProductVersion;
             [device saveInBackgroundWithBlock:^(BOOL succeeded, NSError *error) {
-                
+                if (succeeded) {
+                    SaveCacheObject([NSDate date], @"lastUploadDeviceInfoDate");
+                }
             }];
         }
     }];

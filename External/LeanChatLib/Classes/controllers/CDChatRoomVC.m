@@ -87,25 +87,41 @@ static NSInteger const kOnePageSize = 10;
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithImage:DefaultNaviBarArrowBackImage
                                                                              style:UIBarButtonItemStylePlain
                                                                             target:self
-                                                                            action:@selector(backButtonClicked:)];
+                                                                            action:@selector(closeCurrentViewController)];
 }
-- (void)backButtonClicked:(id)sender {
+- (void)closeCurrentViewController {
+    [self closeCurrentViewControllerAnimated:YES block:nil];
+}
+//关闭当前会话页面
+- (void)closeCurrentViewControllerAnimated:(BOOL)animated block:(YSCBlock)block {
     if (self.messageInputView.isRecording) {
         return ;//正在录音中
     }
     if (self.navigationController) {            //如果有navigationBar
         NSInteger index = [self.navigationController.viewControllers indexOfObject:self];
         if (index > 0) {                        //不是root，就返回上一级
-            [self.navigationController popViewControllerAnimated:YES];
+            [self.navigationController popViewControllerAnimated:animated];
+            if (block) {
+                block();
+            }
         }
         else {
-            [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
+            [self.presentingViewController dismissViewControllerAnimated:animated completion:^{
+                if (block) {
+                    block();
+                }
+            }];
         }
     }
     else {
-        [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
+        [self.presentingViewController dismissViewControllerAnimated:animated completion:^{
+            if (block) {
+                block();
+            }
+        }];
     }
 }
+
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
     [CDChatManager manager].chattingConversationId = self.conv.conversationId;
@@ -212,6 +228,7 @@ static NSInteger const kOnePageSize = 10;
         }
         else if (error.code == kAVIMErrorConnectionLost) {
             [UIView showResultThenHideOnWindow:@"未能连接聊天服务器"];
+            postN(kNotificationConnectToChatServer);
         }
         else if ([error.domain isEqualToString:NSURLErrorDomain]) {
             [UIView showResultThenHideOnWindow:@"网络连接错误"];

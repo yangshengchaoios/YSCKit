@@ -38,7 +38,7 @@
     self.tableView.requestType = RequestTypeCustomResponse;
     self.tableView.header = [MJRefreshNormalHeader headerWithRefreshingBlock:^{
         if (ISLOGGED) {
-            if ([weakSelf.tableView.cellDataArray count] == 0) {
+            if (NO == [[CDConversationStore store] isConversationExists]) {
                 [weakSelf refreshConversationsFromInternet];
             }
             else {
@@ -97,6 +97,7 @@
             NSMutableArray *tempArray = weakSelf.tableView.cellDataArray[indexPath.section];
             [tempArray removeObjectAtIndex:indexPath.row];
             [weakSelf.tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
+            weakSelf.tableView.tipsView.hidden = ! [weakSelf.tableView isCellDataEmpty];
         }];
         [alertView bk_setCancelButtonWithTitle:@"取消" handler:nil];
         [alertView show];
