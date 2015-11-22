@@ -97,9 +97,12 @@
         return [NSString stringWithFormat:@"%ld天 %02ld:%02ld:%02ld", (long)dateComponents.day,
                 (long)dateComponents.hour, (long)dateComponents.minute, (long)dateComponents.second];
     }
-    else {
+    else if (dateComponents.hour > 0) {
         return [NSString stringWithFormat:@"%02ld:%02ld:%02ld",
                 (long)dateComponents.hour, (long)dateComponents.minute, (long)dateComponents.second];
+    }
+    else {
+        return [NSString stringWithFormat:@"%02ld:%02ld", (long)dateComponents.minute, (long)dateComponents.second];
     }
 }
 
