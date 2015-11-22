@@ -23,7 +23,7 @@
         [self.contentView addSubview:self.cancelDetailLabel];
         
         self.cancelTitleLabel.backgroundColor = [UIColor clearColor];
-        self.cancelTitleLabel.textColor = kBubbleTitleFontColor;
+        self.cancelTitleLabel.textColor = kDefaultTextColorRed1;
         self.cancelTitleLabel.font = kBubbleTitleFont;
         self.cancelTitleLabel.numberOfLines = 2;
         
