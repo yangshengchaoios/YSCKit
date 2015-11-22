@@ -1,5 +1,5 @@
 //
-//  EZGScenePhotoListCell.h
+//  EZGAccidentPhotoListCell.h
 //  EZGoal
 //
 //  Created by yangshengchao on 15/11/16.
@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
-@interface EZGScenePhotoListCell : YSCBaseTableViewCell
+@interface EZGAccidentPhotoListCell : YSCBaseTableViewCell
 @property (nonatomic, weak) IBOutlet UIView *containerView;
 @property (nonatomic, weak) IBOutlet UILabel *imageDescLabel;
 @property (nonatomic, weak) IBOutlet NSLayoutConstraint *imageDescWidth;

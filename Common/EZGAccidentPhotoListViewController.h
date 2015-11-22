@@ -1,5 +1,5 @@
 //
-//  EZGScenePhotoListViewController.h
+//  EZGAccidentPhotoListViewController.h
 //  EZGoal
 //
 //  Created by yangshengchao on 15/11/16.
@@ -8,6 +8,6 @@
 
 #import "YSCBaseViewController.h"
 
-@interface EZGScenePhotoListViewController : YSCBaseViewController
+@interface EZGAccidentPhotoListViewController : YSCBaseViewController
 
 @end

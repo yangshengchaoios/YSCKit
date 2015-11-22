@@ -1,19 +1,19 @@
 //
-//  EZGScenePhotoListViewController.m
+//  EZGAccidentPhotoListViewController.m
 //  EZGoal
 //
 //  Created by yangshengchao on 15/11/16.
 //  Copyright © 2015年 Builder. All rights reserved.
 //
 
-#import "EZGScenePhotoListViewController.h"
+#import "EZGAccidentPhotoListViewController.h"
 
-@interface EZGScenePhotoListViewController ()
+@interface EZGAccidentPhotoListViewController ()
 @property (nonatomic, weak) IBOutlet YSCTableView *tableView;
 @property (nonatomic, strong) NSMutableArray *sceneImageArray;
 @end
 
-@implementation EZGScenePhotoListViewController
+@implementation EZGAccidentPhotoListViewController
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -34,7 +34,7 @@
 - (void)initTableViewForView {
     NSMutableArray *imageUrlArray = [NSMutableArray array];
     WEAKSELF
-    self.tableView.cellName = @"EZGScenePhotoListCell";
+    self.tableView.cellName = @"EZGAccidentPhotoListCell";
     self.tableView.methodName = kResPathAccidentDetail;
     self.tableView.enableLoadMore = NO;
     self.tableView.tipsEmptyText = @"亲，暂无您的现场照片数据哟！";
@@ -95,7 +95,7 @@
     self.tableView.enableRefresh = NO;
     self.tableView.enableLoadMore = NO;
     self.tableView.requestType = RequestTypeCustomResponse;
-    self.tableView.cellName = @"EZGScenePhotoListCell";
+    self.tableView.cellName = @"EZGAccidentPhotoListCell";
     self.tableView.cellHeightBlock = ^CGFloat(NSIndexPath *indexPath) {
         if ([weakSelf.tableView isLastCellByIndexPath:indexPath]) {
             return AUTOLAYOUT_LENGTH(360);
