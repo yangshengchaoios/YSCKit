@@ -387,13 +387,23 @@
                 if (isEmpty(error) && objects.count > 0) {
                     conversation = objects[0];
                 }
-                
                 if (conversation) {
                     [EZGDATA openChatRoomByConversion:conversation byParams:paramsChatRoom];
                 }
                 else {
-                    [UIView showResultThenHideOnWindow:@"查询救援会话出错"];
-                    [AppData resetRescueModel:nil];
+                    if (isEmpty(error)) {//如果是之前创建会话失败，可以自动再次创建救援会话
+                        NSDictionary *params = @{kParamOtherId  : Trim(userInfo[kParamOtherId]),
+                                                 kParamChatRoom : userInfo[kParamChatRoom],
+                                                 kParamExtendAttributes : userInfo[kParamExtendAttributes]};
+                        postNWithInfo(kNotificationOpenChatRoom, params);
+                    }
+                    else {
+                        NSString *errMsg = [NSString stringWithFormat:@"查询救援会话出错：%@", error];
+                        [LogManager saveLog:errMsg];
+                        NSLog(@"err:%@", errMsg);
+                        [UIView showResultThenHideOnWindow:@"查询救援会话出错"];
+                        [AppData resetRescueModel:nil];
+                    }
                 }
             }];
         }
@@ -433,6 +443,7 @@
                                                      NSLog(@"connect to LeanCloudIM server error:%@", error);
                                                      NSString *errMsg = [NSString stringWithFormat:@"fetchConvWithMembers:%@ attributes:%@ error:%@",members, attributes, error];
                                                      [LogManager saveLog:errMsg];
+                                                     NSLog(@"建立会话失败：%@", errMsg);
                                                      [UIView showAlertVieWithMessage:@"建立会话失败，请检查网络连接！"];
                                                  }
                                                  else {// 跳转到 ChatView 页面进行聊天
