@@ -12,6 +12,8 @@
 
 @property (weak, nonatomic) IBOutlet UIScrollView *zoomScrollView;
 @property (weak, nonatomic) IBOutlet UIImageView *photoImageView;
+@property (weak, nonatomic) IBOutlet UIActivityIndicatorView *indicatorView;
+@property (weak, nonatomic) IBOutlet UILabel *indicatorLabel;
 @property (strong, nonatomic) UIImage *savedImage;
 
 @end

@@ -42,8 +42,6 @@
     [self.indexLabel makeRoundWithRadius:AUTOLAYOUT_LENGTH(40) / 2];
     [self.saveButton makeBorderWithColor:[UIColor lightGrayColor] borderWidth:1];
     [self.closeButton makeBorderWithColor:[UIColor lightGrayColor] borderWidth:1];
-//    [self.saveButton makeRoundWithRadius:AUTOLAYOUT_LENGTH(60) / 2];
-//    [self.closeButton makeRoundWithRadius:AUTOLAYOUT_LENGTH(60) / 2];
     
     //1. 初始化数据源模型数组
     self.dataArray = [NSMutableArray array];
@@ -57,6 +55,12 @@
         for (UIImage *image in (NSArray *)self.params[kParamImages]) {
             YSCPhotoBrowseCellModel *model = [YSCPhotoBrowseCellModel CreateModelByImageUrl:nil image:image];
             [self.dataArray addObject:model];
+        }
+    }
+    else if (self.params[kParamImageModels]) {//直接传入模型数组，解决数据源单一问题(即同时支持image和url的图片显示)
+        NSArray *array = self.params[kParamImageModels];
+        if ([array isKindOfClass:[NSArray class]] && [array count] > 0) {
+            [self.dataArray addObjectsFromArray:array];
         }
     }
     //2. 刷新数据源

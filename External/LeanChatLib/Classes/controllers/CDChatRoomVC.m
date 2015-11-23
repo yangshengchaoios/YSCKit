@@ -343,28 +343,37 @@ static NSInteger const kOnePageSize = 10;
         }
         //打开图片浏览器
         YSCBaseViewController *photoDetail = (YSCBaseViewController *)[UIResponder createBaseViewController:@"YSCPhotoBrowseViewController"];
-        if (message.file.isDataAvailable) {
-            NSData *imageData = [message.file getData];
-            if (imageData) {
-                UIImage *image = [UIImage imageWithData:imageData];
-                photoDetail.params = @{kParamImages : @[image]};
-                [self.navigationController pushViewController:photoDetail animated:NO];
+        
+        //NOTE:遍历当前消息数组里所有的图片
+        NSMutableArray *photoArray = [NSMutableArray array];
+        NSInteger photoIndex = 0;
+        for (AVIMTypedMessage *msg in self.messages) {
+            if (kAVIMMessageMediaTypeImage == msg.mediaType) {
+                YSCPhotoBrowseCellModel *model = [YSCPhotoBrowseCellModel new];
+                if (msg.file.isDataAvailable) {
+                    NSData *imageData = [msg.file getData];
+                    if (imageData) {
+                        model.image = [UIImage imageWithData:imageData];
+                    }
+                    else {
+                        model.imageUrl = Trim(msg.file.url);
+                    }
+                }
+                else if (isNotEmpty(msg.file.localPath)) {
+                    model.imageUrl = Trim(msg.file.localPath);
+                }
+                else if (isNotEmpty(msg.file.url)) {
+                    model.imageUrl = Trim(msg.file.url);
+                }
+                
+                [photoArray addObject:model];
+                if ([message.messageId isEqualToString:msg.messageId]) {
+                    photoIndex = [photoArray count] - 1;
+                }
             }
-            else {
-                [UIView showResultThenHideOnWindow:@"图片数据问题"];
-            }
         }
-        else if (isNotEmpty(message.file.localPath)) {
-            photoDetail.params = @{kParamImageUrls : @[Trim(message.file.localPath)]};
-            [self.navigationController pushViewController:photoDetail animated:NO];
-        }
-        else if (isNotEmpty(message.file.url)) {
-            photoDetail.params = @{kParamImageUrls : @[Trim(message.file.url)]};
-            [self.navigationController pushViewController:photoDetail animated:NO];
-        }
-        else {
-            [UIView showResultThenHideOnWindow:@"图片下载中"];
-        }
+        photoDetail.params = @{kParamImageModels : photoArray, kParamIndex : @(photoIndex)};
+        [self.navigationController pushViewController:photoDetail animated:NO];
     }
     else if (kAVIMMessageMediaTypeLocation == message.mediaType) {//查看位置
         YSCBaseViewController *mapViewController = (YSCBaseViewController *)[UIResponder createBaseViewController:@"YSCLocationDisplayViewController"];
