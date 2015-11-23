@@ -23,7 +23,7 @@
 }
 
 + (CGFloat)HeightOfCellByObject:(NSObject *)object {
-    return AUTOLAYOUT_LENGTH(80);
+    return AUTOLAYOUT_LENGTH(90);
 }
 
 /**
