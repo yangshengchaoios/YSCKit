@@ -928,8 +928,10 @@ static CGPoint  delayOffset = {0.0};
         EZGMessageImageCell *imageCell = (EZGMessageImageCell *)cell;
         WEAKSELF
         imageCell.block = ^{
-            [weakSelf.messageTableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationNone];
-            [weakSelf scrollToBottomAnimated:YES];
+            [tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationNone];
+            if (indexPath.row == [weakSelf.messages count] - 1) {
+                [tableView scrollToRowAtIndexPath:indexPath atScrollPosition:UITableViewScrollPositionBottom animated:YES];
+            }
         };
     }
     else if (kAVIMMessageMediaTypeLocation == message.mediaType) {

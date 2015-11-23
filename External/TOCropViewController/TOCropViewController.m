@@ -77,19 +77,19 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
         _transitionController = [[TOCropViewControllerTransitioning alloc] init];
         _image = image;
         _ratioArray = [NSMutableArray array];
-        [_ratioArray addObject:@"Original"];
-        [_ratioArray addObject:@"Square"];
-        for (NSString *title in array) {
-            if ([title isContains:@":"]) {
-                [_ratioArray addObject:Trim(title)];
-            }
+        if (isNotEmpty(array)) {
+            [_ratioArray addObjectsFromArray:array];
+        }
+        else {
+            [_ratioArray addObject:@"Original"];
+            [_ratioArray addObject:@"Square"];
         }
     }
     
     return self;
 }
 - (instancetype)initWithImage:(UIImage *)image {
-    return [self initWithImage:image ratioArray:@[@"3:2", @"5:3", @"4:3", @"5:4", @"16:9"]];
+    return [self initWithImage:image ratioArray:@[@"Original", @"Square", @"3:2", @"5:3", @"4:3", @"5:4", @"16:9"]];
 }
 
 - (void)viewDidLoad
@@ -276,16 +276,20 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
     BOOL verticalCropBox = self.cropView.cropBoxAspectRatioIsPortrait;
     UIActionSheet *actionSheet = [UIActionSheet bk_actionSheetWithTitle:nil];
     WEAKSELF
-    [actionSheet bk_addButtonWithTitle:NSLocalizedStringFromTableInBundle(@"Original",@"TOCropViewControllerLocalizable",
-                                                                          [NSBundle bundleForClass:[self class]],nil)
-                               handler:^{
-                                   [weakSelf doCropImageWithSize:CGSizeZero];
-                               }];
-    [actionSheet bk_addButtonWithTitle:NSLocalizedStringFromTableInBundle(@"Square",@"TOCropViewControllerLocalizable",
-                                                                          [NSBundle bundleForClass:[self class]],nil)
-                               handler:^{
-                                   [weakSelf doCropImageWithSize:CGSizeMake(1.0f, 1.0f)];
-                               }];
+    if ([self.ratioArray containsObject:@"Original"]) {
+        [actionSheet bk_addButtonWithTitle:NSLocalizedStringFromTableInBundle(@"Original",@"TOCropViewControllerLocalizable",
+                                                                              [NSBundle bundleForClass:[self class]],nil)
+                                   handler:^{
+                                       [weakSelf doCropImageWithSize:CGSizeZero];
+                                   }];
+    }
+    if ([self.ratioArray containsObject:@"Square"]) {
+        [actionSheet bk_addButtonWithTitle:NSLocalizedStringFromTableInBundle(@"Square",@"TOCropViewControllerLocalizable",
+                                                                              [NSBundle bundleForClass:[self class]],nil)
+                                   handler:^{
+                                       [weakSelf doCropImageWithSize:CGSizeMake(1.0f, 1.0f)];
+                                   }];
+    }
     
     //动态添加比例
     for (NSString *buttonTitle in self.ratioArray) {
