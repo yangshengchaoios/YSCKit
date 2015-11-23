@@ -491,9 +491,9 @@
         if (NO == [conversation.conversationId isEqualToString:[CDChatManager manager].chattingConversationId]) {
             CDChatRoomVC *chatRoom = (CDChatRoomVC *)currentViewController;
             [chatRoom closeCurrentViewControllerAnimated:NO block:^{
-                [EZGDATA bk_performBlock:^(id obj) {//TODO:test
+                [EZGDATA bk_performBlock:^(id obj) {
                     [EZGDATA openChatRoomByConversion:conversation byParams:params];
-                } afterDelay:1];
+                } afterDelay:0.3];
             }];
         }
     }

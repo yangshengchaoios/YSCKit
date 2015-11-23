@@ -343,19 +343,24 @@ static NSInteger const kOnePageSize = 10;
         }
         //打开图片浏览器
         YSCBaseViewController *photoDetail = (YSCBaseViewController *)[UIResponder createBaseViewController:@"YSCPhotoBrowseViewController"];
-        if (isNotEmpty(message.file.localPath)) {
-            photoDetail.params = @{kParamImageUrls : @[Trim(message.file.localPath)]};
-            [self.navigationController pushViewController:photoDetail animated:NO];
-        }
-        else if (message.file.isDataAvailable) {
+        if (message.file.isDataAvailable) {
             NSData *imageData = [message.file getData];
             if (imageData) {
-                photoDetail.params = @{kParamImages : @[imageData]};
+                UIImage *image = [UIImage imageWithData:imageData];
+                photoDetail.params = @{kParamImages : @[image]};
                 [self.navigationController pushViewController:photoDetail animated:NO];
             }
             else {
                 [UIView showResultThenHideOnWindow:@"图片数据问题"];
             }
+        }
+        else if (isNotEmpty(message.file.localPath)) {
+            photoDetail.params = @{kParamImageUrls : @[Trim(message.file.localPath)]};
+            [self.navigationController pushViewController:photoDetail animated:NO];
+        }
+        else if (isNotEmpty(message.file.url)) {
+            photoDetail.params = @{kParamImageUrls : @[Trim(message.file.url)]};
+            [self.navigationController pushViewController:photoDetail animated:NO];
         }
         else {
             [UIView showResultThenHideOnWindow:@"图片下载中"];
@@ -475,7 +480,7 @@ static NSInteger const kOnePageSize = 10;
         
         //处理获得的图片对象
         if (pickedImage) {
-            [[ALAssetsLibrary new] saveImage:pickedImage toAlbum:@"EZGoal" completion:nil failure:nil];
+            [[ALAssetsLibrary new] saveImage:pickedImage toAlbum:@"翼畅行" completion:nil failure:nil];
             [weakSelf didSendMessageWithPhoto:[YSCImageUtils resizeImage:pickedImage]];
         }
         else {

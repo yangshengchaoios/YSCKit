@@ -47,13 +47,12 @@
 //显示message
 - (void)layoutMessage:(AVIMImageMessage *)message displaysTimestamp:(BOOL)displayTimestamp {
     [super layoutMessage:message displaysTimestamp:displayTimestamp];
+    self.bubblePhotoImageView.image = kDefaultMessageImage;
     
     WEAKSELF
     if (message.file.isDataAvailable) {
-        UIImage *image = kDefaultMessageImage;
         NSData *data = [message.file getData:nil];
         if (data) {
-            image = [UIImage imageWithData:data];
             //NOTE:这里要刷新cell，重新计算cell高度
             if ([@"0" isEqualToString:Trim(message.text)]) {
                 if (self.block) {
@@ -61,19 +60,17 @@
                 }
             }
             message.text = @"1";//关闭重新刷新cell的开关
+            self.bubblePhotoImageView.image = [UIImage imageWithData:data];
         }
-        self.bubblePhotoImageView.image = image;
     }
-    else {
-        //异步下载图片
-        self.bubblePhotoImageView.image = kDefaultMessageImage;
+    else {//异步下载图片
         [message.file getDataInBackgroundWithBlock:^(NSData *data, NSError *error) {
             if (data) {
-                message.text = @"1";//关闭重新刷新cell的开关
-                weakSelf.bubblePhotoImageView.image = [UIImage imageWithData:data];
                 if (weakSelf.block) {//NOTE:下载完成后刷新cell，重新计算cell高度
                     weakSelf.block();
                 }
+                message.text = @"1";//关闭重新刷新cell的开关
+                weakSelf.bubblePhotoImageView.image = [UIImage imageWithData:data];
             }
         }];
     }
@@ -93,14 +90,13 @@
     return action == @selector(save:);
 }
 - (void)save:(id)sender {
-    //FIXME:判断是否显示图片
     [self resignFirstResponder];
     [UIView showHUDLoadingOnWindow:@"正在保存"];
-    [[ALAssetsLibrary new] saveImage:self.bubblePhotoImageView.image toAlbum:@"EZGoal" completion:^(NSURL *assetURL, NSError *error) {
+    [[ALAssetsLibrary new] saveImage:self.bubblePhotoImageView.image toAlbum:@"翼畅行" completion:^(NSURL *assetURL, NSError *error) {
         [UIView showResultThenHideOnWindow:@"保存成功"];
     } failure:^(NSError *error) {
         [UIView showResultThenHideOnWindow:@"保存失败！"];
-    }];//保存至相册
+    }];
 }
 
 @end

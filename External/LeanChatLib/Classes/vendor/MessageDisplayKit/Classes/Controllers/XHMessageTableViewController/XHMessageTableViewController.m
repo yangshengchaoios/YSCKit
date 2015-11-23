@@ -929,6 +929,7 @@ static CGPoint  delayOffset = {0.0};
         WEAKSELF
         imageCell.block = ^{
             [weakSelf.messageTableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationNone];
+            [weakSelf scrollToBottomAnimated:YES];
         };
     }
     else if (kAVIMMessageMediaTypeLocation == message.mediaType) {
