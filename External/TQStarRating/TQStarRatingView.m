@@ -12,6 +12,7 @@
 
 @property (nonatomic, strong) UIView *starBackgroundView;
 @property (nonatomic, strong) UIView *starForegroundView;
+@property (nonatomic, assign) CGFloat starWidth;
 
 @end
 
@@ -92,7 +93,7 @@
         score = 1;
     }
     
-    CGPoint point = CGPointMake(score * self.frame.size.width, 0);
+    CGPoint point = CGPointMake(score * self.starWidth * self.numberOfStar, 0);
     
     if(isAnimate)
     {
@@ -162,6 +163,8 @@
         CGRect imageFrame = CGRectMake(i * frame.size.width / self.numberOfStar, 0, frame.size.width / self.numberOfStar, frame.size.height);
         imageView.frame = AUTOLAYOUT_CGRECT(imageFrame.origin.x, imageFrame.origin.y, imageFrame.size.width, imageFrame.size.height);
         [view addSubview:imageView];
+        self.starWidth = imageView.width;
+        
     }
     return view;
 }
