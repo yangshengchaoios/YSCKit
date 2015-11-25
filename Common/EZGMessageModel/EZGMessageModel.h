@@ -32,10 +32,18 @@ typedef NS_ENUM(NSInteger, EZGServiceType) {
 };
 
 //ezgoalType参数值定义(用于区分普通聊天会话)
-static const NSString *EzgoalTypeRescue         = @"BRescueRepresent";
-static const NSString *EzgoalTypeReservation    = @"BReservationRepresent";
-static const NSString *EzgoalTypeCustomer       = @"BCustomerRepresent";
-static const NSString *EzgoalTypeSalePerson     = @"BSalePersonRepresent";
+static const NSString *EzgoalTypeRescue         = @"RescueModule";
+static const NSString *EzgoalTypeReservation    = @"ReservationModule";
+static const NSString *EzgoalTypeCustomer       = @"CustomerModule";
+static const NSString *EzgoalTypeNewCar         = @"NewCarModule";
+static const NSString *EzgoalTypeUsedCar        = @"UsedCarModule";
+static const NSString *EzgoalTypeNews           = @"NewsModule";
+static const NSString *EzgoalTypeDataReport     = @"DataReportModule";
+static const NSString *EzgoalTypeShop           = @"ShopModule";
+static const NSString *EzgoalTypeStaff          = @"StaffModule";
+static const NSString *EzgoalTypeContact        = @"ContactModule";
+static const NSString *EzgoalTypeNotice         = @"NoticeModule";
+
 
 //消息扩展参数名定义
 #define MParamSceneType                 @"sceneType"        //现场照片类型
