@@ -10,6 +10,26 @@
 
 @implementation EZGManager
 
+//格式化评分
++ (float)FormatStaffScore:(NSNumber *)score {
+    float tempValue = score.floatValue / 5.0f;
+    if (tempValue > 0.8f && tempValue < 1.0f) {
+        tempValue = 0.9f;
+    }
+    else if (tempValue > 0.6f && tempValue < 0.8f) {
+        tempValue = 0.7f;
+    }
+    else if (tempValue > 0.4f && tempValue < 0.6f) {
+        tempValue = 0.5f;
+    }
+    else if (tempValue > 0.2f && tempValue < 0.4f) {
+        tempValue = 0.3f;
+    }
+    else if (tempValue > 0.0f && tempValue < 0.2f) {
+        tempValue = 0.1f;
+    }
+    return tempValue;
+}
 //判断救援状态是否还在处理中
 + (BOOL)checkRescueStatusIsProcessing:(RescueStatusType)rescueStatus {
     return (RescueStatusTypeUnProcess == rescueStatus ||

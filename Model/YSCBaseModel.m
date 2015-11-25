@@ -102,10 +102,14 @@
                   andDictParam:params
                      modelName:[self class]
               requestSuccessed:^(id responseObject) {
-                  block(responseObject, nil);
+                  if (block) {
+                      block(responseObject, nil);
+                  }
               }
                 requestFailure:^(NSInteger errorCode, NSString *errorMessage) {
-                    block(nil, CreateNSError(errorMessage));
+                    if (block) {
+                        block(nil, CreateNSError(errorMessage));
+                    }
                 }];
 }
 + (void)PostByMethod:(NSString *)method params:(NSDictionary *)params block:(YSCObjectResultBlock)block {

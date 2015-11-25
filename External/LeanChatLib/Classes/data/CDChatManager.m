@@ -132,16 +132,12 @@ static CDChatManager *instance;
                 callback(objects[0], nil);
             }
             else {//创建一个新的会话
-                NSString *name = nil;
-                if (type == CDConvTypeGroup) {// 群聊默认名字， 老王、小李
-                    name = [AVIMConversation nameOfUserIds:members];
-                }
                 NSMutableDictionary *tempAttr = [NSMutableDictionary dictionary];
                 tempAttr[CONV_TYPE] = @(type);
                 if (isNotEmpty(attributes)) {//新增扩展属性
                     [tempAttr addEntriesFromDictionary:attributes];
                 }
-                [[AVIMClient defaultClient] createConversationWithName:name clientIds:members attributes:tempAttr options:AVIMConversationOptionNone callback:callback];
+                [[AVIMClient defaultClient] createConversationWithName:nil clientIds:members attributes:tempAttr options:AVIMConversationOptionNone callback:callback];
             }
         }
     }];
@@ -190,15 +186,8 @@ static CDChatManager *instance;
 
 #pragma mark - utils
 - (void)sendMessage:(AVIMTypedMessage*)message conversation:(AVIMConversation *)conversation callback:(AVBooleanResultBlock)block {
-    id<CDUserModel> selfUser = [[CDChatManager manager].userDelegate getUserById:self.selfId];
     NSMutableDictionary *attributes = [NSMutableDictionary dictionary];
-    // 云代码中获取到用户名，来设置推送消息, 老王:今晚约吗？
-    if (selfUser.username) {
-        [attributes setObject:selfUser.username forKey:@"username"];
-    }
-    if (self.useDevPushCerticate) {
-        [attributes setObject:@YES forKey:@"dev"];
-    }
+    [attributes setObject:Trim(APPDATA.chatUser.userName) forKey:@"username"];
     if (message.attributes == nil) {
         message.attributes = attributes;
     } else {

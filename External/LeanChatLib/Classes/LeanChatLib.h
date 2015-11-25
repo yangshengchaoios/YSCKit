@@ -15,7 +15,6 @@ FOUNDATION_EXPORT double LeanChatLibVersionNumber;
 FOUNDATION_EXPORT const unsigned char LeanChatLibVersionString[];
 
 // In this header, you should import all the public headers of your framework using statements like #import <LeanChatLib/PublicHeader.h>
-#import "CDChatListVC.h"
 #import "CDChatRoomVC.h"
 #import "CDChatManager.h"
 #import "CDUserModel.h"

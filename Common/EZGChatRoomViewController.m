@@ -25,7 +25,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     APPDATA.chatUser = [[ChatUserModel alloc] initWithString:self.conv.attributes[OtherUserInfo] error:nil];
-    self.title = Trim(APPDATA.chatUser.realName);
+    self.title = Trim(APPDATA.chatUser.userName);
     [self updateUserInfo];
     
     WEAKSELF
@@ -46,7 +46,7 @@
         if (object) {
             ChatUserModel *chatUser = (ChatUserModel *)object;
             APPDATA.chatUser = chatUser;
-            weakSelf.title = Trim(chatUser.realName);
+            weakSelf.title = Trim(chatUser.userName);
             [weakSelf.messageTableView reloadData];//刷新本页列表
             
             //更新conversation

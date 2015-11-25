@@ -64,26 +64,6 @@ static NSString *ObjectTagKeyUpdatedTime = @"ObjectTagKeyUpdatedTime";
 - (NSString *)s4Id {
     return Trim(self.attributes[kParamS4Id]);
 }
-+ (NSString *)nameOfUserIds:(NSArray *)userIds {
-    NSMutableArray *names = [NSMutableArray array];
-    for (int i = 0; i < userIds.count; i++) {
-        id <CDUserModel> user = [[CDChatManager manager].userDelegate getUserById:[userIds objectAtIndex:i]];
-        [names addObject:user.username];
-    }
-    return [names componentsJoinedByString:@","];
-}
-
-- (NSString *)displayName {
-    if ([self type] == CDConvTypeSingle) {
-        NSString *otherId = [self otherId];
-        id <CDUserModel> other = [[CDChatManager manager].userDelegate getUserById:otherId];
-        return other.username;
-    }
-    else {
-        return self.name;
-    }
-}
-
 - (NSString *)otherId {
     NSArray *members = self.members;
     if (members.count == 0) {
@@ -105,19 +85,6 @@ static NSString *ObjectTagKeyUpdatedTime = @"ObjectTagKeyUpdatedTime";
         otherId = members[0];
     }
     return otherId;
-}
-
-- (NSString *)title {
-    if (self.type == CDConvTypeSingle) {
-        return self.displayName;
-    }
-    else {
-        return [NSString stringWithFormat:@"%@(%ld)", self.displayName, (long)self.members.count];
-    }
-}
-
-- (UIImage *)icon {
-    return [UIImage imageWithHashString:self.conversationId displayString:[[self.name substringWithRange:NSMakeRange(0, 1)] capitalizedString]];
 }
 
 @end

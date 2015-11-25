@@ -13,6 +13,8 @@
  */
 @interface EZGManager : NSObject
 
+//格式化评分
++ (float)FormatStaffScore:(NSNumber *)score;
 //判断救援状态是否还在处理中
 + (BOOL)checkRescueStatusIsProcessing:(RescueStatusType)rescueStatus;
 #pragma mark - 车牌号相关

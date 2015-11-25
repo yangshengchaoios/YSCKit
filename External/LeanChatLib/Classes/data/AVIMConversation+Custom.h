@@ -38,41 +38,9 @@ typedef enum : NSUInteger {
 @property (nonatomic, strong) NSString *rescueId;
 @property (nonatomic, strong) NSString *s4Id;
 
-/**
- *  对话的类型，因为可能是两个人的群聊。所以不能通过成员数量来判断
- *
- *  @return 单聊或群聊
- */
+//对话的类型，因为可能是两个人的群聊。所以不能通过成员数量来判断
 - (CDConvType)type;
-
-/**
- *  单聊对话的对方的 clientId
- */
+//单聊对话的对方的 clientId
 - (NSString *)otherId;
-
-/**
- *  对话显示的名称。单聊显示对方名字，群聊显示对话的 name
- */
-- (NSString *)displayName;
-
-/**
- *  对话的标题。如 兴趣群(30)
- */
-- (NSString *)title;
-
-
-/**
- *  对话的图标，通过 conversationId 生成五彩图像
- */
-- (UIImage *)icon;
-
-/**
- *  组合多个用户的名字。如 小王、老李
- *
- *  @param userIds 用户的 userId 集合
- *
- *  @return 拼成的名字
- */
-+ (NSString *)nameOfUserIds:(NSArray *)userIds;
 
 @end

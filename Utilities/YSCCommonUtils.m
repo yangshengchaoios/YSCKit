@@ -276,6 +276,7 @@
         if (resultSet) {
             isExists = [resultSet next];
         }
+        [resultSet close];
     }
     [db close];
     return isExists;
@@ -292,6 +293,7 @@
         if ([resultSet next]) {
             num = [resultSet intForColumnIndex:0];
         }
+        [resultSet close];
     }
     [db close];
     return num;

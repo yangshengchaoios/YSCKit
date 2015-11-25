@@ -32,7 +32,7 @@
         [self layoutConversationByConvId:conversation.conversationId];
         ChatUserModel *cUser = [[ChatUserModel alloc] initWithString:conversation.attributes[OtherUserInfo] error:nil];
         [self.avatarImageView setImageWithURLString:cUser.avatarUrl placeholderImageName:@"default_avatar" withFadeIn:NO];
-        self.nameLabel.text = Trim(cUser.realName);
+        self.nameLabel.text = Trim(cUser.userName);
     }
 }
 - (void)layoutConversationByConvId:(NSString *)convId {
