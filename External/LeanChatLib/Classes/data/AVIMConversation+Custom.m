@@ -66,25 +66,17 @@ static NSString *ObjectTagKeyUpdatedTime = @"ObjectTagKeyUpdatedTime";
 }
 - (NSString *)otherId {
     NSArray *members = self.members;
-    if (members.count == 0) {
-        [NSException raise:@"invalid conv" format:nil];
-    }
-    if (members.count == 1) {
+    if ([members count] == 2) {
         if ([members[0] isEqualToString:[CDChatManager manager].selfId]) {
-            return @"";
+            return members[1];
         }
         else {
             return members[0];
         }
     }
-    NSString *otherId;
-    if ([members[0] isEqualToString:[CDChatManager manager].selfId]) {
-        otherId = members[1];
-    }
     else {
-        otherId = members[0];
+        return @"";
     }
-    return otherId;
 }
 
 @end

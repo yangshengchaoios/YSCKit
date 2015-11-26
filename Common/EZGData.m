@@ -548,40 +548,6 @@
     }
     return conversation;
 }
-//删除所有不合法的会话
-- (void)deleteInvalidConversations {
-    AVQuery *query = [AVQuery queryWithClassName:@"_Conversation"];
-    query.limit = 1000;
-    [query findObjectsInBackgroundWithBlock: ^(NSArray *objects, NSError *error) {
-        if (isEmpty(error)) {
-            for (AVObject *conv in objects) {
-                NSLog(@"convId:%@", conv.objectId);
-                NSDictionary *attr = [conv objectForKey:@"attr"];
-                NSArray *members = [conv objectForKey:@"m"];
-                ChatUserModel *bUser = [[ChatUserModel alloc] initWithString:attr[@"BUserInfo"] error:nil];
-                ChatUserModel *cUser = [[ChatUserModel alloc] initWithString:attr[@"CUserInfo"] error:nil];
-                if (isEmpty(bUser.userId) ||
-                    isEmpty(cUser.userId) ||
-                    NO == [members containsObject:Trim(bUser.userId)] ||
-                    NO == [members containsObject:Trim(cUser.userId)]) {
-                    NSLog(@"---------------------------will delete!!!");
-                    AVObject *object = [AVObject objectWithoutDataWithClassName:@"_Conversation" objectId:conv.objectId];
-                    [object deleteInBackgroundWithBlock:^(BOOL succeeded, NSError *error) {
-                        if (succeeded) {
-                            NSLog(@"delete successed");
-                        }
-                        else {
-                            NSLog(@"delete faild:%@", error);
-                        }
-                    }];
-                }
-            }
-        }
-        else {
-            NSLog(@"error:%@", error);
-        }
-    }];
-}
 //更新conversation的扩展属性
 - (void)updateConversation:(AVIMConversation *)conversation byParams:(NSDictionary *)params block:(YSCResultBlock)block {
     if (isEmpty(conversation)) {

@@ -10,6 +10,15 @@
 
 @implementation EZGManager
 
+//格式化图片url
++ (NSString *)FormatImageUrl:(NSString *)imageUrl width:(CGFloat)width {
+    if ([NSString isUrl:imageUrl] && NO == [NSString isContains:@"?imageView2/2" inString:imageUrl]) {
+        return [NSString stringWithFormat:@"%@?imageView2/2/q/100/h/%.0f", imageUrl, width];
+    }
+    else {
+        return imageUrl;
+    }
+}
 //格式化评分
 + (float)FormatStaffScore:(NSNumber *)score {
     float tempValue = score.floatValue / 5.0f;

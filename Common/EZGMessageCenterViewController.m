@@ -74,21 +74,6 @@
                                  kParamChatRoom         : @{kParamBlock : refreshCellBlock}};
         postNWithInfo(kNotificationOpenChatRoom, params);
     };
-    self.tableView.layoutCellView = ^(UIView *view, NSObject *object) {
-        if ([view isKindOfClass:[EZGMessageCenterCell class]]) {
-            //启动最后一条聊天记录刷新线程
-            EZGMessageCenterCell *cell = (EZGMessageCenterCell *)view;
-            AVIMConversation *conversation = (AVIMConversation *)object;
-            if (isNotEmpty(conversation) && nil == conversation.lastMessage) {
-                [conversation queryMessagesWithLimit:1 callback:^(NSArray *objects, NSError *error) {
-                    if (isNotEmpty(objects)) {
-                        [[CDConversationStore store] updateLastMessage:objects[0] byConvId:conversation.conversationId];
-                        [cell layoutConversationByConvId:conversation.conversationId];
-                    }
-                }];
-            }
-        }
-    };
     self.tableView.deleteCellBlock = ^(NSObject *object, NSIndexPath *indexPath) {
         UIAlertView *alertView = [UIAlertView bk_alertViewWithTitle:@"确定要删除该会话？"];
         [alertView bk_addButtonWithTitle:@"删除" handler:^{

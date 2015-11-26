@@ -56,8 +56,6 @@
 - (void)openChatRoomByPushMessage;
 //根据对方id查找会话对象
 - (AVIMConversation *)findConversionByOtherUserId:(NSString *)otherUserId;
-//删除所有不合法的会话
-- (void)deleteInvalidConversations;
 //更新conversation的扩展属性
 - (void)updateConversation:(AVIMConversation *)conversation byParams:(NSDictionary *)params block:(YSCResultBlock)block;
 

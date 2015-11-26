@@ -29,13 +29,42 @@
 }
 - (void)layoutObject:(AVIMConversation *)conversation {
     if (isNotEmpty(conversation)) {
-        [self layoutConversationByConvId:conversation.conversationId];
-        ChatUserModel *cUser = [[ChatUserModel alloc] initWithString:conversation.attributes[OtherUserInfo] error:nil];
-        [self.avatarImageView setImageWithURLString:cUser.avatarUrl placeholderImageName:@"default_avatar" withFadeIn:NO];
-        self.nameLabel.text = Trim(cUser.userName);
+        WEAKSELF
+        //启动最后一条聊天记录刷新线程
+        if (nil == conversation.lastMessage) {
+            self.badgeView.hidden = YES;
+            self.lastMessageLabel.text = self.timePassedLabel.text = nil;
+            [conversation queryMessagesWithLimit:1 callback:^(NSArray *objects, NSError *error) {
+                if (isNotEmpty(objects)) {
+                    [[CDConversationStore store] updateLastMessage:objects[0] byConvId:conversation.conversationId];
+                    [weakSelf layoutLastMessageByConvId:conversation.conversationId];
+                }
+            }];
+        }
+        else {
+            [self layoutLastMessageByConvId:conversation.conversationId];
+        }
+        //启动用户信息刷新线程
+        ChatUserModel *chatUser = [ChatUserModel GetLocalDataByUserId:conversation.otherId];
+        if (nil == chatUser) {
+            self.nameLabel.text = nil;
+            self.avatarImageView.image = DefaultAvatarImage;
+            [ChatUserModel RefreshByUserIds:@[Trim(conversation.otherId)] block:^(NSObject *object, NSError *error) {
+                if (isNotEmpty(object)) {
+                    ChatUserModel *userModel1 = [ChatUserModel GetLocalDataByUserId:conversation.otherId];
+                    [weakSelf.avatarImageView setImageWithURLString:userModel1.avatarUrl placeholderImageName:@"default_avatar" withFadeIn:NO];
+                    weakSelf.nameLabel.text = Trim(userModel1.userName);
+                }
+            }];
+        }
+        else {
+            [self.avatarImageView setImageWithURLString:chatUser.avatarUrl placeholderImageName:@"default_avatar" withFadeIn:NO];
+            self.nameLabel.text = Trim(chatUser.userName);
+        }
     }
 }
-- (void)layoutConversationByConvId:(NSString *)convId {
+//显示最后一条消息
+- (void)layoutLastMessageByConvId:(NSString *)convId {
     AVIMConversation *conversation = [[CDConversationStore store] selectOneConversationByConvId:convId];//查询本地的conv才会有未读数
     if (conversation) {
         self.badgeView.badgeText = [NSString stringWithFormat:@"%ld", (long)conversation.unreadCount];

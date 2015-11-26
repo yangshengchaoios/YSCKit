@@ -40,7 +40,7 @@
             self.imageDescLabel.hidden = YES;
             self.tipImageView.hidden = YES;
             self.tipLabel.hidden = YES;
-            [self.sceneImageView setImageWithURLString:dataModel.imageUrl withFadeIn:NO];
+            [self.sceneImageView setImageWithURLString:dataModel.imageUrl];
         }
         else {//显示提示图片
             self.sceneImageView.hidden = YES;

@@ -18,9 +18,11 @@
 @property (nonatomic, strong, readonly) AVIMConversation *conv;
 @property (nonatomic, strong, readonly) NSMutableArray *msgs;
 @property (nonatomic, strong) NSDictionary *params;
-@property (nonatomic, assign) BOOL isAppeared;
+@property (nonatomic, assign) BOOL isAppeared;//用于底部工具栏动画控制
 
 - (instancetype)initWithConv:(AVIMConversation *)conv;
+//更新用户信息
+- (void)updateUserInfo:(ChatUserModel *)chatUser;
 //关闭当前会话页面
 - (void)closeCurrentViewControllerAnimated:(BOOL)animated block:(YSCBlock)block;
 //重置conv

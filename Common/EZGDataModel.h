@@ -1,5 +1,5 @@
 //
-//  AVOSDataModel.h
+//  EZGDataModel.h
 //  EZGoal
 //
 //  Created by yangshengchao on 15/11/8.
@@ -8,6 +8,13 @@
 
 #import "AVObject.h"
 
+@protocol ChatUserModel               @end
+
+//=============================================
+//
+//  AVOS在线参数模型
+//
+//=============================================
 //在线参数名称
 @interface AVOSParamName : AVObject <AVSubclassing>
 @property (nonatomic, strong) NSString *appId;          //C_EZGoal  B_EZGoal
@@ -44,4 +51,25 @@
 
 //上传设备信息
 + (void)uploadDeviceInfo;
+@end
+
+
+
+//=============================================
+//
+//  业务模型
+//
+//=============================================
+//聊天对象里的用户模型
+@interface ChatUserModel : BaseDataModel
+@property (nonatomic, strong) NSString *userId;
+@property (nonatomic, strong) NSString *userName;
+@property (nonatomic, strong) NSString *avatarUrl;
+@property (nonatomic, strong) NSString *phoneNumber;
+@property (nonatomic, strong) NSNumber *commentScore;
+//重新查询B端用户信息
++ (void)InitChatUserTable;
++ (void)RefreshByUserIds:(NSArray *)userIds block:(YSCObjectResultBlock)block;//默认是查询聊天对方信息
++ (void)RefreshByUserIds:(NSArray *)userIds userType:(NSString *)userType block:(YSCObjectResultBlock)block;
++ (instancetype)GetLocalDataByUserId:(NSString *)userId;
 @end

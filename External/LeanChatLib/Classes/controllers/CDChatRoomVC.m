@@ -89,6 +89,41 @@ static NSInteger const kOnePageSize = 10;
                                                                              style:UIBarButtonItemStylePlain
                                                                             target:self
                                                                             action:@selector(closeCurrentViewController)];
+    //用户信息
+    APPDATA.chatUser = [ChatUserModel GetLocalDataByUserId:self.conv.otherId];//重置当前聊天对象
+    if (nil == APPDATA.chatUser) {
+        self.title = @"聊天";
+    }
+    else {
+        [self updateUserInfo:APPDATA.chatUser];
+    }
+    [self refreshUserInfo];
+}
+//更新用户头像和昵称等信息
+- (void)refreshUserInfo {
+    WEAKSELF
+    [ChatUserModel RefreshByUserIds:@[Trim(self.conv.otherId)] block:^(NSObject *object, NSError *error) {
+        NSArray *array = (NSArray *)object;
+        if (isNotEmpty(object) && [array isKindOfClass:[NSArray class]]) {
+            ChatUserModel *chatUser = array[0];
+            if (nil == APPDATA.chatUser ||
+                NO == [chatUser.phoneNumber isEqualToString:APPDATA.chatUser.phoneNumber] ||
+                NO == [chatUser.avatarUrl isEqualToString:APPDATA.chatUser.avatarUrl] ||
+                NO == [chatUser.userName isEqualToString:APPDATA.chatUser.userName]) {
+                APPDATA.chatUser = [ChatUserModel GetLocalDataByUserId:weakSelf.conv.otherId];//从缓存数据库中查询
+                [weakSelf updateUserInfo:APPDATA.chatUser];//刷新本页对方相关信息
+                [weakSelf.messageTableView reloadData];//刷新本页列表
+                YSCResultBlock block = weakSelf.params[kParamBlock];
+                if (block) {
+                    block(nil);//刷新cell，更新用户昵称和头像
+                }
+            }
+        }
+    }];
+}
+//更新用户信息
+- (void)updateUserInfo:(ChatUserModel *)chatUser {
+    self.title = Trim(chatUser.userName);//会话对方的昵称
 }
 - (void)closeCurrentViewController {
     [self closeCurrentViewControllerAnimated:YES block:nil];

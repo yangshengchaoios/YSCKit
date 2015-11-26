@@ -16,13 +16,11 @@
  */
 @interface EZGMessageCenterCell : YSCBaseTableViewCell
 
-@property (weak, nonatomic) IBOutlet UIImageView *avatarImageView;
-@property (weak, nonatomic) IBOutlet UILabel *nameLabel;
-@property (weak, nonatomic) IBOutlet UILabel *timePassedLabel;
-@property (weak, nonatomic) IBOutlet UILabel *lastMessageLabel;
+@property (nonatomic, weak) IBOutlet UIImageView *avatarImageView;
+@property (nonatomic, weak) IBOutlet UILabel *nameLabel;
+@property (nonatomic, weak) IBOutlet UILabel *timePassedLabel;
+@property (nonatomic, weak) IBOutlet UILabel *lastMessageLabel;
 @property (nonatomic, weak) IBOutlet UIView *badgeBkgView;//专门用来放badgeView的
 @property (nonatomic, strong) JSBadgeView *badgeView;
-
-- (void)layoutConversationByConvId:(NSString *)convId;
 
 @end
