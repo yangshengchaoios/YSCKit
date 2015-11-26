@@ -12,6 +12,7 @@
 #import "EZGChatRoomViewController.h"
 #import "EZGRescueChatRoomViewController.h"
 #import "ServerTimeSynchronizer.h"
+#import "SDImageCache.h"
 
 @interface EZGData () <BMKLocationServiceDelegate, BMKGeoCodeSearchDelegate>
 @property (nonatomic, strong) BMKLocationService *locationService;  //后台定位服务
@@ -61,6 +62,29 @@
 - (NSString *)cacheDBPath {
     NSString *dbName = [NSString stringWithFormat:@"ezgoal_cache_%@.sqlite", USERID];
     return [[YSCFileUtils DirectoryPathOfDocuments] stringByAppendingPathComponent:dbName];
+}
+//删除本地聊天记录
++ (void)clearSpeechData {
+    [YSCFileUtils deleteFileOrDirectory:[[YSCFileUtils DirectoryPathOfDocuments] stringByAppendingPathComponent:@"speech_stat.sqlite"]];
+    [YSCFileUtils deleteFileOrDirectory:[[YSCFileUtils DirectoryPathOfDocuments] stringByAppendingPathComponent:@"speech_stat.sqlite-shm"]];
+    [YSCFileUtils deleteFileOrDirectory:[[YSCFileUtils DirectoryPathOfDocuments] stringByAppendingPathComponent:@"speech_stat.sqlite-wal"]];
+}
+//清空本地缓存
++ (void)clearLocalDataByRemoveSdImages:(BOOL)removeSDImages {
+    if (removeSDImages) {
+        //1.删除SDImage的缓存数据
+        while ([SDImageCache sharedImageCache].getSize != 0 || [SDImageCache sharedImageCache].getDiskCount != 0) {
+            [[SDImageCache sharedImageCache] clearDisk];
+            [[SDImageCache sharedImageCache] clearMemory];
+            [[SDImageCache sharedImageCache] cleanDisk];
+        }
+    }
+    
+    //2.清除目录 "Library/Caches/" 下的缓存数据
+    [[StorageManager sharedInstance] clearLibraryCaches];
+    
+    //3.移除所有的本地网络请求的缓存数据
+    [[NSURLCache sharedURLCache] removeAllCachedResponses];
 }
 
 //====================================

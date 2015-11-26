@@ -151,17 +151,6 @@
     }
 
 }
-//显示位置weakSelf.addressLocation TODO:位置信息的显示大头针
-//- (void)showAddressLocationByLocationCoordinate:(CLLocationCoordinate2D)reverseGeoPoint {
-//    [self.mapView removeAnnotations:self.mapView.annotations];
-//    if (reverseGeoPoint.longitude == 0 || reverseGeoPoint.latitude == 0) {
-//        return;
-//    }
-//    BMKPointAnnotation *annotation = [[BMKPointAnnotation alloc]init];
-//    annotation.coordinate = reverseGeoPoint;
-//    [self.mapView addAnnotations:@[annotation]];
-//    [self.mapView showAnnotations:@[annotation] animated:YES];
-//}
 //解析GPS坐标
 - (void)searchByLocationCoordinate:(CLLocationCoordinate2D)reverseGeoPoint {
 //    [self showAddressLocationByLocationCoordinate:reverseGeoPoint];
@@ -312,13 +301,8 @@
 }
 #pragma mark - UISearchBarDelegate
 - (void)searchBarTextDidBeginEditing:(UISearchBar *)searchBar {
+
 }
-//- (void)searchBarTextDidBeginEditing:(UISearchBar *)searchBar {
-//    searchBar.barTintColor = kDefaultNaviTintColor;
-//}
-//- (void)searchBarCancelButtonClicked:(UISearchBar *)searchBar {
-//    searchBar.barTintColor = nil;
-//}
 //搜索按钮点击方法
 - (void)searchBarSearchButtonClicked:(UISearchBar *)searchBar {
     if (isEmpty(self.searchBar.text)) {
@@ -335,7 +319,7 @@
 }
 //searchBar搜索框内容变化的时候调用
 - (void)searchBar:(UISearchBar *)searchBar textDidChange:(NSString *)searchText {
-    //TODO:微信是在删除的时候清空列表；增加文字不改变列表！
+    //NOTE:微信是在删除的时候清空列表；增加文字不改变列表！
 }
 
 #pragma mark - BMKPoiSearchDelegate 城市检索
@@ -384,13 +368,6 @@
         self.isNeedReSearchByLocation = YES;
     }
 }
-////根据anntation生成对应的View
-//- (BMKAnnotationView *)mapView:(BMKMapView *)mapView viewForAnnotation:(id <BMKAnnotation>)annotation {
-//    BMKAnnotationView *newAnnotation=[[BMKAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:@"annotation1"];
-//    newAnnotation.image = [UIImage imageNamed:@"image_quick_rescue_location.png"];
-//    newAnnotation.canShowCallout=YES;
-//    return newAnnotation;
-//}
 #pragma mark - 定位按钮点击事件
 - (IBAction)locationButtonClick:(id)sender {
     [self.mapView setCenterCoordinate:EZGDATA.userLocation.location.coordinate animated:YES];
@@ -403,21 +380,5 @@
         [scrollView setScrollIndicatorInsets:UIEdgeInsetsMake(0, 0, AUTOLAYOUT_LENGTH(20), 0)];
     }
 }
-#pragma mark - 消除再次进入searchResultsTableView，偏移量不可控的问题
-//- (void)searchDisplayController:(UISearchDisplayController *)controller didHideSearchResultsTableView:(UITableView *)tableView {
-//    
-//    [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardWillHideNotification object:nil];
-//}
-//- (void)searchDisplayController:(UISearchDisplayController *)controller willShowSearchResultsTableView:(UITableView *)tableView {
-//    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(keyboardWillHide:) name:UIKeyboardWillHideNotification object:nil];
-//}
-//- (void)keyboardWillHide:(NSNotification *)aNotification {
-//    NSDictionary* info = [aNotification userInfo];
-//    CGSize kbSize = [[info objectForKey:UIKeyboardFrameEndUserInfoKey] CGRectValue].size;
-//    UITableView *tableView = [self.searchDisplayController searchResultsTableView];
-//    [tableView setContentInset:UIEdgeInsetsMake(0, 0, kbSize.height, 0)];
-//    [tableView setScrollIndicatorInsets:UIEdgeInsetsMake(0, 0, kbSize.height, 0)];
-//}
-
 
 @end

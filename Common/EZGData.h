@@ -21,6 +21,10 @@
 - (id)init;
 + (instancetype)sharedInstance;
 - (void)initCarNumberArray;
+//删除本地聊天记录
++ (void)clearSpeechData;
+//清空本地缓存
++ (void)clearLocalDataByRemoveSdImages:(BOOL)removeSDImages;
 
 #pragma mark - 百度地图
 //开启定位

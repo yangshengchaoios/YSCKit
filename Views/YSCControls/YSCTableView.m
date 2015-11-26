@@ -173,6 +173,7 @@
                                                      [weakSelf.header beginRefreshing];
                                                  }];
         self.tipsView.hidden = YES;
+        self.tipsView.actionButton.hidden = YES;
     }
     else {
         if (self.tipsView) {

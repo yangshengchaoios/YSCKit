@@ -116,7 +116,7 @@
     NSString *libPath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0];
     NSArray *files = [YSCFileUtils allPathsInDirectoryPath:libPath];
     for (NSString *filePath in files) {
-        if ([filePath hasPrefix:@"com.leancloud.leanchatlib."]) {
+        if ([filePath hasPrefix:@"com.leancloud.leanchatlib."] || [filePath hasPrefix:@"ezgoal_cache"]) {
             [YSCFileUtils deleteFileOrDirectory:[libPath stringByAppendingPathComponent:filePath]];
         }
     }
