@@ -191,19 +191,19 @@
 }
 
 //根据传入参数查询对应类型会话的未读数
-//nil - 所有未读数
-//empty - 普通会话未读数
-//not empty - 特殊会话的未读数
-- (NSInteger)totalUnreadCountByEzgoalType:(NSString *)ezgoalType {
+//nil or empty - 所有会话未读数
+//not empty - 指定会话类型的未读数
+- (NSInteger)totalUnreadCountByEzgoalTypes:(NSArray *)ezgoalTypes {
     __block NSInteger totalUnreadCount = 0;
     [self.databaseQueue inDatabase:^(FMDatabase *db) {
         FMResultSet *resultSet = nil;
-        if (nil != ezgoalType) {
-            resultSet = [db executeQuery:@"SELECT unreadCount FROM conversations WHERE unreadCount > 0 AND ezgoalType = ?"
-                    withArgumentsInArray:@[Trim(ezgoalType)]];
+        if (isEmpty(ezgoalTypes)) {
+            resultSet = [db executeQuery:@"SELECT unreadCount FROM conversations WHERE unreadCount > 0"];
         }
         else {
-            resultSet = [db executeQuery:@"SELECT unreadCount FROM conversations WHERE unreadCount > 0"];
+            NSString *sql = [NSString stringWithFormat:@"SELECT unreadCount FROM conversations WHERE unreadCount > 0 AND ezgoalType IN ('%@')",
+                             [ezgoalTypes componentsJoinedByString:@"','"]];
+            resultSet = [db executeQuery:sql];
         }
         
         while ([resultSet next]) {
@@ -278,24 +278,25 @@
 
 //分页获取本地所有会话列表
 - (NSArray *)selectConversationsByPageIndex:(NSInteger)pageIndex pageSize:(NSInteger)pageSize {
-    return [self selectConversationsByEzgoalType:nil pageIndex:pageIndex pageSize:pageSize];
+    return [self selectConversationsByEzgoalTypes:@[] pageIndex:pageIndex pageSize:pageSize];
 }
 //根据传入参数查询本地特殊类型的会话列表
 //nil - 所有未读数
 //empty - 普通会话未读数
 //not empty - 特殊会话的未读数
-- (NSArray *)selectConversationsByEzgoalType:(NSString *)ezgoalType pageIndex:(NSInteger)pageIndex pageSize:(NSInteger)pageSize {
+- (NSArray *)selectConversationsByEzgoalTypes:(NSArray *)ezgoalTypes pageIndex:(NSInteger)pageIndex pageSize:(NSInteger)pageSize {
     pageIndex--;
     __block NSMutableArray *retArray = [NSMutableArray array];
     [self.databaseQueue inDatabase:^(FMDatabase *db) {
         FMResultSet *resultSet = nil;
-        if (nil != ezgoalType) {
-            resultSet = [db executeQuery:@"SELECT * FROM conversations WHERE ezgoalType = ? ORDER BY updatedTime DESC LIMIT ?,?"
-                    withArgumentsInArray:@[Trim(ezgoalType), @(pageIndex * pageSize), @(pageSize)]];
-        }
-        else {
+        if (isEmpty(ezgoalTypes)) {
             resultSet = [db executeQuery:@"SELECT * FROM conversations ORDER BY updatedTime DESC LIMIT ?,?"
                     withArgumentsInArray:@[@(pageIndex * pageSize), @(pageSize)]];
+        }
+        else {
+            NSString *sql = [NSString stringWithFormat:@"SELECT * FROM conversations WHERE ezgoalType IN ('%@') ORDER BY updatedTime DESC LIMIT %ld,%ld",
+                             [ezgoalTypes componentsJoinedByString:@"','"], (pageIndex * pageSize), pageSize];
+            resultSet = [db executeQuery:sql];
         }
         
         while ([resultSet next]) {

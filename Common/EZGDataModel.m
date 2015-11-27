@@ -128,24 +128,22 @@
     userInfo TEXT DEFAULT NULL)";
     [YSCCommonUtils SqliteUpdate:tablesql_ChatUser dbPath:EZGDATA.cacheDBPath];
 }
-//默认是查询聊天对方信息
-+ (void)RefreshByUserIds:(NSArray *)userIds block:(YSCObjectResultBlock)block {
-    NSString *userType = kAppId;
-    if (IsAppTypeC) {
-        userType = @"B_EZGoal";
-    }
-    else {
-        userType = @"C_EZGoal";
-    }
-    [self RefreshByUserIds:userIds userType:userType block:block];
-}
-+ (void)RefreshByUserIds:(NSArray *)userIds userType:(NSString *)userType block:(YSCObjectResultBlock)block {
++ (void)RefreshByUserIds:(NSArray *)userIds ezgoalType:(NSString *)ezgoalType block:(YSCObjectResultBlock)block {
     if (isEmpty(userIds)) {
         if (block) {
             block(nil, CreateNSError(@"传入的userId数组为空"));
         }
         return;
     }
+    
+    NSString *userType = kAppId;
+    if ([EzgoalTypeB2B isEqualToString:ezgoalType] || IsAppTypeC) {
+        userType = @"B_EZGoal";
+    }
+    else {
+        userType = @"C_EZGoal";
+    }
+    
     //调用接口
     [AFNManager getDataFromUrl:kResPathAppCommonUrl
                        withAPI:kResPathGetUserChatInfo

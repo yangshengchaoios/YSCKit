@@ -20,12 +20,7 @@
     self.badgeBkgView.backgroundColor = [UIColor clearColor];
 }
 + (CGFloat)HeightOfCellByObject:(NSObject *)object {
-    if ([object isKindOfClass:[NSNull class]]) {
-        return AUTOLAYOUT_LENGTH(20);
-    }
-    else {
-        return AUTOLAYOUT_LENGTH(120);
-    }
+    return AUTOLAYOUT_LENGTH(120);
 }
 - (void)layoutObject:(AVIMConversation *)conversation {
     if (isNotEmpty(conversation)) {
@@ -49,7 +44,7 @@
         if (nil == chatUser) {
             self.nameLabel.text = nil;
             self.avatarImageView.image = DefaultAvatarImage;
-            [ChatUserModel RefreshByUserIds:@[Trim(conversation.otherId)] block:^(NSObject *object, NSError *error) {
+            [ChatUserModel RefreshByUserIds:@[Trim(conversation.otherId)] ezgoalType:conversation.ezgoalType block:^(NSObject *object, NSError *error) {
                 if (isNotEmpty(object)) {
                     ChatUserModel *userModel1 = [ChatUserModel GetLocalDataByUserId:conversation.otherId];
                     [weakSelf.avatarImageView setImageWithURLString:userModel1.avatarUrl placeholderImageName:@"default_avatar" withFadeIn:NO];

@@ -40,11 +40,10 @@
 //更新最后一条消息记录成功发送的时间
 - (void)updateLastMessage:(AVIMTypedMessage *)message byConvId:(NSString *)convId;
 
-//根据传入参数查询本地对应类型会话的未读数
-//nil - 所有未读数
-//empty - 普通会话未读数
-//not empty - 特殊会话的未读数
-- (NSInteger)totalUnreadCountByEzgoalType:(NSString *)ezgoalType;
+//根据传入参数查询对应类型会话的未读数
+//nil or empty - 所有会话未读数
+//not empty - 指定会话类型的未读数
+- (NSInteger)totalUnreadCountByEzgoalTypes:(NSArray *)ezgoalTypes;
 //从本地数据库查找指定会话的未读消息数
 - (NSInteger)selectUnreadCountByConvId:(NSString *)convId;
 
@@ -57,7 +56,7 @@
 //分页获取本地会话列表
 - (NSArray *)selectConversationsByPageIndex:(NSInteger)pageIndex pageSize:(NSInteger)pageSize;
 //分页获取本地特殊类型的会话列表
-- (NSArray *)selectConversationsByEzgoalType:(NSString *)ezgoalType pageIndex:(NSInteger)pageIndex pageSize:(NSInteger)pageSize;
+- (NSArray *)selectConversationsByEzgoalTypes:(NSArray *)ezgoalTypes pageIndex:(NSInteger)pageIndex pageSize:(NSInteger)pageSize;
 //查询本地是否有会话
 - (BOOL)isConversationExists;
 

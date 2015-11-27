@@ -525,11 +525,11 @@
     }
     else {//进入聊天会话窗口
         CDChatRoomVC *chatRoom = nil;
-        if (isNotEmpty(conversation.ezgoalType)) {//进入特殊会话窗口
-            chatRoom = [[EZGRescueChatRoomViewController alloc] initWithConv:conversation];
-        }
-        else {//进入普通会话窗口
+        if ([@[EzgoalTypeC2B, EzgoalTypeB2B, EzgoalTypeB2C, EzgoalTypeC2C] containsObject:conversation.ezgoalType]) {//进入普通会话窗口
             chatRoom = [[EZGChatRoomViewController alloc] initWithConv:conversation];
+        }
+        else {//进入特殊会话窗口
+            chatRoom = [[EZGRescueChatRoomViewController alloc] initWithConv:conversation];
         }
         chatRoom.params = params;
         if ([params[kParamIsPush] boolValue]) {
