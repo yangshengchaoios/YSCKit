@@ -12,9 +12,11 @@
 
 - (void)awakeFromNib {
     [super awakeFromNib];
+    self.containerView.backgroundColor = kDefaultViewColor;
     self.bkgImageView.hidden = YES;
     self.lineBottomLabel.hidden = YES;
     self.arrowImageView.hidden = YES;
+    self.leftSpace.constant = AUTOLAYOUT_LENGTH(20);
 }
 
 + (CGFloat)HeightOfViewByObject:(NSObject *)object {

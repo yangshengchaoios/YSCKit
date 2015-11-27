@@ -81,23 +81,12 @@ static CDChatManager *instance;
         }
     }];
 }
-//获取单聊对话
-- (void)fetchConvWithOtherId:(NSString *)otherId callback:(AVIMConversationResultBlock)callback {
-    NSMutableArray *array = [[NSMutableArray alloc] init];
-    [array addObject:[AVIMClient defaultClient].clientId];
-    [array addObject:otherId];
-    [self fetchConvWithMembers:array type:CDConvTypeSingle callback:callback];
-}
-//获取群聊对话
+//根据成员名称查找或创建一个会话
 - (void)fetchConvWithMembers:(NSArray *)members callback:(AVIMConversationResultBlock)callback {
-    [self fetchConvWithMembers:members type:CDConvTypeGroup callback:callback];
+    [self fetchConvWithMembers:members extendAttributes:nil callback:callback];
 }
-//根据成员名称查找或创建一个单聊或群聊会话
-- (void)fetchConvWithMembers:(NSArray *)members type:(CDConvType)type callback:(AVIMConversationResultBlock)callback {
-    [self fetchConvWithMembers:members type:type extendAttributes:nil callback:callback];
-}
-//根据成员名称查找或创建一个单聊或群聊会话
-- (void)fetchConvWithMembers:(NSArray *)members type:(CDConvType)type extendAttributes:(NSDictionary *)attributes callback:(AVIMConversationResultBlock)callback {
+//根据成员名称查找或创建一个会话
+- (void)fetchConvWithMembers:(NSArray *)members extendAttributes:(NSDictionary *)attributes callback:(AVIMConversationResultBlock)callback {
     //判断自己是否包括在内
     if ([members containsObject:self.selfId] == NO) {
         [NSException raise:NSInvalidArgumentException format:@"members should contain myself"];
@@ -108,15 +97,10 @@ static CDChatManager *instance;
         [NSException raise:NSInvalidArgumentException format:@"The array has duplicate value"];
     }
     AVIMConversationQuery *q = [[AVIMClient defaultClient] conversationQuery];
-    [q whereKey:AVIMAttr(CONV_TYPE) equalTo:@(type)];//普通单聊会话
-    
-    if (attributes[kParamEzgoalType]) {//特殊业务会话
+    [q whereKey:AVIMAttr(kParamEzgoalType) equalTo:attributes[kParamEzgoalType]];
+    if (NO == [@[EzgoalTypeC2B, EzgoalTypeB2B, EzgoalTypeC2C, EzgoalTypeB2C] containsObject:attributes[kParamEzgoalType]]) {//如果是非普通会话，需要过滤s4Id和status
         [q whereKey:AVIMAttr(kParamS4Id) equalTo:attributes[kParamS4Id]];
-        [q whereKey:AVIMAttr(kParamEzgoalType) equalTo:attributes[kParamEzgoalType]];
         [q whereKey:AVIMAttr(kParamEzgoalStatus) equalTo:attributes[kParamEzgoalStatus]];
-    }
-    else {//普通会话
-        [q whereKey:AVIMAttr(kParamEzgoalType) equalTo:@""];
     }
     [q whereKey:kAVIMKeyMember containsAllObjectsInArray:members];
     [q whereKey:kAVIMKeyMember sizeEqualTo:members.count];
@@ -133,7 +117,6 @@ static CDChatManager *instance;
             }
             else {//创建一个新的会话
                 NSMutableDictionary *tempAttr = [NSMutableDictionary dictionary];
-                tempAttr[CONV_TYPE] = @(type);
                 if (isNotEmpty(attributes)) {//新增扩展属性
                     [tempAttr addEntriesFromDictionary:attributes];
                 }
@@ -141,23 +124,6 @@ static CDChatManager *instance;
             }
         }
     }];
-}
-- (void)findGroupedConvsWithBlock:(AVIMArrayResultBlock)block {
-    [self findGroupedConvsWithNetworkFirst:NO block:block];
-}
-- (void)findGroupedConvsWithNetworkFirst:(BOOL)networkFirst block:(AVIMArrayResultBlock)block {
-    AVIMConversationQuery *q = [[AVIMClient defaultClient] conversationQuery];
-    [q whereKey:AVIMAttr(CONV_TYPE) equalTo:@(CDConvTypeGroup)];
-    [q whereKey:kAVIMKeyMember containedIn:@[self.selfId]];
-    if (networkFirst) {
-        q.cachePolicy = kAVCachePolicyNetworkElseCache;
-    } else {
-        q.cachePolicy = kAVCachePolicyCacheElseNetwork;
-        q.cacheMaxAge = 60 * 30; // 半小时
-    }
-    // 默认 limit 为10
-    q.limit = 1000;
-    [q findConversationsWithCallback:block];
 }
 //更新会话的扩展属性
 - (void)updateConv:(AVIMConversation *)conv name:(NSString *)name attrs:(NSDictionary *)attrs callback:(AVIMBooleanResultBlock)callback {
@@ -195,16 +161,6 @@ static CDChatManager *instance;
         message.attributes = attributes;
     }
     [conversation sendMessage:message options:AVIMMessageSendOptionRequestReceipt callback:block];
-}
-- (void)sendWelcomeMessageToOther:(NSString *)other text:(NSString *)text block:(AVBooleanResultBlock)block {
-    [self fetchConvWithOtherId:other callback:^(AVIMConversation *conversation, NSError *error) {
-        if (error) {
-            block(NO, error);
-        } else {
-            AVIMTextMessage *textMessage = [AVIMTextMessage messageWithText:text attributes:nil];
-            [self sendMessage:textMessage conversation:conversation callback:block];
-        }
-    }];
 }
 
 

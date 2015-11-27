@@ -88,6 +88,7 @@
             <connections>
                 <outlet property="arrowImageView" destination="h0v-cY-Ois" id="PGS-1j-M04"/>
                 <outlet property="bkgImageView" destination="gFb-wd-q8j" id="aab-Yo-HAW"/>
+                <outlet property="containerView" destination="w3J-NM-CTH" id="gkd-Xu-2WH"/>
                 <outlet property="leftSpace" destination="vLE-qK-dPk" id="tf6-kF-Tdu"/>
                 <outlet property="lineBottomLabel" destination="5tZ-ZV-t8p" id="rYi-p1-c7M"/>
                 <outlet property="lineTopLabel" destination="7na-9J-uHD" id="OwH-F9-M6J"/>

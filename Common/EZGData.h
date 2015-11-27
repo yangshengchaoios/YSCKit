@@ -51,8 +51,6 @@
 - (void)refreshConversationsByPageIndex:(NSInteger)pageIndex pageSize:(NSInteger)pageSize block:(AVIMArrayResultBlock)block;
 //刷新用户最近的特殊会话列表
 - (void)refreshConversationsByEzgoalType:(NSString *)ezgoalType pageIndex:(NSInteger)pageIndex pageSize:(NSInteger)pageSize block:(AVIMArrayResultBlock)block;
-//根据对方id数组查询会话列表
-- (void)searchConversationsFromNetworkByOtherIds:(NSArray *)otherIds block:(AVIMArrayResultBlock)block;
 
 //触发消息：打开聊天窗口
 - (void)openChatRoomByNotification:(NSNotification *)notification;

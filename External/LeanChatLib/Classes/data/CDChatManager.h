@@ -102,46 +102,12 @@ typedef void (^CDRecentConversationsCallback)(NSArray *conversations, NSInteger 
 
 
 #pragma mark - conversation
-/**
- *  根据 conversationId 获取对话
- *  @param convid   对话的 id
- *  @param callback
- */
+//根据 conversationId 获取对话
 - (void)fecthConvWithConvid:(NSString *)convid callback:(AVIMConversationResultBlock)callback;
-
-/**
- *  获取单聊对话
- *  @param otherId  对方的 clientId
- *  @param callback
- */
-- (void)fetchConvWithOtherId:(NSString *)otherId callback:(AVIMConversationResultBlock)callback;
-
-/**
- *  已知参与对话 members，获取群聊对话
- *  @param members  成员，clientId 数组
- *  @param callback
- */
+//根据成员名称查找或创建一个会话
 - (void)fetchConvWithMembers:(NSArray *)members callback:(AVIMConversationResultBlock)callback;
-
-//根据成员名称查找或创建一个单聊或群聊会话
-- (void)fetchConvWithMembers:(NSArray *)members type:(CDConvType)type callback:(AVIMConversationResultBlock)callback;
-//根据成员名称查找或创建一个单聊或群聊会话
-- (void)fetchConvWithMembers:(NSArray *)members type:(CDConvType)type extendAttributes:(NSDictionary *)attributes callback:(AVIMConversationResultBlock)callback;
-
-
-
-/**
- *  获取我在其中的群聊对话，优先从缓存中获取
- *  @param block 对话数组回调
- */
-- (void)findGroupedConvsWithBlock:(AVIMArrayResultBlock)block;
-
-/*!
- *  获取我在其中的群聊对话
- *  @param networkFirst 是否网络优先
- *  @param block        对话数组回调
- */
-- (void)findGroupedConvsWithNetworkFirst:(BOOL)networkFirst block:(AVIMArrayResultBlock)block;
+//根据成员名称查找或创建一个会话
+- (void)fetchConvWithMembers:(NSArray *)members extendAttributes:(NSDictionary *)attributes callback:(AVIMConversationResultBlock)callback;
 
 /**
  *  更新对话 name 或 attrs
@@ -161,14 +127,6 @@ typedef void (^CDRecentConversationsCallback)(NSArray *conversations, NSInteger 
  *  @param block
  */
 - (void)sendMessage:(AVIMTypedMessage*)message conversation:(AVIMConversation *)conversation callback:(AVBooleanResultBlock)block;
-
-/**
- *  发送 "已经是好友了，我们来聊天吧" 之类的消息
- *  @param other 对方的 clientId
- *  @param text  消息文本
- *  @param block
- */
-- (void)sendWelcomeMessageToOther:(NSString *)other text:(NSString *)text block:(AVBooleanResultBlock)block;
 
 /**
  *  查询时间戳之前的历史消息

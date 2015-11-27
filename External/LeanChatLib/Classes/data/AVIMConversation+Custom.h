@@ -10,11 +10,6 @@
 
 #define CONV_TYPE @"type"
 
-typedef enum : NSUInteger {
-    CDConvTypeSingle = 0,
-    CDConvTypeGroup,
-} CDConvType;
-
 @interface AVIMConversation (Custom)
 /**
  *  最后一条消息。通过 SDK 的消息缓存找到的
@@ -38,8 +33,6 @@ typedef enum : NSUInteger {
 @property (nonatomic, strong) NSString *rescueId;
 @property (nonatomic, strong) NSString *s4Id;
 
-//对话的类型，因为可能是两个人的群聊。所以不能通过成员数量来判断
-- (CDConvType)type;
 //单聊对话的对方的 clientId
 - (NSString *)otherId;
 

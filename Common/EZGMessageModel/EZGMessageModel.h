@@ -44,6 +44,12 @@ static const NSString *EzgoalTypeStaff          = @"StaffModule";
 static const NSString *EzgoalTypeContact        = @"ContactModule";
 static const NSString *EzgoalTypeNotice         = @"NoticeModule";
 
+static const NSString *EzgoalTypeC2B            = @"C2B";//C端创建与B端的普通会话
+static const NSString *EzgoalTypeB2B            = @"B2B";//B端同事之间的会话
+static const NSString *EzgoalTypeB2C            = @"B2C";//B端创建与C端的普通会话(暂未启用)
+static const NSString *EzgoalTypeC2C            = @"C2C";//C端用户之间的会话(暂未启用)
+static const NSString *EzgoalTypeGroup          = @"Group";//群会话(暂未启用)
+
 
 //消息扩展参数名定义
 #define MParamSceneType                 @"sceneType"        //现场照片类型

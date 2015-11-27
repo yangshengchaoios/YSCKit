@@ -308,11 +308,11 @@
     [self refreshConversationsByEzgoalType:nil pageIndex:pageIndex pageSize:pageSize block:block];
 }
 //刷新用户最近的特殊会话列表
+//TODO:如何查询任意几种会话的组合？？？
 - (void)refreshConversationsByEzgoalType:(NSString *)ezgoalType pageIndex:(NSInteger)pageIndex pageSize:(NSInteger)pageSize block:(AVIMArrayResultBlock)block {
     AVIMConversationQuery *query = [[AVIMClient defaultClient] conversationQuery];
     query.cachePolicy = kAVCachePolicyNetworkOnly;
     [query orderByDescending:@"lm"];
-    [query whereKey:AVIMAttr(CONV_TYPE) equalTo:@(CDConvTypeSingle)];
     [query whereKey:kAVIMKeyMember containedIn:@[USERID]];
     [query whereKey:kAVIMKeyMember sizeEqualTo:2];
     
@@ -325,28 +325,20 @@
                                                                        @(RescueStatusTypeProcessing),
                                                                        @(RescueStatusTypeCancelByC)]];
         }
-        else if ([EzgoalTypeReservation isEqualToString:ezgoalType]) {//查询有效的预约会话
-            //TODO:
+        else if ([EzgoalTypeReservation isEqualToString:ezgoalType]) {
+            //查询有效的预约会话
         }
     }
-    else if (nil != ezgoalType) {//只查询普通会话
-        [query whereKey:AVIMAttr(kParamEzgoalType) equalTo:@""];
+    else if (nil != ezgoalType) {
+        if (IsAppTypeB) {//查询B端普通会话
+            [query whereKey:AVIMAttr(kParamEzgoalType) containedIn:@[EzgoalTypeB2B, EzgoalTypeB2C, EzgoalTypeC2B]];
+        }
+        else {//查询C端普通会话
+            [query whereKey:AVIMAttr(kParamEzgoalType) containedIn:@[EzgoalTypeC2B, EzgoalTypeB2C, EzgoalTypeC2C]];
+        }
     }
     query.skip = MAX(0, pageIndex - 1) * pageSize;
     query.limit = pageSize;
-    [self searchByConversationQuery:query block:block];
-}
-//根据对方id数组查询会话列表
-- (void)searchConversationsFromNetworkByOtherIds:(NSArray *)otherIds block:(AVIMArrayResultBlock)block {
-    NSString *creatorId = USERID;
-    ReturnWhenObjectIsEmpty(creatorId);
-    ReturnWhenObjectIsEmpty(otherIds); //未登录不能查询
-    AVIMConversationQuery *query = [[AVIMClient defaultClient] conversationQuery];
-    query.cachePolicy = kAVCachePolicyNetworkOnly;
-    [query whereKey:AVIMAttr(CONV_TYPE) equalTo:@(CDConvTypeSingle)];
-    [query whereKey:kAVIMKeyMember sizeEqualTo:2];
-    [query whereKey:kAVIMKeyCreator equalTo:creatorId];
-    [query whereKey:kAVIMKeyMember containedIn:otherIds];
     [self searchByConversationQuery:query block:block];
 }
 //处理查询回来的会话列表
@@ -464,7 +456,6 @@
     }
     else {
         [[CDChatManager manager] fetchConvWithMembers:members
-                                                 type:CDConvTypeSingle
                                      extendAttributes:attributes
                                              callback:^(AVIMConversation *conversation, NSError *error) {
                                                  if (error) {//两种错误：查询出错；创建出错

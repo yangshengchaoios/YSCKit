@@ -49,9 +49,6 @@ static NSString *ObjectTagKeyUpdatedTime = @"ObjectTagKeyUpdatedTime";
     objc_setAssociatedObject(self, &ObjectTagKeyUpdatedTime, _updatedTime, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
-- (CDConvType)type {
-    return [[self.attributes objectForKey:CONV_TYPE] intValue];
-}
 - (NSString *)ezgoalType {
     return Trim(self.attributes[kParamEzgoalType]);
 }
