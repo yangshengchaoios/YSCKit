@@ -105,7 +105,8 @@
             }
             else {
                 if (99 == baseModel.stateInteger) {//登录过期
-                    postNWithInfo(kNotificationLoginExpired, @{kParamMessage : Trim(baseModel.message)});
+                    NSDictionary *param = @{kParamUserId : USERID, kParamMessage : Trim(baseModel.message)};
+                    postNWithInfo(kNotificationLoginExpired, param);
                 }
                 if (requestFailure) {
                     requestFailure(baseModel.stateInteger, baseModel.message);
@@ -144,7 +145,8 @@
               }
               else {
                   if (99 == baseModel.stateInteger) {//登录过期
-                      postNWithInfo(kNotificationLoginExpired, @{kParamMessage : Trim(baseModel.message)});
+                      NSDictionary *param = @{kParamUserId : USERID, kParamMessage : Trim(baseModel.message)};
+                      postNWithInfo(kNotificationLoginExpired, param);
                   }
                   if (requestFailure) {
                       requestFailure(baseModel.stateInteger, baseModel.message);
@@ -298,7 +300,8 @@
         if (200 != operation.response.statusCode) {
             if (401 == operation.response.statusCode) {
                 if (requestFailure) {
-                    postNWithInfo(kNotificationLoginExpired, @{kParamMessage : @"登录失效，请重新登录！"});
+                    NSDictionary *param = @{kParamUserId : USERID, kParamMessage : @"登陆过期"};
+                    postNWithInfo(kNotificationLoginExpired, param);
                     requestFailure(1003, @"您还未登录呢！");
                 }
             }
