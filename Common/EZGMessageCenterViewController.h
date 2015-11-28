@@ -20,7 +20,7 @@
 - (void)initTableView;
 //刷新列表
 - (void)refreshTableView;
-//刷新最近的对话
+//从本地数据库刷新最近的对话
 - (void)refreshConversationsByPageIndex:(NSInteger)pageIndex;
 //从IM服务器刷新会话列表
 - (void)refreshConversationsFromInternet;

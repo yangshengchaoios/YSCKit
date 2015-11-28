@@ -75,8 +75,23 @@
     self.enableTips = YES;
     
     //blocks
-    self.successBlock = ^{};
-    self.failedBlock = ^{};
+    WEAKSELF
+    self.successBlock = ^{
+        YSCBaseViewController *currentVC = (YSCBaseViewController *)[AppConfigManager sharedInstance].currentViewController;
+        if ([currentVC isKindOfClass:[YSCBaseViewController class]]) {
+            currentVC.isClicked = NO;
+        }
+        weakSelf.tipsView.actionButton.hidden = YES;
+        weakSelf.tipsView.iconImageView.image = [UIImage imageNamed:@"icon_empty"];
+    };
+    self.failedBlock = ^{
+        YSCBaseViewController *currentVC = (YSCBaseViewController *)[AppConfigManager sharedInstance].currentViewController;
+        if ([currentVC isKindOfClass:[YSCBaseViewController class]]) {
+            currentVC.isClicked = NO;
+        }
+        weakSelf.tipsView.actionButton.hidden = NO;
+        weakSelf.tipsView.iconImageView.image = [UIImage imageNamed:@"icon_failed"];
+    };
     self.preProcessBlock = ^NSArray *(NSArray *array) {
         return array;
     };
@@ -228,7 +243,7 @@
 }
 //当数据为空时执行下拉刷新
 - (void)refreshWhenCellDataEmpty {
-    if (isEmpty(self.cellDataArray)) {
+    if ([self isCellDataEmpty]) {
         [self beginRefreshing];
     }
 }

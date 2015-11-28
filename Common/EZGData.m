@@ -231,7 +231,7 @@
         }
         //刷新最近N条会话列表，目的是方便关闭进程的APP从推送栏点击推送消息进入，打开聊天窗口更快速
         if (NO == [[CDConversationStore store] isConversationExists]) {
-            [EZGDATA refreshConversationsByPageIndex:kDefaultPageStartIndex pageSize:20 block:nil];
+            [EZGDATA refreshAllConversationsByPageIndex:kDefaultPageStartIndex pageSize:kDefaultConversationPageSize block:nil];
         }
     }];
     [AppData synchronizeDeviceTokenWithUser];
@@ -302,32 +302,25 @@
     }];
 }
 
-
-//刷新用户最近的所有会话列表
-- (void)refreshConversationsByPageIndex:(NSInteger)pageIndex pageSize:(NSInteger)pageSize block:(AVIMArrayResultBlock)block {
+//C端需求：1. 所有会话列表
+- (void)refreshAllConversationsByPageIndex:(NSInteger)pageIndex pageSize:(NSInteger)pageSize block:(AVIMArrayResultBlock)block {
     [self refreshConversationsByEzgoalType:nil pageIndex:pageIndex pageSize:pageSize block:block];
 }
-//刷新用户最近的特殊会话列表
-//TODO:如何查询任意几种会话的组合？？？
+//B端需求：1. 普通会话列表
+- (void)refreshNormalConversationsByPageIndex:(NSInteger)pageIndex pageSize:(NSInteger)pageSize block:(AVIMArrayResultBlock)block {
+    [self refreshConversationsByEzgoalType:@"" pageIndex:pageIndex pageSize:pageSize block:block];
+}
+//B端需求：2. 指定某类的业务会话列表
+//查询条件ezgoalType: nil-所有会话  empty string-普通会话 not empty string-业务会话
 - (void)refreshConversationsByEzgoalType:(NSString *)ezgoalType pageIndex:(NSInteger)pageIndex pageSize:(NSInteger)pageSize block:(AVIMArrayResultBlock)block {
     AVIMConversationQuery *query = [[AVIMClient defaultClient] conversationQuery];
     query.cachePolicy = kAVCachePolicyNetworkOnly;
     [query orderByDescending:@"lm"];
     [query whereKey:kAVIMKeyMember containedIn:@[USERID]];
     [query whereKey:kAVIMKeyMember sizeEqualTo:2];
-    
-    //查询条件ezgoalType: nil-所有会话  empty-普通会话 notempty-特殊会话
     if (isNotEmpty(ezgoalType)) {
         [query whereKey:AVIMAttr(kParamEzgoalType) equalTo:Trim(ezgoalType)];
         [query whereKey:AVIMAttr(kParamS4Id) equalTo:S4ID];
-        if ([EzgoalTypeRescue isEqualToString:ezgoalType]) {//查询有效的救援会话
-            [query whereKey:AVIMAttr(kParamEzgoalStatus) containedIn:@[@(RescueStatusTypeUnProcess),
-                                                                       @(RescueStatusTypeProcessing),
-                                                                       @(RescueStatusTypeCancelByC)]];
-        }
-        else if ([EzgoalTypeReservation isEqualToString:ezgoalType]) {
-            //查询有效的预约会话
-        }
     }
     else if (nil != ezgoalType) {
         if (IsAppTypeB) {//查询B端普通会话
@@ -336,6 +329,9 @@
         else {//查询C端普通会话
             [query whereKey:AVIMAttr(kParamEzgoalType) containedIn:@[EzgoalTypeC2B, EzgoalTypeB2C, EzgoalTypeC2C]];
         }
+    }
+    else {
+        //查询所有会话
     }
     query.skip = MAX(0, pageIndex - 1) * pageSize;
     query.limit = pageSize;

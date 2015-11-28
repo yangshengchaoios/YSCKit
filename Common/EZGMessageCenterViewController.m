@@ -32,7 +32,6 @@
     else {
         self.tableView.tipsEmptyText = @"亲，请登录后查看您的消息！";
     }
-    self.tableView.tipsView.actionButton.hidden = YES;
     self.tableView.enableCellEdit = YES;
     //自定义数据源获取方式
     self.tableView.requestType = RequestTypeCustomResponse;
@@ -58,8 +57,6 @@
             [weakSelf.tableView refreshAtPageIndex:pageIndex response:nil error:nil];
         }
     }];
-    self.tableView.successBlock = ^(){ weakSelf.isClicked = NO; };
-    self.tableView.failedBlock = ^(){ weakSelf.isClicked = NO; };
     //点击cell的回调
     self.tableView.clickCellBlock = ^(NSObject *object, NSIndexPath *indexPath) {
         CheckWeakSelfIsClicked
@@ -97,14 +94,16 @@
 }
 //刷新最近的对话（分页机制）
 - (void)refreshConversationsByPageIndex:(NSInteger)pageIndex {
-    NSArray *array = [[CDConversationStore store] selectConversationsByPageIndex:pageIndex pageSize:50];
+    NSArray *array = [[CDConversationStore store] selectConversationsByPageIndex:pageIndex pageSize:kDefaultConversationPageSize];
     [self.tableView refreshAtPageIndex:pageIndex response:array error:nil];
 }
 //从IM服务器刷新会话列表
 - (void)refreshConversationsFromInternet {
     WEAKSELF
-    [EZGDATA refreshConversationsByPageIndex:kDefaultPageStartIndex pageSize:50 block:^(NSArray *objects, NSError *error) {
-        [weakSelf refreshConversationsByPageIndex:kDefaultPageStartIndex];
-    }];
+    [EZGDATA refreshAllConversationsByPageIndex:kDefaultPageStartIndex
+                                       pageSize:kDefaultConversationPageSize
+                                          block:^(NSArray *objects, NSError *error) {
+                                              [weakSelf refreshConversationsByPageIndex:kDefaultPageStartIndex];
+                                          }];
 }
 @end

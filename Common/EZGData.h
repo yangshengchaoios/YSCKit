@@ -47,10 +47,15 @@
 //更新_Installation，保证同一个userId只能对应一个deviceToken
 - (void)updateInstallationToEnsureUniqueUserId:(NSString *)userId;
 
-//刷新用户的最近会话列表(分页显示)
-- (void)refreshConversationsByPageIndex:(NSInteger)pageIndex pageSize:(NSInteger)pageSize block:(AVIMArrayResultBlock)block;
-//刷新用户最近的特殊会话列表
+
+//C端需求：1. 所有会话列表
+- (void)refreshAllConversationsByPageIndex:(NSInteger)pageIndex pageSize:(NSInteger)pageSize block:(AVIMArrayResultBlock)block;
+//B端需求：1. 普通会话列表
+- (void)refreshNormalConversationsByPageIndex:(NSInteger)pageIndex pageSize:(NSInteger)pageSize block:(AVIMArrayResultBlock)block;
+//B端需求：2. 指定某类的业务会话列表
+//查询条件ezgoalType: nil-所有会话  empty string-普通会话 not empty string-业务会话
 - (void)refreshConversationsByEzgoalType:(NSString *)ezgoalType pageIndex:(NSInteger)pageIndex pageSize:(NSInteger)pageSize block:(AVIMArrayResultBlock)block;
+
 
 //触发消息：打开聊天窗口
 - (void)openChatRoomByNotification:(NSNotification *)notification;

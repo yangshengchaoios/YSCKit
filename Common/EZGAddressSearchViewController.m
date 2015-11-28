@@ -230,7 +230,6 @@
     self.tableView.cellSeperatorLeft = 30;
     self.tableView.separatorColor = RGB(228, 228, 228);
     self.tableView.requestType = RequestTypeCustomResponse;
-    self.tableView.tipsView.actionButton.hidden = YES;
     self.tableView.clickCellBlock = ^(NSObject *object,NSIndexPath *indexPath) {
         //只刷新打钩
         weakSelf.isNeedReSearchByLocation = NO;
