@@ -144,11 +144,11 @@
     [self registerFooterName:footerName];
 }
 - (void)setCellSeperatorLeft:(CGFloat)cellSeperatorLeft {
-    _cellSeperatorLeft = AUTOLAYOUT_LENGTH(cellSeperatorLeft);
+    _cellSeperatorLeft = cellSeperatorLeft;
     [self resetCellEdgeInsets];
 }
 - (void)setCellSeperatorRight:(CGFloat)cellSeperatorRight {
-    _cellSeperatorRight = AUTOLAYOUT_LENGTH(cellSeperatorRight);
+    _cellSeperatorRight = cellSeperatorRight;
     [self resetCellEdgeInsets];
 }
 - (void)setEnableRefresh:(BOOL)enableRefresh {
@@ -692,7 +692,10 @@
     return YES;
 }
 - (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath {
-    [self resetCellEdgeInsets];
+    UIEdgeInsets edgeInsets = UIEdgeInsetsMake(0, self.cellSeperatorLeft, 0, self.cellSeperatorRight);
+    if ([cell respondsToSelector:@selector(setLayoutMargins:)]) {
+        [cell setLayoutMargins:edgeInsets];
+    }
 }
 
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
