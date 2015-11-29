@@ -106,11 +106,7 @@
 }
 
 - (void)reloadData {
-    if (!_shareMenuItems.count)
-        return;
-    
     [self.shareMenuScrollView.subviews makeObjectsPerformSelector:@selector(removeFromSuperview)];
-    
     CGFloat paddingX = 16;
     CGFloat paddingY = 10;
     for (XHShareMenuItem *shareMenuItem in self.shareMenuItems) {

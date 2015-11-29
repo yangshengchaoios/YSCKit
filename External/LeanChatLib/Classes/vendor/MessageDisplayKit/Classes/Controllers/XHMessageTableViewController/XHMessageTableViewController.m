@@ -111,7 +111,6 @@ static CGPoint  delayOffset = {0.0};
         shareMenuView.delegate = self;
         shareMenuView.backgroundColor = [UIColor colorWithWhite:0.961 alpha:1.000];
         shareMenuView.alpha = 0.0;
-        shareMenuView.shareMenuItems = self.shareMenuItems;
         [self.view addSubview:shareMenuView];
         _shareMenuView = shareMenuView;
     }

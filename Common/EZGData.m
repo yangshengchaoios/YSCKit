@@ -19,9 +19,6 @@
 @property (nonatomic, strong) BMKGeoCodeSearch *geoCodeSearch;      //后台GPS坐标解析(成文字信息)
 @property (nonatomic, copy) YSCResultBlock geoCodeResultBlock;      //GPS解析结果回调
 @property (nonatomic, assign) BOOL isGeoCodeResolving;              //是否正在进行GPS解析
-
-@property (nonatomic, assign) BOOL isChecking;                      //是否正在监测登陆状态
-@property (nonatomic, assign) BOOL isNeedCheckLogin;                //是否需要监测登陆状态
 @end
 
 @implementation EZGData
@@ -641,7 +638,7 @@
                                         //更新conversation
                                         [EZGDATA updateConversation:conv byParams:@{kParamEzgoalStatus : @(rescueStatus)} block:^(NSObject *object) {
                                             postN(kNotificationRefreshMessageCenter);//刷新消息中心
-                                            APPDATA.isRescueModelChanged = YES;//通知会话页面，报告conv的状态已经更新了
+                                            postN(kNotificationRefreshConvStatus);//通知会话页面，报告conv的状态已经更新了
                                             //FIXME:更新失败的处理？？？
                                         }];
                                     }];
@@ -656,7 +653,7 @@
             //更新conversation
             [EZGDATA updateConversation:conv byParams:@{kParamEzgoalStatus : @(rescueStatus)} block:^(NSObject *object) {
                 postN(kNotificationRefreshMessageCenter);//刷新消息中心
-                APPDATA.isRescueModelChanged = YES;//通知会话页面，报告conv的状态已经更新了
+                postN(kNotificationRefreshConvStatus);//通知会话页面，报告conv的状态已经更新了
                 //FIXME:更新失败的处理？？？
             }];
         }

@@ -37,7 +37,6 @@ XHEmotionManagerViewDelegate, XHEmotionManagerViewDataSource>
 
 @property (nonatomic, strong) XHLocationHelper *locationHelper;//管理地理位置的工具对象
 @property (nonatomic, strong) NSMutableArray *messages;//消息数组
-@property (nonatomic, strong) NSArray *shareMenuItems;//第三方接入的功能，也包括系统自身的功能，比如拍照、发送地理位置
 @property (nonatomic, copy) NSString *messageSender;//消息的主体，默认为nil
 @property (nonatomic, weak, readonly) XHMessageTableView *messageTableView;//用于显示消息的TableView
 @property (nonatomic, weak, readonly) XHMessageInputView *messageInputView;//用于显示发送消息类型控制的工具条，在底部

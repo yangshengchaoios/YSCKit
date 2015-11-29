@@ -199,7 +199,7 @@ static NSInteger const kOnePageSize = 10;
         XHShareMenuItem *shareMenuItem = [[XHShareMenuItem alloc] initWithNormalIconImage:[UIImage imageNamed:plugIcon] title:[plugTitle objectAtIndex:[plugIcons indexOfObject:plugIcon]]];
         [shareMenuItems addObject:shareMenuItem];
     }
-    self.shareMenuItems = shareMenuItems;
+    self.shareMenuView.shareMenuItems = shareMenuItems;
     [self.shareMenuView reloadData];
 }
 //初始化表情管理器

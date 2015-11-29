@@ -153,7 +153,6 @@
     BOOL flag = [self.routesearch drivingSearch:drivingRouteSearchOption];
     if(flag) {
         NSLog(@"路径规划成功");
-        self.startNavigateButton.hidden = NO;
         [self findRoutePlan];//计算导航路径
     }
     else {
@@ -227,6 +226,7 @@
 //算路成功回调
 - (void)routePlanDidFinished:(NSDictionary *)userInfo {
     NSLog(@"算路成功,userinfo=%@", userInfo);
+    self.startNavigateButton.hidden = NO;
 }
 //算路失败回调
 - (void)routePlanDidFailedWithError:(NSError *)error andUserInfo:(NSDictionary *)userInfo {

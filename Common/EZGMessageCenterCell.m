@@ -13,7 +13,7 @@
 - (void)awakeFromNib {
     [super awakeFromNib];
     self.backgroundColor = [UIColor clearColor];
-    self.contentView.backgroundColor = [UIColor clearColor];
+    self.contentView.backgroundColor = [UIColor whiteColor];
     
     [self.avatarImageView makeRoundWithRadius:5];
     self.lastMessageLabel.text = self.timePassedLabel.text = nil;
