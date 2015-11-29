@@ -10,12 +10,16 @@
 #import "BNRoutePlanModel.h"
 #import "BNCoreServices.h"
 
+//NOTE:需要完善的地方
+//1. 起点和终点的图标没有固定
+//2. 监控app恢复重新启动定位或许是多余的
 @interface YSCLocationDisplayViewController () <BMKMapViewDelegate, BMKRouteSearchDelegate, BNNaviUIManagerDelegate,BNNaviRoutePlanDelegate>
 @property (nonatomic, weak) IBOutlet BMKMapView *mapView;
-@property (strong, nonatomic) BMKRouteSearch *routesearch;
+@property (nonatomic, strong) BMKRouteSearch *routesearch;
 @property (nonatomic, assign) double longitude;
 @property (nonatomic, assign) double latitude;
-@property (weak, nonatomic) IBOutlet UIButton *startNavigateButton;//开始导航按钮
+@property (nonatomic, weak) IBOutlet UIButton *startNavigateButton;//开始导航按钮
+@property (nonatomic, strong) NSString *locationChangedIdentifier;
 @end
 
 @implementation YSCLocationDisplayViewController
@@ -23,6 +27,12 @@
 - (void)dealloc {
     if (self.mapView) {
         self.mapView = nil;
+    }
+    if (self.routesearch) {
+        self.routesearch = nil;
+    }
+    if (self.locationChangedIdentifier) {
+        [EZGDATA bk_removeObserversWithIdentifier:self.locationChangedIdentifier];
     }
 }
 - (void)viewWillAppear:(BOOL)animated {
@@ -32,24 +42,62 @@
 - (void)viewWillDisappear:(BOOL)animated {
     [self.mapView viewWillDisappear];
     self.mapView.delegate = nil; // 不用时，置nil
+    self.routesearch.delegate = nil;
     [super viewWillDisappear:animated];
 }
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.title = @"地理位置";
+    self.longitude = [self.params[kParamLongitude] doubleValue];
+    self.latitude = [self.params[kParamLatitude] doubleValue];
+    
     self.mapView.delegate = self;
     self.mapView.zoomLevel = 15;
     self.mapView.userTrackingMode = BMKUserTrackingModeNone;
     self.mapView.showsUserLocation = NO;
+    self.routesearch = [BMKRouteSearch new];
+    self.routesearch.delegate = self;
+    [self.startNavigateButton makeRoundWithRadius:5];
+    self.startNavigateButton.hidden = YES;
     
-    if (![self.params[kParamIsNavigationable] boolValue]) {
-        [self addEndAnnotation];
-        [self addStartAnnotation];//TODO:重新定位自己
-        [self searchDrvingRoute];//线路规划
+    if ([self.params[kParamIsNavigationable] boolValue]) {//需要导航功能
+        self.mapView.showsUserLocation = YES;
+        [self refreshLocation];
+        addNObserver(@selector(refreshLocation), UIApplicationDidBecomeActiveNotification);
     }
     else {
-        self.startNavigateButton.hidden = YES;
-        [self addEndAnnotation];
+        [self addEndAnnotation];//NOTE:mapView会自动将最后一个annotation放置正中央
+    }
+}
+- (void)refreshLocation {
+    [self.mapView removeAnnotations:self.mapView.annotations];
+    [self addEndAnnotation];
+    if (nil == EZGDATA.userLocation) {//重新定位
+        if ([UIDevice isLocationAvaible]) {
+            WEAKSELF
+            [EZGDATA startLocationService];
+            self.locationChangedIdentifier = [EZGDATA bk_addObserverForKeyPath:@"currentLongitude" task:^(id target) {
+                if (EZGDATA.userLocation && EZGDATA.currentLongitude != 0) {//定位成功，关闭通知
+                    if (weakSelf.locationChangedIdentifier) {
+                        [EZGDATA bk_removeObserversWithIdentifier:weakSelf.locationChangedIdentifier];//关闭自动定位
+                        weakSelf.locationChangedIdentifier = nil;
+                    }
+                    [weakSelf addStartAnnotation];//添加起点
+                    [weakSelf searchDrvingRoute];//线路规划
+                }
+                else {
+                    //定位失败，继续监控定位信息
+                }
+            }];
+        }
+        else {
+            [self.mapView removeOverlays:self.mapView.overlays];//删除路径
+            [UIView showAlertVieWithMessage:@"请在设置中打开本应用的定位服务，否则无法启用导航功能"];
+        }
+    }
+    else {//如果已经定位成功
+        [self addStartAnnotation];//添加起点
+        [self searchDrvingRoute];//线路规划
     }
 }
 
@@ -57,9 +105,13 @@
 - (void)addEndAnnotation {
     BMKCustomAnnotation *endAnnotation = [[BMKCustomAnnotation alloc] init];
     endAnnotation.type = 0;//终点
-    endAnnotation.imageName = @"icon_location_normal";
-    endAnnotation.coordinate = CLLocationCoordinate2DMake([self.params[kParamLatitude] doubleValue],
-                                                          [self.params[kParamLongitude] doubleValue]);
+    if ([self.params[kParamIsNavigationable] boolValue]) {
+        endAnnotation.imageName = @"icon_location_normal";
+    }
+    else {
+        endAnnotation.imageName = @"icon_location_my";
+    }
+    endAnnotation.coordinate = CLLocationCoordinate2DMake(self.latitude,self.longitude);
     NSArray *annotationArray = @[endAnnotation];
     [self.mapView addAnnotations:annotationArray];
     [self.mapView showAnnotations:annotationArray animated:YES];
@@ -74,6 +126,14 @@
     NSArray *annotationArray = @[startAnnotation];
     [self.mapView addAnnotations:annotationArray];
     [self.mapView showAnnotations:annotationArray animated:NO];
+    
+    //设置地图的可见区域
+    double centerLatitude = (self.latitude + EZGDATA.currentLatitude) / 2;
+    double centerLongitude = (self.longitude + EZGDATA.currentLongitude) / 2;
+    CLLocationCoordinate2D centerLocation = CLLocationCoordinate2DMake(centerLatitude, centerLongitude);
+    BMKCoordinateSpan span = BMKCoordinateSpanMake(fabs(self.latitude - EZGDATA.currentLatitude) * 2.15,
+                                                   fabs(self.longitude - EZGDATA.currentLongitude) * 2.15);
+    [self.mapView setRegion:BMKCoordinateRegionMake(centerLocation, span) animated:NO];
 }
 
 //====================================
@@ -91,11 +151,10 @@
     drivingRouteSearchOption.from = start;
     drivingRouteSearchOption.to = end;
     BOOL flag = [self.routesearch drivingSearch:drivingRouteSearchOption];
-    self.startNavigateButton.hidden = ! flag;
     if(flag) {
         NSLog(@"路径规划成功");
-        //计算导航路径
-        [self findRoutePlan];
+        self.startNavigateButton.hidden = NO;
+        [self findRoutePlan];//计算导航路径
     }
     else {
         NSLog(@"路径规划失败");
@@ -208,16 +267,15 @@
         annotationView = [[BMKAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:@"location_annotation"];
         annotationView.annotation = annotation;
         annotationView.canShowCallout = NO;
-        annotationView.centerOffset = CGPointMake(0, -(annotationView.frame.size.height * 0.5));
     }
+    annotationView.centerOffset = CGPointMake(0, -(annotationView.frame.size.height * 0.5));
     annotationView.image = [UIImage imageNamed:annotation.imageName];
     return annotationView;
 }
 - (BMKOverlayView*)mapView:(BMKMapView *)map viewForOverlay:(id<BMKOverlay>)overlay {
     if ([overlay isKindOfClass:[BMKPolyline class]]) {
         BMKPolylineView* polylineView = [[BMKPolylineView alloc] initWithOverlay:overlay];
-        polylineView.fillColor = RGBA(130, 241, 91, 0.7);
-        polylineView.strokeColor = [[UIColor blueColor] colorWithAlphaComponent:0.7];
+        polylineView.strokeColor = RGBA(130, 241, 91, 0.7);
         polylineView.lineWidth = 5.0;
         return polylineView;
     }
@@ -226,10 +284,7 @@
 
 #pragma mark - BMKRouteSearchDelegate
 - (void)onGetDrivingRouteResult:(BMKRouteSearch*)searcher result:(BMKDrivingRouteResult *)result errorCode:(BMKSearchErrorCode)error {
-    NSArray *array = [NSArray arrayWithArray:_mapView.annotations];
-    [_mapView removeAnnotations:array];
-    array = [NSArray arrayWithArray:_mapView.overlays];
-    [_mapView removeOverlays:array];
+    [_mapView removeOverlays:_mapView.overlays];
     if (error == BMK_SEARCH_NO_ERROR) {
         BMKDrivingRouteLine* plan = (BMKDrivingRouteLine*)[result.routes objectAtIndex:0];
         // 计算路线方案中的路段数目
