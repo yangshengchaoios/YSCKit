@@ -262,9 +262,18 @@ static NSInteger const kOnePageSize = 10;
                 } afterDelay:0.5];
             }];
         }
-        else if (error.code == kAVIMErrorConnectionLost) {
+        else if (kAVIMErrorConnectionLost == error.code) {
             [UIView showResultThenHideOnWindow:@"未能连接聊天服务器"];
             postN(kNotificationConnectToChatServer);
+        }
+        else if (kAVIMErrorConversationNotFound == error.code) {
+            [UIView showResultThenHideOnWindow:@"会话不存在！"];
+        }
+        else if (kAVIMErrorConnectionLost == error.code) {
+            [UIView showResultThenHideOnWindow:@"会话连接断开"];
+        }
+        else if (kAVIMErrorMessageTooLong == error.code) {
+            [UIView showResultThenHideOnWindow:@"消息太长"];
         }
         else if ([error.domain isEqualToString:NSURLErrorDomain]) {
             [UIView showResultThenHideOnWindow:@"网络连接错误"];
