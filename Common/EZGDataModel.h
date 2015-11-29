@@ -72,3 +72,17 @@
 + (void)RefreshByUserIds:(NSArray *)userIds ezgoalType:(NSString *)ezgoalType block:(YSCObjectResultBlock)block;
 + (instancetype)GetLocalDataByUserId:(NSString *)userId;
 @end
+
+
+//=============================================
+//
+//  百度地图节点模型
+//
+//=============================================
+@interface BMKCustomAnnotation : BMKPointAnnotation
+@property (nonatomic, assign) NSInteger type; //0:起点 1：终点 2：公交 3：地铁 4:驾乘 5:途经点
+@property (nonatomic, assign) NSInteger degree;
+@property (nonatomic, strong) NSString *imageName;
+@end
+
+

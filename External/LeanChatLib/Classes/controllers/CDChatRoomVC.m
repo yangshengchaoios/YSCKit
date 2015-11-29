@@ -413,7 +413,9 @@ static NSInteger const kOnePageSize = 10;
     else if (kAVIMMessageMediaTypeLocation == message.mediaType) {//查看位置
         YSCBaseViewController *mapViewController = (YSCBaseViewController *)[UIResponder createBaseViewController:@"YSCLocationDisplayViewController"];
         AVIMLocationMessage *locMessage = (AVIMLocationMessage *)message;
-        mapViewController.params = @{kParamBackType : @(BackTypeImage), kParamLatitude : @(locMessage.latitude), kParamLongitude : @(locMessage.longitude)};
+        mapViewController.params = @{kParamBackType : @(BackTypeImage),
+                                     kParamLatitude : @(locMessage.latitude),
+                                     kParamLongitude : @(locMessage.longitude)};
         [self.navigationController pushViewController:mapViewController animated:YES];
     }
     else if (kAVIMMessageMediaTypeVideo == message.mediaType) {

@@ -191,3 +191,4 @@
     [YSCCommonUtils SqliteUpdate:insertSql dbPath:EZGDATA.cacheDBPath];
 }
 @end
+@implementation BMKCustomAnnotation         @end
