@@ -8,8 +8,8 @@
 
 #import "EZGMessageLocationCell.h"
 
-#define kHeightOfMap                230                 //地图高度
-#define kDefaultMapImageName        @"default_image"    //TODO:修改默认地图图片名称
+#define kHeightOfMap                238                     //地图高度
+#define kDefaultMapImageName        @"default_image_map"
 
 @implementation EZGMessageLocationCell
 
