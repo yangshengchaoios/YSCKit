@@ -248,4 +248,14 @@
     return result;
 }
 
+//判断是否允许后台刷新程序
++ (BOOL)isBackgroundRefreshable {
+    if (UIBackgroundRefreshStatusAvailable == [UIApplication sharedApplication].backgroundRefreshStatus) {
+        return YES;
+    }
+    else {
+        return NO;
+    }
+}
+
 @end

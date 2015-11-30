@@ -66,5 +66,7 @@ enum {
 + (BOOL)isCanUserPickVideosFromPhotoLibrary;
 // 是否可以在相册中选择图片
 + (BOOL)isCanUserPickPhotosFromPhotoLibrary;
+//判断是否允许后台刷新程序
++ (BOOL)isBackgroundRefreshable;
 
 @end

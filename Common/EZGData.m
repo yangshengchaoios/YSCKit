@@ -595,10 +595,15 @@
     
     //特殊类型的消息
     RescueStatusType rescueStatus = 0;//默认不修改
-    BOOL isUpdatedByC = YES;//C端需要调用接口更新救援任务状态
-    if (EZGMessageTypeServiceCancel == message.mediaType) {//C端发出之前需要先修改救援任务状态
+    BOOL isUpdatedByC = YES;//C端已经调用了接口更新救援任务的状态！
+    if (EZGMessageTypeServiceCancel == message.mediaType) {//发出之前需要先修改救援任务状态
         //B端处理：conversation的ezgoalType修改为RescueStatusTypeCancelByC
-        rescueStatus = RescueStatusTypeCancelByC;
+        if (0 == [message.attributes[MParamCancelType] integerValue]) {
+            rescueStatus = RescueStatusTypeCancelByC0;
+        }
+        else {
+            rescueStatus = RescueStatusTypeCancelByC1;
+        }
     }
     else if (EZGMessageTypeServiceComment == message.mediaType) {//C端发出之前需要先修改救援任务状态
         //B端处理：conversation的ezgoalType修改为RescueStatusTypeConfirm

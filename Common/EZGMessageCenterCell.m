@@ -47,13 +47,13 @@
             [ChatUserModel RefreshByUserIds:@[Trim(conversation.otherId)] ezgoalType:conversation.ezgoalType block:^(NSObject *object, NSError *error) {
                 if (isNotEmpty(object)) {
                     ChatUserModel *userModel1 = [ChatUserModel GetLocalDataByUserId:conversation.otherId];
-                    [weakSelf.avatarImageView setImageWithURLString:userModel1.avatarUrl placeholderImageName:@"default_avatar" withFadeIn:NO];
+                    [weakSelf.avatarImageView setImageWithURLString:userModel1.avatarUrl placeholderImage:DefaultAvatarImage withFadeIn:NO];
                     weakSelf.nameLabel.text = Trim(userModel1.userName);
                 }
             }];
         }
         else {
-            [self.avatarImageView setImageWithURLString:chatUser.avatarUrl placeholderImageName:@"default_avatar" withFadeIn:NO];
+            [self.avatarImageView setImageWithURLString:chatUser.avatarUrl placeholderImage:DefaultAvatarImage withFadeIn:NO];
             self.nameLabel.text = Trim(chatUser.userName);
         }
     }

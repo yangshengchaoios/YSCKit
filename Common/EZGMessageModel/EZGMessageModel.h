@@ -57,6 +57,7 @@ static const NSString *EzgoalTypeGroup          = @"Group";//群会话(暂未启
 #define MParamCarInfo                   @"carInfo"          //爱车模型
 #define MParamDetailInfo                @"detailInfo"       //详细信息
 #define MParamServiceType               @"serviceType"      //服务类型
+#define MParamCancelType                @"cancelType"       //取消救援类型 0-救援状态从0取消的 1-救援状态从1取消的
 #define MParamRateScore                 @"rateScore"        //评分数
 #define MParamAccidentId                @"accidentId"       //现场记录id
 #define MParamServerTime                @"serverTime"       //发送该消息时服务器的时间（用于：取消救援的时间起点）

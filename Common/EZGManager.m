@@ -7,6 +7,7 @@
 //
 
 #import "EZGManager.h"
+#import "ServerTimeSynchronizer.h"
 
 @implementation EZGManager
 
@@ -43,7 +44,8 @@
 + (BOOL)checkRescueStatusIsProcessing:(RescueStatusType)rescueStatus {
     return (RescueStatusTypeUnProcess == rescueStatus ||
             RescueStatusTypeProcessing == rescueStatus ||
-            RescueStatusTypeCancelByC == rescueStatus);
+            RescueStatusTypeCancelByC0 == rescueStatus ||
+            RescueStatusTypeCancelByC1 == rescueStatus);
 }
 #pragma mark - 车牌号相关
 //今日限号
@@ -118,7 +120,8 @@
 
 #pragma mark - 格式化救援耗时
 + (NSString *)formatRescueTimePassed:(NSDate *)startDate {
-    return [self formatRescueTimePassed:startDate endDate:[NSDate date]];
+    NSDate *endDate = [NSDate dateFromTimeStamp:[ServerTimeSynchronizer sharedInstance].currentTimeInterval];
+    return [self formatRescueTimePassed:startDate endDate:endDate];
 }
 + (NSString *)formatRescueTimePassed:(NSDate *)startDate endDate:(NSDate *)endDate {
     NSDateComponents *dateComponents = [NSDate ComponentsBetweenStartDate:startDate withEndDate:endDate];
@@ -132,6 +135,45 @@
     }
     else {
         return [NSString stringWithFormat:@"%02ld:%02ld", (long)dateComponents.minute, (long)dateComponents.second];
+    }
+}
+//计算时间过了多少
++ (NSString *)timePassedByStartDate:(NSDate *)startDate {
+    return [self timePassedByStartDate:startDate flag:NO];
+}
++ (NSString *)timePassedByStartDate:(NSDate *)startDate flag:(BOOL)flag {
+    NSDate *endDate = [NSDate dateFromTimeStamp:[ServerTimeSynchronizer sharedInstance].currentTimeInterval];
+    //异常时间处理
+    if ([startDate isLaterThanDate:endDate]) {
+        return @"开始时间有误";
+    }
+    
+    NSDateComponents *dateComponents = [NSDate ComponentsBetweenStartDate1:startDate withEndDate:endDate];
+    //如果>=365d
+    if (dateComponents.day >= 365) {
+        return @"超过1年";
+    }
+    else {
+        NSMutableString *timePassed = [NSMutableString string];
+        if (dateComponents.day > 0) {
+            [timePassed appendFormat:@"%ld天", dateComponents.day];
+            if (flag && dateComponents.hour > 0) {
+                [timePassed appendFormat:@"%ld小时", dateComponents.hour];
+            }
+            return timePassed;
+        }
+        if (dateComponents.hour > 0) {
+            [timePassed appendFormat:@"%ld小时", dateComponents.hour];
+            if (flag && dateComponents.minute > 0) {
+                [timePassed appendFormat:@"%ld分钟", dateComponents.minute];
+            }
+            return timePassed;
+        }
+        if (dateComponents.minute > 0) {
+            [timePassed appendFormat:@"%ld分钟", dateComponents.minute];
+            return timePassed;
+        }
+        return @"少于1分钟";
     }
 }
 
