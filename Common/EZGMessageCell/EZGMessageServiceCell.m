@@ -64,7 +64,8 @@
 //计算cell高度
 + (CGFloat)HeightOfCellByMessage:(EZGServiceMessage *)message displaysTimestamp:(BOOL)displayTimestamp {
     CGFloat cellHeight = [super HeightOfCellByMessage:message displaysTimestamp:displayTimestamp];
-    if (EZGServiceTypeOver == [message.attributes[MParamServiceType] integerValue]) {
+    RescueStatusType ezgoalStatus = [message.attributes[kParamEzgoalStatus] integerValue];
+    if ([EZGManager checkRescueStatusIsOver:ezgoalStatus]) {//服务结束(有结束标志！)
         return cellHeight + AUTOLAYOUT_LENGTH(80) + kXHLabelPadding;
     }
     else {
@@ -79,7 +80,8 @@
     self.serviceTitleLabel.text = Trim(message.text);
     self.serviceDetailLabel.text = Trim(message.attributes[MParamDetailInfo]);
     //设置详细内容显示样式
-    if (EZGServiceTypeOver == [message.attributes[MParamServiceType] integerValue]) {//服务结束(有结束标志！)
+    RescueStatusType ezgoalStatus = [message.attributes[kParamEzgoalStatus] integerValue];
+    if ([EZGManager checkRescueStatusIsOver:ezgoalStatus]) {//服务结束(有结束标志！)
         self.overLabel.hidden = NO;
         self.overLabel.text = [NSString stringWithFormat:@"%@\r\n本次服务已结束", [self formatMessageTimeByTimeStamp:message.sendTimestamp]];
     }

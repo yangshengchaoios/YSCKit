@@ -593,75 +593,24 @@
         return;
     }
     
-    //特殊类型的消息
-    RescueStatusType rescueStatus = 0;//默认不修改
-    BOOL isUpdatedByC = YES;//C端已经调用了接口更新救援任务的状态！
-    if (EZGMessageTypeServiceCancel == message.mediaType) {//发出之前需要先修改救援任务状态
-        //B端处理：conversation的ezgoalType修改为RescueStatusTypeCancelByC
-        if (0 == [message.attributes[MParamCancelType] integerValue]) {
-            rescueStatus = RescueStatusTypeCancelByC0;
-        }
-        else {
-            rescueStatus = RescueStatusTypeCancelByC1;
-        }
-    }
-    else if (EZGMessageTypeServiceComment == message.mediaType) {//C端发出之前需要先修改救援任务状态
-        //B端处理：conversation的ezgoalType修改为RescueStatusTypeConfirm
-        rescueStatus = RescueStatusTypeConfirm;
-    }
-    else if (EZGMessageTypeService == message.mediaType) {//救援过程中的业务数据往来
-        if (EZGServiceTypeStart == [message.attributes[MParamServiceType] integerValue]) {
-            //C端处理：conversation的ezgoalType修改为RescueStatusTypeProcessing
-            rescueStatus = RescueStatusTypeProcessing;
-            isUpdatedByC = NO;
-        }
-        else if (EZGServiceTypeFinish == [message.attributes[MParamServiceType] integerValue]) {
-            //C端处理：conversation的ezgoalType修改为RescueStatusTypeFinished
-            rescueStatus = RescueStatusTypeFinished;
-            isUpdatedByC = NO;
-        }
-        else if (EZGServiceTypeOver == [message.attributes[MParamServiceType] integerValue]) {
-            //C端处理：conversation的ezgoalType修改为RescueStatusTypeCancelByB
-            rescueStatus = RescueStatusTypeCancelByB;
-            isUpdatedByC = NO;
-        }
-        else if (EZGServiceTypeResume == [message.attributes[MParamServiceType] integerValue]) {//C端发出之前需要先修改救援任务状态
-            //B端处理：conversation的ezgoalType修改为RescueStatusTypeProcessing
-            rescueStatus = RescueStatusTypeProcessing;
-        }
-    }
-    
-    if (rescueStatus != 0) {//有修改
+    //特殊类型的消息(发出之前需要先修改救援任务状态)
+    if (EZGMessageTypeServiceCancel == message.mediaType ||
+        EZGMessageTypeServiceComment == message.mediaType ||
+        EZGMessageTypeService == message.mediaType) {
+        RescueStatusType rescueStatus = [message.attributes[kParamEzgoalStatus] integerValue];
         AVIMConversation *conv = [[CDConversationStore store] selectOneConversationByConvId:message.conversationId];
-        //更新救援任务状态
-        if ((IsAppTypeC && isUpdatedByC) || (IsAppTypeB && ! isUpdatedByC)) {
-            [RescueModel updateRescueInfo:@{kParamRescueId : Trim(conv.rescueId),
-                                            kParamS4Id : Trim(conv.s4Id),
-                                            kParamRescueStatus : @(rescueStatus)
-                                            }
-                                    block:^(NSObject *object, NSError *error) {
-                                        //更新conversation
-                                        [EZGDATA updateConversation:conv byParams:@{kParamEzgoalStatus : @(rescueStatus)} block:^(NSObject *object) {
-                                            postN(kNotificationRefreshMessageCenter);//刷新消息中心
-                                            postN(kNotificationRefreshConvStatus);//通知会话页面，报告conv的状态已经更新了
-                                            //FIXME:更新失败的处理？？？
-                                        }];
-                                    }];
+        //更新本地救援模型
+        if ([message.conversationId isEqualToString:APPDATA.rescueModel.conversationId] ||
+            [conv.rescueId isEqualToString:APPDATA.rescueModel.rescueId]) {
+            APPDATA.rescueModel.rescueStatus = rescueStatus;
+            SaveObjectByFile(APPDATA.rescueModel, kCachedRescueModel, kParamAppModel);
         }
-        else {
-            //更新本地救援模型
-            if ([message.conversationId isEqualToString:APPDATA.rescueModel.conversationId] ||
-                [conv.rescueId isEqualToString:APPDATA.rescueModel.rescueId]) {
-                APPDATA.rescueModel.rescueStatus = rescueStatus;
-                SaveObjectByFile(APPDATA.rescueModel, kCachedRescueModel, kParamAppModel);
-            }
-            //更新conversation
-            [EZGDATA updateConversation:conv byParams:@{kParamEzgoalStatus : @(rescueStatus)} block:^(NSObject *object) {
-                postN(kNotificationRefreshMessageCenter);//刷新消息中心
-                postN(kNotificationRefreshConvStatus);//通知会话页面，报告conv的状态已经更新了
-                //FIXME:更新失败的处理？？？
-            }];
-        }
+        //更新conversation
+        [EZGDATA updateConversation:conv byParams:@{kParamEzgoalStatus : @(rescueStatus)} block:^(NSObject *object) {
+            postN(kNotificationRefreshMessageCenter);//刷新消息中心
+            postN(kNotificationRefreshConvStatus);//通知会话页面，报告conv的状态已经更新了
+            //FIXME:更新失败的处理？？？
+        }];
     }
     else {
         postN(kNotificationRefreshMessageCenter);//刷新消息中心

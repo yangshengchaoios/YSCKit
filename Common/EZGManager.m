@@ -47,6 +47,12 @@
             RescueStatusTypeCancelByC0 == rescueStatus ||
             RescueStatusTypeCancelByC1 == rescueStatus);
 }
+//判断救援状态是否结束
++ (BOOL)checkRescueStatusIsOver:(RescueStatusType)rescueStatus {
+    return (RescueStatusTypeConfirm == rescueStatus ||
+            RescueStatusTypeGiveUpByB == rescueStatus ||
+            RescueStatusTypeCancelByB == rescueStatus);
+}
 #pragma mark - 车牌号相关
 //今日限号
 + (NSArray *)TodayLimitedNumbers {

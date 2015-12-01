@@ -17,7 +17,7 @@
 #define DateFormat4     @"yyyy.MM.dd"
 #define DateFormat5     @"yyyy年M月d日"
 #define DateFormat6     @"yyyy-MM-dd HH:mm"
-#define DateFormat7     @"yyyy年M月dd日 HH:mm"
+#define DateFormat7     @"yyyy年M月d日 HH:mm"
 #define DateFormat8     @"M月d日"
 #define DateFormat9     @"yyyy年M月"
 #define DateFormat20    @"yyyy年M月d日 HH:mm:ss"

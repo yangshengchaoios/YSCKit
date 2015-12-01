@@ -17,18 +17,23 @@ typedef NS_ENUM(NSInteger, EZGMessageType) {
     EZGMessageTypeServiceComment    = 5,        //完成对服务的评价
 };
 
+//救援任务类型(救援会话类型)
+typedef NS_ENUM(NSInteger, RescueStatusType) {
+    RescueStatusTypeUnProcess           = 0,//暂未开始/C端放弃取消救援
+    RescueStatusTypeProcessing          = 1,//救援中/C端放弃取消救援
+    RescueStatusTypeFinished            = 2,//救援完成/未评价
+    RescueStatusTypeConfirm             = 3,//C端确认完成/已评价 (over)
+    RescueStatusTypeGiveUpByB           = 4,//B端放弃救援(over)
+    RescueStatusTypeCancelByC0          = 5,//C端申请取消救援(从暂未开始改变而来)
+    RescueStatusTypeCancelByB           = 6,//B端确认取消救援/系统到时自动取消(over)
+    RescueStatusTypeCancelByC1          = 7,//C端申请取消救援(从救援中改变而来)
+};
+
 #pragma mark - 消息扩展参数值宏定义
 //现场照片消息类型
 typedef NS_ENUM(NSInteger, EZGSceneType) {
     EZGSceneTypeSingleCar           = 1,
     EZGSceneTypeMultiCar            = 2,
-};
-//服务消息类型
-typedef NS_ENUM(NSInteger, EZGServiceType) {
-    EZGServiceTypeStart             = 1,    //服务开始
-    EZGServiceTypeFinish            = 2,    //服务完成(等待评价)
-    EZGServiceTypeOver              = 3,    //服务结束(有结束标志！)
-    EZGServiceTypeResume            = 4,    //取消放弃操作(C端不想放弃救援了)
 };
 
 //ezgoalType参数值定义(用于区分普通聊天会话)
@@ -56,7 +61,6 @@ static const NSString *EzgoalTypeGroup          = @"Group";//群会话(暂未启
 #define MParamSceneType                 @"sceneType"        //现场照片类型
 #define MParamCarInfo                   @"carInfo"          //爱车模型
 #define MParamDetailInfo                @"detailInfo"       //详细信息
-#define MParamServiceType               @"serviceType"      //服务类型
 #define MParamCancelType                @"cancelType"       //取消救援类型 0-救援状态从0取消的 1-救援状态从1取消的
 #define MParamRateScore                 @"rateScore"        //评分数
 #define MParamAccidentId                @"accidentId"       //现场记录id
