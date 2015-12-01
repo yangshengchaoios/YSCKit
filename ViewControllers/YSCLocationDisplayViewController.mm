@@ -132,7 +132,7 @@
     double centerLongitude = (self.longitude + EZGDATA.currentLongitude) / 2;
     CLLocationCoordinate2D centerLocation = CLLocationCoordinate2DMake(centerLatitude, centerLongitude);
     BMKCoordinateSpan span = BMKCoordinateSpanMake(fabs(self.latitude - EZGDATA.currentLatitude) * 2.15,
-                                                   fabs(self.longitude - EZGDATA.currentLongitude) * 2.15);
+                                                   fabs(self.longitude - EZGDATA.currentLongitude) * 2.15);//TODO:这里应该说1.2倍数才正常！
     [self.mapView setRegion:BMKCoordinateRegionMake(centerLocation, span) animated:NO];
 }
 

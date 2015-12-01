@@ -219,6 +219,16 @@ static CDChatManager *instance;
 
 #pragma mark - receive message handle
 - (void)receiveMessage:(AVIMTypedMessage *)message conversation:(AVIMConversation *)conversation {
+    //>>>>>>>>>B端有新的救援就发送通知，主要解决问题：B端在救援管理主页面时，如果有新的救援到达看不到>>>>>>>>>>>>
+    if (NO == [[CDConversationStore store] isConversationExistsByConvId:conversation.conversationId]) {
+        if ([EzgoalTypeRescue isEqualToString:conversation.ezgoalType] &&
+            RescueStatusTypeUnProcess == conversation.ezgoalStatus &&
+            kAVIMMessageMediaTypeLocation == message.mediaType) {
+            postN(kNotificationRefreshRescueList);
+        }
+    }
+    //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+    
     [[CDConversationStore store] updateConversation:conversation];
     [[CDConversationStore store] updateLastMessage:message byConvId:conversation.conversationId];
     
