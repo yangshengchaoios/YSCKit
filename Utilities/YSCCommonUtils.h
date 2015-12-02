@@ -79,4 +79,11 @@
 + (id)GetObjectForKey:(NSString *)key fileName:(NSString *)fileName subFolder:(NSString *)subFoler;
 + (id)GetCacheObjectForKey:(NSString *)key fileName:(NSString *)fileName subFolder:(NSString *)subFoler;
 
+#pragma mark - 解析错误信息并格式化输出
+//解析错误信息
++ (NSString *)ResolveErrorType:(ErrorType)errorType andError:(NSError *)error;
+//解析错误码
++ (NSString *)ResolveErrorType:(ErrorType)errorType;
+//单独保存error
++ (void)SaveNSError:(NSError *)error;
 @end

@@ -128,7 +128,7 @@
     userInfo TEXT DEFAULT NULL)";
     [YSCCommonUtils SqliteUpdate:tablesql_ChatUser dbPath:EZGDATA.cacheDBPath];
 }
-+ (void)RefreshByUserIds:(NSArray *)userIds ezgoalType:(NSString *)ezgoalType block:(YSCObjectResultBlock)block {
++ (void)RefreshByUserIds:(NSArray *)userIds ezgoalType:(NSString *)ezgoalType block:(YSCResponseErrorMessageBlock)block {
     if (isEmpty(userIds)) {
         if (block) {
             block(nil, CreateNSError(@"传入的userId数组为空"));
@@ -161,9 +161,9 @@
                       block(responseObject, nil);
                   }
               }
-                requestFailure:^(NSInteger errorCode, NSString *errorMessage) {
+                requestFailure:^(ErrorType errorType, NSError *error) {
                     if (block) {
-                        block(nil, CreateNSError(errorMessage));
+                        block(nil, error);
                     }
                 }];
 }

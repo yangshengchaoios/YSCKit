@@ -26,13 +26,12 @@
                            withAPI:kResPathCheckNewVersion
                       andDictParam:params
                          modelName:[NewVersionModel class]
-                  requestSuccessed: ^(id responseObject) {
+                  requestSuccessed:^(id responseObject) {
                       [YSCCommonUtils checkNewVersion:responseObject showMessage:showMessage];
                   }
-                    requestFailure: ^(NSInteger errorCode, NSString *errorMessage) {
-                        if (showMessage) {
-                            [UIView showResultThenHideOnWindow:errorMessage];
-                        }
+                    requestFailure:^(ErrorType errorType, NSError *error) {
+                        NSString *errMsg = [YSCCommonUtils ResolveErrorType:errorType andError:error];
+                        [UIView showResultThenHideOnWindow:errMsg];
                         [YSCCommonUtils checkNewVersionByAppleId:kAppStoreId];
                     }];
     }
@@ -483,6 +482,71 @@
     else {
         return nil;
     }
+}
+
+
+#pragma mark - 解析错误信息并格式化输出
+//解析错误信息
++ (NSString *)ResolveErrorType:(ErrorType)errorType andError:(NSError *)error {
+    NSMutableString *errMsg = [NSMutableString stringWithFormat:@">>>>>>>>>>>>>>>>>>>>ErrorType[%ld]>>>>>>>>>>>>>>>>>>>>", (long)errorType];//错误标记开始
+    NSString *messageTitle = @"提示";
+    NSString *messageDetail = @"";
+    messageDetail = [self ResolveErrorType:errorType];
+    if (isEmpty(messageDetail)) {
+        messageDetail = GetNSErrorMsg(error);
+    }
+    if (isEmpty(messageDetail)) {
+        messageDetail = @"未知错误";
+    }
+    
+    //继续组织错误日志
+    [errMsg appendFormat:@"\r  messageTitle:%@\r  messageDetail:%@", messageTitle, messageDetail];//显示解析后的错误提示
+    if (error) {
+        [errMsg appendFormat:@"\r  errorCode(%ld)\r  errorMessage:%@", (long)error.code, error];//显示error的错误内容
+    }
+    [errMsg appendFormat:@"\r<<<<<<<<<<<<<<<<<<<<ErrorType[%ld]<<<<<<<<<<<<<<<<<<<<\r\n", (long)errorType];//错误标记结束
+    NSLog(@"errMsg=\r\n%@", errMsg);
+    [LogManager saveLog:errMsg];//FIXME:控制是否记录error日志
+    return messageDetail;
+}
+//解析错误码
++ (NSString *)ResolveErrorType:(ErrorType)errorType {
+    if (ErrorTypeDisconnected == errorType) {
+        return @"网络未连接";
+    }
+    else if (ErrorTypeConnectionFailed == errorType) {
+        return @"网络连接失败";
+    }
+    else if (ErrorTypeServerFailed == errorType) {
+        return @"服务器连接失败";
+    }
+    else if (ErrorTypeInternalServer == errorType) {
+        return @"";//NOTE:需要进一步解析dataModel.state 和 message
+    }
+    else if (ErrorTypeCopyFileFailed == errorType) {
+        return @"拷贝文件失败";
+    }
+    else if (ErrorTypeURLInvalid == errorType) {
+        return @"网络请求的URL不合法";
+    }
+    else if (ErrorTypeReturnEmpty == errorType) {
+        return @"返回数据为空";
+    }
+    else if (ErrorTypeDataMappingFailed == errorType) {
+        return @"数据映射本地模型失败";
+    }
+    else if (ErrorTypeLoginExpired == errorType) {
+        return @"登陆过期";
+    }
+    
+    return @"";
+}
+
+//单独保存error
++ (void)SaveNSError:(NSError *)error {
+    NSMutableString *errMsg = [NSMutableString stringWithFormat:@">>>>>>>>>>>>>>>>>>>>errorCode(%ld)>>>>>>>>>>>>>>>>>>>>\r  errorMessage:%@\r<<<<<<<<<<<<<<<<<<<<errorCode(%ld)<<<<<<<<<<<<<<<<<<<<\r\n", (long)error.code, error, (long)error.code];
+    NSLog(@"error=\r\n%@", errMsg);
+    [LogManager saveLog:errMsg];//FIXME:控制是否记录error日志
 }
 
 @end

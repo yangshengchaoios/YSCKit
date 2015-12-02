@@ -102,7 +102,7 @@ static NSInteger const kOnePageSize = 10;
 //更新用户头像和昵称等信息
 - (void)refreshUserInfo {
     WEAKSELF
-    [ChatUserModel RefreshByUserIds:@[Trim(self.conv.otherId)] ezgoalType:self.conv.ezgoalType block:^(NSObject *object, NSError *error) {
+    [ChatUserModel RefreshByUserIds:@[Trim(self.conv.otherId)] ezgoalType:self.conv.ezgoalType block:^(NSObject *object, NSString *errorMessage) {
         NSArray *array = (NSArray *)object;
         if (isNotEmpty(object) && [array isKindOfClass:[NSArray class]]) {
             ChatUserModel *chatUser = array[0];

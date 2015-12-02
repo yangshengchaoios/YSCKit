@@ -44,7 +44,7 @@
         if (nil == chatUser) {
             self.nameLabel.text = nil;
             self.avatarImageView.image = DefaultAvatarImage;
-            [ChatUserModel RefreshByUserIds:@[Trim(conversation.otherId)] ezgoalType:conversation.ezgoalType block:^(NSObject *object, NSError *error) {
+            [ChatUserModel RefreshByUserIds:@[Trim(conversation.otherId)] ezgoalType:conversation.ezgoalType block:^(NSObject *object, NSString *errorMessage) {
                 if (isNotEmpty(object)) {
                     ChatUserModel *userModel1 = [ChatUserModel GetLocalDataByUserId:conversation.otherId];
                     [weakSelf.avatarImageView setImageWithURLString:userModel1.avatarUrl placeholderImage:DefaultAvatarImage withFadeIn:NO];

@@ -266,7 +266,7 @@
 - (void)refreshAtPageIndex:(NSInteger)pageIndex {
     [self refreshAtPageIndex:pageIndex response:nil error:nil];
 }
-- (void)refreshAtPageIndex:(NSInteger)pageIndex response:(NSObject *)responseObject error:(NSString *)errMsg {
+- (void)refreshAtPageIndex:(NSInteger)pageIndex response:(NSObject *)responseObject error:(NSString *)error {
     WEAKSELF
     YSCIdResultBlock resultBlock = ^(id responseObject, NSError *error) {
         BOOL isPullToRefresh = (kDefaultPageStartIndex == pageIndex); //是否下拉刷新
@@ -411,8 +411,8 @@
                   requestSuccessed:^(id responseObjec) {
                       resultBlock(responseObjec, nil);
                   }
-                    requestFailure:^(NSInteger errorCode, NSString *errorMessage) {
-                        resultBlock(nil, CreateNSError(errorMessage));
+                    requestFailure:^(ErrorType errorType, NSError *error) {
+                        resultBlock(nil, error);
                     }];
     }
     else if(RequestTypePOST == self.requestType) {
@@ -423,17 +423,12 @@
                  requestSuccessed:^(id responseObjec) {
                      resultBlock(responseObjec, nil);
                  }
-                   requestFailure:^(NSInteger errorCode, NSString *errorMessage) {
-                       resultBlock(nil, CreateNSError(errorMessage));
+                   requestFailure:^(ErrorType errorType, NSError *error) {
+                       resultBlock(nil, error);
                    }];
     }
     else if (RequestTypeCustomResponse == self.requestType) {
-        if (isEmpty(errMsg)) {
-            resultBlock(responseObject, nil);
-        }
-        else {
-            resultBlock(responseObject, CreateNSError(errMsg));
-        }
+        resultBlock(responseObject, error);
     }
 }
 

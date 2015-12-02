@@ -68,9 +68,10 @@
                   blockSelf.htmlString = responseObject;
                   [blockSelf saveObject:responseObject forKey:KeyOfCachedHtmlString(blockSelf.type)];
                   [blockSelf layoutHtmlString];
-              } requestFailure:^(NSInteger errorCode, NSString *errorMessage) {
+              } requestFailure:^(ErrorType errorType, NSError *error) {
                   if ([NSString isEmpty:blockSelf.htmlString]) {
-                      [blockSelf showResultThenHide:errorMessage];
+                      NSString *errMsg = [YSCCommonUtils ResolveErrorType:errorType andError:error];
+                      [UIView showResultThenHideOnWindow:errMsg];
                   }
               }];
 }

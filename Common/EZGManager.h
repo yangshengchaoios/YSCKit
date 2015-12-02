@@ -13,6 +13,7 @@
  */
 @interface EZGManager : NSObject
 
+#pragma mark - 格式化公共数据
 //格式化图片url
 + (NSString *)FormatImageUrl:(NSString *)imageUrl width:(CGFloat)width;
 //格式化评分
@@ -21,6 +22,7 @@
 + (BOOL)checkRescueStatusIsProcessing:(RescueStatusType)rescueStatus;
 //判断救援状态是否结束
 + (BOOL)checkRescueStatusIsOver:(RescueStatusType)rescueStatus;
+
 #pragma mark - 车牌号相关
 //今日限号
 + (NSArray *)TodayLimitedNumbers;

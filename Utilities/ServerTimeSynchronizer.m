@@ -93,7 +93,7 @@
                       blockSelf.interval = serverTime - localTime;
                       [[NSUserDefaults standardUserDefaults] setDouble:blockSelf.interval forKey:CachedKeyOfInterval];
                   }
-              } requestFailure:^(NSInteger errorCode, NSString *errorMessage) {
+              } requestFailure:^(ErrorType errorType, NSError *error) {
                   [blockSelf refreshFaild];
               }];
 }

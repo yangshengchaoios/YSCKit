@@ -30,8 +30,8 @@
 @property (nonatomic, strong) NSString *sectionKey;//用于多section的TableView封装
 
 + (NSDictionary *)jsonToModelMapping;
-+ (void)GetByMethod:(NSString *)method params:(NSDictionary *)params block:(YSCObjectResultBlock)block;
-+ (void)PostByMethod:(NSString *)method params:(NSDictionary *)params block:(YSCObjectResultBlock)block;
++ (void)GetByMethod:(NSString *)method params:(NSDictionary *)params block:(YSCResponseErrorMessageBlock)block;
++ (void)PostByMethod:(NSString *)method params:(NSDictionary *)params block:(YSCResponseErrorMessageBlock)block;
 @end
 
 //针对基类数据模型不规则的情况

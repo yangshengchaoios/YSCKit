@@ -69,7 +69,7 @@
 @property (nonatomic, strong) NSNumber *commentScore;
 //重新查询B端用户信息
 + (void)InitChatUserTable;
-+ (void)RefreshByUserIds:(NSArray *)userIds ezgoalType:(NSString *)ezgoalType block:(YSCObjectResultBlock)block;
++ (void)RefreshByUserIds:(NSArray *)userIds ezgoalType:(NSString *)ezgoalType block:(YSCResponseErrorMessageBlock)block;
 + (instancetype)GetLocalDataByUserId:(NSString *)userId;
 @end
 

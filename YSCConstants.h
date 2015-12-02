@@ -22,6 +22,7 @@ typedef void (^YSCSetResultBlock)(NSSet *channels, NSError *error);
 typedef void (^YSCDataResultBlock)(NSData *data, NSError *error);
 typedef void (^YSCImageResultBlock)(UIImage * image, NSError *error);
 typedef void (^YSCDictionaryResultBlock)(NSDictionary * dict, NSError *error);
+typedef void (^YSCResponseErrorMessageBlock)(NSObject *object, NSString *errorMessage);
 
 //常量
 #ifndef kLogManageType
@@ -170,7 +171,7 @@ return _sharedObject;
 #define Trim(x)                                     [NSString trimString:x]
 #define RandomInt(from,to)                          ((int)((from) + arc4random() % ((to)-(from) + 1)))  //随机数 [from,to] 之间
 #define CreateNSError(errMsg)                       [NSError errorWithDomain:@"EZGoal" code:0 userInfo:@{NSLocalizedDescriptionKey : Trim(errMsg)}]
-#define CreateNSErrorCode(code,errMsg)                   [NSError errorWithDomain:@"" code:Code userInfo:@{NSLocalizedDescriptionKey : Trim(errMsg)}]
+#define CreateNSErrorCode(c,errMsg)                 [NSError errorWithDomain:@"" code:c userInfo:@{NSLocalizedDescriptionKey : Trim(errMsg)}]
 #define GetNSErrorMsg(error)                        ((NSError *)error).userInfo[NSLocalizedDescriptionKey]  //=error.localizedDescription
 #define STORAGEMANAGER                              [StorageManager sharedInstance]
 

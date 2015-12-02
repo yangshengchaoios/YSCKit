@@ -11,6 +11,7 @@
 
 @implementation EZGManager
 
+#pragma mark - 格式化公共数据
 //格式化图片url
 + (NSString *)FormatImageUrl:(NSString *)imageUrl width:(CGFloat)width {
     if ([NSString isUrl:imageUrl] && NO == [NSString isContains:@"?imageView2/2" inString:imageUrl]) {

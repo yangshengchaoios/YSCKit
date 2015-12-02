@@ -168,16 +168,15 @@
         [blockSelf reloadData];
     };
     
-    RequestFailure requestFailureBlock = ^(NSInteger errorCode, NSString *errorMessage){
+    RequestFailure requestFailureBlock = ^(ErrorType errorType, NSError *error) {
         [blockSelf.contentScrollView.header endRefreshing];
         
         //1. 如果没有数据就将错误信息显示在tipsView上
         if ([NSArray isEmpty:blockSelf.dataArray]) {
-            [blockSelf setIsTipsViewHidden:NO withTipText:errorMessage];
+            [blockSelf setIsTipsViewHidden:NO withTipText:error.localizedDescription];
         }
         else {
             blockSelf.isTipsViewHidden = YES;
-            [blockSelf showAlertVieWithMessage:errorMessage];
         }
         
         //2. 回调
@@ -252,16 +251,15 @@
     };
     
     
-    RequestFailure requestFailureBlock = ^(NSInteger errorCode, NSString *errorMessage){
+    RequestFailure requestFailureBlock = ^(ErrorType errorType, NSError *error) {
         [blockSelf.contentScrollView.footer endRefreshing];
 
         //1. 如果没有数据就将错误信息显示在tipsView上
         if ([NSArray isEmpty:blockSelf.dataArray]) {
-            [blockSelf setIsTipsViewHidden:NO withTipText:errorMessage];
+            [blockSelf setIsTipsViewHidden:NO withTipText:error.localizedDescription];
         }
         else {
             blockSelf.isTipsViewHidden = YES;
-            [blockSelf showAlertVieWithMessage:errorMessage];
         }
         
         //2. 回调

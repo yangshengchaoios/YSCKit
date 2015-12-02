@@ -113,7 +113,7 @@ typedef NSString *(^YSCNameStringSetBlock)(NSObject *object, NSIndexPath *indexP
 
 //下载数据(可重写)
 - (void)refreshAtPageIndex:(NSInteger)pageIndex;
-- (void)refreshAtPageIndex:(NSInteger)pageIndex response:(NSObject *)responseObject error:(NSString *)errMsg;
+- (void)refreshAtPageIndex:(NSInteger)pageIndex response:(NSObject *)responseObject error:(NSString *)error;
 
 - (BOOL)isCellDataEmpty;//判断cell数组是否为空
 - (BOOL)isLastCellByIndexPath:(NSIndexPath *)indexPath;//判断cell是否最后一个

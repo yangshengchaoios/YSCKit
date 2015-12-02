@@ -20,7 +20,7 @@
       requestSuccessed:(RequestSuccessed)requestSuccessed
         requestFailure:(RequestFailure)requestFailure {
     NSString *url = kResPathAppBaseUrl;
-    [self requestByUrl:url withAPI:apiName andArrayParam:nil andDictParam:dictParam andBodyParam:nil modelName:modelName requestType:RequestTypeGET requestSuccessed:requestSuccessed requestFailure:requestFailure];
+    [self getDataFromUrl:url withAPI:apiName andDictParam:dictParam modelName:modelName requestSuccessed:requestSuccessed requestFailure:requestFailure];
 }
 + (void)postDataWithAPI:(NSString *)apiName
            andDictParam:(NSDictionary *)dictParam
@@ -28,7 +28,7 @@
        requestSuccessed:(RequestSuccessed)requestSuccessed
          requestFailure:(RequestFailure)requestFailure {
     NSString *url = kResPathAppBaseUrl;
-    [self requestByUrl:url withAPI:apiName andArrayParam:nil andDictParam:dictParam andBodyParam:nil modelName:modelName requestType:RequestTypePOST requestSuccessed:requestSuccessed requestFailure:requestFailure];
+    [self postDataToUrl:url withAPI:apiName andDictParam:dictParam modelName:modelName requestSuccessed:requestSuccessed requestFailure:requestFailure];
 }
 
 
@@ -92,14 +92,14 @@
                 }
                 
                 //针对转换映射后的处理
-                if (initError) {
-                    if (requestFailure) {
-                        requestFailure(1101, initError.localizedDescription);
+                if (isEmpty(initError)) {
+                    if (requestSuccessed) {
+                        requestSuccessed(dataModel);//注意：这里dataModel为nil也让它返回
                     }
                 }
                 else {
-                    if (requestSuccessed) {
-                        requestSuccessed(dataModel);//注意：这里dataModel为nil也让它返回
+                    if (requestFailure) {
+                        requestFailure(ErrorTypeDataMappingFailed, CreateNSError(@"数据映射出错"));
                     }
                 }
             }
@@ -109,7 +109,7 @@
                     postNWithInfo(kNotificationLoginExpired, param);
                 }
                 if (requestFailure) {
-                    requestFailure(baseModel.stateInteger, baseModel.message);
+                    requestFailure(ErrorTypeInternalServer, CreateNSErrorCode(baseModel.stateInteger, baseModel.message));
                 }
             }
         } requestFailure:requestFailure];
@@ -125,7 +125,6 @@
        imageQuality:(ImageQuality)quality
    requestSuccessed:(RequestSuccessed)requestSuccessed
      requestFailure:(RequestFailure)requestFailure {
-    //TODO:resize
     [self requestByUrl:url
                withAPI:apiName
          andArrayParam:nil
@@ -149,19 +148,19 @@
                       postNWithInfo(kNotificationLoginExpired, param);
                   }
                   if (requestFailure) {
-                      requestFailure(baseModel.stateInteger, baseModel.message);
+                      requestFailure(ErrorTypeInternalServer, CreateNSErrorCode(baseModel.stateInteger, baseModel.message));
                   }
               }
           }
           else {
               if (requestFailure) {
-                  requestFailure(1102, @"本地数据映射错误！");
+                  requestFailure(ErrorTypeDataMappingFailed, CreateNSError(@"数据映射出错"));
               }
           }
           
-      } requestFailure:^(NSInteger errorCode, NSString *errorMessage) {
+      } requestFailure:^(ErrorType errorType, NSError *error) {
           if (requestFailure) {
-              requestFailure(1103, errorMessage);
+              requestFailure(errorType, error);
           }
       }];
 }
@@ -215,13 +214,13 @@
     requestSuccessed:(RequestSuccessed)requestSuccessed
       requestFailure:(RequestFailure)requestFailure {
     if (NO == [ReachabilityManager sharedInstance].reachable) {
-        requestFailure(-1, @"网络错误！");
+        requestFailure(ErrorTypeDisconnected, CreateNSError(@"网络断开"));
         return;
     }
     
 	//1. url合法性判断
-	if (![NSString isUrl:url]) {
-		requestFailure(1005, [NSString stringWithFormat:@"传递的url[%@]不合法！", url]);
+	if (NO == [NSString isUrl:url]) {
+		requestFailure(ErrorTypeURLInvalid, CreateNSError(@"url不合法"));
 		return;
 	}
     
@@ -264,7 +263,7 @@
         NSLog(@"request success! \r\noperation=%@\r\nresponseObject=%@", operation, responseObject);
         JSONModelError *initError = nil;
         id jsonModel = nil;
-        if ( [NSObject isNotEmpty:modelClass] && [modelClass isSubclassOfClass:[JSONModel class]]) {
+        if ([NSObject isNotEmpty:modelClass] && [modelClass isSubclassOfClass:[JSONModel class]]) {
             if ([responseObject isKindOfClass:[NSDictionary class]]) {
                 jsonModel = [[modelClass alloc] initWithDictionary:responseObject error:&initError];
             }
@@ -272,48 +271,38 @@
                 jsonModel = [[modelClass alloc] initWithString:responseObject error:&initError];
             }
         }
-        else {
-            jsonModel = [NSObject isEmpty:responseObject] ? @"empty" : responseObject;
-        }
         
-        if ([NSObject isNotEmpty:jsonModel]) {
+        if (isEmpty(initError)) {
             if (requestSuccessed) {
                 requestSuccessed(jsonModel);
             }
         }
         else {
-            if (initError) {
-                if (requestFailure) {
-                    requestFailure(1001, initError.localizedDescription);
-                }
-            }
-            else {
-                if (requestFailure) {
-                    requestFailure(1002, @"本地对象映射出错！");
-                }
+            if (requestFailure) {
+                requestFailure(ErrorTypeDataMappingFailed, initError);
             }
         }
     };
     //   定义返回失败的block
     void (^requestFailure1)(AFHTTPRequestOperation *operation, NSError *error) = ^(AFHTTPRequestOperation *operation, NSError *error) {
-        NSLog(@"request failed! \r\noperation=%@\r\nerror=%@", operation, error);
+        [YSCCommonUtils SaveNSError:error];//自动记录错误日志
         if (200 != operation.response.statusCode) {
             if (401 == operation.response.statusCode) {
+                NSDictionary *param = @{kParamUserId : USERID, kParamMessage : @"登陆过期"};
+                postNWithInfo(kNotificationLoginExpired, param);
                 if (requestFailure) {
-                    NSDictionary *param = @{kParamUserId : USERID, kParamMessage : @"登陆过期"};
-                    postNWithInfo(kNotificationLoginExpired, param);
-                    requestFailure(1003, @"您还未登录呢！");
+                    requestFailure(ErrorTypeLoginExpired, error);
                 }
             }
             else {
                 if (requestFailure) {
-                    requestFailure(1004, @"网络错误！");
+                    requestFailure(ErrorTypeServerFailed, error);
                 }
             }
         }
         else {
             if (requestFailure) {
-                requestFailure(200, error.localizedDescription);
+                requestFailure(ErrorTypeConnectionFailed, error);
             }
         }
     };
@@ -378,7 +367,7 @@
             NSLog(@"File downloaded to: %@", filePath);
             if (error) {
                 if (requestFailure) {
-                    requestFailure(1001, error.description);
+                    requestFailure(ErrorTypeConnectionFailed, error);
                 }
             }
             else {
@@ -391,7 +380,7 @@
                 }
                 else {
                     if (requestFailure) {
-                        requestFailure(1002, @"文件拷贝失败");
+                        requestFailure(ErrorTypeCopyFileFailed, CreateNSError(@"复制文件出错"));
                     }
                 }
             }

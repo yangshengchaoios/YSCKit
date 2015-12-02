@@ -1,6 +1,6 @@
 //
-//  YSCEnum.h
-//  EZGoal
+//  YSCEnumType.h
+//  YSCKit
 //
 //  Created by yangshengchao on 15/8/27.
 //  Copyright (c) 2015年 Builder. All rights reserved.
@@ -8,6 +8,24 @@
 
 #ifndef EZGoal_YSCEnum_h
 #define EZGoal_YSCEnum_h
+
+//错误类型定义
+typedef NS_ENUM(NSInteger, ErrorType) {
+    //网络层错误
+    ErrorTypeDisconnected           = 10,//网络处于断开状态(访问网络之前)
+    ErrorTypeConnectionFailed       = 11,//网络错误(网络访问过程中statusCode != 200)
+    ErrorTypeServerFailed           = 12,//服务器错误(statusCode == 200, 服务器不可访问)
+    ErrorTypeInternalServer         = 13,//服务器内部错误(需要进一步解析dataModel.state 和 message)
+    
+    //合法性判断错误
+    ErrorTypeCopyFileFailed         = 100,//拷贝文件出错
+    ErrorTypeURLInvalid             = 101,//url非法
+    ErrorTypeReturnEmpty            = 102,//返回数据为空
+    ErrorTypeDataMappingFailed      = 103,//数据映射出错
+    
+    //业务层错误
+    ErrorTypeLoginExpired           = 200,//登陆过期
+};
 
 typedef NS_ENUM(NSInteger, RegexType) {
     RegexTypeEmail          = 0,

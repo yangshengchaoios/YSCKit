@@ -12,7 +12,7 @@
 #pragma mark - block定义
 
 typedef void (^RequestSuccessed)(id responseObject);
-typedef void (^RequestFailure)(NSInteger errorCode, NSString *errorMessage);
+typedef void (^RequestFailure)(ErrorType errorType, NSError *error);
 
 
 

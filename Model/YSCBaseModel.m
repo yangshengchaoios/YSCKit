@@ -97,7 +97,7 @@
 + (NSDictionary *)jsonToModelMapping {
     return nil;
 }
-+ (void)GetByMethod:(NSString *)method params:(NSDictionary *)params block:(YSCObjectResultBlock)block {
++ (void)GetByMethod:(NSString *)method params:(NSDictionary *)params block:(YSCResponseErrorMessageBlock)block {
     [AFNManager getDataWithAPI:method
                   andDictParam:params
                      modelName:[self class]
@@ -106,13 +106,15 @@
                       block(responseObject, nil);
                   }
               }
-                requestFailure:^(NSInteger errorCode, NSString *errorMessage) {
+                requestFailure:^(ErrorType errorType, NSError *error) {
+                    [UIView hideHUDLoadingOnWindow];
+                    NSString *errMsg = [YSCCommonUtils ResolveErrorType:errorType andError:error];
                     if (block) {
-                        block(nil, CreateNSError(errorMessage));
+                        block(nil, errMsg);
                     }
                 }];
 }
-+ (void)PostByMethod:(NSString *)method params:(NSDictionary *)params block:(YSCObjectResultBlock)block {
++ (void)PostByMethod:(NSString *)method params:(NSDictionary *)params block:(YSCResponseErrorMessageBlock)block {
     [AFNManager postDataWithAPI:method
                   andDictParam:params
                      modelName:[self class]
@@ -121,9 +123,11 @@
                       block(responseObject, nil);
                   }
               }
-                requestFailure:^(NSInteger errorCode, NSString *errorMessage) {
+                requestFailure:^(ErrorType errorType, NSError *error) {
+                    [UIView hideHUDLoadingOnWindow];
+                    NSString *errMsg = [YSCCommonUtils ResolveErrorType:errorType andError:error];
                     if (block) {
-                        block(nil, CreateNSError(errorMessage));
+                        block(nil, errMsg);
                     }
                 }];
 }
