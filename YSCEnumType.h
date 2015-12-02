@@ -20,11 +20,11 @@ typedef NS_ENUM(NSInteger, ErrorType) {
     //合法性判断错误
     ErrorTypeCopyFileFailed         = 100,//拷贝文件出错
     ErrorTypeURLInvalid             = 101,//url非法
-    ErrorTypeReturnEmpty            = 102,//返回数据为空
+    ErrorTypeDataEmpty              = 102,//返回数据为空
     ErrorTypeDataMappingFailed      = 103,//数据映射出错
     
     //业务层错误
-    ErrorTypeLoginExpired           = 200,//登陆过期
+    ErrorTypeLoginExpired           = 200,//登录过期
 };
 
 typedef NS_ENUM(NSInteger, RegexType) {

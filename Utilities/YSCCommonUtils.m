@@ -529,14 +529,14 @@
     else if (ErrorTypeURLInvalid == errorType) {
         return @"网络请求的URL不合法";
     }
-    else if (ErrorTypeReturnEmpty == errorType) {
+    else if (ErrorTypeDataEmpty == errorType) {
         return @"返回数据为空";
     }
     else if (ErrorTypeDataMappingFailed == errorType) {
         return @"数据映射本地模型失败";
     }
     else if (ErrorTypeLoginExpired == errorType) {
-        return @"登陆过期";
+        return @"登录过期";
     }
     
     return @"";

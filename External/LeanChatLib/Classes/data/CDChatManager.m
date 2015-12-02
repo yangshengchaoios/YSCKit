@@ -42,7 +42,7 @@ static CDChatManager *instance;
     NSString *libPath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0];
     return [libPath stringByAppendingPathComponent:[NSString stringWithFormat:@"com.leancloud.leanchatlib.%@.sqlite", userId]];
 }
-//登陆IM
+//登录IM
 - (void)openWithClientId:(NSString *)clientId callback:(AVIMBooleanResultBlock)callback {
     _selfId = clientId;
     NSString *dbPath = [self databasePathWithUserId:_selfId];

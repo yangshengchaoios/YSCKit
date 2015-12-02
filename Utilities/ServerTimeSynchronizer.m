@@ -15,7 +15,7 @@
 
 @property (assign, nonatomic) BOOL isSyncSuccessed; //是否同步成功
 @property (assign, nonatomic) double interval;      //服务器时间 - 本地时间  (服务器时间比本地时间快多少)
-@property (nonatomic, strong) NSLock *theLock;
+//@property (nonatomic, strong) NSLock *theLock;
 
 @end
 
@@ -36,7 +36,7 @@
         [[NSUserDefaults standardUserDefaults] setDouble:-0.5 forKey:CachedKeyOfInterval];
         self.interval = -0.5;
         self.currentTimeInterval = [[NSDate dateWithTimeIntervalSinceNow:self.interval / ScaleOfResponseTime] timeStamp];
-        self.theLock = [[NSLock alloc] init];
+//        self.theLock = [[NSLock alloc] init];
         
 		[NSTimer scheduledTimerWithTimeInterval:1
                                          target:self
@@ -59,9 +59,9 @@
 
 //心跳方法
 - (void)timerFired:(NSTimer *)theTimer {
-	[self.theLock lock];
+//	[self.theLock lock];
     self.currentTimeInterval = [[NSDate dateWithTimeIntervalSinceNow:(self.interval / ScaleOfResponseTime)] timeStamp];
-    [self.theLock unlock];
+//    [self.theLock unlock];
 }
 
 //刷新服务器时间

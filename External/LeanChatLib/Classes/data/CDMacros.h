@@ -16,7 +16,7 @@
 #endif
 
 
-#ifndef WEAKSEL
+#ifndef WEAKSELF
 #define WEAKSELF  typeof(self) __weak weakSelf = self;
 #endif
 

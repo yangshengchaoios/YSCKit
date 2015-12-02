@@ -211,7 +211,7 @@
     }
     [AVAnalytics trackAppOpenedWithLaunchOptions:launchOptions];
     
-    //注册IM用户登陆的通知
+    //注册IM用户登录的通知
     [[NSNotificationCenter defaultCenter] addObserver:EZGDATA
                                              selector:@selector(connectToChatServer)
                                                  name:kNotificationConnectToChatServer

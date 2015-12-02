@@ -131,7 +131,7 @@
 + (void)RefreshByUserIds:(NSArray *)userIds ezgoalType:(NSString *)ezgoalType block:(YSCResponseErrorMessageBlock)block {
     if (isEmpty(userIds)) {
         if (block) {
-            block(nil, CreateNSError(@"传入的userId数组为空"));
+            block(nil, @"传入的userId数组为空");
         }
         return;
     }
@@ -163,7 +163,7 @@
               }
                 requestFailure:^(ErrorType errorType, NSError *error) {
                     if (block) {
-                        block(nil, error);
+                        block(nil, [YSCCommonUtils ResolveErrorType:errorType andError:error]);
                     }
                 }];
 }

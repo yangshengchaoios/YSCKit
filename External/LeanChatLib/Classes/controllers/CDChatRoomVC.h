@@ -7,7 +7,6 @@
 //
 
 #import "XHMessageTableViewController.h"
-#import "XHDisplayLocationViewController.h"
 #import "CDChatManager.h"
 
 /**

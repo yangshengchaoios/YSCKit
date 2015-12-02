@@ -11,7 +11,6 @@
 #import "CDChatRoomVC.h"
 
 #import "XHDisplayTextViewController.h"
-#import "XHDisplayMediaViewController.h"
 #import "XHAudioPlayerHelper.h"
 
 #import "LZStatusView.h"

@@ -99,7 +99,7 @@
                 }
                 else {
                     if (requestFailure) {
-                        requestFailure(ErrorTypeDataMappingFailed, CreateNSError(@"数据映射出错"));
+                        requestFailure(ErrorTypeDataMappingFailed, initError);
                     }
                 }
             }
@@ -288,7 +288,7 @@
         [YSCCommonUtils SaveNSError:error];//自动记录错误日志
         if (200 != operation.response.statusCode) {
             if (401 == operation.response.statusCode) {
-                NSDictionary *param = @{kParamUserId : USERID, kParamMessage : @"登陆过期"};
+                NSDictionary *param = @{kParamUserId : USERID, kParamMessage : @"登录过期"};
                 postNWithInfo(kNotificationLoginExpired, param);
                 if (requestFailure) {
                     requestFailure(ErrorTypeLoginExpired, error);
