@@ -412,7 +412,7 @@
             [pageControl setCurrentPage:pageNumber];
         }
         
-        if ([_delegate respondsToSelector:@selector(flowView:didScrollToPageAtIndex:)] && _currentPageIndex != pageNumber) {
+        if ([_delegate respondsToSelector:@selector(flowView:didScrollToPageAtIndex:)]) {
             [_delegate flowView:self didScrollToPageAtIndex:pageNumber];
         }
         _currentPageIndex = pageNumber;
