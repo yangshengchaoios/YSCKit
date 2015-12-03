@@ -54,6 +54,10 @@
             RescueStatusTypeGiveUpByB == rescueStatus ||
             RescueStatusTypeCancelByB == rescueStatus);
 }
+//判断是否普通会话
++ (BOOL)checkConversationIsNormal:(NSString *)ezgoalType {
+    return [EZGDATA.normalConvTypeArray containsObject:ezgoalType];
+}
 #pragma mark - 车牌号相关
 //今日限号
 + (NSArray *)TodayLimitedNumbers {

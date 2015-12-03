@@ -28,6 +28,13 @@
 }
 - (id)init {
     if (self = [super init]) {
+        //0. 初始化属性
+        if (IsAppTypeB) {
+            self.normalConvTypeArray = @[EzgoalTypeB2B, EzgoalTypeB2C, EzgoalTypeC2B];
+        }
+        else {
+            self.normalConvTypeArray = @[EzgoalTypeB2C, EzgoalTypeC2B, EzgoalTypeC2C];
+        }
         //1. 注册通知：其它任何地方都可以通过发送通知进入聊天界面
         addNObserver(@selector(openChatRoomByNotification:), kNotificationOpenChatRoom);
         //2. 同步服务器时间
@@ -320,12 +327,7 @@
         [query whereKey:AVIMAttr(kParamS4Id) equalTo:S4ID];
     }
     else if (nil != ezgoalType) {
-        if (IsAppTypeB) {//查询B端普通会话
-            [query whereKey:AVIMAttr(kParamEzgoalType) containedIn:@[EzgoalTypeB2B, EzgoalTypeB2C, EzgoalTypeC2B]];
-        }
-        else {//查询C端普通会话
-            [query whereKey:AVIMAttr(kParamEzgoalType) containedIn:@[EzgoalTypeC2B, EzgoalTypeB2C, EzgoalTypeC2C]];
-        }
+        [query whereKey:AVIMAttr(kParamEzgoalType) containedIn:EZGDATA.normalConvTypeArray];
     }
     else {
         //查询所有会话
@@ -425,11 +427,11 @@
     else {
         NSDictionary *extendAttributes = userInfo[kParamExtendAttributes];
         //如果是普通会话，则根据对方id查找本地缓存的会话
-        if (nil == extendAttributes[kParamEzgoalType]) {
+        if ([EZGManager checkConversationIsNormal:extendAttributes[kParamEzgoalType]]) {
             NSArray *tempArray = [[CDConversationStore store] selectAllConversations];
             for (AVIMConversation *conv in tempArray) {
                 if ([conv.otherId isEqualToString:userInfo[kParamOtherId]] &&
-                    isEmpty(conv.ezgoalType)) {
+                    [EZGManager checkConversationIsNormal:conv.ezgoalType]) {
                     conversation = conv;
                     break;
                 }
@@ -518,7 +520,7 @@
     }
     else {//进入聊天会话窗口
         CDChatRoomVC *chatRoom = nil;
-        if ([@[EzgoalTypeC2B, EzgoalTypeB2B, EzgoalTypeB2C, EzgoalTypeC2C] containsObject:conversation.ezgoalType]) {//进入普通会话窗口
+        if ([EZGManager checkConversationIsNormal:conversation.ezgoalType]) {//进入普通会话窗口
             chatRoom = [[EZGChatRoomViewController alloc] initWithConv:conversation];
         }
         else {//进入特殊会话窗口

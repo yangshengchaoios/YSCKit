@@ -28,6 +28,7 @@
 @property (nonatomic, assign) BOOL mentioned;
 
 @property (nonatomic, strong) NSDate *updatedTime;
+@property (nonatomic, assign) BOOL isOfficialStaff;
 @property (nonatomic, strong) NSString *ezgoalType;
 @property (nonatomic, assign) RescueStatusType ezgoalStatus;
 @property (nonatomic, strong) NSString *rescueId;

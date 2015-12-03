@@ -23,6 +23,7 @@
 #define DateFormat20    @"yyyy年M月d日 HH:mm:ss"
 #define DateFormat21    @"HH:mm"
 #define DateFormat22    @"MM月dd日 HH:mm"
+#define DateFormat23    @"M月d日 HH:mm"
 
 
 #define D_MINUTE    60

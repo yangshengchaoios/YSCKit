@@ -98,7 +98,7 @@ static CDChatManager *instance;
     }
     AVIMConversationQuery *q = [[AVIMClient defaultClient] conversationQuery];
     [q whereKey:AVIMAttr(kParamEzgoalType) equalTo:attributes[kParamEzgoalType]];
-    if (NO == [@[EzgoalTypeC2B, EzgoalTypeB2B, EzgoalTypeC2C, EzgoalTypeB2C] containsObject:attributes[kParamEzgoalType]]) {//如果是非普通会话，需要过滤s4Id和status
+    if (NO == [EZGManager checkConversationIsNormal:attributes[kParamEzgoalType]]) {//如果是非普通会话，需要过滤s4Id和status
         [q whereKey:AVIMAttr(kParamS4Id) equalTo:attributes[kParamS4Id]];
         [q whereKey:AVIMAttr(kParamEzgoalStatus) equalTo:attributes[kParamEzgoalStatus]];
     }

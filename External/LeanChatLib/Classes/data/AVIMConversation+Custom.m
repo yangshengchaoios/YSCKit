@@ -49,6 +49,9 @@ static NSString *ObjectTagKeyUpdatedTime = @"ObjectTagKeyUpdatedTime";
     objc_setAssociatedObject(self, &ObjectTagKeyUpdatedTime, _updatedTime, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
+- (BOOL)isOfficialStaff {
+    return [self.attributes[kParamIsOfficialStaff] boolValue];
+}
 - (NSString *)ezgoalType {
     return Trim(self.attributes[kParamEzgoalType]);
 }

@@ -22,6 +22,8 @@
 + (BOOL)checkRescueStatusIsProcessing:(RescueStatusType)rescueStatus;
 //判断救援状态是否结束
 + (BOOL)checkRescueStatusIsOver:(RescueStatusType)rescueStatus;
+//判断是否普通会话
++ (BOOL)checkConversationIsNormal:(NSString *)ezgoalType;
 
 #pragma mark - 车牌号相关
 //今日限号

@@ -17,6 +17,7 @@
 @property (nonatomic, assign) double currentLatitude;           //当前用户的维度30.2(百度地图)
 @property (nonatomic, strong) NSMutableArray *carNumberArray;   //车牌二维数组
 @property (nonatomic, strong) NSString *cacheDBPath;            //部分业务数据缓存数据库路径
+@property (nonatomic, strong) NSArray *normalConvTypeArray;     //普通会话类型
 
 - (id)init;
 + (instancetype)sharedInstance;
