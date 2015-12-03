@@ -56,24 +56,19 @@
 
 #pragma mark - 网络访问
 - (void)laodHtmlWithMethod:(NSString *)method andParams:(NSDictionary *)params {
-    if ([NSString isEmpty:self.htmlString]) {
-        [self showHUDLoading:@"正在更新..."];
-    }
-    WeakSelfType blockSelf = self;
-    [AFNManager getDataWithAPI:method
-                  andDictParam:params
-                     modelName:nil
-              requestSuccessed:^(id responseObject) {
-                  [blockSelf hideHUDLoading];
-                  blockSelf.htmlString = responseObject;
-                  [blockSelf saveObject:responseObject forKey:KeyOfCachedHtmlString(blockSelf.type)];
-                  [blockSelf layoutHtmlString];
-              } requestFailure:^(ErrorType errorType, NSError *error) {
-                  if ([NSString isEmpty:blockSelf.htmlString]) {
-                      NSString *errMsg = [YSCCommonUtils ResolveErrorType:errorType andError:error];
-                      [UIView showResultThenHideOnWindow:errMsg];
-                  }
-              }];
+    WEAKSELF
+    [BaseDataModel GetByMethod:method
+                        params:params
+                         block:^(NSObject *object, NSString *errorMessage) {
+                             if (isEmpty(errorMessage)) {
+                                 weakSelf.htmlString = (NSString *)object;
+                                 [weakSelf saveObject:object forKey:KeyOfCachedHtmlString(weakSelf.type)];
+                                 [weakSelf layoutHtmlString];
+                             }
+                             else {
+                                 [UIView showResultThenHideOnWindow:errorMessage];
+                             }
+                         }];
 }
 
 #pragma mark - UIWebViewDelegate
@@ -82,7 +77,8 @@
 // request in this method below, create an NSURLConnection (which can allow self-certs via the delegate methods
 // which UIWebView does not have), authenticate using NSURLConnection, then use another UIWebView to complete
 // the loading and viewing of the page. See connection:didReceiveAuthenticationChallenge to see how this works.
-- (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType; {
+- (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType {
+    [self showHUDLoading:@""];
     NSString *scheme = [[request URL] scheme];
     if ([scheme isEqualToString:@"https"]) {
         //如果是https:的话，那么就用NSURLConnection来重发请求。从而在请求的过程当中吧要请求的URL做信任处理。
@@ -96,17 +92,23 @@
     }
     return YES;
 }
+
+- (void)resizeWebviewHeight {
+    [self hideHUDLoading];
+    WEAKSELF
+    [self bk_performBlock:^(id obj) {//延迟1秒可以解决：首次进入时webview.contentheight高度不正确的问题。
+        [weakSelf.webView.scrollView scrollsToTop];
+    } afterDelay:1.5];
+}
 - (void)webViewDidFinishLoad:(UIWebView *)webView {
-    [self hideHUDLoadingOnView:self.webView];
+    [self resizeWebviewHeight];
     NSString *title = [webView stringByEvaluatingJavaScriptFromString:@"document.title"];
-    if (isNotEmpty(title)) {
+    if (isEmpty(self.navigationItem.title) && isNotEmpty(title)) {
         self.navigationItem.title = title;
     }
-    [self.view layoutIfNeeded];
 }
 - (void)webView:(UIWebView *)webView didFailLoadWithError:(NSError *)error {
-    [self hideHUDLoadingOnView:self.webView];
-    [self.view layoutIfNeeded];
+    [self resizeWebviewHeight];
 }
 
 #pragma mark - NURLConnection delegate
@@ -122,7 +124,6 @@
 - (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response; {
     [connection cancel];
     self.authenticated = YES;
-    [self showHUDLoading:@"网页加载中" onView:self.webView];
     [self.webView loadRequest:self.request];
 }
 
