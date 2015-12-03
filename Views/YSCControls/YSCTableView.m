@@ -266,17 +266,17 @@
 - (void)refreshAtPageIndex:(NSInteger)pageIndex {
     [self refreshAtPageIndex:pageIndex response:nil error:nil];
 }
-- (void)refreshAtPageIndex:(NSInteger)pageIndex response:(NSObject *)responseObject error:(NSString *)error {
+- (void)refreshAtPageIndex:(NSInteger)pageIndex response:(NSObject *)responseObject error:(NSString *)errorMessage {
     WEAKSELF
-    YSCIdResultBlock resultBlock = ^(id responseObject, NSError *error) {
+    YSCResponseErrorMessageBlock resultBlock = ^(id responseObject, NSString *errorMessage) {
         BOOL isPullToRefresh = (kDefaultPageStartIndex == pageIndex); //是否下拉刷新
         isPullToRefresh ? [weakSelf.header endRefreshing] : [weakSelf.footer endRefreshing];
         //处理返回结果
-        if (error) {
+        if (errorMessage) {
             //数据加载失败的tips
             if (weakSelf.tipsView) {
                 weakSelf.tipsView.iconImageView.image = [UIImage imageNamed:weakSelf.tipsFailedIcon];
-                weakSelf.tipsView.messageLabel.text = error.localizedDescription;
+                weakSelf.tipsView.messageLabel.text = errorMessage;
             }
         }
         else {
@@ -390,7 +390,7 @@
         weakSelf.tipsView.hidden = [NSArray isNotEmpty:weakSelf.cellDataArray];
 
         //最后回调(可能会处理tipsView的显示与否的问题)
-        if (error) {
+        if (errorMessage) {
             if (weakSelf.failedBlock) {
                 weakSelf.failedBlock();
             }
@@ -412,7 +412,7 @@
                       resultBlock(responseObjec, nil);
                   }
                     requestFailure:^(ErrorType errorType, NSError *error) {
-                        resultBlock(nil, error);
+                        resultBlock(nil, [YSCCommonUtils ResolveErrorType:errorType andError:error]);
                     }];
     }
     else if(RequestTypePOST == self.requestType) {
@@ -424,11 +424,11 @@
                      resultBlock(responseObjec, nil);
                  }
                    requestFailure:^(ErrorType errorType, NSError *error) {
-                       resultBlock(nil, error);
+                       resultBlock(nil, [YSCCommonUtils ResolveErrorType:errorType andError:error]);
                    }];
     }
     else if (RequestTypeCustomResponse == self.requestType) {
-        resultBlock(responseObject, error);
+        resultBlock(responseObject, errorMessage);
     }
 }
 
