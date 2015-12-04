@@ -76,23 +76,8 @@
     
     //blocks
     WEAKSELF
-    self.successBlock = ^{
-        YSCBaseViewController *currentVC = (YSCBaseViewController *)[AppConfigManager sharedInstance].currentViewController;
-        if ([currentVC isKindOfClass:[YSCBaseViewController class]]) {
-            currentVC.isClicked = NO;
-        }
-        weakSelf.tipsView.actionButton.hidden = YES;
-        weakSelf.tipsView.iconImageView.image = [UIImage imageNamed:@"icon_empty"];
-    };
-    self.failedBlock = ^{
-        YSCBaseViewController *currentVC = (YSCBaseViewController *)[AppConfigManager sharedInstance].currentViewController;
-        if ([currentVC isKindOfClass:[YSCBaseViewController class]]) {
-            currentVC.isClicked = NO;
-        }
-        weakSelf.tipsView.actionButton.hidden = NO;
-        weakSelf.tipsView.iconImageView.image = [UIImage imageNamed:@"icon_failed"];
-        [weakSelf.tipsView.actionButton setTitle:@"重新加载" forState:UIControlStateNormal];
-    };
+    self.successBlock = ^{};
+    self.failedBlock = ^{};
     self.preProcessBlock = ^NSArray *(NSArray *array) {
         return array;
     };
@@ -378,12 +363,21 @@
         weakSelf.tipsView.hidden = [NSArray isNotEmpty:weakSelf.cellDataArray];
 
         //最后回调(可能会处理tipsView的显示与否的问题)
+        YSCBaseViewController *currentVC = (YSCBaseViewController *)[AppConfigManager sharedInstance].currentViewController;
+        if ([currentVC isKindOfClass:[YSCBaseViewController class]]) {
+            currentVC.isClicked = NO;
+        }
         if (errorMessage) {
+            weakSelf.tipsView.actionButton.hidden = NO;
+            weakSelf.tipsView.iconImageView.image = [UIImage imageNamed:@"icon_failed"];
+            [weakSelf.tipsView.actionButton setTitle:@"重新加载" forState:UIControlStateNormal];
             if (weakSelf.failedBlock) {
                 weakSelf.failedBlock();
             }
         }
         else {
+            weakSelf.tipsView.actionButton.hidden = YES;
+            weakSelf.tipsView.iconImageView.image = [UIImage imageNamed:@"icon_empty"];
             if (weakSelf.successBlock) {
                 weakSelf.successBlock();
             }
