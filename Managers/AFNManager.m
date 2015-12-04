@@ -214,13 +214,17 @@
     requestSuccessed:(RequestSuccessed)requestSuccessed
       requestFailure:(RequestFailure)requestFailure {
     if (NO == [ReachabilityManager sharedInstance].reachable) {
-        requestFailure(ErrorTypeDisconnected, CreateNSError(@"网络断开"));
+        if (requestFailure) {
+            requestFailure(ErrorTypeDisconnected, CreateNSError(@"网络断开"));
+        }
         return;
     }
     
 	//1. url合法性判断
 	if (NO == [NSString isUrl:url]) {
-		requestFailure(ErrorTypeURLInvalid, CreateNSError(@"url不合法"));
+        if (requestFailure) {
+            requestFailure(ErrorTypeURLInvalid, CreateNSError(@"url不合法"));
+        }
 		return;
 	}
     
