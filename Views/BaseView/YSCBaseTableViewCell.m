@@ -13,6 +13,10 @@
 - (void)awakeFromNib {
     [super awakeFromNib];
     
+    //NOTE:解决UITableViewCell Color和设置的seperatorColor不一致问题
+    self.backgroundColor = [UIColor whiteColor];
+    self.contentView.backgroundColor = [UIColor whiteColor];
+    
     self.clipsToBounds = YES;
     self.selectionStyle = UITableViewCellSelectionStyleNone;
     [self resetFontSizeOfView];

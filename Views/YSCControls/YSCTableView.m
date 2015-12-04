@@ -266,9 +266,9 @@
 - (void)refreshAtPageIndex:(NSInteger)pageIndex {
     [self refreshAtPageIndex:pageIndex response:nil error:nil];
 }
-- (void)refreshAtPageIndex:(NSInteger)pageIndex response:(NSObject *)responseObject error:(NSString *)errorMessage {
+- (void)refreshAtPageIndex:(NSInteger)pageIndex response:(NSObject *)initObject error:(NSString *)errorMessage {
     WEAKSELF
-    YSCResponseErrorMessageBlock resultBlock = ^(id responseObject, NSString *errorMessage) {
+    YSCResponseErrorMessageBlock resultBlock = ^(NSObject *object, NSString *errorMessage) {
         BOOL isPullToRefresh = (kDefaultPageStartIndex == pageIndex); //是否下拉刷新
         isPullToRefresh ? [weakSelf.header endRefreshing] : [weakSelf.footer endRefreshing];
         //处理返回结果
@@ -280,27 +280,14 @@
             }
         }
         else {
-            //1. 获取结果数组
-            NSArray *dataArray = nil;
-            if ([responseObject isKindOfClass:[NSArray class]]) {
-                dataArray = (NSArray *)responseObject;
-            }
-            else if([responseObject isKindOfClass:[BaseDataModel class]]) {
-                dataArray = @[responseObject];
-            }
-            else if([responseObject isKindOfClass:[NSString class]]) {
-                dataArray = @[responseObject];
-            }
-            
-            //2. 根据组装后的数组刷新列表
+            //1. 根据组装后的数组刷新列表
             NSArray *newDataArray = nil;
-            if ([dataArray count] > 0) {
+            if (isNotEmpty(object)) {
                 weakSelf.currentPageIndex = pageIndex;  //只要接口成功返回了数据，就把当前请求的页码保存起来
                 if (weakSelf.preProcessBlock) {
-                    newDataArray = weakSelf.preProcessBlock(dataArray);
+                    newDataArray = weakSelf.preProcessBlock((NSArray *)object);
                 }
             }
-            
             
             //-----------开始对tableView进行操作-----------
             if (isPullToRefresh) {
@@ -408,11 +395,25 @@
                            withAPI:self.methodName
                       andDictParam:self.dictParamBlock(pageIndex)
                          modelName:NSClassFromString(self.modelName)
-                  requestSuccessed:^(id responseObjec) {
-                      resultBlock(responseObjec, nil);
+                  requestSuccessed:^(id responseObject) {
+                      NSMutableArray *dataArray = [NSMutableArray array];
+                      if ([responseObject isKindOfClass:[NSArray class]]) {
+                          [dataArray addObjectsFromArray:(NSArray *)responseObject];
+                      }
+                      else {
+                          if (isNotEmpty(responseObject)) {
+                              dataArray = @[responseObject];
+                          }
+                      }
+                      //兼容外部数据源
+                      if (isNotEmpty(initObject) && [initObject isKindOfClass:[NSArray class]]) {
+                          [dataArray addObjectsFromArray:(NSArray *)initObject];
+                      }
+                      
+                      resultBlock(dataArray, nil);
                   }
                     requestFailure:^(ErrorType errorType, NSError *error) {
-                        resultBlock(nil, [YSCCommonUtils ResolveErrorType:errorType andError:error]);
+                        resultBlock(initObject, [YSCCommonUtils ResolveErrorType:errorType andError:error]);
                     }];
     }
     else if(RequestTypePOST == self.requestType) {
@@ -420,15 +421,28 @@
                           withAPI:self.methodName
                      andDictParam:self.dictParamBlock(pageIndex)
                         modelName:NSClassFromString(self.modelName)
-                 requestSuccessed:^(id responseObjec) {
-                     resultBlock(responseObjec, nil);
+                 requestSuccessed:^(id responseObject) {
+                     NSMutableArray *dataArray = [NSMutableArray array];
+                     if ([responseObject isKindOfClass:[NSArray class]]) {
+                         [dataArray addObjectsFromArray:(NSArray *)responseObject];
+                     }
+                     else {
+                         if (isNotEmpty(responseObject)) {
+                             dataArray = @[responseObject];
+                         }
+                     }
+                     //兼容外部数据源
+                     if (isNotEmpty(initObject) && [initObject isKindOfClass:[NSArray class]]) {
+                         [dataArray addObjectsFromArray:(NSArray *)initObject];
+                     }
+                     resultBlock(dataArray, nil);
                  }
                    requestFailure:^(ErrorType errorType, NSError *error) {
-                       resultBlock(nil, [YSCCommonUtils ResolveErrorType:errorType andError:error]);
+                       resultBlock(initObject, [YSCCommonUtils ResolveErrorType:errorType andError:error]);
                    }];
     }
     else if (RequestTypeCustomResponse == self.requestType) {
-        resultBlock(responseObject, errorMessage);
+        resultBlock(initObject, errorMessage);
     }
 }
 
@@ -505,6 +519,12 @@
     if ([self respondsToSelector:@selector(setLayoutMargins:)]) {
         [self setLayoutMargins:edgeInsets];
     }
+//    if ([self respondsToSelector:@selector(setPreservesSuperviewLayoutMargins:)]) {
+//        [self setPreservesSuperviewLayoutMargins:NO];;
+//    }
+//    if([self respondsToSelector:@selector(setCellLayoutMarginsFollowReadableWidth:)]) {
+//        self.cellLayoutMarginsFollowReadableWidth = NO;
+//    }
 }
 
 
