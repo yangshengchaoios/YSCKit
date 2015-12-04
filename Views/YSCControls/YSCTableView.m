@@ -91,6 +91,7 @@
         }
         weakSelf.tipsView.actionButton.hidden = NO;
         weakSelf.tipsView.iconImageView.image = [UIImage imageNamed:@"icon_failed"];
+        [weakSelf.tipsView.actionButton setTitle:@"重新加载" forState:UIControlStateNormal];
     };
     self.preProcessBlock = ^NSArray *(NSArray *array) {
         return array;
