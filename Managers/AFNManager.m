@@ -206,13 +206,17 @@
     requestSuccessed:(RequestSuccessed)requestSuccessed
       requestFailure:(RequestFailure)requestFailure {
     if (NO == [ReachabilityManager sharedInstance].reachable) {
-        requestFailure(-1, @"网络错误！");
+        if (requestFailure) {
+            requestFailure(-1, @"网络错误！");
+        }
         return;
     }
     
 	//1. url合法性判断
 	if (![NSString isUrl:url]) {
-		requestFailure(1005, [NSString stringWithFormat:@"传递的url[%@]不合法！", url]);
+        if (requestFailure) {
+            requestFailure(1005, [NSString stringWithFormat:@"传递的url[%@]不合法！", url]);
+        }
 		return;
 	}
     
