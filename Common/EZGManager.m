@@ -41,13 +41,6 @@
     }
     return tempValue;
 }
-//判断救援状态是否还在处理中
-+ (BOOL)checkRescueStatusIsProcessing:(RescueStatusType)rescueStatus {
-    return (RescueStatusTypeUnProcess == rescueStatus ||
-            RescueStatusTypeProcessing == rescueStatus ||
-            RescueStatusTypeCancelByC0 == rescueStatus ||
-            RescueStatusTypeCancelByC1 == rescueStatus);
-}
 //判断救援状态是否结束
 + (BOOL)checkRescueStatusIsOver:(RescueStatusType)rescueStatus {
     return (RescueStatusTypeConfirm == rescueStatus ||

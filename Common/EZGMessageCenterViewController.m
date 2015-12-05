@@ -22,7 +22,7 @@
     self.title = @"消息中心";
     [self initTableView];
     addNObserver(@selector(refreshTableView), kNotificationRefreshMessageCenter);//消息到达后被APPDATA拦截处理后再确定是否需要刷新这个列表
-    addNObserver(@selector(refreshTableView), kCDNotificationUnreadsUpdated);//未读数变化重新查询会话列表
+    addNObserver(@selector(refreshTableView), kCDNotificationUnreadsUpdated);//未读数变化重新查询会话列表(主要是解决从推送栏进入会话后改变了未读数不能刷新对应cell的问题)
 }
 - (void)initTableView {
     WEAKSELF

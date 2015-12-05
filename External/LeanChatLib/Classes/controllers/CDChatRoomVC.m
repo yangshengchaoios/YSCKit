@@ -31,6 +31,7 @@ static NSInteger const kOnePageSize = 10;
 @property (nonatomic, strong) NSArray *emotionManagers;
 @property (nonatomic, strong) LZStatusView *clientStatusView;
 @property (nonatomic, assign) int64_t lastSentTimestamp;
+@property (nonatomic, strong) NSString *isUserChangedIdentifier;
 @end
 
 @implementation CDChatRoomVC
@@ -97,6 +98,12 @@ static NSInteger const kOnePageSize = 10;
         [self updateUserInfo:APPDATA.chatUser];
     }
     [self refreshUserInfo];
+    //监控用户是否被挤下线了
+    self.isUserChangedIdentifier = [APPDATA bk_addObserverForKeyPath:@"isUserChanged" task:^(id target) {
+        if (ISNOTLOGGED && IsAppTypeC) {
+            [weakSelf closeCurrentViewController];
+        }
+    }];
 }
 //更新用户头像和昵称等信息
 - (void)refreshUserInfo {
@@ -186,6 +193,9 @@ static NSInteger const kOnePageSize = 10;
     [[NSNotificationCenter defaultCenter] removeObserver:self name:kCDNotificationMessageDelivered object:nil];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:kCDNotificationConnectivityUpdated object:nil];
     [[XHAudioPlayerHelper shareInstance] setDelegate:nil];
+    if (self.isUserChangedIdentifier) {
+        [APPDATA bk_removeObserversWithIdentifier:self.isUserChangedIdentifier];
+    }
 }
 
 #pragma mark - ui init

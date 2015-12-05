@@ -377,6 +377,7 @@
                     conversation = nil;
                 }
                 if (conversation) {
+                    [[CDConversationStore store] updateConversation:conversation];
                     [EZGDATA openChatRoomByConversion:conversation byParams:paramsChatRoom];
                 }
                 else {
@@ -461,7 +462,7 @@
                                                      [UIView showAlertVieWithMessage:@"建立会话失败，请检查网络连接！"];
                                                  }
                                                  else {// 跳转到 ChatView 页面进行聊天
-                                                     [[CDConversationStore store] updateConversation:conversation];//将会话保存在本地
+                                                     [[CDConversationStore store] updateConversation:conversation];
                                                      [EZGDATA openChatRoomByConversion:conversation byParams:params];
                                                  }
                                              }];
@@ -490,6 +491,7 @@
                     //                    [UIView showAlertVieWithMessage:errMsg];
                 }
                 else {
+                    [[CDConversationStore store] updateConversation:conversation];
                     [EZGDATA openChatRoomByConversion:conversation byParams:params];
                 }
             }];
@@ -507,7 +509,7 @@
             [chatRoom closeCurrentViewControllerAnimated:NO block:^{
                 [EZGDATA bk_performBlock:^(id obj) {
                     [EZGDATA openChatRoomByConversion:conversation byParams:params];
-                } afterDelay:0.3];
+                } afterDelay:kDefaultDuration];
             }];
         }
     }
@@ -515,7 +517,7 @@
         [currentViewController.navigationController dismissViewControllerAnimated:NO completion:^{
             [EZGDATA bk_performBlock:^(id obj) {
                 [EZGDATA openChatRoomByConversion:conversation byParams:params];
-            } afterDelay:1];
+            } afterDelay:kDefaultDuration];
         }];
     }
     else {//进入聊天会话窗口

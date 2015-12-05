@@ -18,8 +18,6 @@
 + (NSString *)FormatImageUrl:(NSString *)imageUrl width:(CGFloat)width;
 //格式化评分
 + (float)FormatStaffScore:(NSNumber *)score;
-//判断救援状态是否还在处理中
-+ (BOOL)checkRescueStatusIsProcessing:(RescueStatusType)rescueStatus;
 //判断救援状态是否结束
 + (BOOL)checkRescueStatusIsOver:(RescueStatusType)rescueStatus;
 //判断是否普通会话

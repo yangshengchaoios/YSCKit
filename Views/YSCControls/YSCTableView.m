@@ -264,6 +264,12 @@
                 weakSelf.tipsView.iconImageView.image = [UIImage imageNamed:weakSelf.tipsFailedIcon];
                 weakSelf.tipsView.messageLabel.text = errorMessage;
             }
+            weakSelf.tipsView.actionButton.hidden = NO;
+            [weakSelf.tipsView.actionButton setTitle:@"重新加载" forState:UIControlStateNormal];
+            [weakSelf.tipsView.actionButton bk_removeEventHandlersForControlEvents:UIControlEventTouchUpInside];
+            [weakSelf.tipsView.actionButton bk_addEventHandler:^(id sender) {
+                [weakSelf beginRefreshing];
+            } forControlEvents:UIControlEventTouchUpInside];
         }
         else {
             //1. 根据组装后的数组刷新列表
@@ -351,6 +357,7 @@
                 weakSelf.tipsView.iconImageView.image = [UIImage imageNamed:weakSelf.tipsEmptyIcon];
                 weakSelf.tipsView.messageLabel.text = weakSelf.tipsEmptyText;
             }
+            weakSelf.tipsView.actionButton.hidden = YES;
             
             //5. 缓存数据
             if (weakSelf.enableCache && isNotEmpty(weakSelf.cacheFileName)) {
@@ -367,20 +374,8 @@
         if ([currentVC isKindOfClass:[YSCBaseViewController class]]) {
             currentVC.isClicked = NO;
         }
-        if (errorMessage) {
-            weakSelf.tipsView.actionButton.hidden = NO;
-            weakSelf.tipsView.iconImageView.image = [UIImage imageNamed:@"icon_failed"];
-            [weakSelf.tipsView.actionButton setTitle:@"重新加载" forState:UIControlStateNormal];
-            if (weakSelf.failedBlock) {
-                weakSelf.failedBlock();
-            }
-        }
-        else {
-            weakSelf.tipsView.actionButton.hidden = YES;
-            weakSelf.tipsView.iconImageView.image = [UIImage imageNamed:@"icon_empty"];
-            if (weakSelf.successBlock) {
-                weakSelf.successBlock();
-            }
+        if (weakSelf.finishLoadBlock) {
+            weakSelf.finishLoadBlock(errorMessage);
         }
     };
     

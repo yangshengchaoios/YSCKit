@@ -16,6 +16,7 @@
 
 @property (nonatomic, strong) UIStoryboard *storyBoard;
 @property (nonatomic, strong) NSString *reachabilityManagerIdentifier;
+@property (nonatomic, strong) NSString *isUserChangedIdentifier;
 
 @end
 
@@ -63,8 +64,11 @@
 }
 - (void)dealloc {
 	NSLog(@"[%@] dealloc......", NSStringFromClass(self.class));
-    if ([NSString isNotEmpty:self.reachabilityManagerIdentifier]) {
+    if (self.reachabilityManagerIdentifier) {
         [[ReachabilityManager sharedInstance] bk_removeObserversWithIdentifier:self.reachabilityManagerIdentifier];
+    }
+    if (self.isUserChangedIdentifier) {
+        [APPDATA bk_removeObserversWithIdentifier:self.isUserChangedIdentifier];
     }
 	[[NSNotificationCenter defaultCenter] removeObserver:self]; //等同于宏定义  removeAllObservers(self);
 }
@@ -126,6 +130,11 @@
         [self.view resetFontSizeOfView];
         [self.view resetConstraintOfView];
     }
+    
+    //监控用户登录状态
+    self.isUserChangedIdentifier = [APPDATA bk_addObserverForKeyPath:@"isUserChanged" task:^(id target) {
+        [blockSelf userLoginStatusChanged];
+    }];
 }
 
 
@@ -533,6 +542,9 @@
 }
 
 #pragma mark - Overridden methods 业务相关
+//用户登录状态改变了
+- (void)userLoginStatusChanged {
+}
 
 /**
  *  返回自定义的在navigationBar上的按钮
