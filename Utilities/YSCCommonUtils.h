@@ -86,4 +86,8 @@
 + (NSString *)ResolveErrorType:(ErrorType)errorType;
 //单独保存error
 + (void)SaveNSError:(NSError *)error;
+
+#pragma mark - 删除多余的日志文件
+//保留最近N天日志文件
++ (void)removeLogFilesByCount:(NSInteger)count;
 @end
