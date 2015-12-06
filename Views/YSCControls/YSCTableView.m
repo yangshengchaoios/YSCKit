@@ -76,8 +76,6 @@
     
     //blocks
     WEAKSELF
-    self.successBlock = ^{};
-    self.failedBlock = ^{};
     self.preProcessBlock = ^NSArray *(NSArray *array) {
         return array;
     };

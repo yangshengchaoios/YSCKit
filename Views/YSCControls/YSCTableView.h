@@ -68,9 +68,7 @@ typedef NSString *(^YSCNameStringSetBlock)(NSObject *object, NSIndexPath *indexP
 @property (nonatomic, assign) IBInspectable BOOL enableCellEdit;//是否开启删除功能(NO)
 
 #pragma mark - 设置和回传
-@property (nonatomic, copy) YSCBlock successBlock;//DEPRECATED
-@property (nonatomic, copy) YSCBlock failedBlock;//DEPRECATED
-@property (nonatomic, copy) YSCResultBlock finishLoadBlock;//用来代替上面的两个block
+@property (nonatomic, copy) YSCResultBlock finishLoadBlock;//用来代替之前的successBlock和failedBlock
 @property (nonatomic, copy) YSCArraySetBlock preProcessBlock;//对于下载回来的一维数组进行清洗过滤
 @property (nonatomic, copy) YSCObjectIndexResultBlock clickHeaderBlock;
 @property (nonatomic, copy) YSCObjectIndexResultBlock clickFooterBlock;
