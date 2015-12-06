@@ -194,18 +194,20 @@
 //nil or empty - 所有会话未读数
 //not empty - 指定会话类型的未读数
 - (NSInteger)totalUnreadCountByEzgoalTypes:(NSArray *)ezgoalTypes {
+    return [self totalUnreadCountByEzgoalTypes:ezgoalTypes ezgoalStatus:nil];
+}
+- (NSInteger)totalUnreadCountByEzgoalTypes:(NSArray *)ezgoalTypes ezgoalStatus:(NSArray *)ezgoalStatus {
     __block NSInteger totalUnreadCount = 0;
     [self.databaseQueue inDatabase:^(FMDatabase *db) {
         FMResultSet *resultSet = nil;
-        if (isEmpty(ezgoalTypes)) {
-            resultSet = [db executeQuery:@"SELECT unreadCount FROM conversations WHERE unreadCount > 0"];
+        NSMutableString *sql = [NSMutableString stringWithString:@"SELECT unreadCount FROM conversations WHERE unreadCount > 0"];
+        if (isNotEmpty(ezgoalTypes)) {
+            [sql appendFormat:@" AND ezgoalType IN ('%@')", [ezgoalTypes componentsJoinedByString:@"','"]];
         }
-        else {
-            NSString *sql = [NSString stringWithFormat:@"SELECT unreadCount FROM conversations WHERE unreadCount > 0 AND ezgoalType IN ('%@')",
-                             [ezgoalTypes componentsJoinedByString:@"','"]];
-            resultSet = [db executeQuery:sql];
+        if (isNotEmpty(ezgoalStatus)) {
+            [sql appendFormat:@" AND ezgoalStatus IN (%@)", [ezgoalStatus componentsJoinedByString:@","]];
         }
-        
+        resultSet = [db executeQuery:sql];
         while ([resultSet next]) {
             NSInteger unreadCount = [resultSet intForColumn:kCDConversationTableKeyUnreadCount];
             if (unreadCount > 0) {

@@ -44,6 +44,7 @@
 //nil or empty - 所有会话未读数
 //not empty - 指定会话类型的未读数
 - (NSInteger)totalUnreadCountByEzgoalTypes:(NSArray *)ezgoalTypes;
+- (NSInteger)totalUnreadCountByEzgoalTypes:(NSArray *)ezgoalTypes ezgoalStatus:(NSArray *)ezgoalStatus;
 //从本地数据库查找指定会话的未读消息数
 - (NSInteger)selectUnreadCountByConvId:(NSString *)convId;
 
