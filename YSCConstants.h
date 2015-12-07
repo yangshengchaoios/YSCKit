@@ -20,8 +20,8 @@ typedef void (^YSCObjectResultBlock)(NSObject *object, NSError *error);
 typedef void (^YSCArrayResultBlock)(NSArray *objects, NSError *error);
 typedef void (^YSCSetResultBlock)(NSSet *channels, NSError *error);
 typedef void (^YSCDataResultBlock)(NSData *data, NSError *error);
-typedef void (^YSCImageResultBlock)(UIImage * image, NSError *error);
-typedef void (^YSCDictionaryResultBlock)(NSDictionary * dict, NSError *error);
+typedef void (^YSCImageResultBlock)(UIImage *image, NSError *error);
+typedef void (^YSCDictionaryResultBlock)(NSDictionary *dict, NSError *error);
 typedef void (^YSCResponseErrorMessageBlock)(NSObject *object, NSString *errorMessage);
 
 //常量

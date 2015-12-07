@@ -12,11 +12,12 @@
 typedef NSArray *(^YSCArraySetBlock)(NSArray *array);
 typedef void (^YSCObjectIndexPathResultBlock)(NSObject *object, NSIndexPath *indexPath);
 typedef void (^YSCObjectIndexResultBlock)(NSObject *object, NSInteger section);
-typedef NSDictionary *(^YSCDictionarySetBlock)(NSInteger pageIndex);
 typedef void (^YSCViewObjectResultBlock)(UIView *view, NSObject *object);
+typedef NSDictionary *(^YSCDictionarySetBlock)(NSInteger pageIndex);
 typedef CGFloat (^YSCCellHeightSetBlock)(NSIndexPath *indexPath);
-typedef NSString *(^YSCNameStringSetBlock)(NSObject *object, NSIndexPath *indexPath);
 typedef CGFloat (^YSCHeaderFooterHeightSetBlock)(NSInteger section);
+typedef NSString *(^YSCCellNameSetBlock)(NSObject *object, NSIndexPath *indexPath);
+typedef NSString *(^YSCHeaderFooterNameSetBlock)(NSObject *object, NSInteger section);
 
 
 //------------------------------------
@@ -29,8 +30,7 @@ typedef CGFloat (^YSCHeaderFooterHeightSetBlock)(NSInteger section);
 //      6. 自定义任意单一确定的数据源
 //      7. 动态设置header、cell、footer的高度
 //      8. 支持多种header、cell、footer的注册
-//  不支持的功能：多数据源
-//
+//      9. 兼容外部数据源(前提是必须和列表数据源类型一致)
 //------------------------------------
 @interface YSCTableView : UITableView
 
@@ -82,9 +82,9 @@ typedef CGFloat (^YSCHeaderFooterHeightSetBlock)(NSInteger section);
 @property (nonatomic, copy) YSCCellHeightSetBlock cellHeightBlock;
 @property (nonatomic, copy) YSCHeaderFooterHeightSetBlock footerHeightBlock;
 
-@property (nonatomic, copy) YSCNameStringSetBlock headerNameBlock;
-@property (nonatomic, copy) YSCNameStringSetBlock cellNameBlock;
-@property (nonatomic, copy) YSCNameStringSetBlock footerNameBlock;
+@property (nonatomic, copy) YSCHeaderFooterNameSetBlock headerNameBlock;
+@property (nonatomic, copy) YSCCellNameSetBlock cellNameBlock;
+@property (nonatomic, copy) YSCHeaderFooterNameSetBlock footerNameBlock;
 
 #pragma mark - 设置ScrollViewDelegate相关的回调
 @property (nonatomic, copy) YSCBlock willBeginDraggingBlock;
@@ -92,7 +92,7 @@ typedef CGFloat (^YSCHeaderFooterHeightSetBlock)(NSInteger section);
 @property (nonatomic, copy) YSCBlock didScrollBlock;
 @property (nonatomic, copy) YSCBlock didEndScrollingAnimationBlock;
 @property (nonatomic, copy) YSCBlock willBeginDeceleratingBlock;
-@property (nonatomic, copy) YSCBlock didEndDeceleratingBlock;
+@property (nonatomic, copy) YSCBlock didEndDeceleratingBlock; 
 
 //创建对象，不用xib布局时使用
 + (instancetype)CreateYSCTableViewOnView:(UIView *)view;

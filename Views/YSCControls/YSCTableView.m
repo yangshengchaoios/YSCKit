@@ -74,18 +74,10 @@
     self.enableLoadMore = YES;
     self.enableTips = YES;
     
-    //blocks
-    WEAKSELF
+    //只要该block不能为nil！
     self.preProcessBlock = ^NSArray *(NSArray *array) {
         return array;
     };
-    self.clickHeaderBlock = ^(NSObject *object, NSInteger section) {};
-    self.clickCellBlock = ^(NSObject *object, NSIndexPath *indexPath) {};
-    self.deleteCellBlock = ^(NSObject *object, NSIndexPath *indexPath) {};
-    self.clickFooterBlock = ^(NSObject *object, NSInteger section) {};
-    self.layoutHeaderView = ^(UIView *view, NSObject *object) {};
-    self.layoutCellView = ^(UIView *view, NSObject *object) {};
-    self.layoutFooterView = ^(UIView *view, NSObject *object) {};
     
     [self initTableView];//初始化tableView
 }
@@ -524,7 +516,7 @@
         NSString *headerName = self.headerName;
         NSObject *headerObject = self.headerDataArray[section];
         if (self.headerNameBlock) {
-            headerName = self.headerNameBlock(headerObject, [NSIndexPath indexPathForRow:0 inSection:section]);
+            headerName = self.headerNameBlock(headerObject, section);
         }
         if (isNotEmpty(headerName)) {
             if (self.headerHeightBlock) {
@@ -546,7 +538,7 @@
         NSString *headerName = self.headerName;
         NSObject *headerObject = self.headerDataArray[section];
         if (self.headerNameBlock) {
-            headerName = self.headerNameBlock(headerObject, [NSIndexPath indexPathForRow:0 inSection:section]);
+            headerName = self.headerNameBlock(headerObject, section);
         }
         
         if (isNotEmpty(headerName)) {
@@ -620,7 +612,7 @@
         NSString *footerName = self.footerName;
         NSObject *footerObject = self.footerDataArray[section];
         if (self.footerNameBlock) {
-            footerName = self.footerNameBlock(footerObject, [NSIndexPath indexPathForRow:0 inSection:section]);
+            footerName = self.footerNameBlock(footerObject, section);
         }
         if (isNotEmpty(footerName)) {
             if (self.footerHeightBlock) {
@@ -642,7 +634,7 @@
         NSString *footerName = self.footerName;
         NSObject *footerObject = self.footerDataArray[section];
         if (self.footerNameBlock) {
-            footerName = self.footerNameBlock(footerObject, [NSIndexPath indexPathForRow:0 inSection:section]);
+            footerName = self.footerNameBlock(footerObject, section);
         }
         
         if (isNotEmpty(footerName)) {
