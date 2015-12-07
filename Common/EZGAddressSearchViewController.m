@@ -90,6 +90,7 @@
     [EZGDATA startLocationService];
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] bk_initWithTitle:@"确定" style:UIBarButtonItemStylePlain handler:^(id sender) {
         if (weakSelf.block) {
+            weakSelf.selectedPoiModel.level = weakSelf.mapView.zoomLevel;
             weakSelf.block(weakSelf.selectedPoiModel);
         }
         [weakSelf backViewController];
@@ -163,7 +164,7 @@
                 weakSelf.userSelectedCity = Trim(result.addressDetail.city);
             }
             NSMutableArray *tempArray = [NSMutableArray array];
-            if (weakSelf.selectedPoiModel && self.isSearch == YES) {
+            if (weakSelf.selectedPoiModel && weakSelf.isSearch) {
                 weakSelf.isSearch = NO;
                 [tempArray addObject:weakSelf.selectedPoiModel];
             }
