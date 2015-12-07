@@ -450,25 +450,12 @@
 
 
 - (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView{
-    //如果有PageControl，计算出当前页码，并对pageControl进行更新
-    
     NSInteger pageIndex;
-    
-    switch (orientation) {
-        case PagedFlowViewOrientationHorizontal:
-            pageIndex = floor(_scrollView.contentOffset.x / _pageSize.width);
-            break;
-        case PagedFlowViewOrientationVertical:
-            pageIndex = floor(_scrollView.contentOffset.y / _pageSize.height);
-            break;
-        default:
-            break;
-    }
-    
+    CGFloat pageWidth = scrollView.width;
+    pageIndex = floor((scrollView.contentOffset.x - pageWidth / 2) / pageWidth) + 1;
     if (pageControl && [pageControl respondsToSelector:@selector(setCurrentPage:)]) {
         [pageControl setCurrentPage:pageIndex];
     }
-    
     if ([_delegate respondsToSelector:@selector(flowView:didScrollToPageAtIndex:)] && _currentPageIndex != pageIndex) {
         [_delegate flowView:self didScrollToPageAtIndex:pageIndex];
     }
