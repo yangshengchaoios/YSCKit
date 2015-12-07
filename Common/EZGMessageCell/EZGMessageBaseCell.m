@@ -130,7 +130,7 @@
             [self.avatarImageView setImageWithURLString:USERAVATAR withFadeIn:NO];
         }
         else {//对方的头像
-            [self.avatarImageView setImageWithURLString:APPDATA.chatUser.avatarUrl withFadeIn:NO];
+            [self.avatarImageView setImageWithURLString:APPDATA.chatUser.avatarUrl placeholderImage:DefaultAvatarImage withFadeIn:NO];
         }
     }
     
