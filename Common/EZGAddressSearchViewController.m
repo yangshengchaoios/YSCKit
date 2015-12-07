@@ -183,7 +183,12 @@
                 model.poiLocation = info.pt;
                 [tempArray addObject:model];
             }
-            weakSelf.currentSelectedRow = 0;
+            if (isEmpty(EZGDATA.userLocation)) {
+                weakSelf.currentSelectedRow = -1;
+            }
+            else {
+                weakSelf.currentSelectedRow = 0;
+            }
             [weakSelf.tableView refreshAtPageIndex:kDefaultPageStartIndex response:tempArray error:nil];
             //选中后滚动
             [weakSelf.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0] atScrollPosition:UITableViewScrollPositionBottom animated:YES];

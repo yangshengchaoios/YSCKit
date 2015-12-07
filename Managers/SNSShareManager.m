@@ -8,7 +8,7 @@
 
 #import "SNSShareManager.h"
 
-@implementation SNSShareManager
+@implementation SNSShareManager 
 
 + (BOOL)IsOauthAndTokenNotExpired:(ShareType)shareType {
     NSString *platformName = [self PlatformTypeOfUMeng:shareType];

@@ -30,5 +30,4 @@
              urlResource:(NSString *)url
      presentedController:(UIViewController *)viewController
                   result:(UMSocialDataServiceCompletion)result;
-
 @end
