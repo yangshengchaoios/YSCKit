@@ -52,17 +52,9 @@ typedef void (^YSCResponseErrorMessageBlock)(NSObject *object, NSString *errorMe
 #define DEBUGMODEL      [GetObject(@"DEBUG") boolValue]
 
 #define __NSLog(s, ...) do { \
-NSString *logString = [NSString stringWithFormat:@"[%@(%d)] %@",[[NSString stringWithUTF8String:__FILE__] lastPathComponent],__LINE__,[NSString stringWithFormat:(s), ##__VA_ARGS__]]; \
-if ( DEBUGMODEL ) { \
-NSLog(@"%@", logString);\
-[LogManager saveLog:logString];\
-} \
-else { \
-NSLog(@"%@", logString); \
-if ([@"1" isEqualToString:kLogManageType]) { \
-[LogManager saveLog:logString]; \
-} \
-} \
+    NSString *logString = [NSString stringWithFormat:@"[%@(%d)] %@",[[NSString stringWithUTF8String:__FILE__] lastPathComponent],__LINE__,[NSString stringWithFormat:(s), ##__VA_ARGS__]]; \
+    NSLog(@"%@", logString); \
+    [LogManager saveLog:logString]; \
 } while (0)
 
 #define NSLog(...) __NSLog(__VA_ARGS__)
