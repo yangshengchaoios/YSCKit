@@ -555,9 +555,12 @@
     }
     return conversation;
 }
-//更新conversation的扩展属性
-- (void)updateConversation:(AVIMConversation *)conversation byParams:(NSDictionary *)params block:(YSCResultBlock)block {
-    if (isEmpty(conversation)) {
+//更新conversation的扩展属性(默认是发送消息调用)
+- (void)updateConversation:(AVIMConversation *)conv byParams:(NSDictionary *)params block:(YSCResultBlock)block {
+    [self updateConversation:conv byParams:params updateType:NO block:block];
+}
+- (void)updateConversation:(AVIMConversation *)conv byParams:(NSDictionary *)params updateType:(BOOL)onlyRefresh block:(YSCResultBlock)block {
+    if (isEmpty(conv.conversationId)) {
         if (block) {
             block(@"conversation is empty");
         }
@@ -569,25 +572,38 @@
         }
         return;
     }
-    //更新conversion
-    if (isEmpty(conversation.attributes)) {
-        NSLog(@"[attributes IS EMPTY!convId=%@,params=%@]", conversation.conversationId, params);
+    if (onlyRefresh) {//接受消息仅仅刷新会话
+        AVIMConversationQuery *query = [[AVIMClient defaultClient] conversationQuery];
+        query.cachePolicy = kAVCachePolicyNetworkOnly;
+        [query getConversationById:conv.conversationId callback:^(AVIMConversation *conversation, NSError *error) {
+            NSLog(@"conv.attr1=%@", conversation.attributes);
+            if (isEmpty(error)) {
+                [[CDConversationStore store] updateConversation:conversation];
+                if (block) {
+                    block(nil);
+                }
+            }
+            else {
+                if (block) {
+                    block(error);
+                }
+            }
+        }];
     }
-    
-    AVIMConversationUpdateBuilder *updateBuilder = [conversation newUpdateBuilder];
-    // ---------  非常重要！！！--------------
-    // 将所有属性转交给 updateBuilder 统一处理。
-    // 否则会删除其它属性
-    // -------------------------------------
-    updateBuilder.attributes = conversation.attributes;
-    for (NSString *paramKey in params.allKeys) {
-        [updateBuilder setObject:params[paramKey] forKey:paramKey];
-    }
-    [conversation update:[updateBuilder dictionary]  callback:^(BOOL succeeded, NSError *error) {
-        if (block) {
-            block(error);
+    else {//发送消息时需要更新会话扩展属性
+        AVIMConversationUpdateBuilder *updateBuilder = [conv newUpdateBuilder];
+        updateBuilder.attributes = conv.attributes;
+        for (NSString *paramKey in params.allKeys) {
+            [updateBuilder setObject:params[paramKey] forKey:paramKey];
         }
-    }];
+        [conv update:[updateBuilder dictionary] callback:^(BOOL succeeded, NSError *error) {
+            NSLog(@"conv.attr2=%@", conv.attributes);
+            [[CDConversationStore store] updateConversation:conv];
+            if (block) {
+                block(error);
+            }
+        }];
+    }
 }
 //拦截消息到达通知
 - (void)messageReceived:(NSNotification *)notification {
@@ -617,10 +633,9 @@
             postN(kNotificationRefreshRescueList);
         }
         //更新conversation
-        [EZGDATA updateConversation:conv byParams:@{kParamEzgoalStatus : @(rescueStatus)} block:^(NSObject *object) {
+        [EZGDATA updateConversation:conv byParams:@{kParamEzgoalStatus : @(rescueStatus)} updateType:YES block:^(NSObject *object) {
             postN(kNotificationRefreshMessageCenter);//刷新消息中心
             postN(kNotificationRefreshConvStatus);//通知会话页面，报告conv的状态已经更新了
-            //FIXME:更新失败的处理？？？
         }];
     }
     else {

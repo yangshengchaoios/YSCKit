@@ -66,5 +66,6 @@
 - (AVIMConversation *)findConversionByOtherUserId:(NSString *)otherUserId;
 //更新conversation的扩展属性
 - (void)updateConversation:(AVIMConversation *)conversation byParams:(NSDictionary *)params block:(YSCResultBlock)block;
+- (void)updateConversation:(AVIMConversation *)conv byParams:(NSDictionary *)params updateType:(BOOL)onlyRefresh block:(YSCResultBlock)block;
 
 @end

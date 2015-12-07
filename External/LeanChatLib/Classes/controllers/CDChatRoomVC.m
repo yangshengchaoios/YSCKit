@@ -693,8 +693,10 @@ static NSInteger const kOnePageSize = 10;
         }
         [[CDSoundManager manager] playSendSoundIfNeed];
         //NOTE:刷新当前message所在的cell
-        NSIndexPath *indexPath = [NSIndexPath indexPathForRow:msgIndex inSection:0];
-        [weakSelf.messageTableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationNone];
+        if (msgIndex < [weakSelf.messages count]) {
+            NSIndexPath *indexPath = [NSIndexPath indexPathForRow:msgIndex inSection:0];
+            [weakSelf.messageTableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationNone];
+        }
     }];
 }
 - (void)replaceMesssage:(AVIMTypedMessage *)message atIndexPath:(NSIndexPath *)indexPath {
