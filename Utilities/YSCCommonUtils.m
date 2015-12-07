@@ -31,7 +31,9 @@
                   }
                     requestFailure:^(ErrorType errorType, NSError *error) {
                         NSString *errMsg = [YSCCommonUtils ResolveErrorType:errorType andError:error];
-                        [UIView showResultThenHideOnWindow:errMsg];
+                        if (showMessage) {
+                            [UIView showResultThenHideOnWindow:errMsg];
+                        }
                         [YSCCommonUtils checkNewVersionByAppleId:kAppStoreId];
                     }];
     }
