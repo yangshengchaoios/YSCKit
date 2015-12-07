@@ -45,6 +45,7 @@
 + (BOOL)checkRescueStatusIsOver:(RescueStatusType)rescueStatus {
     return (RescueStatusTypeConfirm == rescueStatus ||
             RescueStatusTypeGiveUpByB == rescueStatus ||
+            RescueStatusTypeCancelBySystem == rescueStatus ||
             RescueStatusTypeCancelByB == rescueStatus);
 }
 //判断是否普通会话

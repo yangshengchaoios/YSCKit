@@ -39,8 +39,9 @@ typedef NS_ENUM(NSInteger, RescueStatusType) {
     RescueStatusTypeConfirm             = 3,//C端确认完成/已评价 (over)
     RescueStatusTypeGiveUpByB           = 4,//B端放弃救援(over)
     RescueStatusTypeCancelByC1          = 5,//C端申请取消救援(从救援中改变而来)
-    RescueStatusTypeCancelByB           = 6,//B端确认取消救援/系统到时自动取消(over)
+    RescueStatusTypeCancelByB           = 6,//B端确认取消救援(over)
     RescueStatusTypeCancelByC0          = 7,//C端申请取消救援(从暂未开始改变而来)
+    RescueStatusTypeCancelBySystem      = 8,//系统到时自动取消(over)
 };
 
 #pragma mark - 消息扩展参数值宏定义

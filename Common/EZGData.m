@@ -605,7 +605,8 @@
             SaveObjectByFile(APPDATA.rescueModel, kCachedRescueModel, kParamAppModel);
         }
         ////B端接收到系统结束救援的消息、以及C端未开始就取消救援的消息、C端恢复救援的消息 就刷新救援列表
-        if (RescueStatusTypeCancelByB == rescueStatus ||
+        if (RescueStatusTypeCancelBySystem == rescueStatus ||
+            RescueStatusTypeCancelByB == rescueStatus ||
             RescueStatusTypeCancelByC0 == rescueStatus ||
             RescueStatusTypeUnProcess == rescueStatus) {
             postN(kNotificationRefreshRescueList);
