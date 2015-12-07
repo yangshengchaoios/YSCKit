@@ -14,8 +14,9 @@ typedef void (^YSCObjectIndexPathResultBlock)(NSObject *object, NSIndexPath *ind
 typedef void (^YSCObjectIndexResultBlock)(NSObject *object, NSInteger section);
 typedef NSDictionary *(^YSCDictionarySetBlock)(NSInteger pageIndex);
 typedef void (^YSCViewObjectResultBlock)(UIView *view, NSObject *object);
-typedef CGFloat (^YSCFloatSetBlock)(NSIndexPath *indexPath);
+typedef CGFloat (^YSCCellHeightSetBlock)(NSIndexPath *indexPath);
 typedef NSString *(^YSCNameStringSetBlock)(NSObject *object, NSIndexPath *indexPath);
+typedef CGFloat (^YSCHeaderFooterHeightSetBlock)(NSInteger section);
 
 
 //------------------------------------
@@ -77,9 +78,9 @@ typedef NSString *(^YSCNameStringSetBlock)(NSObject *object, NSIndexPath *indexP
 @property (nonatomic, copy) YSCViewObjectResultBlock layoutHeaderView;
 @property (nonatomic, copy) YSCViewObjectResultBlock layoutCellView;
 @property (nonatomic, copy) YSCViewObjectResultBlock layoutFooterView;
-@property (nonatomic, copy) YSCFloatSetBlock headerHeightBlock;
-@property (nonatomic, copy) YSCFloatSetBlock cellHeightBlock;
-@property (nonatomic, copy) YSCFloatSetBlock footerHeightBlock;
+@property (nonatomic, copy) YSCHeaderFooterHeightSetBlock headerHeightBlock;
+@property (nonatomic, copy) YSCCellHeightSetBlock cellHeightBlock;
+@property (nonatomic, copy) YSCHeaderFooterHeightSetBlock footerHeightBlock;
 
 @property (nonatomic, copy) YSCNameStringSetBlock headerNameBlock;
 @property (nonatomic, copy) YSCNameStringSetBlock cellNameBlock;

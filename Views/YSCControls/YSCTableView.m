@@ -507,12 +507,6 @@
     if ([self respondsToSelector:@selector(setLayoutMargins:)]) {
         [self setLayoutMargins:edgeInsets];
     }
-//    if ([self respondsToSelector:@selector(setPreservesSuperviewLayoutMargins:)]) {
-//        [self setPreservesSuperviewLayoutMargins:NO];;
-//    }
-//    if([self respondsToSelector:@selector(setCellLayoutMarginsFollowReadableWidth:)]) {
-//        self.cellLayoutMarginsFollowReadableWidth = NO;
-//    }
 }
 
 
@@ -526,28 +520,25 @@
 }
 //HEADER
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
-    if (self.headerHeightBlock) {
-        return self.headerHeightBlock([NSIndexPath indexPathForRow:0 inSection:section]);
-    }
     if ((section >= 0 && section < [self.headerDataArray count])) {
         NSString *headerName = self.headerName;
         NSObject *headerObject = self.headerDataArray[section];
         if (self.headerNameBlock) {
-            NSString *tempName = self.headerNameBlock(headerObject, [NSIndexPath indexPathForRow:0 inSection:section]);
-            if (isNotEmpty(tempName)) {
-                headerName = tempName;
+            headerName = self.headerNameBlock(headerObject, [NSIndexPath indexPathForRow:0 inSection:section]);
+        }
+        if (isNotEmpty(headerName)) {
+            if (self.headerHeightBlock) {
+                return self.headerHeightBlock(section);
+            }
+            else {
+                if ([NSClassFromString(headerName) isSubclassOfClass:[YSCBaseTableHeaderFooterView class]]) {
+                    return [NSClassFromString(headerName) HeightOfViewByObject:headerObject];
+                }
             }
         }
-        if (isNotEmpty(headerName) && [NSClassFromString(headerName) isSubclassOfClass:[YSCBaseTableHeaderFooterView class]]) {
-            return [NSClassFromString(headerName) HeightOfViewByObject:headerObject];
-        }
-        else {
-            return 0.01;
-        }
     }
-    else {
-        return 0.01;
-    }
+    
+    return 0.01;
 }
 - (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
     YSCBaseTableHeaderFooterView *header = nil;
@@ -555,10 +546,7 @@
         NSString *headerName = self.headerName;
         NSObject *headerObject = self.headerDataArray[section];
         if (self.headerNameBlock) {
-            NSString *tempName = self.headerNameBlock(headerObject, [NSIndexPath indexPathForRow:0 inSection:section]);
-            if (isNotEmpty(tempName)) {
-                headerName = tempName;
-            }
+            headerName = self.headerNameBlock(headerObject, [NSIndexPath indexPathForRow:0 inSection:section]);
         }
         
         if (isNotEmpty(headerName)) {
@@ -628,28 +616,25 @@
 }
 //FOOTER
 - (CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section {
-    if (self.footerHeightBlock) {
-        return self.footerHeightBlock([NSIndexPath indexPathForRow:0 inSection:section]);
-    }
     if ((section >= 0 && section < [self.footerDataArray count])) {
         NSString *footerName = self.footerName;
         NSObject *footerObject = self.footerDataArray[section];
         if (self.footerNameBlock) {
-            NSString *tempName = self.footerNameBlock(footerObject, [NSIndexPath indexPathForRow:0 inSection:section]);
-            if (isNotEmpty(tempName)) {
-                footerName = tempName;
+            footerName = self.footerNameBlock(footerObject, [NSIndexPath indexPathForRow:0 inSection:section]);
+        }
+        if (isNotEmpty(footerName)) {
+            if (self.footerHeightBlock) {
+                return self.footerHeightBlock(section);
+            }
+            else {
+                if ([NSClassFromString(footerName) isSubclassOfClass:[YSCBaseTableHeaderFooterView class]]) {
+                    return [NSClassFromString(footerName) HeightOfViewByObject:footerObject];
+                }
             }
         }
-        if (isNotEmpty(footerName) && [NSClassFromString(footerName) isSubclassOfClass:[YSCBaseTableHeaderFooterView class]]) {
-            return [NSClassFromString(footerName) HeightOfViewByObject:footerObject];
-        }
-        else {
-            return 0.01;
-        }
     }
-    else {
-        return 0.01;
-    }
+    
+    return 0.01;
 }
 - (UIView *)tableView:(UITableView *)tableView viewForFooterInSection:(NSInteger)section {
     YSCBaseTableHeaderFooterView *footer = nil;
@@ -657,10 +642,7 @@
         NSString *footerName = self.footerName;
         NSObject *footerObject = self.footerDataArray[section];
         if (self.footerNameBlock) {
-            NSString *tempName = self.footerNameBlock(footerObject, [NSIndexPath indexPathForRow:0 inSection:section]);
-            if (isNotEmpty(tempName)) {
-                footerName = tempName;
-            }
+            footerName = self.footerNameBlock(footerObject, [NSIndexPath indexPathForRow:0 inSection:section]);
         }
         
         if (isNotEmpty(footerName)) {
