@@ -289,7 +289,6 @@
     };
     //   定义返回失败的block
     void (^requestFailure1)(AFHTTPRequestOperation *operation, NSError *error) = ^(AFHTTPRequestOperation *operation, NSError *error) {
-        [YSCCommonUtils SaveNSError:error];//自动记录错误日志
         if (200 != operation.response.statusCode) {
             if (401 == operation.response.statusCode) {
                 NSDictionary *param = @{kParamUserId : USERID, kParamMessage : @"登录过期"};

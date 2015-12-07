@@ -247,10 +247,10 @@
     currentInstallation.deviceProfile = [EZGManager deviceProfile];
     [currentInstallation saveInBackgroundWithBlock:^(BOOL succeeded, NSError *error) {
         if (succeeded) {
-            NSLog(@"succed");
+            NSLog(@"save installation successed!");
         }
         else {
-            NSLog(@"error:%@", error);
+            NSLog(@"save installation error:%@", error);
         }
     }];
 }
@@ -276,7 +276,6 @@
 //更新_Installation，保证同一个userId只能对应一个deviceToken
 - (void)updateInstallationToEnsureUniqueUserId:(NSString *)userId {
     NSString *deviceToken = [AppConfigManager sharedInstance].deviceToken;
-    NSLog(@"deviceToken2=%@", deviceToken);
     ReturnWhenObjectIsEmpty(userId);
     ReturnWhenObjectIsEmpty(deviceToken);
     AVQuery *query = [AVQuery queryWithClassName:@"_Installation"];
@@ -285,7 +284,6 @@
     [query findObjectsInBackgroundWithBlock: ^(NSArray *objects, NSError *error) {
         if (isEmpty(error)) {
             for (AVObject *object in objects) {
-                NSLog(@"convId:%@", object.objectId);
                 NSMutableArray *tempArray = [[object objectForKey:@"channels"] mutableCopy];
                 [tempArray removeObject:userId];
                 [object setObject:tempArray forKey:@"channels"];
@@ -415,8 +413,7 @@
                     }
                     else {
                         NSString *errMsg = [NSString stringWithFormat:@"查询救援会话出错：%@", error];
-                        [LogManager saveLog:errMsg];
-                        NSLog(@"err:%@", errMsg);
+                        NSLog(@"%@", errMsg);
                         [UIView showResultThenHideOnWindow:@"查询救援会话出错"];
                         [AppData resetRescueModel:nil];
                     }
@@ -455,9 +452,7 @@
                                      extendAttributes:attributes
                                              callback:^(AVIMConversation *conversation, NSError *error) {
                                                  if (error) {//两种错误：查询出错；创建出错
-                                                     NSLog(@"connect to LeanCloudIM server error:%@", error);
                                                      NSString *errMsg = [NSString stringWithFormat:@"fetchConvWithMembers:%@ attributes:%@ error:%@",members, attributes, error];
-                                                     [LogManager saveLog:errMsg];
                                                      NSLog(@"建立会话失败：%@", errMsg);
                                                      [UIView showAlertVieWithMessage:@"建立会话失败，请检查网络连接！"];
                                                  }
