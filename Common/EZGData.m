@@ -570,15 +570,20 @@
         return;
     }
     //更新conversion
-    NSMutableDictionary *tempDict = [NSMutableDictionary dictionary];
-    [tempDict addEntriesFromDictionary:conversation.attributes];
-    for (NSString *paramKey in params.allKeys) {
-        tempDict[paramKey] = params[paramKey];
+    if (isEmpty(conversation.attributes)) {
+        NSLog(@"[attributes IS EMPTY!convId=%@,params=%@]", conversation.conversationId, params);
     }
+    
     AVIMConversationUpdateBuilder *updateBuilder = [conversation newUpdateBuilder];
-    updateBuilder.attributes = tempDict;
-    [conversation update:[updateBuilder dictionary] callback:^(BOOL succeeded, NSError *error) {
-        [[CDConversationStore store] updateConversation:conversation];
+    // ---------  非常重要！！！--------------
+    // 将所有属性转交给 updateBuilder 统一处理。
+    // 否则会删除其它属性
+    // -------------------------------------
+    updateBuilder.attributes = conversation.attributes;
+    for (NSString *paramKey in params.allKeys) {
+        [updateBuilder setObject:params[paramKey] forKey:paramKey];
+    }
+    [conversation update:[updateBuilder dictionary]  callback:^(BOOL succeeded, NSError *error) {
         if (block) {
             block(error);
         }
