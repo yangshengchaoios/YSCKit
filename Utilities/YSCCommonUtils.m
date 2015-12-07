@@ -508,7 +508,7 @@
     }
     [errMsg appendFormat:@"\r<<<<<<<<<<<<<<<<<<<<ErrorType[%ld]<<<<<<<<<<<<<<<<<<<<\r\n", (long)errorType];//错误标记结束
     NSLog(@"errMsg=\r\n%@", errMsg);
-    [LogManager saveLog:errMsg];//FIXME:控制是否记录error日志
+    [LogManager saveLog:errMsg];
     return messageDetail;
 }
 //解析错误码
@@ -547,7 +547,7 @@
 + (void)SaveNSError:(NSError *)error {
     NSMutableString *errMsg = [NSMutableString stringWithFormat:@">>>>>>>>>>>>>>>>>>>>errorCode(%ld)>>>>>>>>>>>>>>>>>>>>\r  errorMessage:%@\r<<<<<<<<<<<<<<<<<<<<errorCode(%ld)<<<<<<<<<<<<<<<<<<<<\r\n", (long)error.code, error, (long)error.code];
     NSLog(@"error=\r\n%@", errMsg);
-    [LogManager saveLog:errMsg];//FIXME:控制是否记录error日志
+    [LogManager saveLog:errMsg];
 }
 
 #pragma mark - 删除多余的日志文件
