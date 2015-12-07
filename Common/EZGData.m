@@ -557,9 +557,9 @@
 }
 //更新conversation的扩展属性(默认是发送消息调用)
 - (void)updateConversation:(AVIMConversation *)conv byParams:(NSDictionary *)params block:(YSCResultBlock)block {
-    [self updateConversation:conv byParams:params updateType:NO block:block];
+    [self updateConversation:conv byParams:params refreshOnly:NO block:block];
 }
-- (void)updateConversation:(AVIMConversation *)conv byParams:(NSDictionary *)params updateType:(BOOL)onlyRefresh block:(YSCResultBlock)block {
+- (void)updateConversation:(AVIMConversation *)conv byParams:(NSDictionary *)params refreshOnly:(BOOL)refreshOnly block:(YSCResultBlock)block {
     if (isEmpty(conv.conversationId)) {
         if (block) {
             block(@"conversation is empty");
@@ -572,7 +572,7 @@
         }
         return;
     }
-    if (onlyRefresh) {//接受消息仅仅刷新会话
+    if (refreshOnly) {//接受消息仅仅刷新会话
         AVIMConversationQuery *query = [[AVIMClient defaultClient] conversationQuery];
         query.cachePolicy = kAVCachePolicyNetworkOnly;
         [query getConversationById:conv.conversationId callback:^(AVIMConversation *conversation, NSError *error) {
@@ -633,7 +633,7 @@
             postN(kNotificationRefreshRescueList);
         }
         //更新conversation
-        [EZGDATA updateConversation:conv byParams:@{kParamEzgoalStatus : @(rescueStatus)} updateType:YES block:^(NSObject *object) {
+        [EZGDATA updateConversation:conv byParams:@{kParamEzgoalStatus : @(rescueStatus)} refreshOnly:YES block:^(NSObject *object) {
             postN(kNotificationRefreshMessageCenter);//刷新消息中心
             postN(kNotificationRefreshConvStatus);//通知会话页面，报告conv的状态已经更新了
         }];
