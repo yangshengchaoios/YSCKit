@@ -273,7 +273,7 @@
 }
 //输入text的时候过滤非法内容
 - (void)filterText:(NSString *)text {
-    //TODO:
+
 }
 //判断内容是否符合正则表达式
 - (BOOL)checkString:(NSString *)string isMatchRegex:(NSString *)regex {

@@ -102,7 +102,7 @@
 /**
  *  获取目录下所有文件和目录的路径
  *
- *  @param directoryPath 目录路径  TODO:need to test filepath
+ *  @param directoryPath 目录路径  
  *
  *  @return 目录数组
  */

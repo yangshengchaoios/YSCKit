@@ -156,7 +156,7 @@
     if (enableTips && isEmpty(self.tipsView)) {
         WEAKSELF
         self.tipsView = [YSCKTipsView CreateYSCTipsViewOnView:self
-                                                   edgeInsets:UIEdgeInsetsZero//TODO:
+                                                   edgeInsets:UIEdgeInsetsZero
                                                   withMessage:self.tipsEmptyText
                                                     iconImage:[UIImage imageNamed:self.tipsEmptyIcon]
                                                   buttonTitle:self.tipsButtonTitle
@@ -488,7 +488,7 @@
         if (isNotEmpty(array)) {
             [self.footerDataArray addObjectsFromArray:array];
         }
-        [self reloadData];//TODO:test 是否需要reload？
+        [self reloadData];
     }
 }
 - (void)resetCellEdgeInsets {

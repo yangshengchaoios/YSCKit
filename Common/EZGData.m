@@ -415,7 +415,6 @@
                         NSString *errMsg = [NSString stringWithFormat:@"查询救援会话出错：%@", error];
                         NSLog(@"%@", errMsg);
                         [UIView showResultThenHideOnWindow:@"查询救援会话出错"];
-                        [AppData resetRescueModel:nil];
                     }
                 }
             }];

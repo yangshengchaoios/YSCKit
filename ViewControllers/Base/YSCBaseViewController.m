@@ -31,11 +31,6 @@
 	}
 	return self;
 }
-- (void)didReceiveMemoryWarning {
-	[super didReceiveMemoryWarning];
-
-	// TODO:这里需要释放dataModel
-}
 - (void)viewWillAppear:(BOOL)animated {
 	[super viewWillAppear:animated];
 

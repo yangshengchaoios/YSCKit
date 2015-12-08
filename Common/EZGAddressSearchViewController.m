@@ -232,7 +232,7 @@
     //实现以下四个属性的设置就可以简单的使用框架
     self.tableView.cellName = @"EZGAddressSearchCell";
     self.tableView.enableRefresh = NO;
-    self.tableView.enableLoadMore = NO;//TODO:如何加载更多数据？
+    self.tableView.enableLoadMore = NO;
     self.tableView.cellSeperatorLeft = 30;
     self.tableView.separatorColor = RGB(228, 228, 228);
     self.tableView.requestType = RequestTypeCustomResponse;
@@ -259,7 +259,7 @@
         [cell layoutObject:object];
     };
     self.tableView.willBeginDeceleratingBlock = ^{
-        //TODO:压缩mapView
+
     };
 }
 //按照关键词进行搜索
@@ -275,7 +275,7 @@
         option.pageIndex = (int)(pageIndex - 1);
         [self.poiSearch poiSearchInCity:option];
     }
-    else {//TODO:根据中心点、半径和检索词发起周边检索 poiSearchNearBy
+    else {
         
     }
 }
