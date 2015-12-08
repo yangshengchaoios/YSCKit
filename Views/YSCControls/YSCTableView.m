@@ -178,17 +178,17 @@
 #pragma mark - 外部可调用的方法
 //注册header、cell、footer
 - (void)registerHeaderName:(NSString *)headerName {
-    if (isNotEmpty(headerName)) {
+    if ([NSClassFromString(headerName) isSubclassOfClass:[YSCBaseTableHeaderFooterView class]]) {
         [NSClassFromString(headerName) registerHeaderFooterToTableView:self];
     }
 }
 - (void)registerCellName:(NSString *)cellName {
-    if (isNotEmpty(cellName)) {
+    if ([NSClassFromString(cellName) isSubclassOfClass:[YSCBaseTableViewCell class]]) {
         [NSClassFromString(cellName) registerCellToTableView:self];
     }
 }
 - (void)registerFooterName:(NSString *)footerName {
-    if (isNotEmpty(footerName)) {
+    if ([NSClassFromString(footerName) isSubclassOfClass:[YSCBaseTableHeaderFooterView class]]) {
         [NSClassFromString(footerName) registerHeaderFooterToTableView:self];
     }
 }
@@ -518,7 +518,7 @@
         if (self.headerNameBlock) {
             headerName = self.headerNameBlock(headerObject, section);
         }
-        if (isNotEmpty(headerName)) {
+        if (isNotEmpty(headerName)) { 
             if (self.headerHeightBlock) {
                 return self.headerHeightBlock(section);
             }
