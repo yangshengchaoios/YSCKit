@@ -501,17 +501,19 @@
         if (NO == [conversation.conversationId isEqualToString:[CDChatManager manager].chattingConversationId]) {
             CDChatRoomVC *chatRoom = (CDChatRoomVC *)currentViewController;
             [chatRoom closeCurrentViewControllerAnimated:NO block:^{
-                [EZGDATA bk_performBlock:^(id obj) {
-                    [EZGDATA openChatRoomByConversion:conversation byParams:params];
-                } afterDelay:kDefaultDuration];
+                [EZGDATA openChatRoomByConversion:conversation byParams:params];
+//                [EZGDATA bk_performBlock:^(id obj) {
+//                    [EZGDATA openChatRoomByConversion:conversation byParams:params];
+//                } afterDelay:kDefaultDuration];
             }];
         }
     }
     else if ([currentViewController isKindOfClass:NSClassFromString(@"EZGFastRescueViewController")]) {//需要关闭快速救援入口窗口
         [currentViewController.navigationController dismissViewControllerAnimated:NO completion:^{
-            [EZGDATA bk_performBlock:^(id obj) {
-                [EZGDATA openChatRoomByConversion:conversation byParams:params];
-            } afterDelay:kDefaultDuration];
+            [EZGDATA openChatRoomByConversion:conversation byParams:params];
+//            [EZGDATA bk_performBlock:^(id obj) {
+//                [EZGDATA openChatRoomByConversion:conversation byParams:params];
+//            } afterDelay:kDefaultDuration];
         }];
     }
     else {//进入聊天会话窗口
