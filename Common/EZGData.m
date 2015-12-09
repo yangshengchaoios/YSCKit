@@ -405,16 +405,24 @@
                     [EZGDATA openChatRoomByConversion:conversation byParams:paramsChatRoom];
                 }
                 else {
-                    if (isEmpty(error)) {//如果是之前创建会话失败，可以自动再次创建救援会话
-                        NSDictionary *params = @{kParamOtherId  : Trim(userInfo[kParamOtherId]),
-                                                 kParamChatRoom : userInfo[kParamChatRoom],
-                                                 kParamExtendAttributes : userInfo[kParamExtendAttributes]};
-                        postNWithInfo(kNotificationOpenChatRoom, params);
+                    if (isEmpty(error)) {
+                        //如果是之前创建会话失败，可以自动再次创建救援会话
+                        if (isNotEmpty(userInfo[kParamOtherId]) &&
+                            isNotEmpty(userInfo[kParamChatRoom]) &&
+                            isNotEmpty(userInfo[kParamExtendAttributes])) {
+                            NSDictionary *params = @{kParamOtherId  : Trim(userInfo[kParamOtherId]),
+                                                     kParamChatRoom : userInfo[kParamChatRoom],
+                                                     kParamExtendAttributes : userInfo[kParamExtendAttributes]};
+                            postNWithInfo(kNotificationOpenChatRoom, params);
+                        }
+                        else {
+                            NSLog(@"救援会话不存在");
+                            [UIView showAlertVieWithMessage:@"救援会话不存在"];
+                        }
                     }
                     else {
-                        NSString *errMsg = [NSString stringWithFormat:@"查询救援会话出错：%@", error];
-                        NSLog(@"%@", errMsg);
-                        [UIView showResultThenHideOnWindow:@"查询救援会话出错"];
+                        NSLog(@"查询救援会话出错:%@", error);
+                        [UIView showAlertVieWithMessage:@"查询救援会话出错"];
                     }
                 }
             }];
@@ -502,18 +510,12 @@
             CDChatRoomVC *chatRoom = (CDChatRoomVC *)currentViewController;
             [chatRoom closeCurrentViewControllerAnimated:NO block:^{
                 [EZGDATA openChatRoomByConversion:conversation byParams:params];
-//                [EZGDATA bk_performBlock:^(id obj) {
-//                    [EZGDATA openChatRoomByConversion:conversation byParams:params];
-//                } afterDelay:kDefaultDuration];
             }];
         }
     }
     else if ([currentViewController isKindOfClass:NSClassFromString(@"EZGFastRescueViewController")]) {//需要关闭快速救援入口窗口
         [currentViewController.navigationController dismissViewControllerAnimated:NO completion:^{
             [EZGDATA openChatRoomByConversion:conversation byParams:params];
-//            [EZGDATA bk_performBlock:^(id obj) {
-//                [EZGDATA openChatRoomByConversion:conversation byParams:params];
-//            } afterDelay:kDefaultDuration];
         }];
     }
     else {//进入聊天会话窗口

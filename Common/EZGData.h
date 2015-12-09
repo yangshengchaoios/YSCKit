@@ -62,6 +62,8 @@
 - (void)openChatRoomByNotification:(NSNotification *)notification;
 //打开会话框
 - (void)openChatRoomByPushMessage;
+//NOTE:关闭防重复点击的开关
+- (void)resetClicked;
 //根据对方id查找会话对象
 - (AVIMConversation *)findConversionByOtherUserId:(NSString *)otherUserId;
 //更新conversation的扩展属性
