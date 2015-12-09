@@ -261,6 +261,7 @@ static NSInteger const kOnePageSize = 10;
 }
 - (BOOL)alertError:(NSError *)error {
     if (error) {
+        [YSCCommonUtils SaveNSError:error];
         if (error.code == 4303 || kAVIMErrorConversationNotFound == error.code) {
             [[CDConversationStore store] deleteConversationByConvId:self.conv.conversationId];//删除本地不存在的会话
             self.conv = nil;
@@ -285,7 +286,11 @@ static NSInteger const kOnePageSize = 10;
             [UIView showResultThenHideOnWindow:@"网络连接错误"];
         }
         else {
-            [self alert:[NSString stringWithFormat:@"alertError: %@", error]];
+            NSString *messageDetail = GetNSErrorMsg(error);
+            if (isEmpty(messageDetail)) {
+                messageDetail = @"会话数据连接失败";
+            }
+            [self alert:messageDetail];
         }
         return YES;
     }

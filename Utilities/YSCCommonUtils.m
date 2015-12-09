@@ -492,8 +492,7 @@
 + (NSString *)ResolveErrorType:(ErrorType)errorType andError:(NSError *)error {
     NSMutableString *errMsg = [NSMutableString stringWithFormat:@">>>>>>>>>>>>>>>>>>>>ErrorType[%ld]>>>>>>>>>>>>>>>>>>>>", (long)errorType];//错误标记开始
     NSString *messageTitle = @"提示";
-    NSString *messageDetail = @"";
-    messageDetail = [self ResolveErrorType:errorType];
+    NSString *messageDetail = [self ResolveErrorType:errorType];
     if (isEmpty(messageDetail)) {
         messageDetail = GetNSErrorMsg(error);
     }
