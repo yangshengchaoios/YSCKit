@@ -104,7 +104,7 @@ static NSInteger const kOnePageSize = 10;
     [self refreshUserInfo];
     //监控用户是否被挤下线了
     self.isUserChangedIdentifier = [APPDATA bk_addObserverForKeyPath:@"isUserChanged" task:^(id target) {
-        if (ISNOTLOGGED && IsAppTypeC) {
+        if (ISNOTLOGGED) {
             [weakSelf.navigationController popToRootViewControllerAnimated:YES];
         }
     }];
