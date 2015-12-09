@@ -183,7 +183,7 @@
         [db beginTransaction];
         [db executeUpdate:@"UPDATE conversations SET lastMessage = ?, updatedTime = ? WHERE id = ?"
     withArgumentsInArray :@[[self dataFromMessage:message],
-                            [NSDate dateWithTimeIntervalSince1970:message.sendTimestamp / 1000],
+                            [NSDate dateWithTimeIntervalSince1970:message.sendTimestamp / 1000.0f],
                             convId]];
         BOOL isSuccess = [db commit];
         NSLog(@"isSuccess:%d", isSuccess);

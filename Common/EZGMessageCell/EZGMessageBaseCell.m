@@ -135,7 +135,7 @@
     }
     
     //3. 设置气泡图片
-    UIEdgeInsets edgeInsets = UIEdgeInsetsMake(30, 28, 85, 28);
+    UIEdgeInsets edgeInsets = AUTOLAYOUT_EDGEINSETS(60, 20, 20, 36);
     if (EZGBubbleMessageTypeReceiving == [self bubbleMessageType]) {
         self.bubbleImageView.image = [[UIImage imageNamed:@"EZGoal_Receiving_White"] resizableImageWithCapInsets:edgeInsets resizingMode:UIImageResizingModeStretch];
     }

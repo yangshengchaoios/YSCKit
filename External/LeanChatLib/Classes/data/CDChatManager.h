@@ -103,7 +103,7 @@ typedef void (^CDRecentConversationsCallback)(NSArray *conversations, NSInteger 
 
 #pragma mark - conversation
 //根据 conversationId 获取对话
-- (void)fecthConvWithConvid:(NSString *)convid callback:(AVIMConversationResultBlock)callback;
+- (void)fetchConvWithConvid:(NSString *)convid callback:(AVIMConversationResultBlock)callback;
 //根据成员名称查找或创建一个会话
 - (void)fetchConvWithMembers:(NSArray *)members callback:(AVIMConversationResultBlock)callback;
 //根据成员名称查找或创建一个会话

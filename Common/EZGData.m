@@ -370,12 +370,8 @@
             [self openChatRoomByConversion:conversation byParams:paramsChatRoom];
         }
         else {//根据conversationId查找网络会话
-            [[CDChatManager manager] fecthConvWithConvid:Trim(userInfo[kParamConversationId]) callback:^(AVIMConversation *conversation, NSError *error) {
-                if (error) {
-                    conversation = nil;
-                }
+            [[CDChatManager manager] fetchConvWithConvid:Trim(userInfo[kParamConversationId]) callback:^(AVIMConversation *conversation, NSError *error) {
                 if (conversation) {
-                    [[CDConversationStore store] updateConversation:conversation];
                     [EZGDATA openChatRoomByConversion:conversation byParams:paramsChatRoom];
                 }
                 else {
@@ -485,16 +481,12 @@
     }
     else {
         [self bk_performBlock:^(id obj) {//延迟1.5秒居然可以解决下面的问题！
-            [[CDChatManager manager] fecthConvWithConvid:convId callback:^(AVIMConversation *conversation, NSError *error) {
-                if (error) {
-                    [EZGDATA resetClicked];
-                    //TODO:偶尔会出现刚创建的会话不能根据convId查询的情况！暂时屏蔽错误提示！
-                    //                    NSString *errMsg = [NSString stringWithFormat:@"fecthConvWithConvid:%@ error:%@", convId, error];
-                    //                    [UIView showAlertVieWithMessage:errMsg];
+            [[CDChatManager manager] fetchConvWithConvid:convId callback:^(AVIMConversation *conversation, NSError *error) {
+                if (conversation) {
+                    [EZGDATA openChatRoomByConversion:conversation byParams:params];
                 }
                 else {
-                    [[CDConversationStore store] updateConversation:conversation];
-                    [EZGDATA openChatRoomByConversion:conversation byParams:params];
+                    [EZGDATA resetClicked];
                 }
             }];
         } afterDelay:1.5];

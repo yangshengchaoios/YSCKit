@@ -64,7 +64,7 @@ static CDChatManager *instance;
 
 #pragma mark - conversation
 //根据会话id查询(不创建)会话
-- (void)fecthConvWithConvid:(NSString *)convid callback:(AVIMConversationResultBlock)callback {
+- (void)fetchConvWithConvid:(NSString *)convid callback:(AVIMConversationResultBlock)callback {
     AVIMConversationQuery *q = [[AVIMClient defaultClient] conversationQuery];
     q.cachePolicy = kAVCachePolicyNetworkOnly;
     [q whereKey:@"objectId" equalTo:convid];
@@ -75,8 +75,10 @@ static CDChatManager *instance;
         else {
             if (objects.count == 0) {
                 callback(nil, [CDChatManager errorWithText:[NSString stringWithFormat:@"conversation of %@ not exists", convid]]);
-            } else {
-                callback([objects objectAtIndex:0], error);
+            }
+            else {
+                [[CDConversationStore store] updateConversation:objects[0]];//将会话保存在本地
+                callback(objects[0], error);
             }
         }
     }];

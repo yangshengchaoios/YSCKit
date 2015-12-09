@@ -21,6 +21,7 @@
 #import "CDFailedMessageStore.h"
 #import "AVIMEmotionMessage.h"
 #import "MJRefresh.h"
+#import "ServerTimeSynchronizer.h"
 
 static NSInteger const kOnePageSize = 10;
 
@@ -55,7 +56,10 @@ static NSInteger const kOnePageSize = 10;
 }
 //重置conv
 - (void)resetConversation {
-    self.conv = [[CDConversationStore store] selectOneConversationByConvId:self.conv.conversationId];
+    AVIMConversation *conversation = [[CDConversationStore store] selectOneConversationByConvId:self.conv.conversationId];
+    if (conversation) {
+        self.conv = conversation;
+    }
 }
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -101,7 +105,7 @@ static NSInteger const kOnePageSize = 10;
     //监控用户是否被挤下线了
     self.isUserChangedIdentifier = [APPDATA bk_addObserverForKeyPath:@"isUserChanged" task:^(id target) {
         if (ISNOTLOGGED && IsAppTypeC) {
-            [weakSelf closeCurrentViewController];
+            [weakSelf.navigationController popToRootViewControllerAnimated:YES];
         }
     }];
 }
@@ -236,9 +240,7 @@ static NSInteger const kOnePageSize = 10;
     if (indexPath.row > 0 && indexPath.row < [self.messages count]) {//FIXME:有bug
         AVIMTypedMessage *currentMsg = [self.messages objectAtIndex:indexPath.row];
         AVIMTypedMessage *lastMsg = [self.messages objectAtIndex:indexPath.row - 1];
-        NSDate *currentDate = [NSDate dateFromTimeInterval:currentMsg.sendTimestamp];
-        NSDate *lastDate = [NSDate dateFromTimeInterval:lastMsg.sendTimestamp];
-        return currentDate.timeIntervalSince1970 - lastDate.timeIntervalSince1970 > 60 * 3;
+        return currentMsg.sendTimestamp - lastMsg.sendTimestamp > 60 * 1 * 1000;//NOTE:超过N分钟间隔就显示时间
     }
     else {
         return NO;
@@ -677,7 +679,7 @@ static NSInteger const kOnePageSize = 10;
 
     //>>>>>设置临时消息必要的属性，先在cell中显示出来>>>>>>>>>>>
     msg.messageId = [[CDChatManager manager] tempMessageId];
-    msg.sendTimestamp = [[NSDate date] timeIntervalSince1970] * 1000;
+    msg.sendTimestamp = [ServerTimeSynchronizer sharedInstance].currentTimeInterval.integerValue * 1000;
     msg.clientId = [CDChatManager manager].selfId;
     msg.conversationId = self.conv.conversationId;
     [self insertMessage:msg];

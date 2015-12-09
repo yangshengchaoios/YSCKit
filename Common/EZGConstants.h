@@ -70,7 +70,7 @@ static const NSString *EzgoalTypeB2C            = @"B2C";//B端创建与C端的�
 static const NSString *EzgoalTypeC2C            = @"C2C";//C端用户之间的会话(暂未启用)
 static const NSString *EzgoalTypeGroup          = @"Group";//群会话(暂未启用)
 
-#define kDefaultConversationPageSize            50       //默认查询会话列表一页的数量
+#define kDefaultConversationPageSize            20       //默认查询会话列表一页的数量
 
 //消息扩展参数名定义
 #define MParamSceneType                 @"sceneType"        //现场照片类型
