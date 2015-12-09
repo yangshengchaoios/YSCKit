@@ -633,6 +633,12 @@
             RescueStatusTypeCancelByB == rescueStatus ||
             RescueStatusTypeCancelByC0 == rescueStatus ||
             RescueStatusTypeUnProcess == rescueStatus) {
+            YSCBaseViewController *currentVC = (YSCBaseViewController *)[AppConfigManager sharedInstance].currentViewController;
+            if (RescueStatusTypeCancelBySystem == rescueStatus &&
+                ([currentVC isKindOfClass:NSClassFromString(@"EZGGiveUpCancelViewController")] ||
+                [currentVC isKindOfClass:NSClassFromString(@"EZGAgreeCancelRescueViewController")])) {
+                [currentVC backViewController];
+            }
             postN(kNotificationRefreshRescueList);
         }
         //更新conversation

@@ -70,7 +70,6 @@ static NSInteger const kOnePageSize = 10;
     [self initBottomMenu];
     [self initEmotionView];
     [self.view addSubview:self.clientStatusView];
-    [self loadMessagesWhenInit];
     [self updateStatusView];
     [[XHAudioPlayerHelper shareInstance] setDelegate:self];
     
@@ -83,6 +82,7 @@ static NSInteger const kOnePageSize = 10;
     header.stateLabel.hidden = YES;
     self.messageTableView.header = header;
     self.currentSelectedIndex = -1;
+    [header beginRefreshing];
     
     //重新设置返回按钮
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithImage:DefaultNaviBarArrowBackImage
@@ -233,13 +233,15 @@ static NSInteger const kOnePageSize = 10;
 #pragma mark -  ui config
 // 是否显示时间轴Label的回调方法
 - (BOOL)shouldDisplayTimestampForRowAtIndexPath:(NSIndexPath *)indexPath {
-    if (indexPath.row > 0 && indexPath.row < [self.messages count]) {
-        AVIMTypedMessage *msg = [self.messages objectAtIndex:indexPath.row];
+    if (indexPath.row > 0 && indexPath.row < [self.messages count]) {//FIXME:有bug
+        AVIMTypedMessage *currentMsg = [self.messages objectAtIndex:indexPath.row];
         AVIMTypedMessage *lastMsg = [self.messages objectAtIndex:indexPath.row - 1];
-        return msg.sendTimestamp - lastMsg.sendTimestamp > 60 * 3 * 1000;
+        NSDate *currentDate = [NSDate dateFromTimeInterval:currentMsg.sendTimestamp];
+        NSDate *lastDate = [NSDate dateFromTimeInterval:lastMsg.sendTimestamp];
+        return currentDate.timeIntervalSince1970 - lastDate.timeIntervalSince1970 > 60 * 3;
     }
     else {
-        return YES;
+        return NO;
     }
 }
 // 是否支持用户手动滚动
@@ -456,7 +458,6 @@ static NSInteger const kOnePageSize = 10;
 - (void)didRetrySendMessage:(AVIMTypedMessage *)message atIndexPath:(NSIndexPath *)indexPath {
     [self resendMessage:message atIndexPath:indexPath discardIfFailed:false];
 }
-
 
 
 
@@ -778,18 +779,22 @@ static NSInteger const kOnePageSize = 10;
             block(msgs, error);
         }
         else {
-            [self cacheMsgs:msgs callback:^(BOOL succeeded, NSError *error) {
+            for (AVIMTypedMessage *msg in msgs) {
+                //设置消息是已读的>>>>>>>>>>>>>>>>>>>
+                if (msg.sendTimestamp <= self.lastSentTimestamp &&
+                    AVIMMessageIOTypeOut == msg.ioType &&
+                    AVIMMessageStatusDelivered != msg.status) {
+                    msg.status = AVIMMessageStatusDelivered;
+                }
+                //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+            }
+            if (block) {
                 block(msgs, error);
-            }];
+            }
         }
     }];
 }
 - (void)loadMessagesWhenInit {
-    if (self.isLoadingMsg) {
-        return;
-    }
-    self.isLoadingMsg = YES;
-    
     [self queryAndCacheMessagesWithTimestamp:0 block:^(NSArray *msgs, NSError *error) {
         if ([self filterError:error]) {
             // 失败消息加到末尾，因为 SDK 缓存不保存它们
@@ -812,14 +817,19 @@ static NSInteger const kOnePageSize = 10;
             }
         }
         self.isLoadingMsg = NO;
+        [self.messageTableView.header endRefreshing];
     }];
 }
 - (void)loadOldMessages {
-    if (self.messages.count == 0 || self.isLoadingMsg) {
-        [self.messageTableView.header endRefreshing];
+    if (self.isLoadingMsg) {
+        return;
+    }
+    if (self.messages.count == 0) {
+        [self loadMessagesWhenInit];
         return;
     }
     self.isLoadingMsg = YES;
+    
     AVIMTypedMessage *msg = self.messages[0];
     int64_t timestamp = msg.sendTimestamp;
     WEAKSELF
@@ -844,35 +854,14 @@ static NSInteger const kOnePageSize = 10;
         }
     }];
 }
-//缓存消息内容文件，不是消息本身！
-- (void)cacheMsgs:(NSArray *)msgs callback:(AVBooleanResultBlock)callback {
-    if (isEmpty(msgs)) {
-        callback(YES, nil);
-    }
-    for (AVIMTypedMessage *msg in msgs) {
-        //设置消息是已读的>>>>>>>>>>>>>>>>>>>
-        if (msg.sendTimestamp <= self.lastSentTimestamp &&
-            AVIMMessageIOTypeOut == msg.ioType &&
-            AVIMMessageStatusDelivered != msg.status) {
-            msg.status = AVIMMessageStatusDelivered;
-        }
-        //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-    }
-    callback(YES, nil);
-}
 - (void)insertMessage:(AVIMTypedMessage *)message {
-    WEAKSELF
-    [self cacheMsgs:@[message] callback:^(BOOL succeeded, NSError *error) {
-        if ([weakSelf filterError:error]) {
-            [weakSelf.messageTableView beginUpdates];
-            NSIndexPath *indexPath = [NSIndexPath indexPathForRow:weakSelf.messages.count inSection:0];
-            [weakSelf.messages addObject:message];
-            [weakSelf.messageTableView insertRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationNone];
-            [weakSelf.messageTableView endUpdates];
-            [weakSelf scrollToBottomAnimated:YES];
-        }
-        weakSelf.isLoadingMsg = NO;
-    }];
+    [self.messageTableView beginUpdates];
+    NSIndexPath *indexPath = [NSIndexPath indexPathForRow:self.messages.count inSection:0];
+    [self.messages addObject:message];
+    [self.messageTableView insertRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationNone];
+    [self.messageTableView endUpdates];
+    [self scrollToBottomAnimated:YES];
+    self.isLoadingMsg = NO;
 }
 
 @end
