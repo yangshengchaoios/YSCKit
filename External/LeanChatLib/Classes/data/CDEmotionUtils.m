@@ -139,7 +139,7 @@
 }
 
 + (NSString *)convertString:(NSString *)text toEmoji:(BOOL)toEmoji {
-    NSMutableString *emojiText = [[NSMutableString alloc] initWithString:text];
+    NSMutableString *emojiText = [[NSMutableString alloc] initWithString:Trim(text)];
     for (NSString *code in[[NSString emojiAliases] allKeys]) {
         NSString *emoji = [NSString emojiAliases][code];
         if (toEmoji) {
