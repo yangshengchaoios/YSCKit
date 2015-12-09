@@ -261,24 +261,21 @@ static NSInteger const kOnePageSize = 10;
 }
 - (BOOL)alertError:(NSError *)error {
     if (error) {
-        if (error.code == 4303) {
+        if (error.code == 4303 || kAVIMErrorConversationNotFound == error.code) {
             [[CDConversationStore store] deleteConversationByConvId:self.conv.conversationId];//删除本地不存在的会话
             self.conv = nil;
             WEAKSELF
             [self alert:@"会话不存在" block:^{
                 [weakSelf bk_performBlock:^(id obj) {
                     [weakSelf.navigationController popViewControllerAnimated:YES];
-                } afterDelay:0.5];
+                } afterDelay:kDefaultDuration];
             }];
         }
         else if (kAVIMErrorConnectionLost == error.code) {
             [UIView showResultThenHideOnWindow:@"未能连接聊天服务器"];
             postN(kNotificationConnectToChatServer);
         }
-        else if (kAVIMErrorConversationNotFound == error.code) {
-            [UIView showResultThenHideOnWindow:@"会话不存在！"];
-        }
-        else if (kAVIMErrorConnectionLost == error.code) {
+        else if (kAVIMErrorConnectionLost == error.code || kAVIMErrorClientNotOpen == error.code) {
             [UIView showResultThenHideOnWindow:@"会话连接断开"];
         }
         else if (kAVIMErrorMessageTooLong == error.code) {
