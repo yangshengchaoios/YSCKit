@@ -8,7 +8,7 @@
 
 #import "EZGMessageImageCell.h"
 
-#define kDefaultMessageImage        [UIImage imageNamed:@"default_image"]//TODO:替换默认图片
+#define kDefaultMessageImage        [UIImage imageNamed:@"default_image_msg"]
 
 @implementation EZGMessageImageCell
 

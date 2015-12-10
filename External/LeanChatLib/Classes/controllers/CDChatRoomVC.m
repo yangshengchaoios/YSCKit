@@ -80,7 +80,7 @@
     header.stateLabel.hidden = YES;
     self.messageTableView.header = header;
     self.currentSelectedIndex = -1;
-    [header beginRefreshing];
+    [self queryMessages];
     
     //重新设置返回按钮
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithImage:DefaultNaviBarArrowBackImage

@@ -615,12 +615,16 @@
         RescueStatusType rescueStatus = [message.attributes[kParamEzgoalStatus] integerValue];
         AVIMConversation *conv = [[CDConversationStore store] selectOneConversationByConvId:message.conversationId];
         //更新本地救援模型
-        if ([message.conversationId isEqualToString:APPDATA.rescueModel.conversationId] ||
-            [conv.rescueId isEqualToString:APPDATA.rescueModel.rescueId]) {
+        if ([conv.rescueId isEqualToString:APPDATA.rescueModel.rescueId]) {
             APPDATA.rescueModel.rescueStatus = rescueStatus;
             SaveObjectByFile(APPDATA.rescueModel, kCachedRescueModel, kParamAppModel);
         }
-        ////B端接收到系统结束救援的消息、以及C端未开始就取消救援的消息、C端恢复救援的消息 就刷新救援列表
+        //更新conversation
+        [EZGDATA updateConversation:conv byParams:@{kParamEzgoalStatus : @(rescueStatus)} refreshOnly:YES block:^(NSObject *object) {
+            postN(kNotificationRefreshMessageCenter);//刷新消息中心
+            postN(kNotificationRefreshConvStatus);//通知会话页面，报告conv的状态已经更新了
+        }];
+        //B端接收到系统结束救援的消息、以及C端未开始就取消救援的消息、C端恢复救援的消息 就刷新救援列表
         if (RescueStatusTypeCancelBySystem == rescueStatus ||
             RescueStatusTypeCancelByB == rescueStatus ||
             RescueStatusTypeCancelByC0 == rescueStatus ||
@@ -633,11 +637,6 @@
             }
             postN(kNotificationRefreshRescueList);
         }
-        //更新conversation
-        [EZGDATA updateConversation:conv byParams:@{kParamEzgoalStatus : @(rescueStatus)} refreshOnly:YES block:^(NSObject *object) {
-            postN(kNotificationRefreshMessageCenter);//刷新消息中心
-            postN(kNotificationRefreshConvStatus);//通知会话页面，报告conv的状态已经更新了
-        }];
     }
     else {
         postN(kNotificationRefreshMessageCenter);//刷新消息中心
