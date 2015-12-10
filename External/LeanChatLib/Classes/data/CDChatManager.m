@@ -180,7 +180,7 @@ static CDChatManager *instance;
     };
     if(timestamp == 0) {
         // sdk 会设置好 timestamp
-        [conversation queryMessagesWithLimit:limit callback:callback];
+        [conversation queryMessagesFromServerWithLimit:limit callback:callback];
     } else {
         [conversation queryMessagesBeforeId:nil timestamp:timestamp limit:limit callback:callback];
     }

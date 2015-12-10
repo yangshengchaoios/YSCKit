@@ -23,7 +23,6 @@
 
 @interface CDChatRoomVC () <UINavigationControllerDelegate, UIImagePickerControllerDelegate, ZYQAssetPickerControllerDelegate>
 @property (nonatomic, strong, readwrite) AVIMConversation *conv;
-@property (atomic, assign) BOOL isLoadingMsg;
 @property (atomic, assign) NSInteger currentSelectedIndex;
 @property (nonatomic, strong) NSArray *emotionManagers;
 @property (nonatomic, strong) LZStatusView *clientStatusView;
@@ -41,7 +40,6 @@
         //self.allowsSendVoice = NO;
         //self.allowsSendFace = NO;
         //self.allowsSendMultiMedia = NO;
-        self.isLoadingMsg = NO;
     }
     return self;
 }
@@ -76,7 +74,7 @@
     //配置下拉刷新
     WEAKSELF
     MJRefreshNormalHeader *header = [MJRefreshNormalHeader headerWithRefreshingBlock:^{
-        [weakSelf loadOldMessages];
+        [weakSelf queryMessages];
     }];
     header.lastUpdatedTimeLabel.hidden = YES;
     header.stateLabel.hidden = YES;
@@ -248,12 +246,6 @@
 }
 
 #pragma mark - alert and async utils
-- (BOOL)filterError:(NSError *)error {
-    return [self alertError:error] == NO;
-}
-- (void)alert:(NSString *)msg {
-    [self alert:msg block:nil];
-}
 - (void)alert:(NSString *)msg block:(void (^)(void))block{
     UIAlertView *alertView = [UIAlertView bk_alertViewWithTitle:msg];
     [alertView bk_setCancelButtonWithTitle:@"确定" handler:block];
@@ -288,9 +280,9 @@
         else {
             NSString *messageDetail = GetNSErrorMsg(error);
             if (isEmpty(messageDetail)) {
-                messageDetail = @"会话数据连接失败";
+                messageDetail = @"会话连接失败";
             }
-            [self alert:messageDetail];
+            [self alert:messageDetail block:nil];
         }
         return YES;
     }
@@ -306,7 +298,7 @@
 #pragma mark - conversations store
 - (void)updateConversationAsRead {
     if (self.conv) {
-        [[CDConversationStore store] updateConversation:self.conv];//如果已经存在就不会继续插入，保证有消息就有会话！
+        [[CDConversationStore store] updateConversation:self.conv];
         [[CDConversationStore store] updateUnreadCountToZeroByConvId:self.conv.conversationId];
         [[CDConversationStore store] updateMentioned:NO convId:self.conv.conversationId];
     }
@@ -678,7 +670,7 @@
     msg.sendTimestamp = [ServerTimeSynchronizer sharedInstance].currentTimeInterval.integerValue * 1000;
     msg.clientId = [CDChatManager manager].selfId;
     msg.conversationId = self.conv.conversationId;
-    [self insertMessage:msg];
+    [self appendMessage:msg];
     NSInteger msgIndex = [self.messages indexOfObject:msg];//先缓存该消息在列表中的位置
     [[CDConversationStore store] updateLastMessage:msg byConvId:self.conv.conversationId];//更新最后一条消息对象
     //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -726,6 +718,7 @@
 }
 
 #pragma mark - receive and delivered
+//处理接收消息
 - (void)receiveMessage:(NSNotification *)notification {
     AVIMTypedMessage *message = notification.object;
     if ([message.conversationId isEqualToString:self.conv.conversationId]) {
@@ -735,35 +728,33 @@
             if (AVIMMessageIOTypeOut == msg.ioType &&
                 AVIMMessageStatusDelivered != msg.status) {
                 msg.status = AVIMMessageStatusDelivered;
-                [self.messages setObject:msg atIndexedSubscript:pos];
                 NSIndexPath *indexPath = [NSIndexPath indexPathForRow:pos inSection:0];
                 [self.messageTableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationNone];
             }
         }
         //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
         
-        if (self.conv.muted == NO) {
+        if (NO == self.conv.muted) {
             [[CDSoundManager manager] playReceiveSoundIfNeed];
         }
-        [self insertMessage:message];
+        [self appendMessage:message];
     }
 }
+//处理消息已送达
 - (void)onMessageDelivered:(NSNotification *)notification {
     AVIMTypedMessage *message = notification.object;
     if ([message.conversationId isEqualToString:self.conv.conversationId]) {
-        AVIMTypedMessage *foundMessage;
-        NSInteger pos;
-        for (pos = 0; pos < self.messages.count; pos++) {
+        int foundIndex = -1;
+        for (int pos = 0; pos < self.messages.count; pos++) {
             AVIMTypedMessage *msg = self.messages[pos];
             if ([msg.messageId isEqualToString:message.messageId]) {
-                foundMessage = msg;
+                foundIndex = pos;
+                msg.status = AVIMMessageStatusDelivered;
                 break;
             }
         }
-        if (foundMessage !=nil) {
-            foundMessage.status = AVIMMessageStatusDelivered;
-            [self.messages setObject:foundMessage atIndexedSubscript:pos];
-            NSIndexPath *indexPath = [NSIndexPath indexPathForRow:pos inSection:0];
+        if (foundIndex >= 0) {
+            NSIndexPath *indexPath = [NSIndexPath indexPathForRow:foundIndex inSection:0];
             [self.messageTableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationNone];
             [self scrollToBottomAnimated:YES];
         }
@@ -771,99 +762,100 @@
 }
 
 #pragma mark - query messages
-- (void)queryAndCacheMessagesWithTimestamp:(int64_t)timestamp block:(AVIMArrayResultBlock)block {
-    NSInteger pageSize = 10;
-    if (0 == timestamp) {
-        pageSize = 30;
-    }
-    [[CDChatManager manager] queryTypedMessagesWithConversation:self.conv timestamp:timestamp limit:pageSize block:^(NSArray *msgs, NSError *error) {
-        if (error) {
-            block(msgs, error);
+//自动分页查询聊天消息
+- (void)queryMessages {
+    int64_t timestamp = 0;
+    NSInteger pageSize = 30;//FIXME:临时解决方案 - 第1页显示的时候强制多获取点服务端的数据
+    if (isNotEmpty(self.messages)) {
+        AVIMTypedMessage *msg = self.messages[0];
+        timestamp = msg.sendTimestamp;
+        pageSize = 10;
+        if (0 == timestamp) {//NOTEO:万一消息的发送时间为0不能当做第1页处理
+            timestamp = [ServerTimeSynchronizer sharedInstance].currentTimeInterval.integerValue * 1000;
         }
-        else {
-            for (AVIMTypedMessage *msg in msgs) {
-                //设置消息是已读的>>>>>>>>>>>>>>>>>>>
-                if (msg.sendTimestamp <= self.lastSentTimestamp &&
-                    AVIMMessageIOTypeOut == msg.ioType &&
-                    AVIMMessageStatusDelivered != msg.status) {
-                    msg.status = AVIMMessageStatusDelivered;
-                }
-                //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-            }
-            if (block) {
-                block(msgs, error);
-            }
-        }
-    }];
-}
-- (void)loadMessagesWhenInit {
-    [self queryAndCacheMessagesWithTimestamp:0 block:^(NSArray *msgs, NSError *error) {
-        if ([self filterError:error]) {
-            // 失败消息加到末尾，因为 SDK 缓存不保存它们
-            NSArray *failedMessages = [[CDFailedMessageStore store] selectFailedMessagesByConversationId:self.conv.conversationId];
-            NSMutableArray *allMessages = [NSMutableArray arrayWithArray:msgs];
-            [allMessages addObjectsFromArray:failedMessages];
-            
-            self.messages = allMessages;
-            [self.messageTableView reloadData];
-            [self scrollToBottomAnimated:NO];
-            if ([msgs count] > 0) {
-                [self updateConversationAsRead];
-            }
-            
-            // 如果连接上，则重发所有的失败消息。若夹杂在历史消息中间不好处理
-            if ([CDChatManager manager].connect) {
-                for (NSInteger i = msgs.count; i < allMessages.count; i++) {
-                    [self resendMessage:allMessages[i] atIndexPath:[NSIndexPath indexPathForRow:i inSection:0] discardIfFailed:YES];
-                }
-            }
-        }
-        self.isLoadingMsg = NO;
-        [self.messageTableView.header endRefreshing];
-    }];
-}
-- (void)loadOldMessages {
-    if (self.isLoadingMsg) {
-        return;
     }
-    if (self.messages.count == 0) {
-        [self loadMessagesWhenInit];
-        return;
-    }
-    self.isLoadingMsg = YES;
-    
-    AVIMTypedMessage *msg = self.messages[0];
-    int64_t timestamp = msg.sendTimestamp;
     WEAKSELF
-    [self queryAndCacheMessagesWithTimestamp:timestamp block:^(NSArray *msgs, NSError *error) {
-        if ([weakSelf filterError:error] && isNotEmpty(msgs)) {
-            NSMutableArray *newMsgs = [NSMutableArray arrayWithArray:msgs];
-            [newMsgs addObjectsFromArray:weakSelf.messages];
-            if ([msgs count] > 0) {
-                [weakSelf insertOldMessages:msgs completion: ^{
-                    weakSelf.isLoadingMsg = NO;
-                    [weakSelf.messageTableView.header endRefreshing];
-                }];
+    AVIMArrayResultBlock callback = ^(NSArray *msgs, NSError *error) {
+        if (isNotEmpty(msgs)) {
+            //1. 处理查询回来的原始数据
+            NSMutableArray *typedMessages = [NSMutableArray array];
+            for (AVIMTypedMessage *message in msgs) {
+                if ([message isKindOfClass:[AVIMTypedMessage class]]) {
+                    //设置消息是已读的>>>>>>>>>>>>>>>>>>>
+                    if (message.sendTimestamp <= weakSelf.lastSentTimestamp &&
+                        AVIMMessageIOTypeOut == message.ioType &&
+                        AVIMMessageStatusDelivered != message.status) {
+                        message.status = AVIMMessageStatusDelivered;
+                    }
+                    //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                    [typedMessages addObject:message];
+                }
             }
-            else {
-                weakSelf.isLoadingMsg = NO;
+            
+            //2. 处理发送失败的消息
+            if (0 == timestamp) {
+                [weakSelf updateConversationAsRead];
+                [weakSelf.messages removeAllObjects];
+                if (isNotEmpty(typedMessages)) {
+                    [weakSelf.messages addObjectsFromArray:typedMessages];
+                    //更新最后一条消息对象
+                    AVIMTypedMessage *lastMessage = [weakSelf.messages lastObject];
+                    if (NO == [lastMessage.messageId isEqualToString:weakSelf.conv.lastMessage.messageId]) {
+                        [[CDConversationStore store] updateLastMessage:lastMessage
+                                                              byConvId:weakSelf.conv.conversationId];
+                    }
+                    //显示消息列表
+                    NSArray *failedMessages = [[CDFailedMessageStore store] selectFailedMessagesByConversationId:weakSelf.conv.conversationId];
+                    [weakSelf.messages addObjectsFromArray:failedMessages];//追加上次发送错误的消息
+                    [weakSelf.messageTableView reloadData];
+                    [weakSelf scrollToBottomAnimated:NO];
+                    if ([CDChatManager manager].connect) {//如果连接上，则重发所有的失败消息
+                        for (NSInteger i = typedMessages.count; i < weakSelf.messages.count; i++) {
+                            [weakSelf resendMessage:weakSelf.messages[i] atIndexPath:[NSIndexPath indexPathForRow:i inSection:0] discardIfFailed:YES];
+                        }
+                    }
+                }
                 [weakSelf.messageTableView.header endRefreshing];
             }
+            //3. 处理加载更多消息
+            else {
+                if (isNotEmpty(typedMessages)) {
+                    [weakSelf insertOldMessages:typedMessages completion: ^{
+                        [weakSelf.messageTableView.header endRefreshing];
+                    }];
+                }
+                else {
+                    [weakSelf.messageTableView.header endRefreshing];
+                }
+            }
         }
         else {
-            weakSelf.isLoadingMsg = NO;
+            [weakSelf alertError:error];
             [weakSelf.messageTableView.header endRefreshing];
         }
-    }];
+    };
+    
+    //开始查询
+    if(timestamp == 0) {
+        if ([CDChatManager manager].connect) {//联网情况下只查询服务器端
+            [self.conv queryMessagesFromServerWithLimit:pageSize callback:callback];
+        }
+        else {
+            [self.conv queryMessagesWithLimit:pageSize callback:callback];
+        }
+    }
+    else {
+        [self.conv queryMessagesBeforeId:nil timestamp:timestamp limit:pageSize callback:callback];
+    }
 }
-- (void)insertMessage:(AVIMTypedMessage *)message {
+//把消息追加到最后
+- (void)appendMessage:(AVIMTypedMessage *)message {
     [self.messageTableView beginUpdates];
     NSIndexPath *indexPath = [NSIndexPath indexPathForRow:self.messages.count inSection:0];
     [self.messages addObject:message];
     [self.messageTableView insertRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationNone];
     [self.messageTableView endUpdates];
     [self scrollToBottomAnimated:YES];
-    self.isLoadingMsg = NO;
 }
 
 @end

@@ -394,7 +394,7 @@
             [q whereKey:AVIMAttr(kParamRescueId) equalTo:userInfo[kParamRescueId]];
             [q findConversationsWithCallback: ^(NSArray *objects, NSError *error) {
                 AVIMConversation *conversation = nil;
-                if (isEmpty(error) && objects.count > 0) {
+                if (isNotEmpty(objects)) {
                     conversation = objects[0];
                 }
                 if (conversation) {
