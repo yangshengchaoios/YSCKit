@@ -33,7 +33,7 @@
 //计算内容大小(不包括气泡四周的边距)
 + (CGSize)ContentSizeWithMessage:(AVIMTextMessage *)message {
     NSString *msgText = [CDEmotionUtils emojiStringFromString:message.text];//将原始字符串转换为带emoji的字符串
-    CGFloat msgTextWidth = [NSString WidthOfNormalString:msgText maxHeight:MAXFLOAT withFont:kBubbleTextFont];
+    CGFloat msgTextWidth = [NSString WidthOfNormalString:msgText maxHeight:MAXFLOAT withFont:AUTOLAYOUT_FONT(32)];
     msgTextWidth = MAX(AUTOLAYOUT_LENGTH(60), msgTextWidth);
     NSAttributedString *attrStr = [[XHMessageBubbleHelper sharedMessageBubbleHelper] bubbleAttributtedStringWithText:msgText];
     CGSize textSize = [SETextView frameRectWithAttributtedString:attrStr
