@@ -123,11 +123,11 @@
     
     //2. 设置头像
     if (message.attributes[MParamAvatarUrl]) {//如果消息中带有头像地址就直接显示该头像
-        [self.avatarImageView setImageWithURLString:message.attributes[MParamAvatarUrl]];
+        [self.avatarImageView setImageWithURLString:message.attributes[MParamAvatarUrl] placeholderImage:DefaultAvatarImage withFadeIn:NO];
     }
     else {
         if (EZGBubbleMessageTypeSending == [self bubbleMessageType]) {//自己的头像
-            [self.avatarImageView setImageWithURLString:USERAVATAR withFadeIn:NO];
+            [self.avatarImageView setImageWithURLString:USERAVATAR placeholderImage:DefaultAvatarImage withFadeIn:NO];
         }
         else {//对方的头像
             [self.avatarImageView setImageWithURLString:APPDATA.chatUser.avatarUrl placeholderImage:DefaultAvatarImage withFadeIn:NO];

@@ -7,9 +7,7 @@
 //
 
 #import <CommonCrypto/CommonCrypto.h>
-
 #import "CDChatRoomVC.h"
-
 #import "XHDisplayTextViewController.h"
 #import "XHAudioPlayerHelper.h"
 
@@ -22,8 +20,6 @@
 #import "AVIMEmotionMessage.h"
 #import "MJRefresh.h"
 #import "ServerTimeSynchronizer.h"
-
-static NSInteger const kOnePageSize = 10;
 
 @interface CDChatRoomVC () <UINavigationControllerDelegate, UIImagePickerControllerDelegate, ZYQAssetPickerControllerDelegate>
 @property (nonatomic, strong, readwrite) AVIMConversation *conv;
@@ -776,7 +772,11 @@ static NSInteger const kOnePageSize = 10;
 
 #pragma mark - query messages
 - (void)queryAndCacheMessagesWithTimestamp:(int64_t)timestamp block:(AVIMArrayResultBlock)block {
-    [[CDChatManager manager] queryTypedMessagesWithConversation:self.conv timestamp:timestamp limit:kOnePageSize block:^(NSArray *msgs, NSError *error) {
+    NSInteger pageSize = 10;
+    if (0 == timestamp) {
+        pageSize = 30;
+    }
+    [[CDChatManager manager] queryTypedMessagesWithConversation:self.conv timestamp:timestamp limit:pageSize block:^(NSArray *msgs, NSError *error) {
         if (error) {
             block(msgs, error);
         }
