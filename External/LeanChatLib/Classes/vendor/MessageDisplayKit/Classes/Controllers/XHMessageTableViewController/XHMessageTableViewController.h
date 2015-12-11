@@ -13,7 +13,6 @@
 #import "XHStoreManager.h"
 
 // Views
-#import "XHMessageTableView.h"
 #import "XHMessageInputView.h"
 #import "XHShareMenuView.h"
 #import "XHEmotionManagerView.h"
@@ -37,8 +36,7 @@ XHEmotionManagerViewDelegate, XHEmotionManagerViewDataSource>
 
 @property (nonatomic, strong) XHLocationHelper *locationHelper;//管理地理位置的工具对象
 @property (nonatomic, strong) NSMutableArray *messages;//消息数组
-@property (nonatomic, copy) NSString *messageSender;//消息的主体，默认为nil
-@property (nonatomic, weak, readonly) XHMessageTableView *messageTableView;//用于显示消息的TableView
+@property (nonatomic, strong) UITableView *messageTableView;//用于显示消息的TableView
 @property (nonatomic, weak, readonly) XHMessageInputView *messageInputView;//用于显示发送消息类型控制的工具条，在底部
 @property (nonatomic, weak, readonly) XHShareMenuView *shareMenuView;//替换键盘的位置的第三方功能控件
 @property (nonatomic, weak, readonly) XHEmotionManagerView *emotionManagerView;//管理第三方gif表情的控件
@@ -57,20 +55,12 @@ XHEmotionManagerViewDelegate, XHEmotionManagerViewDataSource>
 @property (nonatomic, assign) XHMessageInputViewStyle inputViewStyle;
 
 #pragma mark - DataSource Change
-//添加一条新的消息
-- (void)addMessage:(XHMessage *)addedMessage;
-//删除一条已存在的消息
-- (void)removeMessageAtIndexPath:(NSIndexPath *)indexPath;
 //插入旧消息数据到头部，仿微信的做法
 - (void)insertOldMessages:(NSArray *)oldMessages completion:(void (^)())completion;
 
 #pragma mark - Messages view controller
 //完成发送消息的函数
 - (void)finishSendMessageWithBubbleMessageType:(XHBubbleMessageMediaType)mediaType;
-//设置View、tableView的背景颜色
-- (void)setBackgroundColor:(UIColor *)color;
-//设置消息列表的背景图片
-- (void)setBackgroundImage:(UIImage *)backgroundImage;
 //是否滚动到底部
 - (void)scrollToBottomAnimated:(BOOL)animated;
 //滚动到哪一行

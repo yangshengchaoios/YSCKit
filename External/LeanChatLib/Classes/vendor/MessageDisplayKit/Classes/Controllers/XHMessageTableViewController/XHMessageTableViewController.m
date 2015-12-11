@@ -15,7 +15,6 @@
 @property (nonatomic, assign) CGFloat keyboardViewHeight;//记录键盘的高度，为了适配iPad和iPhone
 @property (nonatomic, assign) XHInputViewType textViewInputViewType;
 
-@property (nonatomic, weak, readwrite) XHMessageTableView *messageTableView;
 @property (nonatomic, weak, readwrite) XHMessageInputView *messageInputView;
 @property (nonatomic, weak, readwrite) XHShareMenuView *shareMenuView;
 @property (nonatomic, weak, readwrite) XHEmotionManagerView *emotionManagerView;
@@ -36,28 +35,7 @@
 - (void)exMainQueue:(void (^)())queue {
     dispatch_async(dispatch_get_main_queue(), queue);
 }
-- (void)addMessage:(XHMessage *)addedMessage {
-    WEAKSELF
-    [self exChangeMessageDataSourceQueue:^{
-        NSMutableArray *messages = [NSMutableArray arrayWithArray:weakSelf.messages];
-        [messages addObject:addedMessage];
-        
-        NSMutableArray *indexPaths = [NSMutableArray arrayWithCapacity:1];
-        [indexPaths addObject:[NSIndexPath indexPathForRow:messages.count - 1 inSection:0]];
-        
-        [weakSelf exMainQueue:^{
-            weakSelf.messages = messages;
-            [weakSelf.messageTableView insertRowsAtIndexPaths:indexPaths withRowAnimation:UITableViewRowAnimationNone];
-            [weakSelf scrollToBottomAnimated:YES];
-        }];
-    }];
-}
-- (void)removeMessageAtIndexPath:(NSIndexPath *)indexPath {
-    if (indexPath.row >= self.messages.count)
-        return;
-    [self.messages removeObjectAtIndex:indexPath.row];
-    [self.messageTableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationBottom];
-}
+
 static CGPoint  delayOffset = {0.0};
 // http://stackoverflow.com/a/11602040 Keep UITableView static when inserting rows at the top
 - (void)insertOldMessages:(NSArray *)oldMessages completion:(void (^)())completion {
@@ -89,9 +67,6 @@ static CGPoint  delayOffset = {0.0};
             }
         }];
     }];
-}
-- (void)insertOldMessages:(NSArray *)oldMessages {
-    [self insertOldMessages:oldMessages completion:nil];
 }
 
 #pragma mark - Propertys
@@ -198,14 +173,6 @@ static CGPoint  delayOffset = {0.0};
             break;
     }
 }
-- (void)setBackgroundColor:(UIColor *)color {
-    self.view.backgroundColor = color;
-    _messageTableView.backgroundColor = color;
-}
-- (void)setBackgroundImage:(UIImage *)backgroundImage {
-    self.messageTableView.backgroundView = nil;
-    self.messageTableView.backgroundView = [[UIImageView alloc] initWithImage:backgroundImage];
-}
 - (void)scrollToBottomAnimated:(BOOL)animated {
 	if (![self shouldAllowScroll])
         return;
@@ -239,61 +206,56 @@ static CGPoint  delayOffset = {0.0};
 }
 
 #pragma mark - Life Cycle
-- (void)setup {
-    // iPhone or iPad keyboard view height set here.
+- (void)initilzer {
+    if ([self respondsToSelector:@selector(automaticallyAdjustsScrollViewInsets)]) {
+        self.automaticallyAdjustsScrollViewInsets = NO;
+    }
     self.keyboardViewHeight = (kIsiPad ? 264 : 216);
     _allowsPanToDismissKeyboard = NO;
     _allowsSendVoice = YES;
     _allowsSendMultiMedia = YES;
     _allowsSendFace = YES;
     _inputViewStyle = XHMessageInputViewStyleFlat;
-}
-- (id)init {
-    self = [super init];
-    if (self) {
-        [self setup];
-    }
-    return self;
-}
-- (void)awakeFromNib {
-    [self setup];
-}
-- (void)initilzer {
-    if ([self respondsToSelector:@selector(automaticallyAdjustsScrollViewInsets)]) {
-        self.automaticallyAdjustsScrollViewInsets = NO;
-    }
+    
     // 默认设置用户滚动为NO
     _isUserScrolling = NO;
     
     // 初始化message tableView
-	XHMessageTableView *messageTableView = [[XHMessageTableView alloc] initWithFrame:self.view.bounds style:UITableViewStylePlain];
-	messageTableView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-	messageTableView.dataSource = self;
-	messageTableView.delegate = self;
-    messageTableView.separatorColor = [UIColor clearColor];
-    messageTableView.separatorStyle = UITableViewCellSeparatorStyleNone;
-    [self.view addSubview:messageTableView];
-    [self.view sendSubviewToBack:messageTableView];
-	_messageTableView = messageTableView;
+    self.messageTableView = [[UITableView alloc] initWithFrame:CGRectZero style:UITableViewStylePlain];
+	self.messageTableView.dataSource = self;
+	self.messageTableView.delegate = self;
+    self.messageTableView.separatorColor = [UIColor clearColor];
+    self.messageTableView.separatorStyle = UITableViewCellSeparatorStyleNone;
+    [self.view addSubview:self.messageTableView];
+    [self.view sendSubviewToBack:self.messageTableView];
+    [self.messageTableView mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.top.equalTo(self.view.mas_top).offset(20);
+        make.left.equalTo(self.view.mas_left);
+        make.bottom.equalTo(self.view.mas_bottom);
+        make.right.equalTo(self.view.mas_right);
+    }];
+    // 设置整体背景颜色
+    self.view.backgroundColor = kDefaultViewColor;
+    self.messageTableView.backgroundColor = [UIColor clearColor];
+    self.view.backgroundColor = [UIColor blueColor];//FIXME:test
+    self.messageTableView.backgroundColor = [UIColor redColor];//FIXME:test
+
     
     //注册自定义消息cell
-    [EZGMessageTextCell registerCellToTableView:messageTableView];
-    [EZGMessageVoiceCell registerCellToTableView:messageTableView];
-    [EZGMessageImageCell registerCellToTableView:messageTableView];
-    [EZGMessageLocationCell registerCellToTableView:messageTableView];
-    [EZGMessageVideoCell registerCellToTableView:messageTableView];
-    [EZGMessageSceneCell registerCellToTableView:messageTableView];
-    [EZGMessageCarCell registerCellToTableView:messageTableView];
-    [EZGMessageServiceCell registerCellToTableView:messageTableView];
-    [EZGMessageServiceCancelCell registerCellToTableView:messageTableView];
-    [EZGMessageServiceCommentCell registerCellToTableView:messageTableView];
+    [EZGMessageTextCell registerCellToTableView:self.messageTableView];
+    [EZGMessageVoiceCell registerCellToTableView:self.messageTableView];
+    [EZGMessageImageCell registerCellToTableView:self.messageTableView];
+    [EZGMessageLocationCell registerCellToTableView:self.messageTableView];
+    [EZGMessageVideoCell registerCellToTableView:self.messageTableView];
+    [EZGMessageSceneCell registerCellToTableView:self.messageTableView];
+    [EZGMessageCarCell registerCellToTableView:self.messageTableView];
+    [EZGMessageServiceCell registerCellToTableView:self.messageTableView];
+    [EZGMessageServiceCancelCell registerCellToTableView:self.messageTableView];
+    [EZGMessageServiceCommentCell registerCellToTableView:self.messageTableView];
     
     // 设置Message TableView 的bottom edg
     CGFloat inputViewHeight = 45.0f;
     [self setTableViewInsetsWithBottomValue:inputViewHeight];
-    
-    // 设置整体背景颜色
-    [self setBackgroundColor:kDefaultViewColor];
     
     // 输入工具条的frame
     CGRect inputFrame = CGRectMake(0.0f,
@@ -327,8 +289,6 @@ static CGPoint  delayOffset = {0.0};
             weakSelf.messageInputView.frame = inputViewFrame;
         };
     }
-    
-    // block回调键盘通知
     self.messageTableView.keyboardWillChange = ^(CGRect keyboardRect, UIViewAnimationOptions options, double duration, BOOL showKeyborad) {
         if (weakSelf.textViewInputViewType == XHInputViewTypeText) {
             [UIView animateWithDuration:duration
@@ -358,7 +318,6 @@ static CGPoint  delayOffset = {0.0};
                              completion:nil];
         }
     };
-    
     self.messageTableView.keyboardDidChange = ^(BOOL didShowed) {
         if ([weakSelf.messageInputView.inputTextView isFirstResponder]) {
             if (didShowed) {
@@ -369,7 +328,6 @@ static CGPoint  delayOffset = {0.0};
             }
         }
     };
-    
     self.messageTableView.keyboardDidHide = ^() {
         [weakSelf.messageInputView.inputTextView resignFirstResponder];
     };
@@ -382,11 +340,15 @@ static CGPoint  delayOffset = {0.0};
     inputView.delegate = self;
     [self.view addSubview:inputView];
     [self.view bringSubviewToFront:inputView];
-    
     _messageInputView = inputView;
     
     // 设置手势滑动，默认添加一个bar的高度值
     self.messageTableView.messageInputBarHeight = CGRectGetHeight(_messageInputView.bounds);
+}
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    [self initilzer];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(finishRecordingWhenErrorBehaviors) name:UIApplicationWillResignActiveNotification object:nil];
 }
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
@@ -415,11 +377,6 @@ static CGPoint  delayOffset = {0.0};
     [self.messageInputView.inputTextView removeObserver:self forKeyPath:@"contentSize"];
     [self.messageInputView.inputTextView setEditable:NO];
 }
-- (void)viewDidLoad {
-    [super viewDidLoad];
-    [self initilzer];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(finishRecordingWhenErrorBehaviors) name:UIApplicationWillResignActiveNotification object:nil];
-}
 - (void)dealloc {
     [[NSNotificationCenter defaultCenter] removeObserver:self name:UIApplicationWillResignActiveNotification object:nil];
     _messages = nil;
@@ -427,26 +384,14 @@ static CGPoint  delayOffset = {0.0};
     _messageTableView.dataSource = nil;
     _messageTableView = nil;
     _messageInputView = nil;
-    
     _photographyHelper = nil;
     _locationHelper = nil;
 }
-
-#pragma mark - View Rotation
-- (BOOL)shouldAutorotate {
-    return NO;
-}
-
-#if __IPHONE_OS_VERSION_MAX_ALLOWED < __IPHONE_9_0
-- (NSUInteger)supportedInterfaceOrientations
-#else
-- (UIInterfaceOrientationMask)supportedInterfaceOrientations
-#endif
-{
-    return UIInterfaceOrientationMaskPortrait;
-}
-- (UIInterfaceOrientation)preferredInterfaceOrientationForPresentation {
-    return UIInterfaceOrientationPortrait;
+- (void)viewWillLayoutSubviews {
+    [super viewWillLayoutSubviews];
+    NSLog(@"self.view=%@", self.view);
+    NSLog(@"---");
+//    self.topGuideConstraint.constant = [self.parentViewController.topLayoutGuide length];
 }
 
 #pragma mark - RecorderPath Helper Method
@@ -531,23 +476,6 @@ static CGPoint  delayOffset = {0.0};
                            [textView setContentOffset:bottomOffset animated:YES];
                        });
     }
-}
-
-#pragma mark - Scroll Message TableView Helper Method
-//根据bottom的数值配置消息列表的内部布局变化
-- (void)setTableViewInsetsWithBottomValue:(CGFloat)bottom {
-    UIEdgeInsets insets = [self tableViewInsetsWithBottomValue:bottom];
-    self.messageTableView.contentInset = insets;
-    self.messageTableView.scrollIndicatorInsets = insets;
-}
-//根据底部高度获取UIEdgeInsets常量
-- (UIEdgeInsets)tableViewInsetsWithBottomValue:(CGFloat)bottom {
-    UIEdgeInsets insets = UIEdgeInsetsZero;
-    if ([self respondsToSelector:@selector(topLayoutGuide)]) {
-        insets.top = 64;
-    }
-    insets.bottom = bottom;
-    return insets;
 }
 
 #pragma mark - Message Calculate Cell Height
@@ -972,6 +900,25 @@ static CGPoint  delayOffset = {0.0};
     if (object == self.messageInputView.inputTextView && [keyPath isEqualToString:@"contentSize"]) {
         [self layoutAndAnimateMessageInputTextView:object];
     }
+}
+
+#pragma mark - Scroll Message TableView Helper Method
+//根据bottom的数值配置消息列表的内部布局变化
+- (void)setTableViewInsetsWithBottomValue:(CGFloat)bottom {
+    UIEdgeInsets insets = [self tableViewInsetsWithBottomValue:bottom];
+    self.messageTableView.contentInset = insets;
+    self.messageTableView.scrollIndicatorInsets = insets;
+}
+//根据底部高度获取UIEdgeInsets常量
+- (UIEdgeInsets)tableViewInsetsWithBottomValue:(CGFloat)bottom {
+    UIEdgeInsets insets = self.messageTableView.contentInset;
+    //    if ([self respondsToSelector:@selector(topLayoutGuide)]) {
+    //        if (self.tabBarController) {
+    //            insets.top = 64;
+    //        }
+    //    }
+    insets.bottom = bottom;
+    return insets;
 }
 
 @end

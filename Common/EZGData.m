@@ -519,8 +519,8 @@
             chatRoom = [[EZGRescueChatRoomViewController alloc] initWithConv:conversation];
         }
         chatRoom.params = params;
+        chatRoom.hidesBottomBarWhenPushed = YES;
         if ([params[kParamIsPush] boolValue]) {
-            chatRoom.hidesBottomBarWhenPushed = YES;
             [currentViewController.navigationController pushViewController:chatRoom animated:YES];
         }
         else {

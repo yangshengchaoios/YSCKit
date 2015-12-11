@@ -33,19 +33,11 @@
 @implementation CDChatRoomVC
 
 #pragma mark - life cycle
-- (instancetype)init {
-    self = [super init];
-    if (self) {
-        // 配置输入框UI的样式
-        //self.allowsSendVoice = NO;
-        //self.allowsSendFace = NO;
-        //self.allowsSendMultiMedia = NO;
-    }
-    return self;
-}
 - (instancetype)initWithConv:(AVIMConversation *)conv {
-    self = [self init];
-    self.conv = conv;
+    self = [super initWithNibName:nil bundle:nil];
+    if (self) {
+        self.conv = conv;
+    }
     return self;
 }
 //重置conv
