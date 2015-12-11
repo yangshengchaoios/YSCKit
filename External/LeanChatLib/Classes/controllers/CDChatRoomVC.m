@@ -223,7 +223,7 @@
 #pragma mark -  ui config
 // 是否显示时间轴Label的回调方法
 - (BOOL)shouldDisplayTimestampForRowAtIndexPath:(NSIndexPath *)indexPath {
-    if (indexPath.row > 0 && indexPath.row < [self.messages count]) {//FIXME:有bug
+    if (indexPath.row > 0 && indexPath.row < [self.messages count]) {
         AVIMTypedMessage *currentMsg = [self.messages objectAtIndex:indexPath.row];
         AVIMTypedMessage *lastMsg = [self.messages objectAtIndex:indexPath.row - 1];
         return currentMsg.sendTimestamp - lastMsg.sendTimestamp > 60 * 1 * 1000;//NOTE:超过N分钟间隔就显示时间
