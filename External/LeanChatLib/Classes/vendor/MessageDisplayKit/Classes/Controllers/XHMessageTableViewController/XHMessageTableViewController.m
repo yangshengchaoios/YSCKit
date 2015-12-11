@@ -229,7 +229,7 @@ static CGPoint  delayOffset = {0.0};
     [self.view addSubview:self.messageTableView];
     [self.view sendSubviewToBack:self.messageTableView];
     [self.messageTableView mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.top.equalTo(self.view.mas_top).offset(20);
+        make.top.equalTo(self.view.mas_top);
         make.left.equalTo(self.view.mas_left);
         make.bottom.equalTo(self.view.mas_bottom);
         make.right.equalTo(self.view.mas_right);
@@ -237,9 +237,6 @@ static CGPoint  delayOffset = {0.0};
     // 设置整体背景颜色
     self.view.backgroundColor = kDefaultViewColor;
     self.messageTableView.backgroundColor = [UIColor clearColor];
-    self.view.backgroundColor = [UIColor blueColor];//FIXME:test
-    self.messageTableView.backgroundColor = [UIColor redColor];//FIXME:test
-
     
     //注册自定义消息cell
     [EZGMessageTextCell registerCellToTableView:self.messageTableView];
@@ -912,11 +909,7 @@ static CGPoint  delayOffset = {0.0};
 //根据底部高度获取UIEdgeInsets常量
 - (UIEdgeInsets)tableViewInsetsWithBottomValue:(CGFloat)bottom {
     UIEdgeInsets insets = self.messageTableView.contentInset;
-    //    if ([self respondsToSelector:@selector(topLayoutGuide)]) {
-    //        if (self.tabBarController) {
-    //            insets.top = 64;
-    //        }
-    //    }
+    insets.top = 64;
     insets.bottom = bottom;
     return insets;
 }

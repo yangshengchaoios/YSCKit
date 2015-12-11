@@ -525,6 +525,7 @@
         }
         else {
             UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:chatRoom];
+            navigationController.navigationBar.translucent = YES;
             [currentViewController presentViewController:navigationController animated:YES completion:nil];
         }
     }
