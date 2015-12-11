@@ -417,6 +417,7 @@
                         }
                     }
                     else {
+                        postN(kNotificationConnectToChatServer);
                         NSLog(@"查询救援会话出错:%@", error);
                         [UIView showAlertVieWithMessage:@"查询救援会话出错"];
                     }

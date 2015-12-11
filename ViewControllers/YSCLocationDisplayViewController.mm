@@ -63,10 +63,14 @@
     if ([self.params[kParamIsNavigationable] boolValue]) {//需要导航功能
         self.mapView.showsUserLocation = YES;
         [self refreshLocation];
-        addNObserver(@selector(refreshLocation), UIApplicationDidBecomeActiveNotification);
     }
     else {
         [self addEndAnnotation];//NOTE:mapView会自动将最后一个annotation放置正中央
+    }
+}
+- (void)didAppBecomeActive {
+    if ([self.params[kParamIsNavigationable] boolValue]) {
+        [self refreshLocation];
     }
 }
 - (void)refreshLocation {

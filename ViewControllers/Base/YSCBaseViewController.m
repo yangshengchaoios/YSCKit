@@ -130,6 +130,9 @@
     self.isUserChangedIdentifier = [APPDATA bk_addObserverForKeyPath:@"isUserChanged" task:^(id target) {
         [blockSelf userLoginStatusChanged];
     }];
+    
+    //APP恢复运行
+    addNObserver(@selector(didAppBecomeActive), UIApplicationDidBecomeActiveNotification);
 }
 
 
@@ -539,6 +542,9 @@
 #pragma mark - Overridden methods 业务相关
 //用户登录状态改变了
 - (void)userLoginStatusChanged {
+}
+//APP恢复运行
+- (void)didAppBecomeActive {
 }
 
 /**
