@@ -83,11 +83,13 @@
 //计算字符串的长度（1个英文字母为1个字节，1个汉字为2个字节）
 + (NSInteger)StringLength:(NSString *)string;
 - (NSInteger)StringLength;
-
 //移除字符串最后一个字符
 + (NSString *)removeLastCharOfString:(NSString *)string;
 - (NSString *)removeLastChar;
 + (void)removeLastCharOfMutableString:(NSMutableString *)mutableString;
+//获取末尾N个字符
++ (NSString *)substringFromEnding:(NSString *)string count:(NSInteger)count;
+- (NSString *)substringFromEnding:(NSInteger)count;
 
 #pragma mark - 汉字转拼音
 + (NSString *)toPinYin:(NSString *)hanzi;

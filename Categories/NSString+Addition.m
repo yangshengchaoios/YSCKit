@@ -257,7 +257,6 @@
     }
     return 2 * l + (a + b);
 }
-
 //移除字符串最后一个字符
 + (NSString *)removeLastCharOfString:(NSString *)string {
     ReturnEmptyWhenObjectIsEmpty(string)
@@ -269,6 +268,14 @@
 + (void)removeLastCharOfMutableString:(NSMutableString *)mutableString {
     ReturnWhenObjectIsEmpty(mutableString)
     [mutableString deleteCharactersInRange:NSMakeRange([mutableString length] - 1, 1)];
+}
+//获取末尾N个字符
++ (NSString *)substringFromEnding:(NSString *)string count:(NSInteger)count {
+    return [string substringFromEnding:count];
+}
+- (NSString *)substringFromEnding:(NSInteger)count {
+    NSString *str = Trim(self);
+    return [str substringFromIndex:MAX((int)[str length] - count, 0)];
 }
 
 #pragma mark - 汉字转拼音
