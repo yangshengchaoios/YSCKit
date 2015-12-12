@@ -66,7 +66,6 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     WEAKSELF
-    self.automaticallyAdjustsScrollViewInsets = NO;
     self.title = @"位置";
     self.tableView.didScrollBlock = ^() {
         [UIView animateWithDuration:0.3 animations:^{

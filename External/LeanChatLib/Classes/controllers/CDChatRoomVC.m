@@ -682,6 +682,7 @@
             NSIndexPath *indexPath = [NSIndexPath indexPathForRow:msgIndex inSection:0];
             [weakSelf.messageTableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationNone];
         }
+        [weakSelf scrollToBottomAnimated:YES];
     }];
 }
 - (void)replaceMesssage:(AVIMTypedMessage *)message atIndexPath:(NSIndexPath *)indexPath {

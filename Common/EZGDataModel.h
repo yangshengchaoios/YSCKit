@@ -24,17 +24,28 @@
 @property (nonatomic, strong) NSString *defaultValue;   //参数默认值
 @property (nonatomic, assign) BOOL isOn;                //是否启用在线参数
 @property (nonatomic, strong) NSString *desc;           //描述
+
++ (void)addNewParam:(NSString *)name values:(NSArray *)values block:(AVBooleanResultBlock)block;
++ (void)addNewParam:(NSString *)name defaultValue:(NSString *)value block:(AVBooleanResultBlock)block;
++ (void)addNewParam:(NSString *)name defaultValue:(NSString *)value values:(NSArray *)values block:(AVBooleanResultBlock)block;
 @end
 
 //在线参数值
 @interface AVOSParamValue : AVObject <AVSubclassing>
 @property (nonatomic, strong) NSString *value;
 @property (nonatomic, strong) NSString *udid;
-@property (nonatomic, strong) NSString *ver_1;
-@property (nonatomic, strong) NSString *ver_2;
-@property (nonatomic, strong) NSString *ver_3;
+@property (nonatomic, strong) NSString *ver1;
+@property (nonatomic, strong) NSString *ver2;
+@property (nonatomic, strong) NSString *ver3;
 @property (nonatomic, strong) NSString *buildId;
 @property (nonatomic, strong) NSString *desc;
+
++ (instancetype)CreateNewParamValue:(NSString *)value;
++ (instancetype)CreateNewParamValue:(NSString *)value udid:(NSString *)udid;
++ (instancetype)CreateNewParamValue:(NSString *)value udid:(NSString *)udid v1:(NSString *)v1;
++ (instancetype)CreateNewParamValue:(NSString *)value udid:(NSString *)udid v1:(NSString *)v1 v2:(NSString *)v2;
++ (instancetype)CreateNewParamValue:(NSString *)value udid:(NSString *)udid v1:(NSString *)v1 v2:(NSString *)v2 v3:(NSString *)v3;
++ (instancetype)CreateNewParamValue:(NSString *)value udid:(NSString *)udid v1:(NSString *)v1 v2:(NSString *)v2 v3:(NSString *)v3 buildId:(NSString *)buildId;
 @end
 
 //设备信息

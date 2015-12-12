@@ -274,7 +274,7 @@
     }];
 }
 //更新_Installation，保证同一个userId只能对应一个deviceToken
-- (void)updateInstallationToEnsureUniqueUserId:(NSString *)userId {
++ (void)updateInstallationToEnsureUniqueUserId:(NSString *)userId {
     NSString *deviceToken = [AppConfigManager sharedInstance].deviceToken;
     ReturnWhenObjectIsEmpty(userId);
     ReturnWhenObjectIsEmpty(deviceToken);
@@ -302,6 +302,41 @@
             NSLog(@"error:%@", error);
         }
     }];
+}
+//更新在线参数
++ (void)updateOnlineParams {
+    [AVCloud callFunctionInBackground:@"GetAppParams"
+                       withParameters:@{@"appId"    : Trim(kAppId),
+                                        @"type"     : @"ios",
+                                        @"udid"     : Trim([AppConfigManager sharedInstance].udid),
+                                        @"version"  : Trim(AppVersion),
+                                        @"buildId"  : Trim(BundleVersion)}
+                                block:^(id object, NSError *error) {
+                                    NSLog(@"online params:%@", object);
+                                    if (isEmpty(error)) {
+                                        NSDictionary *oldParams = GetObjectByFile(@"AppParams", @"OnLineParams");
+                                        NSString *oldSign = [AppData SignatureWithParams:oldParams];
+                                        NSMutableDictionary *newParams = [NSMutableDictionary dictionary];
+                                        NSString *newSign = @"";
+                                        if ([object isKindOfClass:[NSArray class]]) {
+                                            for (NSDictionary *paramDict in (NSArray *)object) {
+                                                if (isNotEmpty(paramDict[@"name"])) {
+                                                    newParams[Trim(paramDict[@"name"])] = Trim(paramDict[@"value"]);
+                                                }
+                                            }
+                                            newSign = [AppData SignatureWithParams:newParams];
+                                        }
+                                        //检测是否有参数变更
+                                        if (NO == [oldSign isEqualToString:newSign]) {
+                                            SaveObjectByFile(newParams, @"AppParams", @"OnLineParams");
+                                            [[AppConfigManager sharedInstance] resetAppParams];
+                                            postN(kNotificationRefreshHome);
+                                        }
+                                    }
+                                    else {
+                                        NSLog(@"get online params error:%@", error);
+                                    }
+                                }];
 }
 
 //C端需求：1. 所有会话列表
@@ -526,7 +561,6 @@
         }
         else {
             UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:chatRoom];
-            navigationController.navigationBar.translucent = YES;
             [currentViewController presentViewController:navigationController animated:YES completion:nil];
         }
     }

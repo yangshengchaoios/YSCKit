@@ -207,9 +207,9 @@ static CGPoint  delayOffset = {0.0};
 
 #pragma mark - Life Cycle
 - (void)initilzer {
-    if ([self respondsToSelector:@selector(automaticallyAdjustsScrollViewInsets)]) {
-        self.automaticallyAdjustsScrollViewInsets = NO;
-    }
+    self.navigationController.navigationBar.translucent = YES;//NOTE:与下面的参数必须配套设置，否则top会有64个像素的偏移量
+    self.automaticallyAdjustsScrollViewInsets = NO;
+    
     self.keyboardViewHeight = (kIsiPad ? 264 : 216);
     _allowsPanToDismissKeyboard = NO;
     _allowsSendVoice = YES;
@@ -383,12 +383,6 @@ static CGPoint  delayOffset = {0.0};
     _messageInputView = nil;
     _photographyHelper = nil;
     _locationHelper = nil;
-}
-- (void)viewWillLayoutSubviews {
-    [super viewWillLayoutSubviews];
-    NSLog(@"self.view=%@", self.view);
-    NSLog(@"---");
-//    self.topGuideConstraint.constant = [self.parentViewController.topLayoutGuide length];
 }
 
 #pragma mark - RecorderPath Helper Method
@@ -908,7 +902,7 @@ static CGPoint  delayOffset = {0.0};
 }
 //根据底部高度获取UIEdgeInsets常量
 - (UIEdgeInsets)tableViewInsetsWithBottomValue:(CGFloat)bottom {
-    UIEdgeInsets insets = self.messageTableView.contentInset;
+    UIEdgeInsets insets = UIEdgeInsetsZero;
     insets.top = 64;
     insets.bottom = bottom;
     return insets;

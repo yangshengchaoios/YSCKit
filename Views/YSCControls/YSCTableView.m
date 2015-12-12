@@ -63,7 +63,6 @@
     };
     
     //设置默认属性
-    self.prefixOfUrl = kResPathAppBaseUrl;
     self.tipsEmptyText = kDefaultTipsEmptyText;
     self.tipsEmptyIcon = kDefaultTipsEmptyIcon;
     self.tipsFailedIcon = kDefaultTipsFailedIcon;
@@ -107,6 +106,12 @@
 }
 
 #pragma mark - 属性设置
+- (NSString *)prefixOfUrl {
+    if (isEmpty(_prefixOfUrl)) {
+        return kResPathAppBaseUrl;
+    }
+    return  _prefixOfUrl;
+}
 - (void)setCellName:(NSString *)cellName {
     _cellName = cellName;
     [self registerCellName:cellName];
@@ -258,6 +263,7 @@
             [weakSelf.tipsView.actionButton setTitle:@"重新加载" forState:UIControlStateNormal];
             [weakSelf.tipsView.actionButton bk_removeEventHandlersForControlEvents:UIControlEventTouchUpInside];
             [weakSelf.tipsView.actionButton bk_addEventHandler:^(id sender) {
+                [[AppConfigManager sharedInstance] resetAppParams];//NOTE:初始化在线参数
                 [weakSelf beginRefreshing];
             } forControlEvents:UIControlEventTouchUpInside];
         }

@@ -46,7 +46,9 @@
 //保存deviceToken
 + (void)saveInstallationWithDeviceToken:(NSData *)deviceTokenData;
 //更新_Installation，保证同一个userId只能对应一个deviceToken
-- (void)updateInstallationToEnsureUniqueUserId:(NSString *)userId;
++ (void)updateInstallationToEnsureUniqueUserId:(NSString *)userId;
+//更新在线参数
++ (void)updateOnlineParams;
 
 
 //C端需求：1. 所有会话列表

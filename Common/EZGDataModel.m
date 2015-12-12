@@ -29,14 +29,30 @@
 + (NSString *)parseClassName {
     return @"AppParamName";
 }
++ (void)addNewParam:(NSString *)name values:(NSArray *)values block:(AVBooleanResultBlock)block {
+    [self addNewParam:name defaultValue:@"" values:values block:block];
+}
++ (void)addNewParam:(NSString *)name defaultValue:(NSString *)value block:(AVBooleanResultBlock)block {
+    [self addNewParam:name defaultValue:value values:@[] block:block];
+}
++ (void)addNewParam:(NSString *)name defaultValue:(NSString *)value values:(NSArray *)values block:(AVBooleanResultBlock)block {
+    AVOSParamName *paramName = [AVOSParamName new];
+    paramName.appId = kAppId;
+    paramName.type = @"ios";
+    paramName.name = name;
+    paramName.isOn = YES;
+    paramName.values = values;
+    paramName.defaultValue = Trim(value);
+    [paramName saveInBackgroundWithBlock:block];
+}
 @end
 
 @implementation AVOSParamValue
 @dynamic value;
 @dynamic udid;
-@dynamic ver_1;
-@dynamic ver_2;
-@dynamic ver_3;
+@dynamic ver1;
+@dynamic ver2;
+@dynamic ver3;
 @dynamic buildId;
 @dynamic desc;
 
@@ -45,6 +61,32 @@
 }
 + (NSString *)parseClassName {
     return @"AppParamValue";
+}
++ (instancetype)CreateNewParamValue:(NSString *)value {
+    return [self CreateNewParamValue:value udid:nil];
+}
++ (instancetype)CreateNewParamValue:(NSString *)value udid:(NSString *)udid {
+    return [self CreateNewParamValue:value udid:udid v1:nil];
+}
++ (instancetype)CreateNewParamValue:(NSString *)value udid:(NSString *)udid v1:(NSString *)v1 {
+    return [self CreateNewParamValue:value udid:udid v1:v1 v2:nil];
+}
++ (instancetype)CreateNewParamValue:(NSString *)value udid:(NSString *)udid v1:(NSString *)v1 v2:(NSString *)v2 {
+    return [self CreateNewParamValue:value udid:udid v1:v1 v2:v2 v3:nil];
+}
++ (instancetype)CreateNewParamValue:(NSString *)value udid:(NSString *)udid v1:(NSString *)v1 v2:(NSString *)v2 v3:(NSString *)v3 {
+    return [self CreateNewParamValue:value udid:udid v1:v1 v2:v2 v3:v3 buildId:nil];
+}
++ (instancetype)CreateNewParamValue:(NSString *)value udid:(NSString *)udid v1:(NSString *)v1 v2:(NSString *)v2 v3:(NSString *)v3 buildId:(NSString *)buildId {
+    AVOSParamValue *newValue = [AVOSParamValue new];
+    newValue.value = Trim(value);
+    newValue.udid = Trim(udid);
+    newValue.ver1 = Trim(v1);
+    newValue.ver2 = Trim(v2);
+    newValue.ver3 = Trim(v3);
+    newValue.buildId = Trim(buildId);
+    newValue.desc = @"";
+    return newValue;
 }
 @end
 
