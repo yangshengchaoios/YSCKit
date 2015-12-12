@@ -844,12 +844,10 @@ static CGPoint  delayOffset = {0.0};
     else if (kAVIMMessageMediaTypeImage == message.mediaType) {
         cell = [EZGMessageImageCell dequeueCellByTableView:tableView];
         EZGMessageImageCell *imageCell = (EZGMessageImageCell *)cell;
-        WEAKSELF
         imageCell.block = ^{
             [tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationNone];
-            if (indexPath.row == [weakSelf.messages count] - 1) {
-                [tableView scrollToRowAtIndexPath:indexPath atScrollPosition:UITableViewScrollPositionBottom animated:YES];
-            }
+            //TODO:如何判断当处于bottom就始终scroll to bottom；不处于bottom就只刷新cell？？？
+//            [tableView scrollToRowAtIndexPath:indexPath atScrollPosition:UITableViewScrollPositionBottom animated:YES];
         };
     }
     else if (kAVIMMessageMediaTypeLocation == message.mediaType) {
