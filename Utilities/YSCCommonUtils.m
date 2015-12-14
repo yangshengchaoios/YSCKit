@@ -123,7 +123,9 @@
     }
     
     //统一设置导航栏是否透明，这会影响self.view的高度(如果透明则view.height=screen.height，否则view.height=screen.height-64)
-    [[UINavigationBar appearance] setTranslucent:YES];
+    if ([[UINavigationBar appearance] respondsToSelector:@selector(setTranslucent:)]) {
+        [[UINavigationBar appearance] setTranslucent:YES];
+    }
     
     //影响范围：icon颜色、left、right文字颜色
     [[UINavigationBar appearance] setTintColor:kDefaultNaviBarTintColor];

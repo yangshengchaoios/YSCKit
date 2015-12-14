@@ -845,7 +845,7 @@ static CGPoint  delayOffset = {0.0};
         cell = [EZGMessageImageCell dequeueCellByTableView:tableView];
         EZGMessageImageCell *imageCell = (EZGMessageImageCell *)cell;
         imageCell.block = ^{
-            [tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationNone];
+            [tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationNone];//FIXME:bug?
             //TODO:如何判断当处于bottom就始终scroll to bottom；不处于bottom就只刷新cell？？？
 //            [tableView scrollToRowAtIndexPath:indexPath atScrollPosition:UITableViewScrollPositionBottom animated:YES];
         };
