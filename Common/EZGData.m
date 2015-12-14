@@ -318,12 +318,8 @@
                                         NSString *oldSign = [AppData SignatureWithParams:oldParams];
                                         NSMutableDictionary *newParams = [NSMutableDictionary dictionary];
                                         NSString *newSign = @"";
-                                        if ([object isKindOfClass:[NSArray class]]) {
-                                            for (NSDictionary *paramDict in (NSArray *)object) {
-                                                if (isNotEmpty(paramDict[@"name"])) {
-                                                    newParams[Trim(paramDict[@"name"])] = Trim(paramDict[@"value"]);
-                                                }
-                                            }
+                                        if ([object isKindOfClass:[NSDictionary class]]) {
+                                            [newParams addEntriesFromDictionary:(NSDictionary *)object];
                                             newSign = [AppData SignatureWithParams:newParams];
                                         }
                                         //检测是否有参数变更
