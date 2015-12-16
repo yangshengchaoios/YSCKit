@@ -92,7 +92,7 @@
     NSString *nibName = [self nibNameOfCell];
     if ([NSString isNotEmpty:nibName] &&
         [NSClassFromString(nibName) isSubclassOfClass:[YSCBaseTableViewCell class]]) {
-        return [NSClassFromString(nibName) HeightOfCell];
+        return [NSClassFromString(nibName) HeightOfCellByObject:nil];
     }
     else {
         return 44.0f;

@@ -63,6 +63,7 @@ static const NSString *EzgoalTypeShop           = @"ShopModule";
 static const NSString *EzgoalTypeStaff          = @"StaffModule";
 static const NSString *EzgoalTypeContact        = @"ContactModule";
 static const NSString *EzgoalTypeNotice         = @"NoticeModule";
+static const NSString *EzgoalTypeWifi           = @"WifiModule";
 
 static const NSString *EzgoalTypeC2B            = @"C2B";//C端创建与B端的普通会话
 static const NSString *EzgoalTypeB2B            = @"B2B";//B端同事之间的会话

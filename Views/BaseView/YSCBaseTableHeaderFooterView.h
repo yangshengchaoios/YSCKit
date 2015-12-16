@@ -22,7 +22,5 @@
 
 #pragma mark - 呈现数据
 - (void)layoutObject:(NSObject *)object;
-- (void)layoutDataModel:(BaseDataModel *)dataModel DEPRECATED_ATTRIBUTE;
-- (void)layoutDataModels:(NSArray *)dataModelArray DEPRECATED_ATTRIBUTE;
 
 @end

@@ -42,12 +42,7 @@
 + (CGFloat)HeightOfCellByObject:(NSObject *)object {
     return 44;
 }
-+ (CGFloat)HeightOfCell {
-    return [self HeightOfCellByObject:nil];
-}
 
 #pragma mark - 呈现数据
 - (void)layoutObject:(NSObject *)object { }
-- (void)layoutDataModel:(BaseDataModel *)dataModel { [self layoutObject:dataModel]; }
-- (void)layoutDataModels:(NSArray *)dataModelArray { [self layoutObject:dataModelArray]; }
 @end
