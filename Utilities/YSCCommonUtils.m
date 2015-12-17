@@ -575,4 +575,16 @@
     }
 }
 
+#pragma mark - Label上显示HTML
+//只能显示HTML内容，但不能点击链接
+//view包括:UILabel UITextField UITextView
++ (void)LayoutHtmlString:(NSString *)htmlString onView:(UIView *)view {
+    NSAttributedString * attrStr = [[NSAttributedString alloc] initWithData:[htmlString dataUsingEncoding:NSUnicodeStringEncoding]
+                                                                    options:@{ NSDocumentTypeDocumentAttribute: NSHTMLTextDocumentType}
+                                                         documentAttributes:nil error:nil];
+    if ([view respondsToSelector:@selector(setAttributedText:)]) {
+        [view performSelector:@selector(setAttributedText:) withObject:attrStr];
+    }
+}
+
 @end

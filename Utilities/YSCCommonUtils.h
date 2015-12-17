@@ -90,4 +90,10 @@
 #pragma mark - 删除多余的日志文件
 //保留最近N天日志文件
 + (void)removeLogFilesByCount:(NSInteger)count;
+
+#pragma mark - Label上显示HTML
+//只能显示HTML内容，但不能点击链接
+//view包括:UILabel UITextField UITextView
++ (void)LayoutHtmlString:(NSString *)htmlString onView:(UIView *)view;
+
 @end
