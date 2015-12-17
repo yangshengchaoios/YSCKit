@@ -37,9 +37,6 @@
 + (CGSize)SizeOfCellByObject:(NSObject *)object {
     return CGSizeMake(145, 145);
 }
-+ (CGSize)SizeOfCell {
-    return [self SizeOfCellByObject:nil];
-}
 
 #pragma mark - 呈现数据
 - (void)layoutObject:(NSObject *)object {}

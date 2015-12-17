@@ -18,7 +18,6 @@
 
 #pragma mark - 计算大小
 + (CGSize)SizeOfCellByObject:(NSObject *)object;
-+ (CGSize)SizeOfCell;
 
 #pragma mark - 呈现数据
 - (void)layoutObject:(NSObject *)object;

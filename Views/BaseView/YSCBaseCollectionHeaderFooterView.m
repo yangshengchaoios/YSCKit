@@ -52,9 +52,6 @@
 + (CGSize)SizeOfViewByObject:(NSObject *)object {
     return CGSizeMake(SCREEN_WIDTH, 35.0f);
 }
-+ (CGSize)SizeOfView {
-    return [self SizeOfViewByObject:nil];
-}
 
 #pragma mark - 呈现数据
 - (void)layoutObject:(NSObject *)object {}

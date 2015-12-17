@@ -19,7 +19,6 @@
 + (UINib *)NibNameOfView;
 
 #pragma mark - 计算大小
-+ (CGSize)SizeOfView;
 + (CGSize)SizeOfViewByObject:(NSObject *)object;
 
 #pragma mark - 呈现数据

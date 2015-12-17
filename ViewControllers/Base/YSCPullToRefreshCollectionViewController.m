@@ -86,7 +86,7 @@
     NSString *nibName = [self nibNameOfCell];
     if ([NSString isNotEmpty:nibName] &&
         [NSClassFromString(nibName) isSubclassOfClass:[YSCBaseCollectionViewCell class]]) {
-        return [NSClassFromString(nibName) SizeOfCell];
+        return [NSClassFromString(nibName) SizeOfCellByObject:nil];
     }
     else {
         return CGSizeMake(290, 290);

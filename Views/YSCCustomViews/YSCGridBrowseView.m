@@ -91,7 +91,7 @@ UICollectionViewDelegateFlowLayout>
 - (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath {
     if ([NSString isNotEmpty:self.collectionViewCell] &&
         [NSClassFromString(self.collectionViewCell) isSubclassOfClass:[YSCBaseCollectionViewCell class]]) {
-        return [NSClassFromString(self.collectionViewCell) SizeOfCell];
+        return [NSClassFromString(self.collectionViewCell) SizeOfCellByObject:nil];
     }
     return CGSizeMake(290, 290);
 }

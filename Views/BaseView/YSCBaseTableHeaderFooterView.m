@@ -37,9 +37,6 @@
 + (CGFloat)HeightOfViewByObject:(NSObject *)object {
     return 35.0f;
 }
-+ (CGFloat)HeightOfView {
-    return [self HeightOfViewByObject:nil];
-}
 
 #pragma mark - 呈现数据
 - (void)layoutObject:(NSObject *)object {}
