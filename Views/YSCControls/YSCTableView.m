@@ -82,15 +82,9 @@
 }
 - (void)initTableView {
     //1. 注册cell、header、footer
-    if (isNotEmpty(self.cellName)) {
-        [NSClassFromString(self.cellName) registerCellToTableView:self];
-    }
-    if (isNotEmpty(self.headerName)) {
-        [NSClassFromString(self.headerName) registerHeaderFooterToTableView:self];
-    }
-    if (isNotEmpty(self.footerName)) {
-        [NSClassFromString(self.footerName) registerHeaderFooterToTableView:self];
-    }
+    [self registerHeaderName:self.headerName];
+    [self registerCellName:self.cellName];
+    [self registerFooterName:self.footerName];
     
     //2. 设置cell的分割线
     [self resetCellEdgeInsets];
@@ -183,17 +177,17 @@
 #pragma mark - 外部可调用的方法
 //注册header、cell、footer
 - (void)registerHeaderName:(NSString *)headerName {
-    if ([NSClassFromString(headerName) isSubclassOfClass:[YSCBaseTableHeaderFooterView class]]) {
+    if (isNotEmpty(headerName) && [NSClassFromString(headerName) isSubclassOfClass:[YSCBaseTableHeaderFooterView class]]) {
         [NSClassFromString(headerName) registerHeaderFooterToTableView:self];
     }
 }
 - (void)registerCellName:(NSString *)cellName {
-    if ([NSClassFromString(cellName) isSubclassOfClass:[YSCBaseTableViewCell class]]) {
+    if (isNotEmpty(cellName) && [NSClassFromString(cellName) isSubclassOfClass:[YSCBaseTableViewCell class]]) {
         [NSClassFromString(cellName) registerCellToTableView:self];
     }
 }
 - (void)registerFooterName:(NSString *)footerName {
-    if ([NSClassFromString(footerName) isSubclassOfClass:[YSCBaseTableHeaderFooterView class]]) {
+    if (isNotEmpty(footerName) && [NSClassFromString(footerName) isSubclassOfClass:[YSCBaseTableHeaderFooterView class]]) {
         [NSClassFromString(footerName) registerHeaderFooterToTableView:self];
     }
 }
@@ -232,6 +226,7 @@
 - (void)clearData {
     [self.headerDataArray removeAllObjects];
     [self.cellDataArray removeAllObjects];
+    [self.footerDataArray removeAllObjects];
     self.tipsView.hidden = NO;
     [self reloadData];
 }
@@ -312,6 +307,7 @@
                         
                         //处理section header model(直接保存原始的model，在具体显示的时候再确定显示哪个属性)
                         [weakSelf.headerDataArray addObject:object];
+                        [weakSelf.footerDataArray addObject:object];
                         
                         NSMutableArray *tempArray = [NSMutableArray array];
                         [tempArray addObject:object];
