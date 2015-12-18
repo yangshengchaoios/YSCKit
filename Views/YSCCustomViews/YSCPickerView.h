@@ -24,7 +24,7 @@ typedef NS_ENUM(NSInteger, YSCPickerType) {
 @property (weak, nonatomic) IBOutlet UIButton *cancelButton;
 @property (weak, nonatomic) IBOutlet UIButton *doneButton;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *containerBottom;//260
-@property (weak, nonatomic) NSArray *customDataArray;
+@property (strong, nonatomic) NSArray *customDataArray;
 
 @property (assign, nonatomic) YSCPickerType pickerType;
 @property (copy, nonatomic) YSCIdResultBlock selectingBlock;
