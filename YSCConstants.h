@@ -166,6 +166,7 @@ return _sharedObject;
 #define CreateNSErrorCode(c,errMsg)                 [NSError errorWithDomain:@"" code:c userInfo:@{NSLocalizedDescriptionKey : Trim(errMsg)}]
 #define GetNSErrorMsg(error)                        ((NSError *)error).userInfo[NSLocalizedDescriptionKey]  //=error.localizedDescription
 #define STORAGEMANAGER                              [StorageManager sharedInstance]
+#define CURRENTDATE                                 [YSCCommonUtils currentDate]    //当前(服务器端)时间
 
 /**
  *  版本相关

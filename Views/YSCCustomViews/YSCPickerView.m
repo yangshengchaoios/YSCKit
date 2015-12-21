@@ -43,7 +43,7 @@
     self.datePicker.locale = [[NSLocale alloc] initWithLocaleIdentifier:@"zh_CN"];
     [self.datePicker setTimeZone:[NSTimeZone timeZoneWithName:@"GMT+8"]];
     [self.datePicker setMinimumDate:[NSDate dateFromString:@"1930-01-01" withFormat:DateFormat3]];
-    [self.datePicker setMaximumDate:[NSDate date]];
+    [self.datePicker setMaximumDate:CURRENTDATE];
 
     
     //点击半透明关闭选择器
@@ -176,7 +176,7 @@
         else if (self.pickerType < YSCPickerTypeAddress) {
             NSDate *initDate = (NSDate *)initObject;
             if ([NSObject isEmpty:initDate] || (! [initDate isKindOfClass:[NSDate class]])) {
-                initDate = [NSDate date];
+                initDate = CURRENTDATE;
             }
             [self.datePicker setDate:initDate animated:YES];
         }

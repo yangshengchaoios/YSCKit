@@ -111,16 +111,22 @@
 - (id)init {
     self = [super init];
     if (self) {
-        self.udid = [AppConfigManager sharedInstance].udid;
-        self.deviceToken = [AppConfigManager sharedInstance].deviceToken;
-        self.type = @"ios";
-        self.appId = kAppId;
-        self.deviceName = [UIDevice currentDevice].name;
-        self.deviceSystemVersion = [UIDevice currentDevice].systemVersion;
-        self.deviceType = [UIDevice currentDevice].model;
-        self.deviceInfo = @"";//暂时不收集其它信息
+        //NOTE:很奇怪！这里初始化的值能在save中覆盖掉查询回来的值。
     }
     return self;
+}
++ (instancetype)CreateNewDevice {
+    AVOSDevice *device = [AVOSDevice new];
+    device.udid = [AppConfigManager sharedInstance].udid;
+    device.deviceToken = [AppConfigManager sharedInstance].deviceToken;
+    device.type = @"ios";
+    device.appId = kAppId;
+    device.appVersion = ProductVersion;
+    device.deviceName = [UIDevice currentDevice].name;
+    device.deviceSystemVersion = [UIDevice currentDevice].systemVersion;
+    device.deviceType = [UIDevice currentDevice].model;
+    device.deviceInfo = @"";//暂时不收集其它信息
+    return device;
 }
 + (void)uploadDeviceInfo {
     NSDate *lastUploadDate = GetCacheObject(@"lastUploadDeviceInfoDate");
@@ -128,7 +134,7 @@
     if (nil == lastUploadDate) {
         lastUploadDate = [NSDate dateWithMinutesBeforeNow:2 * intervalMinutes];
     }
-    NSInteger currentMinutes = [[NSDate date] minutesAfterDate:lastUploadDate];
+    NSInteger currentMinutes = [CURRENTDATE minutesAfterDate:lastUploadDate];
     if (currentMinutes < intervalMinutes) {
         NSLog(@"pause uploading device info...");
         return;
@@ -136,20 +142,22 @@
     //保存设备信息
     AVQuery *query = [AVOSDevice query];
     [query whereKey:@"udid" equalTo:[AppConfigManager sharedInstance].udid];
+    [query whereKey:@"appId" equalTo:kAppId];
     [query findObjectsInBackgroundWithBlock:^(NSArray *objects, NSError *error) {
         AVOSDevice *device = nil;
         if ([objects count] > 0) {
             device = objects[0];
         }
         else {
-            device = [AVOSDevice new];
+            device = [AVOSDevice CreateNewDevice];
         }
         
-        if (device && isNotEmpty(device.udid)) {
+        if (isNotEmpty(device.udid)) {
             device.appVersion = ProductVersion;
+            device.deviceName = [UIDevice currentDevice].name;
             [device saveInBackgroundWithBlock:^(BOOL succeeded, NSError *error) {
                 if (succeeded) {
-                    SaveCacheObject([NSDate date], @"lastUploadDeviceInfoDate");
+                    SaveCacheObject(CURRENTDATE, @"lastUploadDeviceInfoDate");
                 }
             }];
         }

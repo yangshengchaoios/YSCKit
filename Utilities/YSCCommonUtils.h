@@ -96,4 +96,8 @@
 //view包括:UILabel UITextField UITextView
 + (void)LayoutHtmlString:(NSString *)htmlString onView:(UIView *)view;
 
+#pragma mark - 获取当前(服务器端)时间
++ (NSDate *)currentDate;
++ (NSTimeInterval)currentTimeInterval;
+
 @end

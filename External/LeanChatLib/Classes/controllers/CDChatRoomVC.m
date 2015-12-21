@@ -19,7 +19,6 @@
 #import "CDFailedMessageStore.h"
 #import "AVIMEmotionMessage.h"
 #import "MJRefresh.h"
-#import "ServerTimeSynchronizer.h"
 
 @interface CDChatRoomVC () <UINavigationControllerDelegate, UIImagePickerControllerDelegate, ZYQAssetPickerControllerDelegate>
 @property (nonatomic, strong, readwrite) AVIMConversation *conv;
@@ -659,7 +658,7 @@
 
     //>>>>>设置临时消息必要的属性，先在cell中显示出来>>>>>>>>>>>
     msg.messageId = [[CDChatManager manager] tempMessageId];
-    msg.sendTimestamp = [ServerTimeSynchronizer sharedInstance].currentTimeInterval.integerValue * 1000;
+    msg.sendTimestamp = [YSCCommonUtils currentTimeInterval] * 1000;
     msg.clientId = [CDChatManager manager].selfId;
     msg.conversationId = self.conv.conversationId;
     [self appendMessage:msg];
@@ -764,7 +763,7 @@
         timestamp = msg.sendTimestamp;
         pageSize = 10;
         if (0 == timestamp) {//NOTEO:万一消息的发送时间为0不能当做第1页处理
-            timestamp = [ServerTimeSynchronizer sharedInstance].currentTimeInterval.integerValue * 1000;
+            timestamp = [YSCCommonUtils currentTimeInterval] * 1000;
         }
     }
     WEAKSELF

@@ -7,7 +7,6 @@
 //
 
 #import "EZGManager.h"
-#import "ServerTimeSynchronizer.h"
 
 @implementation EZGManager
 
@@ -56,7 +55,7 @@
 //今日限号
 + (NSArray *)TodayLimitedNumbers {
     NSMutableArray *limitedArray = [NSMutableArray array];
-    NSInteger weekDay = [NSDate date].weekday - 1;
+    NSInteger weekDay = CURRENTDATE.weekday - 1;
     if (weekDay == 1) {
         [limitedArray addObjectsFromArray:@[@"1", @"6"]];
     }
@@ -125,8 +124,7 @@
 
 #pragma mark - 格式化救援耗时
 + (NSString *)formatRescueTimePassed:(NSDate *)startDate {
-    NSDate *endDate = [NSDate dateFromTimeStamp:[ServerTimeSynchronizer sharedInstance].currentTimeInterval];
-    return [self formatRescueTimePassed:startDate endDate:endDate];
+    return [self formatRescueTimePassed:startDate endDate:CURRENTDATE];
 }
 + (NSString *)formatRescueTimePassed:(NSDate *)startDate endDate:(NSDate *)endDate {
     NSDateComponents *dateComponents = [NSDate ComponentsBetweenStartDate:startDate withEndDate:endDate];
@@ -147,7 +145,7 @@
     return [self timePassedByStartDate:startDate flag:NO];
 }
 + (NSString *)timePassedByStartDate:(NSDate *)startDate flag:(BOOL)flag {
-    NSDate *endDate = [NSDate dateFromTimeStamp:[ServerTimeSynchronizer sharedInstance].currentTimeInterval];
+    NSDate *endDate = CURRENTDATE;
     //异常时间处理
     if ([startDate isLaterThanDate:endDate]) {
         return @"开始时间有误";

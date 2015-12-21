@@ -83,7 +83,7 @@
         NSData *data = [self dataFromConversation:conversation];
         NSDate *lastDate = conversation.lastMessageAt;
         if (nil == lastDate) {
-            lastDate = [NSDate date];
+            lastDate = CURRENTDATE;
         }
         [db executeUpdate:kCDConversationTableInsertSQL
      withArgumentsInArray:@[conversation.conversationId, data, @0, @(NO), @"", lastDate,

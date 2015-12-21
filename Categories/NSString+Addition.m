@@ -945,7 +945,7 @@
 + (BOOL)verifyIDCardHadAdult:(NSString *)card {
     NSString *birtday = [NSString getIDCardBirthday:card];   //****年**月**日
     NSDate *birthDate = [NSDate dateFromString:birtday withFormat:@"yyyy年MM月dd日"];
-    return ([NSDate date].year - birthDate.year >= 18);
+    return (CURRENTDATE.year - birthDate.year >= 18);
 }
 
 //得到身份证的生日****这个方法中不做身份证校验，请确保传入的是正确身份证

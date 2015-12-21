@@ -18,9 +18,9 @@
 }
 + (void)saveLog:(NSString *)logString {
     NSString *logDirectory = [STORAGEMANAGER directoryPathOfDocumentsLog];
-    NSString *fileName =  [[NSDate date] stringWithFormat:@"yyyy-MM-dd"];
+    NSString *fileName =  [CURRENTDATE stringWithFormat:@"yyyy-MM-dd"];
     NSString *logFilePath = [logDirectory stringByAppendingPathComponent:fileName];
-    NSString *logStringWithTime = [NSString stringWithFormat:@"%@ -> %@\r\n", [[NSDate date] stringWithFormat:@"HH:mm:ss SSS"], logString];
+    NSString *logStringWithTime = [NSString stringWithFormat:@"%@ -> %@\r\n", [CURRENTDATE stringWithFormat:@"HH:mm:ss SSS"], logString];
     [self saveLog:logStringWithTime intoFilePath:logFilePath overWrite:NO];
 }
 

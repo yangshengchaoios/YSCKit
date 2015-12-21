@@ -8,6 +8,7 @@
 
 #import "YSCCommonUtils.h"
 #import <SystemConfiguration/CaptiveNetwork.h>
+#import "ServerTimeSynchronizer.h"
 
 @implementation YSCCommonUtils
 
@@ -585,6 +586,15 @@
     if ([view respondsToSelector:@selector(setAttributedText:)]) {
         [view performSelector:@selector(setAttributedText:) withObject:attrStr];
     }
+}
+
+#pragma mark - 获取当前(服务器端)时间
++ (NSDate *)currentDate {
+    return [NSDate dateFromTimeStamp:[ServerTimeSynchronizer sharedInstance].currentTimeInterval];
+}
+
++ (NSTimeInterval)currentTimeInterval {
+    return [[ServerTimeSynchronizer sharedInstance].currentTimeInterval doubleValue];
 }
 
 @end
