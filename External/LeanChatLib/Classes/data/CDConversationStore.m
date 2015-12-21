@@ -52,6 +52,7 @@
 
 @interface CDConversationStore ()
 @property (nonatomic, strong) FMDatabaseQueue *databaseQueue;
+@property (nonatomic, strong) NSString *databaseFilePath;
 @end
 
 @implementation CDConversationStore
@@ -70,10 +71,16 @@
     if (self.databaseQueue) {
         DLog(@"database queue not nil !!!!");
     }
+    self.databaseFilePath = path;
     self.databaseQueue = [FMDatabaseQueue databaseQueueWithPath:path];
     [self.databaseQueue inDatabase:^(FMDatabase *db) {
         [db executeUpdate:kCDConversatoinTableCreateSQL];
     }];
+    [self.databaseQueue close];
+}
+//重新创建数据库文件
+- (void)reSetupDataBase {
+    [self setupStoreWithDatabasePath:self.databaseFilePath];
 }
 
 //插入一条最近会话
@@ -91,6 +98,7 @@
                             @(conversation.ezgoalStatus),
                             Trim(conversation.rescueId)]];
     }];
+    [self.databaseQueue close];
 }
 //判断会话是否存在本地
 - (BOOL)isConversationExistsByConvId:(NSString *)convId {
@@ -103,6 +111,7 @@
         }
         [resultSet close];
     }];
+    [self.databaseQueue close];
     return exists;
 }
 //删除所有会话
@@ -110,6 +119,7 @@
     [self.databaseQueue inDatabase:^(FMDatabase *db) {
         [db executeUpdate:@"DELETE FROM conversations"];
     }];
+    [self.databaseQueue close];
 }
 //删除本地所有会话数据库文件！
 - (void)deleteAllConversionFiles {
@@ -120,6 +130,7 @@
             [YSCFileUtils deleteFileOrDirectory:[libPath stringByAppendingPathComponent:filePath]];
         }
     }
+    [self reSetupDataBase];
 }
 //删除单个会话
 - (void)deleteConversationByConvId:(NSString *)convId {
@@ -127,6 +138,7 @@
     [self.databaseQueue inDatabase:^(FMDatabase *db) {
         [db executeUpdate:@"DELETE FROM conversations WHERE id = ?" withArgumentsInArray:@[convId]];
     }];
+    [self.databaseQueue close];
 }
 //清空某个会话的未读数
 - (void)updateUnreadCountToZeroByConvId:(NSString *)convId {
@@ -134,6 +146,7 @@
     [self.databaseQueue inDatabase:^(FMDatabase *db) {
         [db executeUpdate:@"UPDATE conversations SET unreadCount = 0 WHERE id = ?" withArgumentsInArray:@[convId]];
     }];
+    [self.databaseQueue close];
 }
 //增加未读数
 - (void)increaseUnreadCountByConvId:(NSString *)convId {
@@ -141,6 +154,7 @@
     [self.databaseQueue inDatabase:^(FMDatabase *db) {
         [db executeUpdate:@"UPDATE conversations SET unreadCount = unreadCount + 1 WHERE id = ?" withArgumentsInArray:@[convId]];
     }];
+    [self.databaseQueue close];
 }
 //更新 mentioned 值，当接收到消息发现 @了我的时候，设为 YES，进入聊天页面，设为 NO
 - (void)updateMentioned:(BOOL)mentioned convId:(NSString *)convId {
@@ -148,6 +162,7 @@
     [self.databaseQueue inDatabase:^(FMDatabase *db) {
         [db executeUpdate:@"UPDATE conversations SET mentioned = ? WHERE id = ?" withArgumentsInArray:@[@(mentioned), convId]];
     }];
+    [self.databaseQueue close];
 }
 //更新会话(列表)，如果没有就新建
 - (void)updateConversations:(NSArray *)conversations {
@@ -170,6 +185,7 @@
             BOOL isSuccess = [db commit];
             NSLog(@"isSuccess:%d", isSuccess);
         }];
+        [self.databaseQueue close];
     }
     else {
         [self insertConversation:conversation];
@@ -188,6 +204,7 @@
         BOOL isSuccess = [db commit];
         NSLog(@"isSuccess:%d", isSuccess);
     }];
+    [self.databaseQueue close];
 }
 
 //根据传入参数查询对应类型会话的未读数
@@ -216,6 +233,7 @@
         }
         [resultSet close];
     }];
+    [self.databaseQueue close];
     return totalUnreadCount;
 }
 //从本地数据库查找指定会话的未读消息数
@@ -234,6 +252,7 @@
         }
         [resultSet close];
     }];
+    [self.databaseQueue close];
     return retUnreadCount;
 }
 
@@ -250,6 +269,7 @@
         }
         [resultSet close];
     }];
+    [self.databaseQueue close];
     return conversations;
 }
 - (AVIMConversation *)selectOneConversationByConvId:(NSString *)convId {
@@ -262,6 +282,7 @@
         }
         [resultSet close];
     }];
+    [self.databaseQueue close];
     return conv;
 }
 //根据rescueId查询会话
@@ -275,6 +296,7 @@
         }
         [resultSet close];
     }];
+    [self.databaseQueue close];
     return conv;
 }
 
@@ -309,19 +331,21 @@
         }
         [resultSet close];
     }];
+    [self.databaseQueue close];
     return retArray;
 }
 //查询本地是否有会话
 - (BOOL)isConversationExists {
     __block BOOL exists = NO;
     [self.databaseQueue inDatabase:^(FMDatabase *db) {
-        NSString *sql = [NSString stringWithFormat:@"SELECT * FROM conversations"];
+        NSString *sql = [NSString stringWithFormat:@"SELECT 1 FROM conversations"];
         FMResultSet *resultSet = [db executeQuery:sql];
         if ([resultSet next]) {
             exists = YES;
         }
         [resultSet close];
     }];
+    [self.databaseQueue close];
     return exists;
 }
 

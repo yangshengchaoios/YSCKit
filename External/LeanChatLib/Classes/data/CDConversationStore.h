@@ -16,6 +16,8 @@
 
 //会在 openClient 时调用 跟自己的clientId相关的数据库路径
 - (void)setupStoreWithDatabasePath:(NSString *)path;
+//重新创建数据库文件
+- (void)reSetupDataBase;
 
 //插入一条最近会话
 - (void )insertConversation:(AVIMConversation *)conversation;
