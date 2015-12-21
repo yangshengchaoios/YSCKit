@@ -127,17 +127,6 @@ static CDChatManager *instance;
         }
     }];
 }
-//更新会话的扩展属性
-- (void)updateConv:(AVIMConversation *)conv name:(NSString *)name attrs:(NSDictionary *)attrs callback:(AVIMBooleanResultBlock)callback {
-    NSMutableDictionary *dict = [NSMutableDictionary dictionary];
-    if (name) {
-        [dict setObject:name forKey:@"name"];
-    }
-    if (attrs) {
-        [dict setObject:attrs forKey:@"attrs"];
-    }
-    [conv update:dict callback:callback];
-}
 //根据convId数组查询所有会话
 - (void)fetchConvsWithConvids:(NSSet *)convids callback:(AVIMArrayResultBlock)callback {
     if (convids.count > 0) {
@@ -163,27 +152,6 @@ static CDChatManager *instance;
         message.attributes = attributes;
     }
     [conversation sendMessage:message options:AVIMMessageSendOptionRequestReceipt callback:block];
-}
-
-
-#pragma mark - query msgs
-- (void)queryTypedMessagesWithConversation:(AVIMConversation *)conversation timestamp:(int64_t)timestamp limit:(NSInteger)limit block:(AVIMArrayResultBlock)block {
-    AVIMArrayResultBlock callback = ^(NSArray *messages, NSError *error) {
-        //以下过滤为了避免非法的消息，引起崩溃
-        NSMutableArray *typedMessages = [NSMutableArray array];
-        for (AVIMTypedMessage *message in messages) {
-            if ([message isKindOfClass:[AVIMTypedMessage class]]) {
-                [typedMessages addObject:message];
-            }
-        }
-        block(typedMessages, error);
-    };
-    if(timestamp == 0) {
-        // sdk 会设置好 timestamp
-        [conversation queryMessagesFromServerWithLimit:limit callback:callback];
-    } else {
-        [conversation queryMessagesBeforeId:nil timestamp:timestamp limit:limit callback:callback];
-    }
 }
 
 
@@ -444,35 +412,6 @@ static CDChatManager *instance;
     else {//没有联网就直接返回本地缓存的会话列表
         block(conversations, nil);
     }
-}
-- (void)findRecentConversationsWithBlock:(CDRecentConversationsCallback)block {
-    [self selectOrRefreshConversationsWithBlock:^(NSArray *conversations, NSError *error) {
-        if ([conversations count] > 0) {
-            //计算未读消息总数
-            NSUInteger totalUnreadCount = 0;
-            for (AVIMConversation *conversation in conversations) {
-                NSArray *tempArray = [conversation queryMessagesFromCacheWithLimit:1];//这里只取本地的最后一条对话消息
-                if (tempArray.count > 0) {
-                    conversation.lastMessage = tempArray[0];
-                }
-                else {
-                    conversation.lastMessage = nil;
-                }
-                if (conversation.muted == NO && conversation.unreadCount > 0) {
-                    totalUnreadCount += conversation.unreadCount;
-                }
-            }
-            //排序
-            NSArray *sortedRooms = [conversations sortedArrayUsingComparator:^NSComparisonResult(AVIMConversation *conv1, AVIMConversation *conv2) {
-                return conv2.lastMessage.sendTimestamp - conv1.lastMessage.sendTimestamp;
-            }];
-            //返回最后一条消息发送时间排好序的会话列表
-            block(sortedRooms, totalUnreadCount, nil);
-        }
-        else {
-            block(nil, 0, error);
-        }
-    }];
 }
 
 #pragma mark - mention

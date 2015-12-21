@@ -108,15 +108,6 @@ typedef void (^CDRecentConversationsCallback)(NSArray *conversations, NSInteger 
 - (void)fetchConvWithMembers:(NSArray *)members callback:(AVIMConversationResultBlock)callback;
 //根据成员名称查找或创建一个会话
 - (void)fetchConvWithMembers:(NSArray *)members extendAttributes:(NSDictionary *)attributes callback:(AVIMConversationResultBlock)callback;
-
-/**
- *  更新对话 name 或 attrs
- *  @param conv     要更新的对话
- *  @param name     对话名字
- *  @param attrs    对话的附加属性
- *  @param callback
- */
-- (void)updateConv:(AVIMConversation *)conv name:(NSString *)name attrs:(NSDictionary *)attrs callback:(AVIMBooleanResultBlock)callback;
 //根据convId数组查询所有会话
 - (void)fetchConvsWithConvids:(NSSet *)convids callback:(AVIMArrayResultBlock)callback;
 
@@ -127,21 +118,6 @@ typedef void (^CDRecentConversationsCallback)(NSArray *conversations, NSInteger 
  *  @param block
  */
 - (void)sendMessage:(AVIMTypedMessage*)message conversation:(AVIMConversation *)conversation callback:(AVBooleanResultBlock)block;
-
-/**
- *  查询时间戳之前的历史消息
- *  @param conversation 需要查询的对话
- *  @param timestamp    起始时间戳
- *  @param limit        条数
- *  @param block        消息数组回调
- */
-- (void)queryTypedMessagesWithConversation:(AVIMConversation *)conversation timestamp:(int64_t)timestamp limit:(NSInteger)limit block:(AVIMArrayResultBlock)block;
-/**
- *  查找最近我参与过的对话
- *  @param block 对话数组回调
- */
-- (void)findRecentConversationsWithBlock:(CDRecentConversationsCallback)block;
-
 /**
  *  在 ApplicationDelegate 中的 application:didRemoteNotification 调用，来记录推送时的 convid，这样点击弹框打开后进入相应的对话
  *  @param userInfo
