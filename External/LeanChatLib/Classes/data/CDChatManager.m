@@ -155,7 +155,7 @@ static CDChatManager *instance;
 #pragma mark - utils
 - (void)sendMessage:(AVIMTypedMessage*)message conversation:(AVIMConversation *)conversation callback:(AVBooleanResultBlock)block {
     NSMutableDictionary *attributes = [NSMutableDictionary dictionary];
-    [attributes setObject:Trim(APPDATA.chatUser.userName) forKey:@"username"];
+    attributes[@"fromUser"] = USERNAME;
     if (message.attributes == nil) {
         message.attributes = attributes;
     } else {
