@@ -371,60 +371,57 @@
         }
     };
     
+    RequestSuccessed successBlock = ^(id responseObject) {
+        NSMutableArray *dataArray = [NSMutableArray array];
+        if ([responseObject isKindOfClass:[NSArray class]]) {
+            [dataArray addObjectsFromArray:(NSArray *)responseObject];
+        }
+        else {
+            if (isNotEmpty(responseObject)) {
+                dataArray = @[responseObject];
+            }
+        }
+        //兼容外部数据源
+        if (isNotEmpty(initObject) && [initObject isKindOfClass:[NSArray class]]) {
+            [dataArray addObjectsFromArray:(NSArray *)initObject];
+        }
+        
+        resultBlock(dataArray, nil);
+    };
+    RequestFailure failureBlock = ^(ErrorType errorType, NSError *error) {
+        resultBlock(initObject, [YSCCommonUtils ResolveErrorType:errorType andError:error]);
+    };
+    
     //4. 开始网络访问
     if(RequestTypeGET == self.requestType) {
         [AFNManager getDataFromUrl:self.prefixOfUrl
                            withAPI:self.methodName
                       andDictParam:self.dictParamBlock(pageIndex)
                          modelName:NSClassFromString(self.modelName)
-                  requestSuccessed:^(id responseObject) {
-                      NSMutableArray *dataArray = [NSMutableArray array];
-                      if ([responseObject isKindOfClass:[NSArray class]]) {
-                          [dataArray addObjectsFromArray:(NSArray *)responseObject];
-                      }
-                      else {
-                          if (isNotEmpty(responseObject)) {
-                              dataArray = @[responseObject];
-                          }
-                      }
-                      //兼容外部数据源
-                      if (isNotEmpty(initObject) && [initObject isKindOfClass:[NSArray class]]) {
-                          [dataArray addObjectsFromArray:(NSArray *)initObject];
-                      }
-                      
-                      resultBlock(dataArray, nil);
-                  }
-                    requestFailure:^(ErrorType errorType, NSError *error) {
-                        resultBlock(initObject, [YSCCommonUtils ResolveErrorType:errorType andError:error]);
-                    }];
+                  requestSuccessed:successBlock
+                    requestFailure:failureBlock];
     }
     else if(RequestTypePOST == self.requestType) {
         [AFNManager postDataToUrl:self.prefixOfUrl
                           withAPI:self.methodName
                      andDictParam:self.dictParamBlock(pageIndex)
                         modelName:NSClassFromString(self.modelName)
-                 requestSuccessed:^(id responseObject) {
-                     NSMutableArray *dataArray = [NSMutableArray array];
-                     if ([responseObject isKindOfClass:[NSArray class]]) {
-                         [dataArray addObjectsFromArray:(NSArray *)responseObject];
-                     }
-                     else {
-                         if (isNotEmpty(responseObject)) {
-                             dataArray = @[responseObject];
-                         }
-                     }
-                     //兼容外部数据源
-                     if (isNotEmpty(initObject) && [initObject isKindOfClass:[NSArray class]]) {
-                         [dataArray addObjectsFromArray:(NSArray *)initObject];
-                     }
-                     resultBlock(dataArray, nil);
-                 }
-                   requestFailure:^(ErrorType errorType, NSError *error) {
-                       resultBlock(initObject, [YSCCommonUtils ResolveErrorType:errorType andError:error]);
-                   }];
+                 requestSuccessed:successBlock
+                   requestFailure:failureBlock];
     }
     else if (RequestTypeCustomResponse == self.requestType) {
         resultBlock(initObject, errorMessage);
+    }
+    else if (RequestTypePostBodyData == self.requestType) {
+        [AFNManager requestByUrl:self.prefixOfUrl
+                         withAPI:self.methodName
+                   andArrayParam:nil
+                    andDictParam:nil
+                    andBodyParam:[NSString jsonStringWithObject:self.dictParamBlock(pageIndex)]
+                       modelName:NSClassFromString(self.modelName)
+                     requestType:RequestTypePostBodyData
+                requestSuccessed:successBlock
+                  requestFailure:failureBlock];
     }
 }
 

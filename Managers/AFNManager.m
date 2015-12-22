@@ -82,7 +82,7 @@
             if (1 == baseModel.stateInteger) {  //接口访问成功
                 NSObject *dataModel = baseModel.data;
                 JSONModelError *initError = nil;
-                if ( [NSObject isNotEmpty:modelName] && [modelName isSubclassOfClass:[BaseDataModel class]]) {
+                if ([NSObject isNotEmpty:modelName] && [modelName isSubclassOfClass:[BaseDataModel class]]) {
                     if ([dataModel isKindOfClass:[NSArray class]]) {
                         dataModel = [modelName arrayOfModelsFromDictionaries:(NSArray *)dataModel error:&initError];
                     }
@@ -240,7 +240,6 @@
     
     //4. 格式化所有请求的参数
     NSDictionary *newDictParam = [AppData FormatRequestParams:dictParam];
-    NSLog(@"request params=%@", newDictParam);
     
 	//5. 发起网络请求
     AFHTTPRequestOperationManager *manager = [AFHTTPRequestOperationManager manager];
@@ -257,23 +256,11 @@
     
     //   定义返回成功的block
     void (^requestSuccessed1)(AFHTTPRequestOperation *operation, id responseObject) = ^(AFHTTPRequestOperation *operation, id responseObject) {
-        //如果返回的数据是编过码的，则需要转换成字符串，方便输出调试
-        if ([responseObject isKindOfClass:[NSData class]]) {
-            responseObject = [[NSString alloc] initWithData:responseObject encoding:NSUTF8StringEncoding];
-        }
-        if ([responseObject isKindOfClass:[NSString class]]) {
-            responseObject = [NSString replaceString:responseObject byRegex:@"[\r\n\t]" to:@""];
-        }
-        NSLog(@"request success! \r\noperation=%@\r\nresponseObject=%@", operation, responseObject);
+        NSString *resolvedString = [AppData ResolveResponseObject:responseObject];
         JSONModelError *initError = nil;
         id jsonModel = nil;
         if ([NSObject isNotEmpty:modelClass] && [modelClass isSubclassOfClass:[JSONModel class]]) {
-            if ([responseObject isKindOfClass:[NSDictionary class]]) {
-                jsonModel = [[modelClass alloc] initWithDictionary:responseObject error:&initError];
-            }
-            else if ([responseObject isKindOfClass:[NSString class]]) {
-                jsonModel = [[modelClass alloc] initWithString:responseObject error:&initError];
-            }
+            jsonModel = [[modelClass alloc] initWithString:resolvedString error:&initError];
         }
         
         if (isEmpty(initError)) {
@@ -347,7 +334,7 @@
     else if (RequestTypePostBodyData == requestType) {
         NSLog(@"posting bodydata to url[%@]", newUrlString);
         NSMutableURLRequest *mutableRequest = [manager.requestSerializer requestWithMethod:@"POST" URLString:newUrlString parameters:nil error:nil];
-        mutableRequest.HTTPBody = [bodyParam dataUsingEncoding:manager.requestSerializer.stringEncoding];
+        mutableRequest.HTTPBody = [[AppData EncryptPostBodyParam:bodyParam] dataUsingEncoding:manager.requestSerializer.stringEncoding];
         [mutableRequest setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
         AFHTTPRequestOperation *operation = [manager HTTPRequestOperationWithRequest:mutableRequest success:requestSuccessed1 failure:requestFailure1];
         [manager.operationQueue addOperation:operation];

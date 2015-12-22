@@ -178,7 +178,9 @@ return _sharedObject;
 #define BundleIdentifier                [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleIdentifier"]
 #define WelcomeVersion                  [NSString stringWithFormat:@"Welcome_V%@.%@", AppVersion, BundleVersion]
 #define SkipVersion(x)                  [NSString stringWithFormat:@"SkipVersion_V%@", x]
-
+#define VersionEqualsOrLater(v)         (NSOrderedAscending != [AppVersion compare:v options:NSNumericSearch])      //判断当前APP的版本号等于或大于v
+#define VersionLater(v)                 (NSOrderedDescending == [AppVersion compare:v options:NSNumericSearch])     //判断当前APP的版本号大于v
+#define VersionBefore(v)                (NSOrderedAscending == [AppVersion compare:v options:NSNumericSearch])      //判断当前APP的版本号小于v
 
 /**
  *  自动布局相关代码段简写

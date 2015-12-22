@@ -43,17 +43,20 @@
                                  options:0
                                    range:NSMakeRange(0, [text length])
                               usingBlock:^(NSTextCheckingResult *result, NSMatchingFlags flags, BOOL *stop) {
-                                  NSRange matchRange = [result range];
+                                  NSRange matchRange = [result range];//范围
+                                  
                                   if (attributesDict) {
                                       [attributedString addAttributes:attributesDict range:matchRange];
                                   }
                                   if ([result resultType] == NSTextCheckingTypeLink) {
                                       NSURL *url = [result URL];
                                       [attributedString addAttribute:NSLinkAttributeName value:url range:matchRange];
-                                  } else if ([result resultType] == NSTextCheckingTypePhoneNumber) {
+                                  }
+                                  else if ([result resultType] == NSTextCheckingTypePhoneNumber) {
                                       NSString *phoneNumber = [result phoneNumber];
                                       [attributedString addAttribute:NSLinkAttributeName value:phoneNumber range:matchRange];
-                                  } else if ([result resultType] == NSTextCheckingTypeDate) {
+                                  }
+                                  else if ([result resultType] == NSTextCheckingTypeDate) {
 //                                      NSDate *date = [result date];
                                   }
                               }];

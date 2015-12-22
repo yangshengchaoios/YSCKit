@@ -107,7 +107,6 @@
                   }
               }
                 requestFailure:^(ErrorType errorType, NSError *error) {
-                    [UIView hideHUDLoadingOnWindow];
                     NSString *errMsg = [YSCCommonUtils ResolveErrorType:errorType andError:error];
                     if (block) {
                         block(nil, errMsg);
@@ -124,12 +123,32 @@
                   }
               }
                 requestFailure:^(ErrorType errorType, NSError *error) {
-                    [UIView hideHUDLoadingOnWindow];
                     NSString *errMsg = [YSCCommonUtils ResolveErrorType:errorType andError:error];
                     if (block) {
                         block(nil, errMsg);
                     }
                 }];
+}
+//统一规范参数的提交方式：加密的json字符串写入httpBody
++ (void)RequesByMethod:(NSString *)method params:(NSDictionary *)params block:(YSCResponseErrorMessageBlock)block {
+    [AFNManager requestByUrl:kResPathAppBaseUrl
+                     withAPI:method
+               andArrayParam:nil
+                andDictParam:nil
+                andBodyParam:[NSString jsonStringWithObject:params]
+                   modelName:[self class]
+                 requestType:RequestTypePostBodyData
+            requestSuccessed:^(id responseObject) {
+                if (block) {
+                    block(responseObject, nil);
+                }
+            }
+              requestFailure:^(ErrorType errorType, NSError *error) {
+                  NSString *errMsg = [YSCCommonUtils ResolveErrorType:errorType andError:error];
+                  if (block) {
+                      block(nil, errMsg);
+                  }
+              }];
 }
 
 //将大写首字母转换为小写

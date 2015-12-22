@@ -2,7 +2,6 @@
 //  Prefix header
 //
 //  The contents of this file are implicitly included at the beginning of every source file.
-//  FORMATED!
 //
 
 #import <Availability.h>
@@ -10,7 +9,7 @@
 #ifndef __IPHONE_7_0
 #warning "This project uses features only available in iOS SDK 3.0 and later."
 #endif
-
+ 
 #ifdef __OBJC__
     //常用pod中第三方库
     #import <UIKit/UIKit.h>

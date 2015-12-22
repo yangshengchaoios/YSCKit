@@ -9,46 +9,43 @@
 #import <Foundation/Foundation.h>
 
 #if TARGET_OS_IPHONE
-#import <UIKit/UIKit.h>
+    #import <UIKit/UIKit.h>
 
-@compatibility_alias NSView UIView;
-@compatibility_alias NSColor UIColor;
-@compatibility_alias NSBezierPath UIBezierPath;
-@compatibility_alias NSImage UIImage;
+    @compatibility_alias NSView UIView;
+    @compatibility_alias NSColor UIColor;
+    @compatibility_alias NSBezierPath UIBezierPath;
+    @compatibility_alias NSImage UIImage;
 
-typedef UIEdgeInsets NSEdgeInsets;
+    typedef UIEdgeInsets NSEdgeInsets;
 
-#define NSEdgeInsetsMake UIEdgeInsetsMake
-#define NSRectFill UIRectFill
-#define NSStringFromRect NSStringFromCGRect
-#define NSStringFromSize NSStringFromCGSize
-#define NSTextInputClient UITextInput
-
-extern NSString * const NSLinkAttributeName;
-extern NSString * const NSStrikethroughStyleAttributeName;
+    #define NSEdgeInsetsMake UIEdgeInsetsMake
+    #define NSRectFill UIRectFill
+    #define NSStringFromRect NSStringFromCGRect
+    #define NSStringFromSize NSStringFromCGSize
+    #define NSTextInputClient UITextInput
 
 #else
-#import <Cocoa/Cocoa.h>
+    #import <Cocoa/Cocoa.h>
 
-@compatibility_alias UIView NSView;
-@compatibility_alias UIFont NSFont;
-@compatibility_alias UIColor NSColor;
-@compatibility_alias UIBezierPath NSBezierPath;
-@compatibility_alias UIImage NSImage;
+    @compatibility_alias UIView NSView;
+    @compatibility_alias UIFont NSFont;
+    @compatibility_alias UIColor NSColor;
+    @compatibility_alias UIBezierPath NSBezierPath;
+    @compatibility_alias UIImage NSImage;
 
-typedef NSEdgeInsets UIEdgeInsets;
+    typedef NSEdgeInsets UIEdgeInsets;
 
-#define UIEdgeInsetsMake NSEdgeInsetsMake
-#define UIRectFill NSRectFill
-#define NSStringFromCGRect NSStringFromRect
-#define NSStringFromCGSize NSStringFromSize
-#define UITextInput NSTextInputClient
+    #define UIEdgeInsetsMake NSEdgeInsetsMake
+    #define UIRectFill NSRectFill
+    #define NSStringFromCGRect NSStringFromRect
+    #define NSStringFromCGSize NSStringFromSize
+    #define UITextInput NSTextInputClient
 
-@interface NSColor (Compatibility)
+    @interface NSColor (Compatibility)
 
-- (CGColorRef)createCGColor CF_RETURNS_RETAINED;
+    - (CGColorRef)createCGColor CF_RETURNS_RETAINED;
 
-@end
+    @end
 
 #endif
 
