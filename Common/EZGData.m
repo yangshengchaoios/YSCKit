@@ -556,8 +556,8 @@
             [currentViewController.navigationController pushViewController:chatRoom animated:YES];
         }
         else {
-            UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:chatRoom];
-            [currentViewController presentViewController:navigationController animated:YES completion:nil];
+            [currentViewController presentViewController:[UIResponder createNavigationControllerWithRootViewController:chatRoom]
+                                                animated:YES completion:nil];
         }
     }
 }

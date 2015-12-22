@@ -366,11 +366,9 @@
 }
 - (UINavigationController *)presentNormalViewController:(UIViewController *)viewController {
     [self hideKeyboard];
-    UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:viewController];
-//    navigationController.interactivePopGestureRecognizer.enabled = YES;//NOTE:关闭系统自带的侧边滑动功能，会与MLTransition冲突！
-//    navigationController.interactivePopGestureRecognizer.delegate = self;
-    [self presentViewController:navigationController animated:YES completion:nil];
-    return navigationController;
+    [self presentViewController:[UIResponder createNavigationControllerWithRootViewController:viewController]
+                       animated:YES completion:nil];
+    return nil;
 }
 //在self上一级viewController调用dismiss（通常情况下使用该方法）
 - (void)dismissOnPresentingViewController {

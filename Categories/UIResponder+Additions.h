@@ -12,5 +12,8 @@
 @interface UIResponder (Additions)
 
 + (id)currentFirstResponder;
+//统一创建UIViewController
 + (UIViewController *)createBaseViewController:(NSString *)className;
+//统一创建UINavigationController
++ (UINavigationController *)createNavigationControllerWithRootViewController:(UIViewController *)viewController;
 @end

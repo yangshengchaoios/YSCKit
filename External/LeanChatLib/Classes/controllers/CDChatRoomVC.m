@@ -477,7 +477,7 @@
     };
     YSCBaseViewController *viewController = (YSCBaseViewController *)[UIResponder createBaseViewController:@"EZGAddressSearchViewController"];
     viewController.params = @{kParamBackType : @(BackTypeImage), kParamBlock : block};
-    [self presentViewController:[[UINavigationController alloc] initWithRootViewController:viewController]
+    [self presentViewController:[UIResponder createNavigationControllerWithRootViewController:viewController]
                        animated:YES completion:nil];
 }
 //点击扩展功能按钮-发送拍摄照片

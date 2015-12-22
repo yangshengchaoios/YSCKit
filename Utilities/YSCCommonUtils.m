@@ -114,32 +114,12 @@
         }
     }
 }
-+ (void)configNavigationBar {    
-    //改变Navibar的颜色和背景图片
-    if (DefaultNaviBarBackImage) {
-        [[UINavigationBar appearance] setBackgroundImage:DefaultNaviBarBackImage forBarMetrics:UIBarMetricsDefault];
-    }
-    else {
-        [[UINavigationBar appearance] setBarTintColor:kDefaultNaviTintColor];
-    }
-    
-    //统一设置导航栏是否透明，这会影响self.view的高度(如果透明则view.height=screen.height，否则view.height=screen.height-64)
-    if ([[UINavigationBar appearance] respondsToSelector:@selector(setTranslucent:)]) {
-        [[UINavigationBar appearance] setTranslucent:YES];
-    }
-    
-    //影响范围：icon颜色、left、right文字颜色
-    [[UINavigationBar appearance] setTintColor:kDefaultNaviBarTintColor];
-    
-    //设置Title字体大小和颜色(如果不设置将按默认显示whiteColor)
-    [[UINavigationBar appearance] setTitleTextAttributes:@{NSForegroundColorAttributeName : kDefaultNaviBarTitleColor,
-                                                           NSFontAttributeName : kDefaultNaviBarTitleFont}];
-    [[UINavigationBar appearance] setBarStyle:UIBarStyleDefault];//默认样式，带下横线的
-    
++ (void)configNavigationBar {
     //设置BarButtonItem字体大小和颜色(如果不设置将按默认的tintColor显示)
     [[UIBarButtonItem appearance] setTitleTextAttributes:@{NSForegroundColorAttributeName : kDefaultNaviBarItemColor,
                                                            NSFontAttributeName : kDefaultNaviBarItemFont}
                                                 forState:UIControlStateNormal];
+    //其它大部分的设置都放在创建navigationController中了
 }
 + (void)registerForRemoteNotification {
     UIApplication *application = [UIApplication sharedApplication];
