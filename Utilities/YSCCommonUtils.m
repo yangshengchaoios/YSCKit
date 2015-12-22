@@ -119,7 +119,7 @@
     [[UIBarButtonItem appearance] setTitleTextAttributes:@{NSForegroundColorAttributeName : kDefaultNaviBarItemColor,
                                                            NSFontAttributeName : kDefaultNaviBarItemFont}
                                                 forState:UIControlStateNormal];
-    //其它大部分的设置都放在创建navigationController中了
+    //其它大部分的设置都放在创建navigationController([UIResponder createNavi])中了
 }
 + (void)registerForRemoteNotification {
     UIApplication *application = [UIApplication sharedApplication];
