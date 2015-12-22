@@ -47,7 +47,6 @@
                                   if (attributesDict) {
                                       [attributedString addAttributes:attributesDict range:matchRange];
                                   }
-                                  
                                   if ([result resultType] == NSTextCheckingTypeLink) {
                                       NSURL *url = [result URL];
                                       [attributedString addAttribute:NSLinkAttributeName value:url range:matchRange];
@@ -67,24 +66,11 @@
     if ([_attributedStringCache objectForKey:text]) {
         return [_attributedStringCache objectForKey:text];
     }
-    
     NSDictionary *textAttributes = @{NSForegroundColorAttributeName : [UIColor colorWithRed:0.185 green:0.583 blue:1.000 alpha:1.000]};
-    
     NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:text];
-    
-    NSDataDetector *detector = [NSDataDetector dataDetectorWithTypes:NSTextCheckingTypeLink | NSTextCheckingTypePhoneNumber | NSTextCheckingTypeDate
-                                                               error:nil];
-    
+    NSDataDetector *detector = nil;//[NSDataDetector dataDetectorWithTypes:NSTextCheckingTypeLink | NSTextCheckingTypePhoneNumber | NSTextCheckingTypeDate error:nil];//取消内容检测，TODO:测试该类的用法！
     [self setDataDetectorsAttributedAttributedString:attributedString atText:text withRegularExpression:detector attributes:textAttributes];
-    
-    
-//    NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@"/s(13[0-9]|15[0-35-9]|18[0-9]|14[57])[0-9]{8}"
-//                                                                           options:0
-//                                                                             error:nil];
-//    [self setDataDetectorsAttributedAttributedString:attributedString atText:text withRegularExpression:regex attributes:textAttributes];
-    
     [_attributedStringCache setObject:attributedString forKey:text];
-    
     return attributedString;
 }
 
