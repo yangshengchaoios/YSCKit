@@ -35,8 +35,7 @@
     NSString *msgText = [CDEmotionUtils emojiStringFromString:message.text];//将原始字符串转换为带emoji的字符串
     CGFloat msgTextWidth = [NSString WidthOfNormalString:msgText maxHeight:MAXFLOAT withFont:AUTOLAYOUT_FONT(32)];
     msgTextWidth = MAX(AUTOLAYOUT_LENGTH(60), msgTextWidth);
-    NSAttributedString *attrStr = [[XHMessageBubbleHelper sharedMessageBubbleHelper] bubbleAttributtedStringWithText:msgText];
-    CGSize textSize = [SETextView frameRectWithAttributtedString:attrStr
+    CGSize textSize = [SETextView frameRectWithAttributtedString:[[NSAttributedString alloc] initWithString:msgText]
                                                   constraintSize:CGSizeMake(kMaxContentWidth - 2 * kXHBubbleMarginHor, MAXFLOAT)
                                                      lineSpacing:kTextLineSpacing
                                                             font:kBubbleTextFont].size;
@@ -50,7 +49,7 @@
 - (void)layoutMessage:(AVIMTextMessage *)message displaysTimestamp:(BOOL)displayTimestamp {
     [super layoutMessage:message displaysTimestamp:displayTimestamp];
     NSString *msgText = [CDEmotionUtils emojiStringFromString:message.text];//将原始字符串转换为带emoji的字符串
-    self.displayTextView.attributedText = [[XHMessageBubbleHelper sharedMessageBubbleHelper] bubbleAttributtedStringWithText:msgText];
+    self.displayTextView.attributedText = [[NSAttributedString alloc] initWithString:msgText];
 }
 //动态计算位置和大小
 - (void)layoutSubviews {

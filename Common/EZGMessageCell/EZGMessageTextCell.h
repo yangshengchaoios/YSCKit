@@ -8,7 +8,6 @@
 
 #import "EZGMessageBaseCell.h"
 #import "SETextView.h"
-#import "XHMessageBubbleHelper.h"
 
 @interface EZGMessageTextCell : EZGMessageBaseCell
 

@@ -130,7 +130,7 @@
                 }];
 }
 //统一规范参数的提交方式：加密的json字符串写入httpBody
-+ (void)RequesByMethod:(NSString *)method params:(NSDictionary *)params block:(YSCResponseErrorMessageBlock)block {
++ (void)RequestByMethod:(NSString *)method params:(NSDictionary *)params block:(YSCResponseErrorMessageBlock)block {
     [AFNManager requestByUrl:kResPathAppBaseUrl
                      withAPI:method
                andArrayParam:nil

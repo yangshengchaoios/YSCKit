@@ -95,6 +95,10 @@
 //只能显示HTML内容，但不能点击链接
 //view包括:UILabel UITextField UITextView
 + (void)LayoutHtmlString:(NSString *)htmlString onView:(UIView *)view;
+//根据正则表达式设置attributedString的各项参数
+//regular: 正则表达式
+//attributes: 每个满足ragular的attri
++ (void)FillMutableAttributedString:(NSMutableAttributedString *)attributedString byRegular:(NSRegularExpression *)regular attributes:(NSDictionary *)attributes;
 
 #pragma mark - 获取当前(服务器端)时间
 + (NSDate *)currentDate;

@@ -581,11 +581,45 @@
 //view包括:UILabel UITextField UITextView
 + (void)LayoutHtmlString:(NSString *)htmlString onView:(UIView *)view {
     NSAttributedString *attrStr = [[NSAttributedString alloc] initWithData:[htmlString dataUsingEncoding:NSUnicodeStringEncoding]
-                                                                    options:@{ NSDocumentTypeDocumentAttribute: NSHTMLTextDocumentType}
-                                                         documentAttributes:nil error:nil];
+                                                                   options:@{ NSDocumentTypeDocumentAttribute: NSHTMLTextDocumentType}
+                                                        documentAttributes:nil
+                                                                     error:nil];
     if ([view respondsToSelector:@selector(setAttributedText:)]) {
         [view performSelector:@selector(setAttributedText:) withObject:attrStr];
     }
+}
+//根据正则表达式设置attributedString的各项参数
+//regular: 正则表达式
+//attributes: 每个满足ragular的attri
++ (void)FillMutableAttributedString:(NSMutableAttributedString *)attributedString byRegular:(NSRegularExpression *)regular attributes:(NSDictionary *)attributes {
+    ReturnWhenObjectIsEmpty(attributedString);
+    ReturnWhenObjectIsEmpty(regular);
+    ReturnWhenObjectIsEmpty(attributedString.string);
+    
+    NSRange stringRange = NSMakeRange(0, [attributedString.string length]);
+    [regular enumerateMatchesInString:attributedString.string
+                                 options:0
+                                   range:stringRange
+                              usingBlock:^(NSTextCheckingResult *result, NSMatchingFlags flags, BOOL *stop) {
+                                  //0. 获取到匹配的范围
+                                  NSRange matchRange = [result range];
+                                  //1. 设置通用的attribute
+                                  if (attributes) {
+                                      [attributedString addAttributes:attributes range:matchRange];
+                                  }
+                                  //2. 分别设置匹配项目的attribute
+                                  if ([result resultType] == NSTextCheckingTypeLink) {
+                                      NSURL *url = [result URL];
+                                      [attributedString addAttribute:NSLinkAttributeName value:url range:matchRange];
+                                  }
+                                  else if ([result resultType] == NSTextCheckingTypePhoneNumber) {
+                                      NSString *phoneNumber = [result phoneNumber];
+                                      [attributedString addAttribute:NSLinkAttributeName value:phoneNumber range:matchRange];
+                                  }
+                                  else {
+                                      //其它特殊内容
+                                  }
+                              }];
 }
 
 #pragma mark - 获取当前(服务器端)时间
