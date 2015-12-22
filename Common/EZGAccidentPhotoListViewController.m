@@ -26,6 +26,9 @@
     self.tableView.methodName = kResPathAccidentDetail;
     self.tableView.enableLoadMore = NO;
     self.tableView.tipsEmptyText = @"亲，暂无您的现场照片数据哟！";
+    if (IsAppTypeB) {//FIXME:暂时只对B端进行解密，如果要配合C端发布1.3.1版本的话，要取消解密！
+        self.tableView.requestType = RequestTypePostBodyData;
+    }
     self.tableView.dictParamBlock = ^NSDictionary *(NSInteger page) {
         return @{kParamAccidentId : Trim(self.params[kParamAccidentId])};
     };

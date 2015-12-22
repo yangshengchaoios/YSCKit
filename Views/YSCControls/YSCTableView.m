@@ -370,7 +370,6 @@
             weakSelf.finishLoadBlock(errorMessage);
         }
     };
-    
     RequestSuccessed successBlock = ^(id responseObject) {
         NSMutableArray *dataArray = [NSMutableArray array];
         if ([responseObject isKindOfClass:[NSArray class]]) {
@@ -409,9 +408,6 @@
                  requestSuccessed:successBlock
                    requestFailure:failureBlock];
     }
-    else if (RequestTypeCustomResponse == self.requestType) {
-        resultBlock(initObject, errorMessage);
-    }
     else if (RequestTypePostBodyData == self.requestType) {
         [AFNManager requestByUrl:self.prefixOfUrl
                          withAPI:self.methodName
@@ -422,6 +418,9 @@
                      requestType:RequestTypePostBodyData
                 requestSuccessed:successBlock
                   requestFailure:failureBlock];
+    }
+    else {
+        resultBlock(initObject, errorMessage);
     }
 }
 
