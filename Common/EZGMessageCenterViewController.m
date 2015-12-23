@@ -32,7 +32,6 @@
     else {
         self.tableView.tipsEmptyText = @"亲，请登录后查看您的消息！";
     }
-    self.tableView.enableCellEdit = YES;
     //自定义数据源获取方式
     self.tableView.requestType = RequestTypeCustomResponse;
     self.tableView.header = [MJRefreshNormalHeader headerWithRefreshingBlock:^{

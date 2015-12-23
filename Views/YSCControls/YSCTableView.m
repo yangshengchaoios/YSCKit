@@ -377,7 +377,7 @@
         }
         else {
             if (isNotEmpty(responseObject)) {
-                dataArray = @[responseObject];
+                dataArray = [@[responseObject] mutableCopy];
             }
         }
         //兼容外部数据源
@@ -686,7 +686,12 @@
 //    return @"删除";
 //}
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
-    return self.enableCellEdit;
+    if (self.deleteCellBlock) {
+        return YES;
+    }
+    else {
+        return NO;
+    }
 }
 
 #pragma mark - UIScrollViewDelegate
