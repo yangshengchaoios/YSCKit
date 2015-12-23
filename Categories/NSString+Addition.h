@@ -99,6 +99,7 @@
 //根据分隔符切分字符串为数组 (默认是大小写敏感的)
 + (NSArray *)splitString:(NSString *)string byRegex:(NSString *)pattern;
 + (NSArray *)splitString:(NSString *)string byRegex:(NSString *)pattern options:(NSRegularExpressionOptions)options;
+- (NSArray *)splitByRegex:(NSString *)pattern;
 - (NSArray *)splitByRegex:(NSString *)pattern options:(NSRegularExpressionOptions)options;
 //返回匹配regex的数组 (默认是大小写敏感的)
 + (NSArray *)matchesInString:(NSString *)string byRegex:(NSString *)pattern;

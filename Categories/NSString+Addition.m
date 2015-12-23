@@ -304,6 +304,9 @@
     }
     return [string splitByRegex:pattern options:options];
 }
+- (NSArray *)splitByRegex:(NSString *)pattern {
+    return [self splitByRegex:pattern options:NSRegularExpressionCaseInsensitive];
+}
 - (NSArray *)splitByRegex:(NSString *)pattern options:(NSRegularExpressionOptions)options {
     if ([NSString isEmpty:pattern]) {
         return @[];
