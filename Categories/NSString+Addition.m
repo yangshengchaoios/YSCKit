@@ -174,6 +174,7 @@
 }
 //将id对象转换成json字符串
 + (NSString *)jsonStringWithObject:(id)object {
+    ReturnEmptyWhenObjectIsEmpty(object);
     NSError *error = nil;
     NSData *jsonData = [NSJSONSerialization dataWithJSONObject:object
                                                        options:NSJSONWritingPrettyPrinted
