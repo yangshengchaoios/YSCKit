@@ -492,7 +492,7 @@
         [errMsg appendFormat:@"\r  errorCode(%ld)\r  errorMessage:%@", (long)error.code, error];//显示error的错误内容
     }
     [errMsg appendFormat:@"\r<<<<<<<<<<<<<<<<<<<<ErrorType[%ld]<<<<<<<<<<<<<<<<<<<<\r\n", (long)errorType];//错误标记结束
-    NSLog(@"errMsg=\r\n%@", errMsg);
+    NSLog(@"errMsg=\r%@", errMsg);
     [LogManager saveLog:errMsg];
     return messageDetail;
 }
@@ -531,7 +531,7 @@
 //单独保存error
 + (void)SaveNSError:(NSError *)error {
     NSMutableString *errMsg = [NSMutableString stringWithFormat:@">>>>>>>>>>>>>>>>>>>>errorCode(%ld)>>>>>>>>>>>>>>>>>>>>\r  errorMessage:%@\r<<<<<<<<<<<<<<<<<<<<errorCode(%ld)<<<<<<<<<<<<<<<<<<<<\r\n", (long)error.code, error, (long)error.code];
-    NSLog(@"error=\r\n%@", errMsg);
+    NSLog(@"error=\r%@", errMsg);
     [LogManager saveLog:errMsg];
 }
 

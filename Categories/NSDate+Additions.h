@@ -115,9 +115,13 @@
 //缺陷：最多只能计算到天数
 + (NSDateComponents *)ComponentsBetweenStartDate1:(NSDate *)startDate withEndDate:(NSDate *)endDate;
 
-//过去了多长时间
+//过去了多长时间 TODO:待优化
 + (NSString *)TimePassedByStartDate:(NSDate *)startDate;
 + (NSString *)TimePassedByStartTimeStamp:(NSString *)timeStamp;
++ (NSString *)TimePassedByStartDate1:(NSDate *)startDate;
++ (NSString *)TimePassedByStartDate2:(NSDate *)startDate;
++ (NSString *)TimePassedByStartDate3:(NSDate *)startDate;
++ (NSString *)TimePassedByStartDate3:(NSDate *)startDate flag:(BOOL)flag;
 
 //还剩多长时间
 + (NSString *)TimeRemainByEndDate:(NSDate *)endDate;

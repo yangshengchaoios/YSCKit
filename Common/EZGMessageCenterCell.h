@@ -9,7 +9,6 @@
 #import "JSBadgeView.h"
 #import "CDConversationStore.h"
 #import "CDMessageHelper.h"
-#import "DateTools.h"
 
 /*
  *  消息cell基类

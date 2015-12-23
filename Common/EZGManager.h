@@ -35,13 +35,6 @@
 //格式化车牌号
 + (NSString *)formatCarNumber:(NSString *)carNumber;
 
-#pragma mark - 格式化救援耗时
-+ (NSString *)formatRescueTimePassed:(NSDate *)startDate;
-+ (NSString *)formatRescueTimePassed:(NSDate *)startDate endDate:(NSDate *)endDate;
-//计算时间过了多少
-+ (NSString *)timePassedByStartDate:(NSDate *)startDate;
-+ (NSString *)timePassedByStartDate:(NSDate *)startDate flag:(BOOL)flag;
-
 //获取推送证书名称
 + (NSString *)deviceProfile;
 //检测是否用测试证书打包

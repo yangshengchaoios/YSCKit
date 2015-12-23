@@ -733,7 +733,7 @@
     ReturnEmptyWhenObjectIsEmpty(startDate);
     //异常时间处理
     if ([startDate isLaterThanDate:endDate]) {
-        return [startDate stringWithFormat:DateFormat5];
+        return [startDate stringWithFormat:DateFormat1];
     }
     NSDateComponents *dateComponents = [NSDate ComponentsBetweenStartDate1:startDate withEndDate:endDate];
     //如果>=365d
@@ -757,6 +757,90 @@
         return [NSString stringWithFormat:@"%ld分钟前", (long)dateComponents.minute];
     }
     return @"刚刚";//1分钟以内
+}
+/**
+ * 1. 如果不是今年   返回 yyyy年M月d日 HH:mm
+ * 2. 如果是今天     返回 今天 HH:mm
+ * 3. 如果是昨天     返回 昨天 HH:mm
+ * 4. 如果是前天     返回 前天 HH:mm
+ * 5. 如果是前天以前  返回 M月d日 HH:mm
+ **/
++ (NSString *)TimePassedByStartDate1:(NSDate *)startDate {
+    if ([startDate isThisYear]) {
+        if ([startDate isToday]) {
+            return [NSString stringWithFormat:@"今天 %@", [startDate stringWithFormat:DateFormat21]];
+        }
+        else if ([startDate isYesterday]) {
+            return [NSString stringWithFormat:@"昨天 %@", [startDate stringWithFormat:DateFormat21]];
+        }
+        else if ([startDate isBeforeYesterday]) {
+            return [NSString stringWithFormat:@"前天 %@", [startDate stringWithFormat:DateFormat21]];
+        }
+        else {
+            return [startDate stringWithFormat:DateFormat23];
+        }
+    }
+    else {
+        return [startDate stringWithFormat:DateFormat7];
+    }
+}
+/**
+ * 返回 xx天 xx:xx:xx 计时器
+ **/
++ (NSString *)TimePassedByStartDate2:(NSDate *)startDate {
+    NSDateComponents *dateComponents = [NSDate ComponentsBetweenStartDate:startDate withEndDate:CURRENTDATE];
+    if (dateComponents.day > 0) {
+        return [NSString stringWithFormat:@"%ld天 %02ld:%02ld:%02ld", (long)dateComponents.day,
+                (long)dateComponents.hour, (long)dateComponents.minute, (long)dateComponents.second];
+    }
+    else if (dateComponents.hour > 0) {
+        return [NSString stringWithFormat:@"%02ld:%02ld:%02ld",
+                (long)dateComponents.hour, (long)dateComponents.minute, (long)dateComponents.second];
+    }
+    else {
+        return [NSString stringWithFormat:@"%02ld:%02ld", (long)dateComponents.minute, (long)dateComponents.second];
+    }
+}
+/**
+ * 返回 xx天xx小时xx分钟
+ **/
++ (NSString *)TimePassedByStartDate3:(NSDate *)startDate {
+    return [self TimePassedByStartDate3:startDate flag:NO];
+}
++ (NSString *)TimePassedByStartDate3:(NSDate *)startDate flag:(BOOL)flag {
+    NSDate *endDate = CURRENTDATE;
+    //异常时间处理
+    if ([startDate isLaterThanDate:endDate]) {
+        return @"开始时间有误";
+    }
+    
+    NSDateComponents *dateComponents = [NSDate ComponentsBetweenStartDate1:startDate withEndDate:endDate];
+    //如果>=365d
+    if (dateComponents.day >= 365) {
+        return @"超过1年";
+    }
+    else {
+        NSMutableString *timePassed = [NSMutableString string];
+        if (dateComponents.day > 0) {
+            [timePassed appendFormat:@"%ld天", dateComponents.day];
+            if (flag && dateComponents.hour > 0) {
+                [timePassed appendFormat:@"%ld小时", dateComponents.hour];
+            }
+            return timePassed;
+        }
+        if (dateComponents.hour > 0) {
+            [timePassed appendFormat:@"%ld小时", dateComponents.hour];
+            if (flag && dateComponents.minute > 0) {
+                [timePassed appendFormat:@"%ld分钟", dateComponents.minute];
+            }
+            return timePassed;
+        }
+        if (dateComponents.minute > 0) {
+            [timePassed appendFormat:@"%ld分钟", dateComponents.minute];
+            return timePassed;
+        }
+        return @"少于1分钟";
+    }
 }
 
 #pragma mark - 还剩多长时间
