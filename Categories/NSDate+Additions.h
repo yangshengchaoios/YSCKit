@@ -20,6 +20,8 @@
 #define DateFormat7     @"yyyy年M月d日 HH:mm"
 #define DateFormat8     @"M月d日"
 #define DateFormat9     @"yyyy年M月"
+#define DateFormat10    @"yyyy-MM-dd ccc HH:mm"//2015-12-24 周四 11:32
+#define DateFormat11    @"yyyy-MM-dd cccc HH:mm"//2015-12-24 星期四 11:32
 #define DateFormat20    @"yyyy年M月d日 HH:mm:ss"
 #define DateFormat21    @"HH:mm"
 #define DateFormat22    @"MM月dd日 HH:mm"
