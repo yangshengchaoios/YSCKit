@@ -28,6 +28,7 @@ typedef NS_ENUM(NSInteger, YSCPickerType) {
 
 @property (assign, nonatomic) YSCPickerType pickerType;
 @property (copy, nonatomic) YSCIdResultBlock selectingBlock;
+@property (copy, nonatomic) YSCIdResultBlock selectedBlock;
 @property (copy, nonatomic) YSCBlock completionShowBlock;
 @property (copy, nonatomic) YSCBlock completionHideBlock;
 

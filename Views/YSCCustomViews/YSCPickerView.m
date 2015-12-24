@@ -23,6 +23,9 @@
 
 @implementation YSCPickerView
 
+- (void)dealloc {
+    NSLog(@"YSCPickerView deallocing...");
+}
 - (void)awakeFromNib {
     [super awakeFromNib];
     WeakSelfType blockSelf = self;
@@ -66,12 +69,12 @@
     [UIView makeBorderForView:self.doneButton withColor:[UIColor blackColor] borderWidth:1];
     [self.doneButton bk_addEventHandler:^(id sender) {
         [blockSelf hidePickerView];
-        if (blockSelf.selectingBlock) {
+        if (blockSelf.selectedBlock) {
             if (YSCPickerTypeCustom == blockSelf.pickerType) {
-                blockSelf.selectingBlock(blockSelf.selectedIndexArray, nil);
+                blockSelf.selectedBlock(blockSelf.selectedIndexArray, nil);
             }
             else if (blockSelf.pickerType <= YSCPickerTypeDateTime) {
-                blockSelf.selectingBlock([blockSelf.datePicker date], nil);
+                blockSelf.selectedBlock([blockSelf.datePicker date], nil);
             }
         }
     } forControlEvents:UIControlEventTouchUpInside];
