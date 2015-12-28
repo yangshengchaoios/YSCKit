@@ -26,17 +26,26 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-
-    NSString *url = Trim(self.params[kParamUrl]);
-    NSString *content = Trim(self.params[kParamContent]);
-    NSString *method = Trim(self.params[kParamMethod]);
-    if ([NSString isUrl:url]) {
-        [self.webView loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:url]]];
+    self.tipsView = [YSCKTipsView CreateYSCTipsViewOnView:self.webView edgeInsets:UIEdgeInsetsZero withMessage:@"" iconImage:[UIImage imageNamed:kDefaultTipsEmptyIcon] buttonTitle:nil buttonAction:nil];
+    self.tipsView.actionButton.hidden = YES;
+    self.tipsView.hidden = YES;
+    
+    if (self.params[kParamUrl]) {
+        NSString *url = Trim(self.params[kParamUrl]);
+        if ([url isUrl]) {
+            [self.webView loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:url]]];
+        }
+        else {
+            self.tipsView.hidden = NO;
+            self.tipsView.messageLabel.text = @"传入的URL为空";
+        }
     }
-    else if ([NSString isNotEmpty:content]) {
+    else if (self.params[kParamContent]) {
+        NSString *content = Trim(self.params[kParamContent]);
         [self.webView loadHTMLString:content baseURL:nil];
     }
-    else if ([NSString isNotEmpty:method]) {
+    else if (self.params[kParamMethod]) {
+        NSString *method = Trim(self.params[kParamMethod]);
         NSDictionary *params = self.params[kParamParams];
         self.type = params[kParamType];
         if ([NSString isEmpty:self.type] || [NSString isEmpty:method]) {
@@ -102,6 +111,7 @@
 }
 - (void)webViewDidFinishLoad:(UIWebView *)webView {
     [self resizeWebviewHeight];
+    self.tipsView.hidden = YES;
     NSString *title = [webView stringByEvaluatingJavaScriptFromString:@"document.title"];
     if (isEmpty(self.navigationItem.title) && isNotEmpty(title)) {
         self.navigationItem.title = title;
@@ -109,6 +119,8 @@
 }
 - (void)webView:(UIWebView *)webView didFailLoadWithError:(NSError *)error {
     [self resizeWebviewHeight];
+    self.tipsView.hidden = NO;
+    self.tipsView.messageLabel.text = GetNSErrorMsg(error);
 }
 
 #pragma mark - NURLConnection delegate
