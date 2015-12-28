@@ -44,10 +44,10 @@
 
 - (void)dealloc {
     if (self.mapView) {
-        self.mapView = nil;
+        self.mapView.delegate = nil;
     }
     if (self.poiSearch) {
-        self.poiSearch = nil;
+        self.poiSearch.delegate = nil;
     }
     if (self.locationChangedIdentifier) {
         [APPDATA bk_removeObserversWithIdentifier:self.locationChangedIdentifier];
@@ -56,6 +56,8 @@
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     [self.mapView viewWillAppear];
+    self.mapView.delegate = self;
+    self.poiSearch.delegate = self;
 }
 - (void)viewWillDisappear:(BOOL)animated {
     [self.mapView viewWillDisappear];

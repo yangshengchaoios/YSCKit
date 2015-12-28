@@ -40,7 +40,10 @@
             self.imageDescLabel.hidden = YES;
             self.tipImageView.hidden = YES;
             self.tipLabel.hidden = YES;
-            [self.sceneImageView setImageWithURLString:dataModel.imageUrl];
+            [self.sceneImageView setImageWithURLString:dataModel.imageUrl completed:^(UIImage *image, NSError *error) {
+                self.sceneImageView.contentMode = UIViewContentModeScaleToFill;
+                self.sceneImageView.clipsToBounds = YES;
+            }];
         }
         else {//显示提示图片
             self.sceneImageView.hidden = YES;
