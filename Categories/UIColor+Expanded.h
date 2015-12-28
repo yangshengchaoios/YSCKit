@@ -64,6 +64,7 @@
 // String representations of the color
 - (NSString *)stringFromColor;
 - (NSString *)hexStringFromColor;
+- (NSString *)rgbStringFromColor;
 
 // The named color that matches this one most closely
 - (NSString *)closestColorName;

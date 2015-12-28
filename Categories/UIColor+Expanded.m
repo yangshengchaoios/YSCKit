@@ -450,6 +450,12 @@ static NSLock *crayolaNameCacheLock;
 - (NSString *)hexStringFromColor {
 	return [NSString stringWithFormat:@"%0.6X", self.rgbHex];
 }
+- (NSString *)rgbStringFromColor {
+    return [NSString stringWithFormat:@"{%.0f, %.0f, %0.0f}",
+            self.red * 255,
+            self.green * 255,
+            self.blue * 255];
+}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 - (NSString *)closestColorNameFor: (const char *) aColorDatabase {
