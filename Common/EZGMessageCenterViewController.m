@@ -14,9 +14,6 @@
 
 @implementation EZGMessageCenterViewController
 
-- (void)dealloc {
-    NSLog(@"%@ deallocing...", NSStringFromClass(self.class));
-}
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.title = @"消息中心";
