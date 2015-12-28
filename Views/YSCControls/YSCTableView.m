@@ -359,7 +359,7 @@
                 SaveCacheObjectByFile(weakSelf.footerDataArray, KeyOfFooterData, weakSelf.cacheFileName);
             }
         }
-        weakSelf.tipsView.hidden = [NSArray isNotEmpty:weakSelf.cellDataArray];
+        weakSelf.tipsView.hidden = (! [weakSelf isCellDataEmpty]);
 
         //最后回调(可能会处理tipsView的显示与否的问题)
         YSCBaseViewController *currentVC = (YSCBaseViewController *)[AppConfigManager sharedInstance].currentViewController;
