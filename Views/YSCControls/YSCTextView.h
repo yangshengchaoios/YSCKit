@@ -21,6 +21,7 @@
 @property (nonatomic, assign) IBInspectable BOOL allowsKeyboardDone;    //default YES 是否响应键盘的done按钮
 @property (nonatomic, assign) IBInspectable BOOL allowsLetter;          //default YES
 @property (nonatomic, assign) IBInspectable BOOL allowsNumber;          //default YES
+@property (nonatomic, assign) IBInspectable BOOL stringLengthType;      //YES-string.length NO-char length default YES
 
 //控制UI样式
 @property (nonatomic, assign) IBInspectable CGFloat cornerRadius;       //圆角弧度

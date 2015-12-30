@@ -47,6 +47,7 @@
     self.allowsKeyboardDone = YES;
     self.allowsLetter = YES;
     self.allowsNumber = YES;
+    self.stringLengthType = YES;
     self.cornerRadius = 8;
     self.borderColor = kDefaultBorderColor;
     
@@ -132,12 +133,12 @@
                 textView.text = self.oldString;
             }
         }
-        self.remainingCount = self.maxLength - [self.text StringLength];
+        self.remainingCount = self.maxLength - [self textLength];
     }
 }
 //只检测配置属性 ok -> err
 - (BOOL)isValidByProperty {
-    if (self.maxLength > 0 && [self.text StringLength] > self.maxLength) {
+    if (self.maxLength > 0 && [self textLength] > self.maxLength) {
         return NO;
     }
     if (isEmpty(self.text)) {
@@ -269,7 +270,12 @@
 }
 //返回去掉首位空格后的字符串的长度
 - (NSInteger)textLength {
-    return [[self textString] StringLength];
+    if (self.stringLengthType) {
+        return [self textString].length;
+    }
+    else {
+        return [[self textString] StringLength];
+    }
 }
 //输入text的时候过滤非法内容
 - (void)filterText:(NSString *)text {
