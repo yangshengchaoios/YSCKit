@@ -210,13 +210,14 @@
 #pragma mark - connect status view
 - (LZStatusView *)clientStatusView {
     if (_clientStatusView == nil) {
-        _clientStatusView = [[LZStatusView alloc] initWithFrame:CGRectMake(0, 64, self.messageTableView.frame.size.width, kLZStatusViewHight)];
+        _clientStatusView = [[LZStatusView alloc] initWithFrame:CGRectMake(0, 64, SCREEN_WIDTH, kLZStatusViewHight)];
         _clientStatusView.hidden = YES;
     }
     return _clientStatusView;
 }
 - (void)updateStatusView {
-    self.clientStatusView.hidden = ([AVIMClient defaultClient].status != AVIMClientStatusClosed);
+    NSLog(@"status=%d", [AVIMClient defaultClient].status);
+    self.clientStatusView.hidden = ([AVIMClient defaultClient].status == AVIMClientStatusOpened);
 }
 
 #pragma mark -  ui config

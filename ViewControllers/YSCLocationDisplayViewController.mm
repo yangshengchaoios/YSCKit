@@ -20,6 +20,7 @@
 @property (nonatomic, assign) double latitude;
 @property (nonatomic, weak) IBOutlet UIButton *startNavigateButton;//开始导航按钮
 @property (nonatomic, strong) NSString *locationChangedIdentifier;
+@property (nonatomic, assign) BOOL isSearchSuccessed;//路径规划是否成功
 @end
 
 @implementation YSCLocationDisplayViewController
@@ -154,14 +155,8 @@
     BMKDrivingRoutePlanOption *drivingRouteSearchOption = [[BMKDrivingRoutePlanOption alloc]init];
     drivingRouteSearchOption.from = start;
     drivingRouteSearchOption.to = end;
-    BOOL flag = [self.routesearch drivingSearch:drivingRouteSearchOption];
-    if(flag) {
-        NSLog(@"路径规划成功");
-        [self findRoutePlan];//计算导航路径
-    }
-    else {
-        NSLog(@"路径规划失败");
-    }
+    self.isSearchSuccessed = [self.routesearch drivingSearch:drivingRouteSearchOption];
+    self.startNavigateButton.hidden = ! self.isSearchSuccessed;
 }
 - (void)findRoutePlan {
     NSMutableArray *nodesArray = [[NSMutableArray alloc]initWithCapacity:2];
@@ -172,8 +167,6 @@
     startNode.pos.y = EZGDATA.currentLatitude;
     startNode.pos.eType = BNCoordinate_BaiduMapSDK;
     [nodesArray addObject:startNode];
-    
-    //NOTE:也可以在此加入1到3个的途经点
     
     //终点
     BNRoutePlanNode *endNode = [[BNRoutePlanNode alloc] init];
@@ -222,7 +215,7 @@
         [alertView show];
     }
     else {//路径规划成功，开始导航
-        [BNCoreServices_UI showNaviUI:BN_NaviTypeReal delegete:self isNeedLandscape:NO];
+        [self findRoutePlan];//计算导航路径
     }
 }
 
@@ -230,7 +223,7 @@
 //算路成功回调
 - (void)routePlanDidFinished:(NSDictionary *)userInfo {
     NSLog(@"算路成功,userinfo=%@", userInfo);
-    self.startNavigateButton.hidden = NO;
+    [BNCoreServices_UI showNaviUI:BN_NaviTypeReal delegete:self isNeedLandscape:NO];
 }
 //算路失败回调
 - (void)routePlanDidFailedWithError:(NSError *)error andUserInfo:(NSDictionary *)userInfo {

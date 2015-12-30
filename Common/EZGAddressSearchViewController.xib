@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="9059" systemVersion="15A2301" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="9531" systemVersion="15C50" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="9049"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="9529"/>
     </dependencies>
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="EZGAddressSearchViewController">
@@ -29,14 +29,12 @@
                     <subviews>
                         <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="eij-1H-J1F" customClass="BMKMapView">
                             <rect key="frame" x="0.0" y="0.0" width="640" height="500"/>
-                            <animations/>
                             <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                             <constraints>
                                 <constraint firstAttribute="height" constant="500" id="BvN-nt-Qvb"/>
                             </constraints>
                         </view>
                     </subviews>
-                    <animations/>
                     <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                     <constraints>
                         <constraint firstItem="eij-1H-J1F" firstAttribute="top" secondItem="pPQ-jo-thG" secondAttribute="top" id="7nq-dr-JDe"/>
@@ -47,7 +45,6 @@
                 </view>
                 <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="icon_location_my.png" translatesAutoresizingMaskIntoConstraints="NO" id="iFK-vJ-LJJ">
                     <rect key="frame" x="300" y="234" width="40" height="60"/>
-                    <animations/>
                     <constraints>
                         <constraint firstAttribute="width" constant="40" id="Qlu-mq-ukV"/>
                         <constraint firstAttribute="height" constant="60" id="XxU-NT-kh6"/>
@@ -55,7 +52,6 @@
                 </imageView>
                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="nnD-JM-Ncu">
                     <rect key="frame" x="510" y="414" width="100" height="100"/>
-                    <animations/>
                     <constraints>
                         <constraint firstAttribute="width" constant="100" id="L0p-WB-SWu"/>
                         <constraint firstAttribute="height" constant="100" id="rLA-1x-la7"/>
@@ -70,11 +66,9 @@
                     <subviews>
                         <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="HVg-Za-kw4" customClass="YSCTableView">
                             <rect key="frame" x="0.0" y="0.0" width="640" height="267"/>
-                            <animations/>
                             <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         </tableView>
                     </subviews>
-                    <animations/>
                     <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                     <constraints>
                         <constraint firstAttribute="trailing" secondItem="HVg-Za-kw4" secondAttribute="trailing" id="FBm-pj-KAZ"/>
@@ -84,7 +78,6 @@
                     </constraints>
                 </view>
             </subviews>
-            <animations/>
             <constraints>
                 <constraint firstItem="pPQ-jo-thG" firstAttribute="leading" secondItem="Ufd-Ex-O2X" secondAttribute="leading" id="1qz-MR-wbC"/>
                 <constraint firstItem="FaG-vL-fDx" firstAttribute="top" secondItem="nnD-JM-Ncu" secondAttribute="bottom" constant="30" id="D8h-Pl-Ir3"/>
