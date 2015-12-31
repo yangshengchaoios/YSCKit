@@ -392,7 +392,7 @@ static CDChatManager *instance;
     if (self.connect) {//如果是联网状态就从网络下载最新的会话列表
         NSMutableSet *convids = [NSMutableSet set];
         for (AVIMConversation *conversation in conversations) {
-            [convids addObject:conversation.conversationId];
+            [convids addObject:Trim(conversation.conversationId)];
         }
         //刷新会话列表
         [self fetchConvsWithConvids:convids callback:^(NSArray *objects, NSError *error) {
