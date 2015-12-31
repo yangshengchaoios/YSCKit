@@ -16,7 +16,6 @@
 #define RegexRealName       @"^[a-zA-Z0-9\u4E00-\u9FA5 ]{1,10}+$" //@"^[^\W]$"
 #define RegexNickName       @"^[\u4e00-\u9fa5]{4,8}$"
 #define RegexSimpleIdentityCard     @"^(\\d{14}|\\d{17})(\\d|[xX])$"//简单身份证合法性判断
-#define RegexComplexIdentityCard    @"^(\\d{14}|\\d{17})(\\d|[xX])$"//TODO:复杂身份证合法性判断
 #define RegexAllNumbers     @"^[0-9]\\d*$"
 #define RegexUrl            @"((http|ftp|https)://)(([a-zA-Z0-9\\._-]+\\.[a-zA-Z]{2,6})|([0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}))(:[0-9]{1,4})*(/[a-zA-Z0-9\\&%_\\./-~-]*)?"
 #define RegexSimpleChinese  @"^[\u4E00-\u9FA5]+"  //匹配汉字
