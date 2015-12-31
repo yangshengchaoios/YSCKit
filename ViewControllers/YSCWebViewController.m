@@ -32,6 +32,9 @@
     
     if (self.params[kParamUrl]) {
         NSString *url = Trim(self.params[kParamUrl]);
+        if (NO == [url isContains:@"http"]) {//兼容没有输入http://的情况
+            url = [NSString stringWithFormat:@"http://%@", url];
+        }
         if ([url isUrl]) {
             [self.webView loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:url]]];
         }
