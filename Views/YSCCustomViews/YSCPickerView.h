@@ -27,8 +27,8 @@ typedef NS_ENUM(NSInteger, YSCPickerType) {
 @property (strong, nonatomic) NSArray *customDataArray;
 
 @property (assign, nonatomic) YSCPickerType pickerType;
-@property (copy, nonatomic) YSCIdResultBlock selectingBlock;
-@property (copy, nonatomic) YSCIdResultBlock selectedBlock;
+@property (copy, nonatomic) YSCIdResultBlock selectingBlock;        //选中的value发生变化时回调(点击【确定】按钮不回调)
+@property (copy, nonatomic) YSCIdResultBlock selectedBlock;         //点击【确定】按钮回调
 @property (copy, nonatomic) YSCBlock completionShowBlock;
 @property (copy, nonatomic) YSCBlock completionHideBlock;
 
