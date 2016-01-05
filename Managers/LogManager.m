@@ -12,6 +12,19 @@
 
 @implementation LogManager
 
+//记录APP的crash日志
+void uncaughtExceptionHandler(NSException *exception) {
+    NSArray *stackArray = [exception callStackSymbols];// 异常的堆栈信息
+    NSString *reason = [exception reason];// 出现异常的原因
+    NSString *name = [exception name];// 异常名称
+    NSString *exceptionInfo = [NSString stringWithFormat:@"Exception reason：%@\rException name：%@\rException stack：%@",name, reason, stackArray];
+    
+    NSMutableString *errMsg = [NSMutableString stringWithString:@"\r>>>>>>>>>>>>>>>>>>>>CrashLog>>>>>>>>>>>>>>>>>>>>\r"];//错误标记开始
+    [errMsg appendFormat:@"%@\r", exceptionInfo];
+    [errMsg appendString:@"<<<<<<<<<<<<<<<<<<<<CrashLog<<<<<<<<<<<<<<<<<<<<\r\n"];//错误标记结束
+    [LogManager saveLog:errMsg];
+}
+
 + (void)saveLogError:(NSError *)error {
     NSString *errMsg = [NSString stringWithFormat:@"%@", error];
     [self saveLog:errMsg];

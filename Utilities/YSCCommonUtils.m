@@ -476,7 +476,7 @@
 #pragma mark - 解析错误信息并格式化输出
 //解析错误信息
 + (NSString *)ResolveErrorType:(ErrorType)errorType andError:(NSError *)error {
-    NSMutableString *errMsg = [NSMutableString stringWithFormat:@">>>>>>>>>>>>>>>>>>>>ErrorType[%ld]>>>>>>>>>>>>>>>>>>>>", (long)errorType];//错误标记开始
+    NSMutableString *errMsg = [NSMutableString stringWithFormat:@"\r>>>>>>>>>>>>>>>>>>>>ErrorType[%ld]>>>>>>>>>>>>>>>>>>>>\r", (long)errorType];//错误标记开始
     NSString *messageTitle = @"提示";
     NSString *messageDetail = [self ResolveErrorType:errorType];
     if (isEmpty(messageDetail)) {
@@ -487,12 +487,12 @@
     }
     
     //继续组织错误日志
-    [errMsg appendFormat:@"\r  messageTitle:%@\r  messageDetail:%@", messageTitle, messageDetail];//显示解析后的错误提示
+    [errMsg appendFormat:@"  messageTitle:%@\r  messageDetail:%@\r", messageTitle, messageDetail];//显示解析后的错误提示
     if (error) {
-        [errMsg appendFormat:@"\r  errorCode(%ld)\r  errorMessage:%@", (long)error.code, error];//显示error的错误内容
+        [errMsg appendFormat:@"  errorCode(%ld)\r  errorMessage:%@\r", (long)error.code, error];//显示error的错误内容
     }
-    [errMsg appendFormat:@"\r<<<<<<<<<<<<<<<<<<<<ErrorType[%ld]<<<<<<<<<<<<<<<<<<<<\r\n", (long)errorType];//错误标记结束
-    NSLog(@"errMsg=\r%@", errMsg);
+    [errMsg appendFormat:@"<<<<<<<<<<<<<<<<<<<<ErrorType[%ld]<<<<<<<<<<<<<<<<<<<<\r\n", (long)errorType];//错误标记结束
+    NSLog(@"errMsg=%@", errMsg);
     [LogManager saveLog:errMsg];
     return messageDetail;
 }
@@ -530,8 +530,10 @@
 }
 //单独保存error
 + (void)SaveNSError:(NSError *)error {
-    NSMutableString *errMsg = [NSMutableString stringWithFormat:@">>>>>>>>>>>>>>>>>>>>errorCode(%ld)>>>>>>>>>>>>>>>>>>>>\r  errorMessage:%@\r<<<<<<<<<<<<<<<<<<<<errorCode(%ld)<<<<<<<<<<<<<<<<<<<<\r\n", (long)error.code, error, (long)error.code];
-    NSLog(@"error=\r%@", errMsg);
+    NSMutableString *errMsg = [NSMutableString stringWithFormat:@"\r>>>>>>>>>>>>>>>>>>>>errorCode(%ld)>>>>>>>>>>>>>>>>>>>>\r", (long)error.code];
+    [errMsg appendFormat:@"errorMessage:%@\r", error];
+    [errMsg appendFormat:@"<<<<<<<<<<<<<<<<<<<<errorCode(%ld)<<<<<<<<<<<<<<<<<<<<\r\n", (long)error.code];
+    NSLog(@"error=%@", errMsg);
     [LogManager saveLog:errMsg];
 }
 
