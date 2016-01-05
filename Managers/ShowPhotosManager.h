@@ -10,7 +10,7 @@
 
 @interface ShowPhotosManager : NSObject
 
-#pragma mark - TODO:showPhotoViewController
+#pragma mark - showPhotoViewController
 
 + (void)showPhotosWithImageUrls:(NSArray *)imageUrls atIndex:(NSInteger)index fromImageView:(UIImageView *)imageView;
 + (void)showPhotosWithImages:(NSArray *)images atIndex:(NSInteger)index fromImageView:(UIImageView *)imageView;

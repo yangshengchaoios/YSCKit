@@ -269,8 +269,6 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
         self.toolbar.clampButtonGlowing = NO;
         return;
     }
-    
-    //TODO: Completely overhaul this once iOS 7 support is dropped
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
     BOOL verticalCropBox = self.cropView.cropBoxAspectRatioIsPortrait;
