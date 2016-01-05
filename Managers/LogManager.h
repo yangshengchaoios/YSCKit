@@ -11,9 +11,7 @@
 
 @interface LogManager : NSObject
 
-//记录APP的crash日志
-void uncaughtExceptionHandler(NSException *exception);
-
++ (void)SetUncaughtExceptionHandler;
 + (void)saveLogError:(NSError *)error;
 + (void)saveLog:(NSString *)logString;
 + (void)saveTempLog:(NSString *)logString;

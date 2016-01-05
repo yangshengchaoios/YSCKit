@@ -10,8 +10,6 @@
 #import "StorageManager.h"
 #import "NSDate+Additions.h"
 
-@implementation LogManager
-
 //记录APP的crash日志
 void uncaughtExceptionHandler(NSException *exception) {
     NSArray *stackArray = [exception callStackSymbols];// 异常的堆栈信息
@@ -25,6 +23,11 @@ void uncaughtExceptionHandler(NSException *exception) {
     [LogManager saveLog:errMsg];
 }
 
+@implementation LogManager
+
++ (void)SetUncaughtExceptionHandler {
+    NSSetUncaughtExceptionHandler(&uncaughtExceptionHandler);
+}
 + (void)saveLogError:(NSError *)error {
     NSString *errMsg = [NSString stringWithFormat:@"%@", error];
     [self saveLog:errMsg];
