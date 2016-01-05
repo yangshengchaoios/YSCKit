@@ -28,13 +28,11 @@
  */
 @interface YSCCommonUtils : NSObject
 
+#pragma mark - 检测新版本
 + (void)checkNewVersionShowMessage:(BOOL)showMessage;
 + (void)checkNewVersionShowMessage:(BOOL)showMessage withParams:(NSDictionary *)params andType:(NSInteger)type;
 + (void)checkNewVersion:(NewVersionModel *)versionModel showMessage:(BOOL)showMessage;
 + (void)checkNewVersionByAppleId:(NSString *)appleId;
-
-+ (void)configNavigationBar;
-+ (void)registerForRemoteNotification;
 
 #pragma mark - 格式化
 //常用的价格字符串格式化方法（默认：显示￥、显示小数点）
@@ -103,5 +101,11 @@
 #pragma mark - 获取当前(服务器端)时间
 + (NSDate *)currentDate;
 + (NSTimeInterval)currentTimeInterval;
+
+
+#pragma mark - Global Configuration
++ (void)ConfigNavigationBar;
++ (void)ConfigPullToBack;
++ (void)RegisterForRemoteNotification;
 
 @end

@@ -9,9 +9,11 @@
 #import "YSCCommonUtils.h"
 #import <SystemConfiguration/CaptiveNetwork.h>
 #import "ServerTimeSynchronizer.h"
+#import "MLBlackTransition.h"
 
 @implementation YSCCommonUtils
 
+#pragma mark - 检测新版本
 + (void)checkNewVersionShowMessage:(BOOL)showMessage {
     [self checkNewVersionShowMessage:showMessage withParams:nil andType:[kCheckNewVersionType integerValue]];
 }
@@ -42,7 +44,6 @@
         [YSCCommonUtils checkNewVersionByAppleId:kAppStoreId];
     }
 }
-
 //具体检测新版本的业务逻辑
 + (void)checkNewVersion:(NewVersionModel *)versionModel showMessage:(BOOL)showMessage {
     if ([versionModel isKindOfClass:[NewVersionModel class]]) {
@@ -112,29 +113,6 @@
             [alertView bk_setCancelButtonWithTitle:@"关闭" handler:nil];
             [alertView show];
         }
-    }
-}
-+ (void)configNavigationBar {
-    //设置BarButtonItem字体大小和颜色(如果不设置将按默认的tintColor显示)
-    [[UIBarButtonItem appearance] setTitleTextAttributes:@{NSForegroundColorAttributeName : kDefaultNaviBarItemColor,
-                                                           NSFontAttributeName : kDefaultNaviBarItemFont}
-                                                forState:UIControlStateNormal];
-    //其它大部分的设置都放在创建navigationController([UIResponder createNavi])中了
-}
-+ (void)registerForRemoteNotification {
-    UIApplication *application = [UIApplication sharedApplication];
-    if ([application respondsToSelector:@selector(registerForRemoteNotifications)]) {
-        UIUserNotificationSettings *settings = [UIUserNotificationSettings settingsForTypes:UIUserNotificationTypeAlert |
-                                                UIUserNotificationTypeBadge |
-                                                UIUserNotificationTypeSound
-                                                                                 categories:nil];
-        [application registerUserNotificationSettings:settings];
-        [application registerForRemoteNotifications];
-    } else {
-        [application registerForRemoteNotificationTypes:
-         UIRemoteNotificationTypeBadge |
-         UIRemoteNotificationTypeAlert |
-         UIRemoteNotificationTypeSound];
     }
 }
 
@@ -608,9 +586,37 @@
 + (NSDate *)currentDate {
     return [NSDate dateFromTimeStamp:[ServerTimeSynchronizer sharedInstance].currentTimeInterval];
 }
-
 + (NSTimeInterval)currentTimeInterval {
     return [[ServerTimeSynchronizer sharedInstance].currentTimeInterval doubleValue];
+}
+
+
+#pragma mark - Global Configuration
++ (void)ConfigNavigationBar {
+    //设置BarButtonItem字体大小和颜色(如果不设置将按默认的tintColor显示)
+    [[UIBarButtonItem appearance] setTitleTextAttributes:@{NSForegroundColorAttributeName : kDefaultNaviBarItemColor,
+                                                           NSFontAttributeName : kDefaultNaviBarItemFont}
+                                                forState:UIControlStateNormal];
+    //其它大部分的设置都放在创建navigationController([UIResponder createNavi])中了
+}
++ (void)ConfigPullToBack {
+    [MLBlackTransition validatePanPackWithMLBlackTransitionGestureRecognizerType:MLBlackTransitionGestureRecognizerTypeScreenEdgePan];
+}
++ (void)RegisterForRemoteNotification {
+    UIApplication *application = [UIApplication sharedApplication];
+    if ([application respondsToSelector:@selector(registerForRemoteNotifications)]) {
+        UIUserNotificationSettings *settings = [UIUserNotificationSettings settingsForTypes:UIUserNotificationTypeAlert |
+                                                UIUserNotificationTypeBadge |
+                                                UIUserNotificationTypeSound
+                                                                                 categories:nil];
+        [application registerUserNotificationSettings:settings];
+        [application registerForRemoteNotifications];
+    } else {
+        [application registerForRemoteNotificationTypes:
+         UIRemoteNotificationTypeBadge |
+         UIRemoteNotificationTypeAlert |
+         UIRemoteNotificationTypeSound];
+    }
 }
 
 @end
