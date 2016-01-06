@@ -74,7 +74,7 @@
         if (self.image.size.width < self.width && self.image.size.height < self.height) {
             self.contentMode = UIViewContentModeCenter;
         }
-        else {//否则就将默认图片等比例缩小到尽可能填充imageView
+        else {//等比例缩放，且全部显示出来
             self.contentMode = UIViewContentModeScaleAspectFit;
         }
     }
@@ -118,13 +118,13 @@
 
     //采用SDWebImage的缓存方案
     if ([[ReachabilityManager sharedInstance].reachability isReachableViaWiFi] ||
-        [GetObject(kParamEnableDownloadImage) boolValue]) {//wifi环境下一定会显示图片
+        [GetObject(kParamEnableDownloadImage) boolValue]) {//wifi环境下一定会从网络下载图片
         [self sd_setImageWithURL:[NSURL URLWithString:newUrlString]
                 placeholderImage:placeholderImage
                        completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL)  {
                            if ( ! error) {
                                blockSelf.backgroundColor = [UIColor clearColor];
-                               blockSelf.contentMode = UIViewContentModeScaleAspectFill;
+                               blockSelf.contentMode = UIViewContentModeScaleAspectFill;//等比例缩放，且全部填充(会切掉部分图片)
                                
                                if (withAnimate) {
                                    blockSelf.alpha = 0;
@@ -155,7 +155,7 @@
     ReturnWhenObjectIsEmpty(image);
     self.image = image;
     self.backgroundColor = [UIColor clearColor];
-    self.contentMode = UIViewContentModeScaleAspectFill;
+    self.contentMode = UIViewContentModeScaleAspectFill;//等比例缩放，且全部显示出来
 }
 
 @end
