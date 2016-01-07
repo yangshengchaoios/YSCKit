@@ -15,19 +15,19 @@
 @implementation YSCPhotoBrowseViewCell
 - (void)awakeFromNib {
     [super awakeFromNib];
+    self.photoImageView = [[UIImageView alloc] initWithFrame:CGRectZero];
+    self.photoImageView.backgroundColor = [UIColor clearColor];
+    self.photoImageView.contentMode = UIViewContentModeScaleAspectFit;
+    [self.zoomScrollView addSubview:self.photoImageView];
+    
     self.zoomScrollView.backgroundColor = [UIColor clearColor];
     self.zoomScrollView.minimumZoomScale = 1.0;
     self.zoomScrollView.maximumZoomScale = 3.0;
     self.zoomScrollView.showsHorizontalScrollIndicator = NO;
     self.zoomScrollView.showsVerticalScrollIndicator = NO;
     self.zoomScrollView.delegate = self;
-    
-    self.photoImageView = [[UIImageView alloc] initWithFrame:CGRectZero];
-    self.photoImageView.backgroundColor = [UIColor clearColor];
-    self.photoImageView.contentMode = UIViewContentModeScaleAspectFit;
-    self.photoImageView.userInteractionEnabled = YES;
-    [self.zoomScrollView addSubview:self.photoImageView];
-    [self.photoImageView bk_whenTapped:^{
+    self.zoomScrollView.userInteractionEnabled = YES;
+    [self.zoomScrollView bk_whenTapped:^{
         UIViewController *controller = [AppConfigManager sharedInstance].currentViewController;
         [controller.navigationController popViewControllerAnimated:NO];
     }];
@@ -71,9 +71,16 @@
     self.indicatorLabel.hidden = self.indicatorView.hidden = YES;
     self.zoomScrollView.hidden = NO;
     self.savedImage = image;
+    
     self.photoImageView.image = image;
-    self.photoImageView.size = CGSizeMake(SCREEN_WIDTH, image.size.height * SCREEN_WIDTH / image.size.width);
-    self.photoImageView.center = CGPointMake(SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT / 2.0f);
+    CGFloat imageWidth = MIN(SCREEN_WIDTH, image.size.width);
+    CGFloat imageHeight = image.size.height * imageWidth / image.size.width;
+    if (imageHeight > SCREEN_HEIGHT) {
+        imageHeight = SCREEN_HEIGHT;
+        imageWidth = image.size.width * imageHeight / image.size.height;
+    }
+    self.photoImageView.size = CGSizeMake(imageWidth, imageHeight);
+    self.photoImageView.center = CGPointMake(SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT / 2.0f);//center的设置必须在size设置之后！
 }
 //图片加载失败
 - (void)loadImageFailed {
