@@ -58,6 +58,9 @@
 
 @interface TOCropViewController : UIViewController
 
+//FIXME:TEST
+@property (nonatomic, assign) BOOL flagOfSetting;
+
 /**
  The original, uncropped image that was passed to this controller.
  */

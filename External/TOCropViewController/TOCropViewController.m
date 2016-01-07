@@ -117,6 +117,31 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
     self.transitioningDelegate = self;
     
     self.view.backgroundColor = self.cropView.backgroundColor;
+    
+    if (YES == self.flagOfSetting) {
+        [self layoutSetting];
+    }
+}
+- (void)layoutSetting {
+    //FIXME:TEST
+    //根据初始化的时候传入的ratioArray数组来初始化
+    if (isNotEmpty(self.ratioArray)) {
+        return;
+    }
+    NSString *sizeString = self.ratioArray[0];
+    if ([sizeString isEqualToString:@"Square"]) {
+        [self doCropImageWithSize:CGSizeMake(1.0f, 1.0f)];
+    }
+    else if ([sizeString isEqualToString:@"Original"]) {
+        //TODO:兼容不同尺寸
+        [self doCropImageWithSize:CGSizeZero];
+    }
+    else {
+        NSArray *tempArray = [sizeString splitByRegex:@":" options:0];
+        CGFloat width = [tempArray[0] floatValue];
+        CGFloat height = [tempArray[1] intValue];
+        [self doCropImageWithSize:CGSizeMake(width, height)];
+    }
 }
 
 - (void)viewWillAppear:(BOOL)animated
