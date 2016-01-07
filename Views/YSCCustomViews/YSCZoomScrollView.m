@@ -18,14 +18,15 @@
     self.photoImageView.backgroundColor = [UIColor clearColor];
     self.photoImageView.contentMode = UIViewContentModeScaleAspectFit;
     [self addSubview:self.photoImageView];
+    
+    self.backgroundColor = [UIColor clearColor];
     self.minimumZoomScale = 1.0;
     self.maximumZoomScale = 3.0;
     self.showsHorizontalScrollIndicator = NO;
     self.showsVerticalScrollIndicator = NO;
     self.delegate = self;
-    
-    self.photoImageView.userInteractionEnabled = YES;
-    [self.photoImageView bk_whenTapped:^{
+    self.userInteractionEnabled = YES;
+    [self bk_whenTapped:^{
         UIViewController *controller = [AppConfigManager sharedInstance].currentViewController;
         [controller.navigationController popViewControllerAnimated:NO];
     }];
@@ -33,8 +34,14 @@
 //这里需要根据image的大小动态计算imageView的大小
 - (void)setImage:(UIImage *)image {
     self.photoImageView.image = image;
-    self.photoImageView.size = CGSizeMake(SCREEN_WIDTH, image.size.height * SCREEN_WIDTH / image.size.width);
-    self.photoImageView.center = CGPointMake(SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT / 2.0f);
+    CGFloat imageWidth = MIN(SCREEN_WIDTH, image.size.width);
+    CGFloat imageHeight = image.size.height * imageWidth / image.size.width;
+    if (imageHeight > SCREEN_HEIGHT) {
+        imageHeight = SCREEN_HEIGHT;
+        imageWidth = image.size.width * imageHeight / image.size.height;
+    }
+    self.photoImageView.size = CGSizeMake(imageWidth, imageHeight);
+    self.photoImageView.center = CGPointMake(SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT / 2.0f);//center的设置必须在size设置之后！
 }
 
 #pragma mark - UIScrollViewDelegate
