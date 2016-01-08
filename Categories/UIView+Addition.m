@@ -7,6 +7,8 @@
 //
 
 #import "UIView+Addition.h"
+#import "YSCImagePickerViewController.h"
+
 
 @implementation UIView (Addition)
 
@@ -194,8 +196,6 @@
     else {
         if (numberOfSelection > 1) {//多张图片
             ZYQAssetPickerController *picker = [[ZYQAssetPickerController alloc] init];
-//           [picker.navigationBar setTintColor:[UIColor blueColor]];//影响范围：icon颜色、left、right文字颜色
-//           [picker.navigationBar setTitleTextAttributes:@{NSForegroundColorAttributeName : [UIColor blackColor]}];
             picker.delegate = (id)viewController;
             picker.maximumNumberOfSelection = numberOfSelection;
             picker.assetsFilter = [ALAssetsFilter allPhotos];
@@ -208,6 +208,7 @@
                     return YES;
                 }
             }];
+            [UIResponder ConfigNavigationBar:picker.navigationBar];
             [viewController presentViewController:picker animated:YES completion:NULL];
         }
         else {//选择相册里单张图片
@@ -225,8 +226,7 @@
     imagePickerController.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
     imagePickerController.allowsEditing = allowsEditing;
     imagePickerController.sourceType = sourceType;
-//    [imagePickerController.navigationBar setTintColor:[UIColor blueColor]];//影响范围：icon颜色、left、right文字颜色
-//    [imagePickerController.navigationBar setTitleTextAttributes:@{NSForegroundColorAttributeName : [UIColor blackColor]}];
+    [UIResponder ConfigNavigationBar:imagePickerController.navigationBar];
     return imagePickerController;
 }
 

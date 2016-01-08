@@ -16,4 +16,7 @@
 + (UIViewController *)createBaseViewController:(NSString *)className;
 //统一创建UINavigationController
 + (UINavigationController *)createNavigationControllerWithRootViewController:(UIViewController *)viewController;
+//这里统一设置controller的各种属性
++ (void)ConfigNavigationBar:(UINavigationBar *)navigationBar;
+
 @end
