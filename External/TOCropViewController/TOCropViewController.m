@@ -124,7 +124,7 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
 }
 - (void)layoutSetting {
     //根据初始化的时候传入的ratioArray数组来初始化
-    if (isNotEmpty(self.ratioArray)) {
+    if (isEmpty(self.ratioArray)) {
         return;
     }
     NSString *sizeString = self.ratioArray[0];
