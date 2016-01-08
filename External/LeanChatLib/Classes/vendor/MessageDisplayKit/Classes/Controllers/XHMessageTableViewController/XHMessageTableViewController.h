@@ -11,30 +11,24 @@
 // Model
 #import "XHMessage.h"
 #import "XHStoreManager.h"
+#import "EMCDDeviceManager.h"
 
 // Views
 #import "XHMessageInputView.h"
 #import "XHShareMenuView.h"
 #import "XHEmotionManagerView.h"
-#import "XHVoiceRecordHUD.h"
 
 // Factory
 #import "XHMessageBubbleFactory.h"
 #import "XHMessageVideoConverPhotoFactory.h"
 
-// Helper
-#import "XHPhotographyHelper.h"
-#import "XHLocationHelper.h"
-#import "XHVoiceRecordHelper.h"
-
 // Categorys
 #import "UIScrollView+XHkeyboardControl.h"
 
 
-@interface XHMessageTableViewController : UIViewController <UITableViewDataSource, UITableViewDelegate,  XHMessageInputViewDelegate, XHShareMenuViewDelegate,
-XHEmotionManagerViewDelegate, XHEmotionManagerViewDataSource>
+@interface XHMessageTableViewController : UIViewController <UITableViewDataSource, UITableViewDelegate,
+XHMessageInputViewDelegate, XHShareMenuViewDelegate, XHEmotionManagerViewDelegate, XHEmotionManagerViewDataSource>
 
-@property (nonatomic, strong) XHLocationHelper *locationHelper;//管理地理位置的工具对象
 @property (nonatomic, strong) NSMutableArray *messages;//消息数组
 @property (nonatomic, strong) UITableView *messageTableView;//用于显示消息的TableView
 @property (nonatomic, weak, readonly) XHMessageInputView *messageInputView;//用于显示发送消息类型控制的工具条，在底部

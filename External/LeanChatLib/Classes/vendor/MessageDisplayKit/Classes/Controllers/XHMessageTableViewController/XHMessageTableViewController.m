@@ -8,6 +8,8 @@
 
 #import "XHMessageTableViewController.h"
 #import <MobileCoreServices/MobileCoreServices.h>
+#import "XHVoiceRecordHelper.h"
+#import "XHVoiceRecordHUD.h"
 
 @interface XHMessageTableViewController ()
 @property (nonatomic, assign) BOOL isUserScrolling;//判断是否用户手指滚动
@@ -20,7 +22,6 @@
 @property (nonatomic, weak, readwrite) XHEmotionManagerView *emotionManagerView;
 
 @property (nonatomic, strong, readwrite) XHVoiceRecordHUD *voiceRecordHUD;
-@property (nonatomic, strong) XHPhotographyHelper *photographyHelper;//管理本机的摄像和图片库的工具对象
 @property (nonatomic, strong) XHVoiceRecordHelper *voiceRecordHelper;//管理录音工具对象
 @end
 
@@ -110,18 +111,6 @@ static CGPoint  delayOffset = {0.0};
         _voiceRecordHUD = [[XHVoiceRecordHUD alloc] initWithFrame:CGRectMake(0, 0, 140, 140)];
     }
     return _voiceRecordHUD;
-}
-- (XHPhotographyHelper *)photographyHelper {
-    if (!_photographyHelper) {
-        _photographyHelper = [[XHPhotographyHelper alloc] init];
-    }
-    return _photographyHelper;
-}
-- (XHLocationHelper *)locationHelper {
-    if (!_locationHelper) {
-        _locationHelper = [[XHLocationHelper alloc] init];
-    }
-    return _locationHelper;
 }
 - (XHVoiceRecordHelper *)voiceRecordHelper {
     if (!_voiceRecordHelper) {
@@ -381,8 +370,6 @@ static CGPoint  delayOffset = {0.0};
     _messageTableView.dataSource = nil;
     _messageTableView = nil;
     _messageInputView = nil;
-    _photographyHelper = nil;
-    _locationHelper = nil;
 }
 
 #pragma mark - RecorderPath Helper Method
@@ -731,58 +718,6 @@ static CGPoint  delayOffset = {0.0};
 - (void)didDragInsideAction {
     DLog(@"didDragInsideAction");
     [self pauseRecord];
-}
-
-#pragma mark - XHShareMenuView Delegate
-- (void)didSelecteShareMenuItem:(XHShareMenuItem *)shareMenuItem atIndex:(NSInteger)index {
-    WEAKSELF
-    void (^PickerMediaBlock)(UIImage *image, NSDictionary *editingInfo) = ^(UIImage *image, NSDictionary *editingInfo) {
-        if (image) {
-            [weakSelf didSendMessageWithPhoto:image];
-        }
-        else {
-            if (!editingInfo)
-                return ;
-            NSString *mediaType = [editingInfo objectForKey: UIImagePickerControllerMediaType];
-            NSString *videoPath;
-            NSURL *videoUrl;
-            if (CFStringCompare ((__bridge CFStringRef) mediaType, kUTTypeMovie, 0) == kCFCompareEqualTo) {
-                videoUrl = (NSURL*)[editingInfo objectForKey:UIImagePickerControllerMediaURL];
-                videoPath = [videoUrl path];
-                UIImage *thumbnailImage = [XHMessageVideoConverPhotoFactory videoConverPhotoWithVideoPath:videoPath];
-                [weakSelf didSendMessageWithVideoConverPhoto:thumbnailImage videoPath:videoPath];
-            }
-            else {
-                [weakSelf didSendMessageWithPhoto:[editingInfo valueForKey:UIImagePickerControllerOriginalImage]];
-            }
-        }
-    };
-    switch (index) {
-        case 0: {
-            [self.photographyHelper showOnPickerViewControllerSourceType:UIImagePickerControllerSourceTypePhotoLibrary onViewController:self compled:PickerMediaBlock];
-            break;
-        }
-        case 1: {
-            [self.photographyHelper showOnPickerViewControllerSourceType:UIImagePickerControllerSourceTypeCamera onViewController:self compled:PickerMediaBlock];
-            break;
-        }
-        case 2: {
-            [self.locationHelper getCurrentGeolocationsCompled:^(NSArray *placemarks) {
-                CLPlacemark *placemark = [placemarks lastObject];
-                if (placemark) {
-                    NSDictionary *addressDictionary = placemark.addressDictionary;
-                    NSArray *formattedAddressLines = [addressDictionary valueForKey:@"FormattedAddressLines"];
-                    NSString *geoLocations = [formattedAddressLines lastObject];
-                    if (geoLocations) {
-                        [weakSelf didSendGeolocationsMessageWithGeolocaltions:geoLocations location:placemark.location];
-                    }
-                }
-            }];
-            break;
-        }
-        default:
-            break;
-    }
 }
 
 #pragma mark - XHEmotionManagerView Delegate

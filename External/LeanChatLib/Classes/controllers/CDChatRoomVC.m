@@ -9,7 +9,6 @@
 #import <CommonCrypto/CommonCrypto.h>
 #import "CDChatRoomVC.h"
 #import "XHDisplayTextViewController.h"
-#import "XHAudioPlayerHelper.h"
 
 #import "LZStatusView.h"
 #import "CDEmotionUtils.h"
@@ -20,7 +19,8 @@
 #import "AVIMEmotionMessage.h"
 #import "MJRefresh.h"
 
-@interface CDChatRoomVC () <UINavigationControllerDelegate, UIImagePickerControllerDelegate, ZYQAssetPickerControllerDelegate>
+@interface CDChatRoomVC () <UINavigationControllerDelegate, UIImagePickerControllerDelegate,
+ZYQAssetPickerControllerDelegate>
 @property (nonatomic, strong, readwrite) AVIMConversation *conv;
 @property (atomic, assign) NSInteger currentSelectedIndex;
 @property (nonatomic, strong) NSArray *emotionManagers;
@@ -60,7 +60,6 @@
     [self initEmotionView];
     [self.view addSubview:self.clientStatusView];
     [self updateStatusView];
-    [[XHAudioPlayerHelper shareInstance] setDelegate:self];
     
     //配置下拉刷新
     WEAKSELF
@@ -160,7 +159,7 @@
 - (void)viewDidDisappear:(BOOL)animated {
     self.isAppeared = NO;
     [CDChatManager manager].chattingConversationId = nil;
-    [[XHAudioPlayerHelper shareInstance] stopAudio];
+    [self stopPlayingAudio];
     //如果有未读消息，且通过推送栏进入本页面后，继续有新消息到达，退出的时候就需要清空conv的未读消息，
     //因为处于当前页面时不会发送kCDNotificationUnreadsUpdated通知！
     [self updateConversationAsRead];
@@ -171,6 +170,7 @@
     self.isAppeared = YES;
 }
 - (void)viewWillDisappear:(BOOL)animated {
+    [[EMCDDeviceManager sharedInstance] disableProximitySensor];
     YSCResultBlock block = self.params[kParamBlock];
     if (block) {
         block(nil);//刷新cell，更新最后一条聊天记录
@@ -178,10 +178,10 @@
     [super viewWillDisappear:animated];
 }
 - (void)dealloc {
+    [self stopPlayingAudio];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:kCDNotificationMessageReceived object:nil];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:kCDNotificationMessageDelivered object:nil];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:kCDNotificationConnectivityUpdated object:nil];
-    [[XHAudioPlayerHelper shareInstance] setDelegate:nil];
     if (self.isUserChangedIdentifier) {
         [APPDATA bk_removeObserversWithIdentifier:self.isUserChangedIdentifier];
     }
@@ -351,35 +351,26 @@
 }
 //单击消息体
 - (void)multiMediaMessageDidSelectedOnMessage:(AVIMTypedMessage *)message atIndexPath:(NSIndexPath *)indexPath onMessageTableViewCell:(EZGMessageBaseCell *)messageTableViewCell {
+    WEAKSELF
     //1. 正在录音过程中不能跳转页面
     if (self.messageInputView.isRecording) {
         return;
     }
     //2. 单击消息体跳转页面
     if (kAVIMMessageMediaTypeAudio == message.mediaType) {//播放声音
-        if (self.currentSelectedIndex >= 0) {//停止cell动画
-            EZGMessageVoiceCell *voiceCell = [self.messageTableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:self.currentSelectedIndex inSection:0]];
-            [voiceCell.animationVoiceImageView stopAnimating];
-        }
-        
-        if (indexPath.row == self.currentSelectedIndex) {
-            [[XHAudioPlayerHelper shareInstance] stopAudio];//停止播放
-            self.currentSelectedIndex = -1;
-        }
-        else {//开始cell动画
+        NSInteger oldIndex = self.currentSelectedIndex;
+        [self stopPlayingAudio];
+        if (indexPath.row != oldIndex) {//停止播放之前的index和当前不同才开始播放
             self.currentSelectedIndex = indexPath.row;
-            [[XHAudioPlayerHelper shareInstance] managerAudioWithFileName:message.file.localPath toPlay:YES];
+            [[EMCDDeviceManager sharedInstance] enableProximitySensor];
+            [[EMCDDeviceManager sharedInstance] asyncPlayingWithPath:message.file.localPath completion:^(NSError *error) {
+                [weakSelf stopPlayingAudio];
+            }];
             [self.messageTableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationNone];
         }
     }
     else if (kAVIMMessageMediaTypeImage == message.mediaType) {//打开图片浏览器
-        //关闭音频播放
-        if (kAVIMMessageMediaTypeImage == message.mediaType) {
-            [[XHAudioPlayerHelper shareInstance] stopAudio];
-            EZGMessageVoiceCell *voiceCell = [self.messageTableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:self.currentSelectedIndex inSection:0]];
-            [voiceCell.animationVoiceImageView stopAnimating];
-            self.currentSelectedIndex = -1;
-        }
+        [self stopPlayingAudio];
         //打开图片浏览器
         YSCBaseViewController *photoDetail = (YSCBaseViewController *)[UIResponder createBaseViewController:@"YSCPhotoBrowseViewController"];
         
@@ -415,6 +406,7 @@
         [self.navigationController pushViewController:photoDetail animated:NO];
     }
     else if (kAVIMMessageMediaTypeLocation == message.mediaType) {//查看位置
+        [self stopPlayingAudio];
         YSCBaseViewController *mapViewController = (YSCBaseViewController *)[UIResponder createBaseViewController:@"YSCLocationDisplayViewController"];
         AVIMLocationMessage *locMessage = (AVIMLocationMessage *)message;
         mapViewController.params = @{kParamBackType : @(BackTypeImage),
@@ -439,6 +431,18 @@
 //重发消息
 - (void)didRetrySendMessage:(AVIMTypedMessage *)message atIndexPath:(NSIndexPath *)indexPath {
     [self resendMessage:message atIndexPath:indexPath discardIfFailed:false];
+}
+//停止音频播放
+- (void)stopPlayingAudio {
+    [[EMCDDeviceManager sharedInstance] stopPlaying];//停止播放
+    [[EMCDDeviceManager sharedInstance] disableProximitySensor];//停止接近传感器的检测
+    
+    if (self.currentSelectedIndex >= 0) {
+        //停止cell动画
+        EZGMessageVoiceCell *voiceCell = [self.messageTableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:self.currentSelectedIndex inSection:0]];
+        [voiceCell.animationVoiceImageView stopAnimating];
+        self.currentSelectedIndex = -1;
+    }
 }
 
 
@@ -560,26 +564,10 @@
 //  toolBar相关delegate
 //
 //================================================
-#pragma mark - XHAudioPlayerHelper Delegate
-- (void)didAudioPlayerStopPlay:(AVAudioPlayer *)audioPlayer {
-    if (self.currentSelectedIndex < 0) {
-        return;
-    }
-    //停止cell动画
-    EZGMessageVoiceCell *voiceCell = [self.messageTableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:self.currentSelectedIndex inSection:0]];
-    [voiceCell.animationVoiceImageView stopAnimating];
-    self.currentSelectedIndex = -1;
-}
-
 #pragma mark - XHMessageInputView Delegate
 //开始录音
 - (void)prepareRecordingVoiceActionWithCompletion:(BOOL (^)(void))completion {
-    [[XHAudioPlayerHelper shareInstance] stopAudio];
-    if (self.currentSelectedIndex >= 0) {//停止cell动画
-        EZGMessageVoiceCell *voiceCell = [self.messageTableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:self.currentSelectedIndex inSection:0]];
-        [voiceCell.animationVoiceImageView stopAnimating];
-        self.currentSelectedIndex = -1;
-    }
+    [self stopPlayingAudio];
     [super prepareRecordingVoiceActionWithCompletion:completion];
 }
 
