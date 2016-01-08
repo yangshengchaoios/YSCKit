@@ -147,75 +147,86 @@
 }
 
 #pragma mark - 图片选择器
-+ (UIActionSheet *)showImagePickerActionSheetWithDelegate:(id<UINavigationControllerDelegate,
-                                                           UIImagePickerControllerDelegate,
-                                                           ZYQAssetPickerControllerDelegate>)delegate
-                                            allowsEditing:(BOOL)allowsEditing
-                                              singleImage:(BOOL)singleImage
-                                        numberOfSelection:(NSInteger)numberOfSelection
-                                         onViewController:(UIViewController *)viewController {
+//弹出actionSheet选择器
++ (UIActionSheet *)ShowImagePickerActionSheetonViewController:(UIViewController *)viewController
+                                            numberOfSelection:(NSInteger)numberOfSelection {
+    return [self ShowImagePickerActionSheetonViewController:viewController
+                                          numberOfSelection:numberOfSelection
+                                                cameraTitle:@"拍摄照片"
+                                           imagePickerTitle:@"选取照片"];
+}
++ (UIActionSheet *)ShowImagePickerActionSheetonViewController:(UIViewController *)viewController
+                                            numberOfSelection:(NSInteger)numberOfSelection
+                                                  cameraTitle:(NSString *)cameraTitle
+                                             imagePickerTitle:(NSString *)imagePickerTitle {
     UIActionSheet *actionSheet = [UIActionSheet bk_actionSheetWithTitle:nil];
-    [actionSheet bk_addButtonWithTitle:@"拍摄照片"
+    [actionSheet bk_addButtonWithTitle:cameraTitle
                                handler:^{
-                                   UIImagePickerControllerSourceType sourceType = UIImagePickerControllerSourceTypeCamera;
-                                   if ( ! [UIImagePickerController isSourceTypeAvailable:sourceType]) {
-                                       [UIView showResultThenHideOnWindow:@"您的设备无法通过此方式获取照片"];
-                                       return;
-                                   }
-                                   else {
-                                       UIImagePickerController *imagePickerController = [[UIImagePickerController alloc] init];
-                                       imagePickerController.delegate = delegate;
-                                       imagePickerController.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
-                                       imagePickerController.allowsEditing = allowsEditing;
-                                       imagePickerController.sourceType = sourceType;
-                                       [viewController presentViewController:imagePickerController animated:YES completion:nil];
-                                   }
+                                   [self PresentCameraPickerOnViewController:viewController];
                                }];
-    
-    [actionSheet bk_addButtonWithTitle:@"选取照片"
+    [actionSheet bk_addButtonWithTitle:imagePickerTitle
                                handler:^{
-                                   UIImagePickerControllerSourceType sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
-                                   if ( ! [UIImagePickerController isSourceTypeAvailable:sourceType]) {
-                                       [UIView showResultThenHideOnWindow:@"您的设备无法通过此方式获取照片"];
-                                       return;
-                                   }
-                                   else {
-                                       if (singleImage) {//选择相册里单张图片
-                                           UIImagePickerController *imagePickerController = [[UIImagePickerController alloc] init];
-                                           [imagePickerController.navigationBar setBarTintColor:[UIColor colorWithRed:58/255.0f green:61/255.0f blue:69/255.0f alpha:1]];//NOTE::修改bar的颜色
-                                           //设置Title字体大小和颜色(如果不设置将按默认显示whiteColor)
-                                           [imagePickerController.navigationBar setTitleTextAttributes:@{NSForegroundColorAttributeName : kDefaultNaviBarTitleColor}];
-                                           imagePickerController.delegate = delegate;
-                                           imagePickerController.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
-                                           imagePickerController.allowsEditing = allowsEditing;
-                                           imagePickerController.sourceType = sourceType;
-                                           [viewController presentViewController:imagePickerController animated:YES completion:nil];
-                                       }
-                                       else {//多张图片
-                                           ZYQAssetPickerController *picker = [[ZYQAssetPickerController alloc] init];
-                                            [picker.navigationBar setBarTintColor:[UIColor colorWithRed:58/255.0f green:61/255.0f blue:69/255.0f alpha:1]];//NOTE:修改bar的颜色
-                                           //设置Title字体大小和颜色(如果不设置将按默认显示whiteColor)
-                                           [picker.navigationBar setTitleTextAttributes:@{NSForegroundColorAttributeName : kDefaultNaviBarTitleColor}];
-                                           picker.delegate = delegate;
-                                           picker.maximumNumberOfSelection = numberOfSelection;
-                                           picker.assetsFilter = [ALAssetsFilter allPhotos];
-                                           picker.showEmptyGroups = NO;
-                                           picker.selectionFilter = [NSPredicate predicateWithBlock:^BOOL(id evaluatedObject, NSDictionary *bindings) {
-                                               if ([[(ALAsset*)evaluatedObject valueForProperty:ALAssetPropertyType] isEqual:ALAssetTypeVideo]) {
-                                                   NSTimeInterval duration = [[(ALAsset*)evaluatedObject valueForProperty:ALAssetPropertyDuration] doubleValue];
-                                                   return duration >= 5;
-                                               } else {
-                                                   return YES;
-                                               }
-                                           }];
-                                           [viewController presentViewController:picker animated:YES completion:NULL];
-                                       }
-                                   }
+                                   [self PresentImagePickerOnViewController:viewController numberOfSelection:numberOfSelection];
                                }];
-    
     [actionSheet bk_setCancelButtonWithTitle:@"取消" handler:nil];
     [actionSheet showInView:viewController.view];
     return actionSheet;
+}
+
+//弹出系统相机进行拍照
++ (void)PresentCameraPickerOnViewController:(UIViewController *)viewController {
+    if (NO == [UIDevice isCanUseCamera]) {
+        [UIView showResultThenHideOnWindow:@"请在设置->隐私->相机,打开本应用的权限"];
+        return;
+    }
+    else {
+        UIImagePickerController *imagePickerController = [[UIImagePickerController alloc] init];
+        imagePickerController.delegate = (id)viewController;
+        imagePickerController.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
+        imagePickerController.allowsEditing = NO;
+        imagePickerController.sourceType = UIImagePickerControllerSourceTypeCamera;
+        [viewController presentViewController:imagePickerController animated:YES completion:nil];
+    }
+}
+
+//弹出图片选择器
++ (void)PresentImagePickerOnViewController:(UIViewController *)viewController numberOfSelection:(NSInteger)numberOfSelection {
+    if (NO == [UIDevice isPhotoLibraryAvailable]) {
+        [UIView showResultThenHideOnWindow:@"请在设置->隐私->照片,打开本应用的权限"];
+        return;
+    }
+    else {
+        if (numberOfSelection > 1) {//多张图片
+            ZYQAssetPickerController *picker = [[ZYQAssetPickerController alloc] init];
+//           [picker.navigationBar setTintColor:[UIColor blueColor]];//影响范围：icon颜色、left、right文字颜色
+//           [picker.navigationBar setTitleTextAttributes:@{NSForegroundColorAttributeName : [UIColor blackColor]}];
+            picker.delegate = (id)viewController;
+            picker.maximumNumberOfSelection = numberOfSelection;
+            picker.assetsFilter = [ALAssetsFilter allPhotos];
+            picker.showEmptyGroups = NO;
+            picker.selectionFilter = [NSPredicate predicateWithBlock:^BOOL(id evaluatedObject, NSDictionary *bindings) {
+                if ([[(ALAsset*)evaluatedObject valueForProperty:ALAssetPropertyType] isEqual:ALAssetTypeVideo]) {
+                    NSTimeInterval duration = [[(ALAsset*)evaluatedObject valueForProperty:ALAssetPropertyDuration] doubleValue];
+                    return duration >= 5;
+                } else {
+                    return YES;
+                }
+            }];
+            [viewController presentViewController:picker animated:YES completion:NULL];
+        }
+        else {//选择相册里单张图片
+            UIImagePickerController *imagePickerController = [[UIImagePickerController alloc] init];
+//           [imagePickerController.navigationBar setTintColor:[UIColor blueColor]];//影响范围：icon颜色、left、right文字颜色
+//           [imagePickerController.navigationBar setTitleTextAttributes:@{NSForegroundColorAttributeName : [UIColor blackColor]}];
+            imagePickerController.delegate = (id)viewController;
+            imagePickerController.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
+            imagePickerController.allowsEditing = NO;
+            imagePickerController.sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
+            [viewController presentViewController:imagePickerController animated:YES completion:nil];
+            
+            
+        }
+    }
 }
 
 

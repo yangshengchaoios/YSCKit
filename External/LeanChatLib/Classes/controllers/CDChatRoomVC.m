@@ -479,40 +479,11 @@ ZYQAssetPickerControllerDelegate>
 }
 //点击扩展功能按钮-发送拍摄照片
 - (void)didClickedShareMenuItemCamera {
-    if ([UIDevice isCanUseCamera]) { //打开摄像头，获取的图片要保存到自定义相册EZGoal
-        UIImagePickerController *imagePickerController = [[UIImagePickerController alloc] init];
-        imagePickerController.delegate = self;
-        imagePickerController.allowsEditing = NO;
-        imagePickerController.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
-        imagePickerController.sourceType = UIImagePickerControllerSourceTypeCamera;
-        [self presentViewController:imagePickerController animated:YES completion:nil];
-    }
-    else {
-        [UIView showAlertVieWithMessage:@"请在设置->隐私->相机,打开本应用的权限"];
-    }
+    [UIView PresentCameraPickerOnViewController:self];
 }
 //点击扩展功能按钮-发送图片
 - (void)didClickedShareMenuItemSendPhoto {
-    if ([UIDevice isPhotoLibraryAvailable]) {
-        ZYQAssetPickerController *picker = [[ZYQAssetPickerController alloc] init];
-        picker.delegate = self;
-        picker.maximumNumberOfSelection = 9;//最大同时选择的照片数量
-        picker.assetsFilter = [ALAssetsFilter allPhotos];
-        picker.showEmptyGroups = NO;
-        picker.selectionFilter = [NSPredicate predicateWithBlock:^BOOL(id evaluatedObject, NSDictionary *bindings) {
-            if ([[(ALAsset*)evaluatedObject valueForProperty:ALAssetPropertyType] isEqual:ALAssetTypeVideo]) {
-                NSTimeInterval duration = [[(ALAsset*)evaluatedObject valueForProperty:ALAssetPropertyDuration] doubleValue];
-                return duration >= 5;
-            }
-            else {
-                return YES;
-            }
-        }];
-        [self presentViewController:picker animated:YES completion:NULL];
-    }
-    else {
-        [UIView showAlertVieWithMessage:@"请在设置->隐私->照片,打开本应用的权限"];
-    }
+    [UIView PresentImagePickerOnViewController:self numberOfSelection:9];
 }
 #pragma mark - UIImagePickerControllerDelegate
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info {

@@ -44,14 +44,17 @@
 - (void)hideAllSubviews;
 
 #pragma mark - 图片选择器
-+ (UIActionSheet *)showImagePickerActionSheetWithDelegate:(id<UINavigationControllerDelegate,
-                                                           UIImagePickerControllerDelegate,
-                                                           ZYQAssetPickerControllerDelegate>)delegate
-                                            allowsEditing:(BOOL)allowsEditing
-                                              singleImage:(BOOL)singleImage
-                                        numberOfSelection:(NSInteger)numberOfSelection
-                                         onViewController:(UIViewController *)viewController;
-
+//弹出选择器
++ (UIActionSheet *)ShowImagePickerActionSheetonViewController:(UIViewController *)viewController
+                                            numberOfSelection:(NSInteger)numberOfSelection;
++ (UIActionSheet *)ShowImagePickerActionSheetonViewController:(UIViewController *)viewController
+                                            numberOfSelection:(NSInteger)numberOfSelection
+                                                  cameraTitle:(NSString *)cameraTitle
+                                             imagePickerTitle:(NSString *)imagePickerTitle;
+//弹出系统相机进行拍照
++ (void)PresentCameraPickerOnViewController:(UIViewController *)viewController;
+//弹出图片选择器
++ (void)PresentImagePickerOnViewController:(UIViewController *)viewController numberOfSelection:(NSInteger)numberOfSelection;
 
 
 #pragma mark - view边框调整
