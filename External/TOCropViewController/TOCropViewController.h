@@ -58,7 +58,6 @@
 
 @interface TOCropViewController : UIViewController
 
-//FIXME:TEST
 @property (nonatomic, assign) BOOL flagOfSetting;
 
 /**

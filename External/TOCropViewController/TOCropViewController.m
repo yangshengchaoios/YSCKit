@@ -123,7 +123,6 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
     }
 }
 - (void)layoutSetting {
-    //FIXME:TEST
     //根据初始化的时候传入的ratioArray数组来初始化
     if (isNotEmpty(self.ratioArray)) {
         return;
@@ -133,7 +132,6 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
         [self doCropImageWithSize:CGSizeMake(1.0f, 1.0f)];
     }
     else if ([sizeString isEqualToString:@"Original"]) {
-        //TODO:兼容不同尺寸
         [self doCropImageWithSize:CGSizeZero];
     }
     else {
