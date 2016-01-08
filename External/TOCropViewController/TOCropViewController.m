@@ -115,14 +115,14 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
     self.toolbar.rotateButtonTapped =   ^{ [weakSelf rotateCropView]; };
     
     self.transitioningDelegate = self;
-    
     self.view.backgroundColor = self.cropView.backgroundColor;
     
     //NOTE:根据需求添加
-    if (YES == self.flagOfSetting) {
+    if (self.flagOfSetting) {
         [self layoutSetting];
     }
 }
+//设置第一个比例为裁剪尺寸
 - (void)layoutSetting {
     //根据初始化的时候传入的ratioArray数组来初始化
     if (isEmpty(self.ratioArray)) {
@@ -136,10 +136,12 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
         [self doCropImageWithSize:CGSizeZero];
     }
     else {
-        NSArray *tempArray = [sizeString splitByRegex:@":" options:0];
-        CGFloat width = [tempArray[0] floatValue];
-        CGFloat height = [tempArray[1] intValue];
-        [self doCropImageWithSize:CGSizeMake(width, height)];
+        NSArray *tempArray = [sizeString splitByRegex:@":"];
+        if ([tempArray count] >= 2) {
+            CGFloat width = [tempArray[0] floatValue];
+            CGFloat height = [tempArray[1] floatValue];
+            [self doCropImageWithSize:CGSizeMake(width, height)];
+        }
     }
 }
 
@@ -319,11 +321,10 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
         if ([tempArray count] > 1) {
             CGSize newSize = CGSizeMake([tempArray[0] floatValue], [tempArray[1] floatValue]);
             NSString *newTitle = buttonTitle;
-            //NOTE:比例传进来多少就显示多少
-//            if (verticalCropBox) {
-//                newSize = CGSizeMake([tempArray[1] floatValue], [tempArray[0] floatValue]);
-//                newTitle = [NSString stringWithFormat:@"%@:%@", tempArray[1], tempArray[0]];
-//            }
+            if (verticalCropBox) {
+                newSize = CGSizeMake([tempArray[1] floatValue], [tempArray[0] floatValue]);
+                newTitle = [NSString stringWithFormat:@"%@:%@", tempArray[1], tempArray[0]];
+            }
             
             [actionSheet bk_addButtonWithTitle:newTitle
                                        handler:^{
