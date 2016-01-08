@@ -158,8 +158,8 @@ ZYQAssetPickerControllerDelegate>
 }
 - (void)viewDidDisappear:(BOOL)animated {
     self.isAppeared = NO;
-    [CDChatManager manager].chattingConversationId = nil;
     [self stopPlayingAudio];
+    [CDChatManager manager].chattingConversationId = nil;
     //如果有未读消息，且通过推送栏进入本页面后，继续有新消息到达，退出的时候就需要清空conv的未读消息，
     //因为处于当前页面时不会发送kCDNotificationUnreadsUpdated通知！
     [self updateConversationAsRead];
@@ -170,7 +170,6 @@ ZYQAssetPickerControllerDelegate>
     self.isAppeared = YES;
 }
 - (void)viewWillDisappear:(BOOL)animated {
-    [[EMCDDeviceManager sharedInstance] disableProximitySensor];
     YSCResultBlock block = self.params[kParamBlock];
     if (block) {
         block(nil);//刷新cell，更新最后一条聊天记录
@@ -178,7 +177,6 @@ ZYQAssetPickerControllerDelegate>
     [super viewWillDisappear:animated];
 }
 - (void)dealloc {
-    [self stopPlayingAudio];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:kCDNotificationMessageReceived object:nil];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:kCDNotificationMessageDelivered object:nil];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:kCDNotificationConnectivityUpdated object:nil];
@@ -370,7 +368,6 @@ ZYQAssetPickerControllerDelegate>
         }
     }
     else if (kAVIMMessageMediaTypeImage == message.mediaType) {//打开图片浏览器
-        [self stopPlayingAudio];
         //打开图片浏览器
         YSCBaseViewController *photoDetail = (YSCBaseViewController *)[UIResponder createBaseViewController:@"YSCPhotoBrowseViewController"];
         
@@ -406,7 +403,6 @@ ZYQAssetPickerControllerDelegate>
         [self.navigationController pushViewController:photoDetail animated:NO];
     }
     else if (kAVIMMessageMediaTypeLocation == message.mediaType) {//查看位置
-        [self stopPlayingAudio];
         YSCBaseViewController *mapViewController = (YSCBaseViewController *)[UIResponder createBaseViewController:@"YSCLocationDisplayViewController"];
         AVIMLocationMessage *locMessage = (AVIMLocationMessage *)message;
         mapViewController.params = @{kParamBackType : @(BackTypeImage),
