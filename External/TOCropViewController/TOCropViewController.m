@@ -118,6 +118,7 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
     
     self.view.backgroundColor = self.cropView.backgroundColor;
     
+    //NOTE:根据需求添加
     if (YES == self.flagOfSetting) {
         [self layoutSetting];
     }
@@ -318,10 +319,11 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
         if ([tempArray count] > 1) {
             CGSize newSize = CGSizeMake([tempArray[0] floatValue], [tempArray[1] floatValue]);
             NSString *newTitle = buttonTitle;
-            if (verticalCropBox) {
-                newSize = CGSizeMake([tempArray[1] floatValue], [tempArray[0] floatValue]);
-                newTitle = [NSString stringWithFormat:@"%@:%@", tempArray[1], tempArray[0]];
-            }
+            //NOTE:比例传进来多少就显示多少
+//            if (verticalCropBox) {
+//                newSize = CGSizeMake([tempArray[1] floatValue], [tempArray[0] floatValue]);
+//                newTitle = [NSString stringWithFormat:@"%@:%@", tempArray[1], tempArray[0]];
+//            }
             
             [actionSheet bk_addButtonWithTitle:newTitle
                                        handler:^{

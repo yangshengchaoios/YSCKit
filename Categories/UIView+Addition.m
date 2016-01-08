@@ -182,6 +182,9 @@
                                    else {
                                        if (singleImage) {//选择相册里单张图片
                                            UIImagePickerController *imagePickerController = [[UIImagePickerController alloc] init];
+                                           [imagePickerController.navigationBar setBarTintColor:[UIColor colorWithRed:58/255.0f green:61/255.0f blue:69/255.0f alpha:1]];//NOTE::修改bar的颜色
+                                           //设置Title字体大小和颜色(如果不设置将按默认显示whiteColor)
+                                           [imagePickerController.navigationBar setTitleTextAttributes:@{NSForegroundColorAttributeName : kDefaultNaviBarTitleColor}];
                                            imagePickerController.delegate = delegate;
                                            imagePickerController.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
                                            imagePickerController.allowsEditing = allowsEditing;
@@ -190,6 +193,9 @@
                                        }
                                        else {//多张图片
                                            ZYQAssetPickerController *picker = [[ZYQAssetPickerController alloc] init];
+                                            [picker.navigationBar setBarTintColor:[UIColor colorWithRed:58/255.0f green:61/255.0f blue:69/255.0f alpha:1]];//NOTE:修改bar的颜色
+                                           //设置Title字体大小和颜色(如果不设置将按默认显示whiteColor)
+                                           [picker.navigationBar setTitleTextAttributes:@{NSForegroundColorAttributeName : kDefaultNaviBarTitleColor}];
                                            picker.delegate = delegate;
                                            picker.maximumNumberOfSelection = numberOfSelection;
                                            picker.assetsFilter = [ALAssetsFilter allPhotos];

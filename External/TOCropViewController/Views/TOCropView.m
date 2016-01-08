@@ -183,7 +183,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     [self addSubview:self.translucencyView];
     
     self.foregroundContainerView = [[UIView alloc] initWithFrame:(CGRect){0,0,200,200}];
-    self.foregroundContainerView.clipsToBounds = YES;
+//    self.foregroundContainerView.clipsToBounds = YES;//NOTE:这个应对需求不裁剪图片
     self.foregroundContainerView.userInteractionEnabled = NO;
     [self addSubview:self.foregroundContainerView];
     
@@ -195,10 +195,11 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     self.foregroundImageView = [[UIImageView alloc] initWithImage:self.image];
     [self.foregroundContainerView addSubview:self.foregroundImageView];
     
-    self.gridPanGestureRecognizer = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(gridPanGestureRecognized:)];
-    self.gridPanGestureRecognizer.delegate = self;
-    [self.scrollView.panGestureRecognizer requireGestureRecognizerToFail:self.gridPanGestureRecognizer];
-    [self addGestureRecognizer:self.gridPanGestureRecognizer];
+    //NOTE:根据需求删除栅栏格的拖动手势
+//    self.gridPanGestureRecognizer = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(gridPanGestureRecognized:)];
+//    self.gridPanGestureRecognizer.delegate = self;
+//    [self.scrollView.panGestureRecognizer requireGestureRecognizerToFail:self.gridPanGestureRecognizer];
+//    [self addGestureRecognizer:self.gridPanGestureRecognizer];
     
     self.editing = NO;
 }
