@@ -74,6 +74,7 @@ return _sharedObject;
 
 
 //设置默认颜色
+#define kDefaultColorRGB(c)                 RGB(c, c, c)
 #ifndef kDefaultViewColor
     #define kDefaultViewColor               RGB(238, 238, 238)      //self.view的默认背景颜色
 #endif
