@@ -55,7 +55,10 @@
 + (void)PresentCameraPickerOnViewController:(UIViewController *)viewController;
 //弹出图片选择器
 + (void)PresentImagePickerOnViewController:(UIViewController *)viewController numberOfSelection:(NSInteger)numberOfSelection;
-
+//统一创建UIImagePickerController
++ (UIImagePickerController *)CreateImagePickerController:(UIImagePickerControllerSourceType)sourceType
+                                           allowsEditing:(BOOL)allowsEditing
+                                                delegate:(id)delegate;
 
 #pragma mark - view边框调整
 + (void)makeCircleForView:(UIView *)view;

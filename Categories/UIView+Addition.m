@@ -180,11 +180,7 @@
         return;
     }
     else {
-        UIImagePickerController *imagePickerController = [[UIImagePickerController alloc] init];
-        imagePickerController.delegate = (id)viewController;
-        imagePickerController.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
-        imagePickerController.allowsEditing = NO;
-        imagePickerController.sourceType = UIImagePickerControllerSourceTypeCamera;
+        UIImagePickerController *imagePickerController = [self CreateImagePickerController:UIImagePickerControllerSourceTypeCamera allowsEditing:NO delegate:(id)viewController];
         [viewController presentViewController:imagePickerController animated:YES completion:nil];
     }
 }
@@ -215,18 +211,23 @@
             [viewController presentViewController:picker animated:YES completion:NULL];
         }
         else {//选择相册里单张图片
-            UIImagePickerController *imagePickerController = [[UIImagePickerController alloc] init];
-//           [imagePickerController.navigationBar setTintColor:[UIColor blueColor]];//影响范围：icon颜色、left、right文字颜色
-//           [imagePickerController.navigationBar setTitleTextAttributes:@{NSForegroundColorAttributeName : [UIColor blackColor]}];
-            imagePickerController.delegate = (id)viewController;
-            imagePickerController.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
-            imagePickerController.allowsEditing = NO;
-            imagePickerController.sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
+            UIImagePickerController *imagePickerController = [self CreateImagePickerController:UIImagePickerControllerSourceTypePhotoLibrary allowsEditing:NO delegate:(id)viewController];
             [viewController presentViewController:imagePickerController animated:YES completion:nil];
-            
-            
         }
     }
+}
+//统一创建UIImagePickerController
++ (UIImagePickerController *)CreateImagePickerController:(UIImagePickerControllerSourceType)sourceType
+                                           allowsEditing:(BOOL)allowsEditing
+                                                delegate:(id)delegate {
+    UIImagePickerController *imagePickerController = [[UIImagePickerController alloc] init];
+    imagePickerController.delegate = delegate;
+    imagePickerController.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
+    imagePickerController.allowsEditing = allowsEditing;
+    imagePickerController.sourceType = sourceType;
+//    [imagePickerController.navigationBar setTintColor:[UIColor blueColor]];//影响范围：icon颜色、left、right文字颜色
+//    [imagePickerController.navigationBar setTitleTextAttributes:@{NSForegroundColorAttributeName : [UIColor blackColor]}];
+    return imagePickerController;
 }
 
 
