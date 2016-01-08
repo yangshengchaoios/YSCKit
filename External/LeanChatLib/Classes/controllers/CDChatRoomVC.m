@@ -324,11 +324,7 @@ ZYQAssetPickerControllerDelegate>
     
     //4. 单击消息体
     [cell.bubbleImageView bk_whenTapped:^{
-        //关闭menu
-        UIMenuController *menu = [UIMenuController sharedMenuController];
-        if (menu.isMenuVisible) {
-            [menu setMenuVisible:NO animated:YES];
-        }
+        [cell setupNormalMenuController];
         //点击媒体消息
         [weakSelf multiMediaMessageDidSelectedOnMessage:message atIndexPath:indexPath onMessageTableViewCell:cell];
     }];

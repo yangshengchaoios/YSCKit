@@ -78,5 +78,7 @@ typedef NS_ENUM(NSInteger, EZGBubbleMessageType) {
 #pragma mark - Long Press Gesture
 //自动判断是否添加
 - (void)addLongPressGesture;
+//统一一个方法隐藏MenuController，多处需要调用
+- (void)setupNormalMenuController;
 
 @end
