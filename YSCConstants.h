@@ -6,8 +6,8 @@
 //  Copyright (c) 2015年 Builder. All rights reserved.
 //
 
-#ifndef EZGoal_YSCConstants_h
-#define EZGoal_YSCConstants_h
+#ifndef YSCKit_YSCConstants_h
+#define YSCKit_YSCConstants_h
 
 typedef void (^YSCBlock)();
 typedef void (^YSCResultBlock)(NSObject *object);
@@ -165,9 +165,9 @@ return _sharedObject;
 #define ReturnZeroWhenObjectIsEmpty(object)         if ([NSObject isEmpty:object]) { return 0;  }
 #define Trim(x)                                     [NSString trimString:x]
 #define RandomInt(from,to)                          ((int)((from) + arc4random() % ((to)-(from) + 1)))  //随机数 [from,to] 之间
-#define CreateNSError(errMsg)                       [NSError errorWithDomain:@"EZGoal" code:0 userInfo:@{NSLocalizedDescriptionKey : Trim(errMsg)}]
-#define CreateNSErrorCode(c,errMsg)                 [NSError errorWithDomain:@"" code:c userInfo:@{NSLocalizedDescriptionKey : Trim(errMsg)}]
-#define GetNSErrorMsg(error)                        ((NSError *)error).userInfo[NSLocalizedDescriptionKey]  //=error.localizedDescription
+#define CreateNSErrorCode(c,errMsg)                 [NSError errorWithDomain:@"YSCKit" code:c userInfo:@{NSLocalizedDescriptionKey : Trim(errMsg)}]
+#define CreateNSError(errMsg)                       CreateNSErrorCode(0,errMsg)
+#define GetNSErrorMsg(e)                            ((NSError *)e).userInfo[NSLocalizedDescriptionKey]  //=e.localizedDescription
 #define STORAGEMANAGER                              [StorageManager sharedInstance]
 #define CURRENTDATE                                 [YSCCommonUtils currentDate]    //当前(服务器端)时间
 
