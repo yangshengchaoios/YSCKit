@@ -46,9 +46,9 @@ typedef void (^YSCResponseErrorMessageBlock)(NSObject *object, NSString *errorMe
 
 
 //控制调试信息的输出
-#define DEBUGMODEL      [[NSUserDefaults standardUserDefaults] boolForKey:@"APP_DEBUG"]
-#define SwitchToDebug   [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"APP_DEBUG"]
-#define SwitchToNormal  [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"APP_DEBUG"]
+#define DEBUGMODEL      [GetObject(@"DEBUG") boolValue]
+#define SwitchToDebug   SaveObject(@(YES), @"DEBUG")
+#define SwitchToNormal  SaveObject(@(NO), @"DEBUG")
 
 /**
  *  重新定义NSLog
