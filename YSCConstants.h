@@ -184,6 +184,7 @@ return _sharedObject;
 #define VersionEqualsOrLater(v)         (NSOrderedAscending != [AppVersion compare:v options:NSNumericSearch])      //判断当前APP的版本号等于或大于v
 #define VersionLater(v)                 (NSOrderedDescending == [AppVersion compare:v options:NSNumericSearch])     //判断当前APP的版本号大于v
 #define VersionBefore(v)                (NSOrderedAscending == [AppVersion compare:v options:NSNumericSearch])      //判断当前APP的版本号小于v
+#define IsLoadGuideView                 [GetObject(WelcomeVersion) boolValue]                                       //判断是否加载过欢迎页面
 
 /**
  *  自动布局相关代码段简写
