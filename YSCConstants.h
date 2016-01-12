@@ -45,14 +45,14 @@ typedef void (^YSCResponseErrorMessageBlock)(NSObject *object, NSString *errorMe
 #define YSCDeprecated(explain) __attribute__((deprecated(explain)))
 
 
+//控制调试信息的输出
+#define DEBUGMODEL      [[NSUserDefaults standardUserDefaults] boolForKey:@"APP_DEBUG"]
+#define SwitchToDebug   [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"APP_DEBUG"]
+#define SwitchToNormal  [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"APP_DEBUG"]
+
 /**
  *  重新定义NSLog
  */
-//控制调试信息的输出
-#define DEBUGMODEL      [GetObject(@"DEBUG") boolValue]
-#define SwitchToDebug   SaveObject(@"1", @"DEBUG")
-#define SwitchToNormal  SaveObject(@"0", @"DEBUG")
-
 #define __NSLog(s, ...) do { \
     NSString *logString = [NSString stringWithFormat:@"[%@(%d)] %@",[[NSString stringWithUTF8String:__FILE__] lastPathComponent],__LINE__,[NSString stringWithFormat:(s), ##__VA_ARGS__]]; \
     NSLog(@"%@", logString); \
