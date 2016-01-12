@@ -50,8 +50,8 @@ typedef void (^YSCResponseErrorMessageBlock)(NSObject *object, NSString *errorMe
  */
 //控制调试信息的输出
 #define DEBUGMODEL      [GetObject(@"DEBUG") boolValue]
-#define SwitchToDebug   SaveObject(@(YES), @"DEBUG")
-#define SwitchToNormal  SaveObject(@(NO), @"DEBUG")
+#define SwitchToDebug   SaveObject(@"1", @"DEBUG")
+#define SwitchToNormal  SaveObject(@"0", @"DEBUG")
 
 #define __NSLog(s, ...) do { \
     NSString *logString = [NSString stringWithFormat:@"[%@(%d)] %@",[[NSString stringWithUTF8String:__FILE__] lastPathComponent],__LINE__,[NSString stringWithFormat:(s), ##__VA_ARGS__]]; \
