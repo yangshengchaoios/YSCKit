@@ -170,6 +170,7 @@ return _sharedObject;
 #define GetNSErrorMsg(e)                            ((NSError *)e).userInfo[NSLocalizedDescriptionKey]  //=e.localizedDescription
 #define STORAGEMANAGER                              [StorageManager sharedInstance]
 #define CURRENTDATE                                 [YSCCommonUtils currentDate]    //当前(服务器端)时间
+#define APPCONFIGMANAGER                            [AppConfigManager sharedInstance]
 
 /**
  *  版本相关

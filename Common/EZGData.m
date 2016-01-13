@@ -325,8 +325,8 @@
                                         //检测是否有参数变更
                                         if (NO == [oldSign isEqualToString:newSign]) {
                                             SaveObjectByFile(newParams, @"AppParams", @"OnLineParams");
-                                            [[AppConfigManager sharedInstance] resetAppParams];
-                                            postN(kNotificationRefreshHome);
+                                            [APPCONFIGMANAGER resetAppParams];
+                                            APPCONFIGMANAGER.isOnlineParamsChanged = YES;
                                         }
                                     }
                                     else {
