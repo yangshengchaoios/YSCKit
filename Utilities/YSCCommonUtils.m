@@ -178,6 +178,32 @@
         return macAddress;
     }
 }
+//格式化输出json到console(格式化失败返回empty)
++ (NSString *)FormatPrintJsonStringOnConsole:(NSString *)jsonString {
+    if (isNotEmpty(jsonString)) {
+        NSError *error = nil;
+        id data = [NSJSONSerialization JSONObjectWithData:[jsonString dataUsingEncoding:NSUTF8StringEncoding]
+                                                  options:0
+                                                    error:&error];
+        if (nil == error) {
+            NSData *jsonData = [NSJSONSerialization dataWithJSONObject:data
+                                                               options:(NSJSONWritingOptions)NSJSONWritingPrettyPrinted
+                                                                 error:&error];
+            if (nil == error) {
+                return (jsonData) ? [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding] : @"";
+            }
+            else {
+                return @"";
+            }
+        }
+        else {
+            return @"";
+        }
+    }
+    else {
+        return @"";
+    }
+}
 
 
 #pragma mark 打电话

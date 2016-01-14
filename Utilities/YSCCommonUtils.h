@@ -46,6 +46,8 @@
 + (NSString *)formatNumberValue:(NSNumber *)value;
 //规范化mac地址
 + (NSString *)formatMacAddress:(NSString *)macAddress;
+//格式化输出json到console(格式化失败返回empty)
++ (NSString *)FormatPrintJsonStringOnConsole:(NSString *)jsonString;
 
 #pragma mark - 打电话
 + (void)MakeCall:(NSString *)phoneNumber;
