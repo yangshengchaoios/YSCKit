@@ -14,104 +14,104 @@
 @implementation YSCCommonUtils
 
 #pragma mark - 检测新版本
-+ (void)checkNewVersionShowMessage:(BOOL)showMessage {
-    [self checkNewVersionShowMessage:showMessage withParams:nil andType:[kCheckNewVersionType integerValue]];
++ (void)checkNewVersion {
+    [self checkNewVersionWithParams:nil type:[kCheckNewVersionType integerValue]];
 }
-+ (void)checkNewVersionShowMessage:(BOOL)showMessage withParams:(NSDictionary *)params andType:(NSInteger)type {
-    if (0 == type) {
-        return;
-    }
-    else if (1 == type) {
-        if (showMessage) {
-            [UIView showHUDLoadingOnWindow:@"正在检测新版本"];
-        }
++ (void)checkNewVersionWithParams:(NSDictionary *)params type:(CheckNewVersionType)type {
+    if (CheckNewVersionTypeServer == type) {
         [AFNManager getDataFromUrl:kResPathAppCommonUrl
                            withAPI:kResPathCheckNewVersion
                       andDictParam:params
                          modelName:[NewVersionModel class]
                   requestSuccessed:^(id responseObject) {
-                      [YSCCommonUtils checkNewVersion:responseObject showMessage:showMessage];
+                      NewVersionModel *versionModel = (NewVersionModel *)responseObject;
+                      if (isNotEmpty(versionModel.appVersion)) {
+                          [YSCCommonUtils checkNewVersionWithModel:versionModel isCheckOnAppStore:NO];
+                      }
+                      else {
+                          [YSCCommonUtils checkNewVersionOnAppStore];
+                      }
                   }
                     requestFailure:^(ErrorType errorType, NSError *error) {
-                        NSString *errMsg = [YSCCommonUtils ResolveErrorType:errorType andError:error];
-                        if (showMessage) {
-                            [UIView showResultThenHideOnWindow:errMsg];
-                        }
-                        [YSCCommonUtils checkNewVersionByAppleId:kAppStoreId];
+                        [YSCCommonUtils checkNewVersionOnAppStore];
                     }];
     }
-    else if (2 == type) {//检测app store上通过审核的新版本
-        [YSCCommonUtils checkNewVersionByAppleId:kAppStoreId];
+    else if (CheckNewVersionTypeAppStore == type) {
+        [YSCCommonUtils checkNewVersionOnAppStore];
     }
 }
-//具体检测新版本的业务逻辑
-+ (void)checkNewVersion:(NewVersionModel *)versionModel showMessage:(BOOL)showMessage {
-    if ([versionModel isKindOfClass:[NewVersionModel class]]) {
-        BOOL isSkipTheVersion = [GetCacheObject(SkipVersion(Trim(versionModel.appVersion))) boolValue];
-        if ( ! isSkipTheVersion) {
-            if (NSOrderedAscending == [AppVersion compare:versionModel.appVersion options:NSNumericSearch]) {
-                [UIView hideHUDLoadingOnWindow];
-                if ([NSString isNotEmpty:versionModel.appDownloadUrl]) {//TODO:这里可以进一步判断是否是标准的ios更新地址
-                    NSString *title = [NSString stringWithFormat:@"发现新版本 %@", versionModel.appVersion];
-                    NSString *message = [NSString trimString:versionModel.appUpdateLog];
-                    
-                    UIAlertView *alertView = [UIAlertView bk_alertViewWithTitle:title message:message];
-                    [alertView bk_setCancelButtonWithTitle:@"立即更新" handler:^{
-                        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:versionModel.appDownloadUrl]];
-                        exit(0);
-                    }];
-                    if (NO == versionModel.isForcedUpdate ) {   //非强制更新的话才显示更多选项
-                        [alertView bk_addButtonWithTitle:@"忽略此版本" handler:^{
-                            SaveCacheObject(@(YES), SkipVersion(Trim(versionModel.appVersion)));
-                        }];
-                        [alertView bk_addButtonWithTitle:@"稍后再说" handler:nil];//下次启动再次检测
-                    }
-                    [alertView show];
-                }
-                else {
-                    [UIView showAlertVieWithMessage:@"下载地址出错"];
-                }
-            }
-            else {
-                if (showMessage) {
-                    [UIView showResultThenHideOnWindow:@"已经是最新版本"];
-                }
+//检测本APP在AppStore上是否有新版本上线
++ (void)checkNewVersionOnAppStore {
+    NSURL *checkUrl = [NSURL URLWithString:[NSString stringWithFormat:@"http://itunes.apple.com/lookup?id=%@", kAppStoreId]];
+    [[[NSURLSession sharedSession] dataTaskWithURL:checkUrl completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+        NSString *dataString = [[NSString alloc] initWithBytes:[data bytes] length:[data length] encoding:NSUTF8StringEncoding];
+        NSDictionary *resultsDict = (NSDictionary *)[NSString jsonObjectOfString:dataString];
+        NSArray *results = resultsDict[@"results"];
+        if ([results count] > 0) {
+            NSDictionary *releaseItem = results[0];
+            NSString *onlineVersion = releaseItem[@"version"];//最新版本号
+            NSString *releaseNotes = releaseItem[@"releaseNotes"];//最新版本的修改内容
+            if (NSOrderedAscending == [AppVersion compare:onlineVersion options:NSNumericSearch]) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    NewVersionModel *versionModel = [NewVersionModel new];
+                    versionModel.appVersion = onlineVersion;
+                    versionModel.appUpdateLog = releaseNotes;
+                    versionModel.isForcedUpdate = NO;
+                    [YSCCommonUtils checkNewVersionWithModel:versionModel isCheckOnAppStore:YES];
+                });
             }
         }
+    }] resume];
+}
+//具体检测新版本的业务逻辑
++ (void)checkNewVersionWithModel:(NewVersionModel *)versionModel isCheckOnAppStore:(BOOL)isCheckOnAppStore {
+    //1. 取出模型中的参数
+    NSString *appVersion = Trim(versionModel.appVersion);
+    BOOL isSkipTheVersion = [GetCacheObject(SkipVersion(appVersion)) boolValue];
+    BOOL isForcedUpdate = versionModel.isForcedUpdate;
+    NSString *appUpdateLog = Trim(versionModel.appUpdateLog);
+    NSString *appDownloadUrl = Trim(versionModel.appDownloadUrl);
+    if (NO == [appDownloadUrl isUrl]) {
+        appDownloadUrl = AppUpdateUrl;
+    }
+    
+    //2. 判断是否需要更新
+    if (NO == isSkipTheVersion) {
+        if (NSOrderedAscending == [AppVersion compare:appVersion options:NSNumericSearch]) {
+            //0. 判断是否重复调用(APP第一次运行时如果有alertView需要处理，则applicationDidBecomeActive在处理完后会再次被调用，从而导致版本检测调用多次而出问题)
+            static BOOL isAlertShow = NO;
+            if (isAlertShow) {
+                return;
+            }
+            isAlertShow = YES;
+            
+            //1. 显示新版本提示
+            NSString *title = [NSString stringWithFormat:@"发现新版本 %@", appVersion];
+            UIAlertView *alertView = [UIAlertView bk_alertViewWithTitle:title message:appUpdateLog];
+            [alertView bk_setCancelButtonWithTitle:@"立即更新" handler:^{
+                [[UIApplication sharedApplication] openURL:[NSURL URLWithString:appDownloadUrl]];
+                exit(0);
+            }];
+            if (NO == isForcedUpdate ) {   //非强制更新的话才显示更多选项
+                [alertView bk_addButtonWithTitle:@"忽略此版本" handler:^{
+                    SaveCacheObject(@(YES), SkipVersion(appVersion));
+                    isAlertShow = NO;
+                }];
+                [alertView bk_addButtonWithTitle:@"稍后再说" handler:^{
+                    isAlertShow = NO;
+                }];//下次启动再次检测
+            }
+            [alertView show];
+        }
         else {
-            [UIView hideHUDLoadingOnWindow];
+            if (NO == isCheckOnAppStore) {//如果接口未来得及更新升级信息，就自动检测AppStore上的新版本
+                [YSCCommonUtils checkNewVersionOnAppStore];
+            }
         }
     }
     else {
-        if (showMessage) {
-            [UIView showResultThenHideOnWindow:@"版本检测出错"];
-        }
-    }
-}
-+ (void)checkNewVersionByAppleId:(NSString *)appleId {
-    NSMutableURLRequest *request = [[NSMutableURLRequest alloc] init];
-    [request setURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://itunes.apple.com/lookup?id=%@", appleId]]];
-    [request setHTTPMethod:@"POST"];
-    NSHTTPURLResponse *urlResponse = nil;
-    NSError *error = nil;
-    NSData *recervedData = [NSURLConnection sendSynchronousRequest:request returningResponse:&urlResponse error:&error];
-    
-    NSString *results = [[NSString alloc] initWithBytes:[recervedData bytes] length:[recervedData length] encoding:NSUTF8StringEncoding];
-    NSDictionary *dic = (NSDictionary *)[NSString jsonObjectOfString:results];
-    NSArray *infoArray = [dic objectForKey:@"results"];
-    if ([infoArray count]) {
-        NSDictionary *releaseInfo = [infoArray objectAtIndex:0];
-        NSString *onlineVersion = [releaseInfo objectForKey:@"version"];
-        NSString *currentVersion = AppVersion;
-        if (VersionCompareResultAscending == [currentVersion compareWithVersion:onlineVersion]) {
-            NSString *showMsg = [NSString stringWithFormat:@"发现新版本%@，是否前往更新？", onlineVersion];
-            UIAlertView *alertView = [[UIAlertView alloc] bk_initWithTitle:@"提示" message:showMsg];
-            [alertView bk_addButtonWithTitle:@"更新" handler:^{
-                NSString *openUrl = [NSString stringWithFormat:@"https://itunes.apple.com/app/id%@", appleId];
-                [[UIApplication sharedApplication] openURL:[NSURL URLWithString:openUrl]];
-            }];
-            [alertView bk_setCancelButtonWithTitle:@"关闭" handler:nil];
-            [alertView show];
+        if (NO == isCheckOnAppStore) {//如果接口未来得及更新升级信息，就自动检测AppStore上的新版本
+            [YSCCommonUtils checkNewVersionOnAppStore];
         }
     }
 }
@@ -349,10 +349,8 @@
     }
     NSString *bssid = nil;
     NSArray *ifs = (__bridge id)CNCopySupportedInterfaces();
-    NSLog(@"ifs:%@",ifs);
     for (NSString *ifnam in ifs) {
         NSDictionary *info = (__bridge id)CNCopyCurrentNetworkInfo((__bridge CFStringRef)ifnam);
-        NSLog(@"dici：%@", info);
         if (info[@"BSSID"]) {
             bssid = [NSString stringWithFormat:@"%@", info[@"BSSID"]];
             bssid = bssid.lowercaseString;

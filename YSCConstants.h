@@ -171,6 +171,7 @@ return _sharedObject;
 #define STORAGEMANAGER                              [StorageManager sharedInstance]
 #define CURRENTDATE                                 [YSCCommonUtils currentDate]    //当前(服务器端)时间
 #define APPCONFIGMANAGER                            [AppConfigManager sharedInstance]
+#define AppUpdateUrl                                [@"https://itunes.apple.com/app/id" stringByAppendingString:kAppStoreId]//App升级url
 
 /**
  *  版本相关

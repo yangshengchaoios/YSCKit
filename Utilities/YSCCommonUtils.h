@@ -29,10 +29,9 @@
 @interface YSCCommonUtils : NSObject
 
 #pragma mark - 检测新版本
-+ (void)checkNewVersionShowMessage:(BOOL)showMessage;
-+ (void)checkNewVersionShowMessage:(BOOL)showMessage withParams:(NSDictionary *)params andType:(NSInteger)type;
-+ (void)checkNewVersion:(NewVersionModel *)versionModel showMessage:(BOOL)showMessage;
-+ (void)checkNewVersionByAppleId:(NSString *)appleId;
++ (void)checkNewVersion;
++ (void)checkNewVersionWithParams:(NSDictionary *)params type:(CheckNewVersionType)type;
++ (void)checkNewVersionOnAppStore;//检测本APP在AppStore上是否有新版本上线
 
 #pragma mark - 格式化
 //常用的价格字符串格式化方法（默认：显示￥、显示小数点）

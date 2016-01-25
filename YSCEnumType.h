@@ -9,6 +9,13 @@
 #ifndef EZGoal_YSCEnum_h
 #define EZGoal_YSCEnum_h
 
+//检测新版本的几种方法
+typedef NS_ENUM(NSInteger, CheckNewVersionType) {
+    CheckNewVersionTypeNone         = 0,//关闭更新功能
+    CheckNewVersionTypeServer       = 1,//后台接口
+    CheckNewVersionTypeAppStore     = 2,//直接检测AppStore是否有新版本上线
+};
+
 //错误类型定义
 typedef NS_ENUM(NSInteger, ErrorType) {
     //网络层错误
