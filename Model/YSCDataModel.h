@@ -13,7 +13,7 @@
 //  公共model的基类
 //
 //--------------------------
-@interface BaseDataModel : NSObject
+@interface BaseDataModel : NSObject <NSCopying>
 //用于多section的TableView封装
 @property (nonatomic, strong) NSString *sectionKey;
 

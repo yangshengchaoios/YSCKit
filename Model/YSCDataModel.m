@@ -12,6 +12,9 @@
 @implementation BaseDataModel
 MJExtensionCodingImplementation
 MJExtensionLogAllProperties
+-(instancetype)copyWithZone:(NSZone *)zone {
+    return [NSKeyedUnarchiver unarchiveObjectWithData:[NSKeyedArchiver archivedDataWithRootObject:self]];
+}
 + (id)ObjectWithKeyValues:(id)keyValues {
     if ([keyValues isKindOfClass:[NSArray class]]) {
         return [self mj_objectArrayWithKeyValuesArray:keyValues];

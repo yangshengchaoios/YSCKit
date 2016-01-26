@@ -491,7 +491,7 @@
     //继续组织错误日志
     [errMsg appendFormat:@"  messageTitle:%@\r  messageDetail:%@\r", messageTitle, messageDetail];//显示解析后的错误提示
     if (error) {
-        [errMsg appendFormat:@"  errorCode(%ld)\r  errorMessage:%@\r", (long)error.code, error];//显示error的错误内容
+        [errMsg appendFormat:@"  errorCode:%ld\r  errorMessage:%@\r", (long)error.code, error];//显示error的错误内容
     }
     [errMsg appendFormat:@"<<<<<<<<<<<<<<<<<<<<ErrorType[%ld]<<<<<<<<<<<<<<<<<<<<\r\n", (long)errorType];//错误标记结束
     NSLog(@"errMsg=%@", errMsg);
