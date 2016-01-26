@@ -169,7 +169,7 @@
 }
 - (NSObject *)jsonObjectOfString {
     NSData *data = [self dataUsingEncoding:NSUTF8StringEncoding];
-    NSObject *json = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
+    NSObject *json = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:nil];
     return json;
 }
 //将id对象转换成json字符串

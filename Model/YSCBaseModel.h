@@ -7,46 +7,14 @@
 //  FORMATED!
 //
 
-#import <JSONModel/JSONModel.h>
+@interface YSCBaseModel : NSObject
 
-#define RegionDbPath       AppProgramPath(@"region.sqlite")
-@class BaseDataModel, StateModel;
-
-@interface YSCBaseModel : JSONModel
-@property (assign, nonatomic) NSInteger stateInteger;
+@property (assign, nonatomic) NSInteger state;
 @property (strong, nonatomic) NSString *message;
-@property (strong, nonatomic) NSObject<ConvertOnDemand> *data;
-@property (strong, nonatomic) StateModel *stateModel;
+@property (strong, nonatomic) NSObject *data;
 
-+ (NSDictionary *)jsonToModelMapping;
-- (void)formatProperties;
-@end
++ (instancetype)ObjectWithKeyValues:(id)keyValues;
+- (BOOL)isSuccess;
+- (BOOL)isLoginExpired;
 
-
-/**
- *  公共model的基类，主要是设置所有参数都是optional的，并添加序列化和反序列化方法
- */
-@interface BaseDataModel : JSONModel
-@property (nonatomic, strong) NSString *sectionKey;//用于多section的TableView封装
-
-+ (NSDictionary *)jsonToModelMapping;
-+ (void)GetByMethod:(NSString *)method params:(NSDictionary *)params block:(YSCResponseErrorMessageBlock)block;
-+ (void)PostByMethod:(NSString *)method params:(NSDictionary *)params block:(YSCResponseErrorMessageBlock)block;
-//统一规范参数的提交方式：加密的json字符串写入httpBody
-+ (void)RequestByMethod:(NSString *)method params:(NSDictionary *)params block:(YSCResponseErrorMessageBlock)block;
-@end
-
-//针对基类数据模型不规则的情况
-@interface StateModel : BaseDataModel
-@property (nonatomic, assign) NSInteger code;
-@property (nonatomic, strong) NSString *msg;
-@property (nonatomic, strong) NSString *debugMsg;
-@end
-
-//YSCKit中用到的model
-@interface YSCPhotoBrowseCellModel : BaseDataModel
-@property (nonatomic, strong) NSString *imageUrl;
-@property (nonatomic, strong) UIImage *image;
-
-+ (instancetype)CreateModelByImageUrl:(NSString *)imageUrl image:(UIImage *)image;
 @end

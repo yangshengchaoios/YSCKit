@@ -281,14 +281,14 @@
     [AFNManager getDataFromUrl:[self prefixOfUrl]
                        withAPI:[self methodWithPath]
                   andDictParam:param
-                     modelName:[self modelClassOfData]
+                     dataModel:[self modelClassOfData]
               requestSuccessed:successed requestFailure:failed];
 }
 - (void)postDataByParam:(NSDictionary *)param successed:(RequestSuccessed)successed failed:(RequestFailure)failed {
     [AFNManager postDataToUrl:[self prefixOfUrl]
                       withAPI:[self methodWithPath]
                  andDictParam:param
-                    modelName:[self modelClassOfData]
+                    dataModel:[self modelClassOfData]
              requestSuccessed:successed requestFailure:failed];
 }
 

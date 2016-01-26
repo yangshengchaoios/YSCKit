@@ -44,7 +44,7 @@
 #pragma mark - 计算大小
 //计算内容大小(不包括气泡四周的边距)
 + (CGSize)ContentSizeWithMessage:(EZGCarMessage *)message {
-    MyCarModel *carModel = [[MyCarModel alloc] initWithString:Trim(message.attributes[MParamCarInfo]) error:nil];
+    MyCarModel *carModel = [MyCarModel ObjectWithKeyValues:Trim(message.attributes[MParamCarInfo])];
     CGFloat titleHeight = [NSString HeightOfNormalString:Trim(message.text)
                                                 maxWidth:kBubbleServiceTextWidth
                                                 withFont:kBubbleTitleFont];
@@ -64,7 +64,7 @@
 - (void)layoutMessage:(EZGCarMessage *)message displaysTimestamp:(BOOL)displayTimestamp {
     [super layoutMessage:message displaysTimestamp:displayTimestamp];
     self.carTitleLabel.text = message.text;
-    MyCarModel *carModel = [[MyCarModel alloc] initWithString:Trim(message.attributes[MParamCarInfo]) error:nil];
+    MyCarModel *carModel = [MyCarModel ObjectWithKeyValues:Trim(message.attributes[MParamCarInfo])];
     self.carBrandLabel.text = [carModel formatCarModelName];
     self.carNumberLabel.text = [carModel formatCarNumber];
 }

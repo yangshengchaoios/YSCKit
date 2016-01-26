@@ -57,6 +57,7 @@
 
 //基类
 #import "YSCBaseModel.h"
+#import "YSCDataModel.h"
 #import "YSCPullToRefreshTableViewController.h"
 #import "YSCPullToRefreshCollectionViewController.h"
 #import "YSCBaseTableViewCell.h"

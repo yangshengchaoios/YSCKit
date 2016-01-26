@@ -22,7 +22,7 @@
         [AFNManager getDataFromUrl:kResPathAppCommonUrl
                            withAPI:kResPathCheckNewVersion
                       andDictParam:params
-                         modelName:[NewVersionModel class]
+                         dataModel:[NewVersionModel class]
                   requestSuccessed:^(id responseObject) {
                       NewVersionModel *versionModel = (NewVersionModel *)responseObject;
                       if (isNotEmpty(versionModel.appVersion)) {

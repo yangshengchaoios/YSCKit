@@ -73,7 +73,7 @@
     [AFNManager getDataFromUrl:kResPathAppCommonUrl
                        withAPI:kResPathGetServerTime
                   andDictParam:nil
-                     modelName:nil
+                     dataModel:nil
               requestSuccessed:^(id responseObject) {
                   NSDate *nowDate = [NSDate date];
                   NSTimeInterval httpWaste = [nowDate timeIntervalSinceDate:date];//计算接口调用的执行时间(秒)

@@ -199,7 +199,7 @@
                        withAPI:kResPathGetUserChatInfo
                   andDictParam:@{kParamUserType : userType,
                                  kParamUserIds : [userIds componentsJoinedByString:@","]}
-                     modelName:[ChatUserModel class]
+                     dataModel:[ChatUserModel class]
               requestSuccessed:^(id responseObject) {
                   NSArray *array = (NSArray *)responseObject;
                   if (isNotEmpty(array)) {
@@ -225,7 +225,7 @@
         FMResultSet *resultSet = [db executeQuery:sql];
         if ([resultSet next]) {
             NSString *userInfo = Trim([resultSet stringForColumn:@"userInfo"]);
-            userModel = [[ChatUserModel alloc] initWithString:userInfo error:nil];
+            userModel = [ChatUserModel ObjectWithKeyValues:userInfo];
         }
         [resultSet close];
     }

@@ -396,7 +396,7 @@
         [AFNManager getDataFromUrl:self.prefixOfUrl
                            withAPI:self.methodName
                       andDictParam:self.dictParamBlock(pageIndex)
-                         modelName:NSClassFromString(self.modelName)
+                         dataModel:NSClassFromString(self.modelName)
                   requestSuccessed:successBlock
                     requestFailure:failureBlock];
     }
@@ -404,7 +404,7 @@
         [AFNManager postDataToUrl:self.prefixOfUrl
                           withAPI:self.methodName
                      andDictParam:self.dictParamBlock(pageIndex)
-                        modelName:NSClassFromString(self.modelName)
+                        dataModel:NSClassFromString(self.modelName)
                  requestSuccessed:successBlock
                    requestFailure:failureBlock];
     }
@@ -414,7 +414,8 @@
                    andArrayParam:nil
                     andDictParam:nil
                     andBodyParam:[NSString jsonStringWithObject:self.dictParamBlock(pageIndex)]
-                       modelName:NSClassFromString(self.modelName)
+                       dataModel:NSClassFromString(self.modelName)
+                       imageData:nil
                      requestType:RequestTypePostBodyData
                 requestSuccessed:successBlock
                   requestFailure:failureBlock];
