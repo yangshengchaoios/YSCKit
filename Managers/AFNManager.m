@@ -66,8 +66,11 @@
     requestSuccessed:(RequestSuccessed)requestSuccessed
       requestFailure:(RequestFailure)requestFailure {
     //0. url组装、参数格式化
-    url = [url stringByAppendingPathComponent:apiName];//组装完整的url地址
-    url = [url stringByAppendingPathComponent:[arrayParam componentsJoinedByString:@"/"]];//组装数组参数
+    NSString *tempUrl = [@"/" stringByAppendingPathComponent:apiName];//组装完整的url地址
+    url = [url stringByAppendingString:tempUrl];
+    if ([arrayParam count] > 0) {
+        url = [url stringByAppendingFormat:@"/%@", [arrayParam componentsJoinedByString:@"/"]];//组装数组参数
+    }
     NSDictionary *newDictParam = [AppData FormatRequestParams:dictParam];//格式化所有请求的参数
     
     //1. 调用网络访问通用方法
