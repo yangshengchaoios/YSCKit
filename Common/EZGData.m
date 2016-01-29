@@ -346,7 +346,7 @@
 //B端需求：2. 指定某类的业务会话列表
 //查询条件ezgoalType: nil-所有会话  empty string-普通会话 not empty string-业务会话
 - (void)refreshConversationsByEzgoalType:(NSString *)ezgoalType pageIndex:(NSInteger)pageIndex pageSize:(NSInteger)pageSize block:(AVIMArrayResultBlock)block {
-    AVIMConversationQuery *query = [[AVIMClient defaultClient] conversationQuery];
+    AVIMConversationQuery *query = [[CDChatManager manager].client conversationQuery];
     query.cachePolicy = kAVCachePolicyNetworkOnly;
     [query orderByDescending:@"lm"];
     [query whereKey:kAVIMKeyMember containedIn:@[USERID]];
@@ -420,7 +420,7 @@
             [self openChatRoomByConversion:conversation byParams:paramsChatRoom];
         }
         else {//根据rescueId查找网络会话
-            AVIMConversationQuery *q = [[AVIMClient defaultClient] conversationQuery];
+            AVIMConversationQuery *q = [[CDChatManager manager].client conversationQuery];
             q.cachePolicy = kAVCachePolicyNetworkOnly;
             [q whereKey:AVIMAttr(kParamRescueId) equalTo:userInfo[kParamRescueId]];
             [q findConversationsWithCallback: ^(NSArray *objects, NSError *error) {
@@ -600,7 +600,7 @@
         return;
     }
     if (refreshOnly) {//接受消息仅仅刷新会话
-        AVIMConversationQuery *query = [[AVIMClient defaultClient] conversationQuery];
+        AVIMConversationQuery *query = [[CDChatManager manager].client conversationQuery];
         query.cachePolicy = kAVCachePolicyNetworkOnly;
         [query getConversationById:conv.conversationId callback:^(AVIMConversation *conversation, NSError *error) {
             NSLog(@"conv.attr1=%@", conversation.attributes);

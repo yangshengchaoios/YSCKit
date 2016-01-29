@@ -13,48 +13,32 @@
  *       常用的单例变量管理
  */
 
-#define YSCInstance         [YSCData SharedInstance]
-
+#define YSCInstance             [YSCData SharedInstance]
 
 //--------------------------------------
-//  常用业务变量
+//  定义全局变量
 //--------------------------------------
 @interface YSCData : NSObject
+@property (nonatomic, weak) UIViewController *currentViewController;
+@property (nonatomic, strong) NSString *cacheDBPath;        //缓存数据库路径
+//app config
+@property (nonatomic, strong) NSString *udid;               //设备唯一编号(UMeng)
+@property (nonatomic, strong) NSString *deviceToken;        //推送通知的token
+@property (nonatomic, assign) BOOL isOnlineParamsChanged;   //在线参数是否改动了
+//current date
+@property (nonatomic, strong) NSDate *currentDate;
+@property (nonatomic, assign) NSTimeInterval currentTimeInterval;//服务器当前时间戳(秒)从1970-01-01 00:00:00开始
 
 + (instancetype)SharedInstance;
 
-- (NSDate *)currentDate;
-- (NSTimeInterval)currentTimeInterval;
+#pragma mark - 获取服务器当前时间
+- (void)refreshServerTimeWithBlock:(YSCResultBlock)block;   //如果具体项目的网络请求不同就重新该方法
 
-@end
+#pragma mark - 获取配置参数(本地参数+在线参数)
+- (void)resetAppParams;                                     //重置参数键值对(当有在线参数更新时调用)
+- (NSString *)valueOfAppConfig:(NSString *)name;            //在线参数值优先级 > 本地参数值
 
-
-//--------------------------------------
-//  获取配置参数(本地参数+在线参数)
-//--------------------------------------
-@interface YSCData (AppConfig)
-
-
-
-@end
-
-
-//--------------------------------------
-//  网络状态监测
-//--------------------------------------
-@interface YSCData (Reachability)
-
-
-
-@end
-
-
-
-//--------------------------------------
-//  播放音频
-//--------------------------------------
-@interface YSCData (PlayAudio)
-
-
-
+#pragma mark - 播放音频
+- (void)playAudioWithFilePath:(NSString *)filePath;
+- (void)playAudioWithFilePath:(NSString *)filePath repeatCount:(NSInteger)count;
 @end

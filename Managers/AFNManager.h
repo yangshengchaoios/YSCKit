@@ -26,6 +26,13 @@ typedef void (^RequestFailure)(ErrorType errorType, NSError *error);
               dataModel:(Class)dataModel
        requestSuccessed:(RequestSuccessed)requestSuccessed
          requestFailure:(RequestFailure)requestFailure;
+//没有模型映射
++ (void)RequestWithApi:(NSString *)apiName
+                params:(NSDictionary *)params
+           requestType:(RequestType)requestType
+      requestSuccessed:(RequestSuccessed)requestSuccessed
+        requestFailure:(RequestFailure)requestFailure;
+
 + (void)getDataFromUrl:(NSString *)url
                withAPI:(NSString *)apiName
           andDictParam:(NSDictionary *)dictParam
@@ -38,6 +45,13 @@ typedef void (^RequestFailure)(ErrorType errorType, NSError *error);
             dataModel:(Class)dataModel
      requestSuccessed:(RequestSuccessed)requestSuccessed
        requestFailure:(RequestFailure)requestFailure;
+//没有模型映射
++ (void)RequestFromUrl:(NSString *)url
+               withAPI:(NSString *)apiName
+                params:(NSDictionary *)params
+           requestType:(RequestType)requestType
+      requestSuccessed:(RequestSuccessed)requestSuccessed
+        requestFailure:(RequestFailure)requestFailure;
 
 #pragma mark - 处理YSCBaseModel和BaseDataModel映射、登陆过期(state=99)
 + (void)requestByUrl:(NSString *)url

@@ -9,15 +9,15 @@
 #ifndef YSCHelper_h
 #define YSCHelper_h
 
-#import "YSCData.h"
-#import "YSCSNSShareData.h"
-#import "YSCStorageData.h"
-
 #import "YSCManager.h"
 #import "YSCLogManager.h"
 #import "YSCFileManager.h"
 #import "YSCImageManager.h"
 #import "YSCRequestManager.h"
 
+#import "YSCData.h"
+#import "YSCSNSShareData.h"
+#import "YSCStorageData.h"
 
-#endif /* YSCHelper_h */
+
+#endif

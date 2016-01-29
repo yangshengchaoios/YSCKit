@@ -90,6 +90,7 @@
 #pragma mark - Overridden methods 业务相关
 - (void)userLoginStatusChanged;//用户登录状态改变了
 - (void)didAppBecomeActive;//APP恢复运行
+- (void)didAppEnterBackground;//用户按下Home键APP进入后台
 - (NSArray *)customBarButtonOnNavigationBar:(UIView *)customButton withFixedSpaceWidth:(NSInteger)width;
 - (IBAction)backButtonClicked:(id)sender;
 - (IBAction)popButtonClicked:(id)sender;

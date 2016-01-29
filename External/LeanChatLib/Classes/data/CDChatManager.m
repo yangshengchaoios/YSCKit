@@ -34,7 +34,6 @@ static CDChatManager *instance;
         [AVIMClient setTimeoutIntervalInSeconds:20];
         // 以下选项也即是说 A 不在线时，有人往A发了很多条消息，下次启动时，不再收到具体的离线消息，而是收到离线消息的数目(未读通知)
         [AVIMClient setUserOptions:@{AVIMUserOptionUseUnread:@(NO)}];
-        [AVIMClient defaultClient].delegate =self;
     }
     return self;
 }
@@ -48,7 +47,11 @@ static CDChatManager *instance;
     NSString *dbPath = [self databasePathWithUserId:_selfId];
     [[CDConversationStore store] setupStoreWithDatabasePath:dbPath];
     [[CDFailedMessageStore store] setupStoreWithDatabasePath:dbPath];
-    [[AVIMClient defaultClient] openWithClientId:clientId tag:@"Mobile" callback:^(BOOL succeeded, NSError *error) {
+    self.client = [[AVIMClient alloc] initWithClientId:clientId tag:@"Mobile"];
+    self.client.delegate = self;
+    AVIMClientOpenOption *option = [[AVIMClientOpenOption alloc] init];
+    option.force = YES;
+    [self.client openWithOption:option callback:^(BOOL succeeded, NSError *error) {
         [self updateConnectStatus];
         if (callback) {
             callback(succeeded, error);
@@ -58,14 +61,14 @@ static CDChatManager *instance;
 //注销IM
 - (void)closeWithCallback:(AVBooleanResultBlock)callback {
     if (_selfId) {
-        [[AVIMClient defaultClient] closeWithCallback:callback];
+        [self.client closeWithCallback:callback];
     }
 }
 
 #pragma mark - conversation
 //根据会话id查询(不创建)会话
 - (void)fetchConvWithConvid:(NSString *)convid callback:(AVIMConversationResultBlock)callback {
-    AVIMConversationQuery *q = [[AVIMClient defaultClient] conversationQuery];
+    AVIMConversationQuery *q = [self.client conversationQuery];
     q.cachePolicy = kAVCachePolicyNetworkOnly;
     [q whereKey:@"objectId" equalTo:convid];
     [q findConversationsWithCallback: ^(NSArray *objects, NSError *error) {
@@ -98,7 +101,7 @@ static CDChatManager *instance;
     if (set.count != members.count) {
         [NSException raise:NSInvalidArgumentException format:@"The array has duplicate value"];
     }
-    AVIMConversationQuery *q = [[AVIMClient defaultClient] conversationQuery];
+    AVIMConversationQuery *q = [self.client conversationQuery];
     [q whereKey:AVIMAttr(kParamEzgoalType) equalTo:attributes[kParamEzgoalType]];
     if (NO == [EZGManager checkConversationIsNormal:attributes[kParamEzgoalType]]) {//如果是非普通会话，需要过滤s4Id和status
         [q whereKey:AVIMAttr(kParamS4Id) equalTo:attributes[kParamS4Id]];
@@ -122,7 +125,7 @@ static CDChatManager *instance;
                 if (isNotEmpty(attributes)) {//新增扩展属性
                     [tempAttr addEntriesFromDictionary:attributes];
                 }
-                [[AVIMClient defaultClient] createConversationWithName:nil clientIds:members attributes:tempAttr options:AVIMConversationOptionNone callback:callback];
+                [self.client createConversationWithName:nil clientIds:members attributes:tempAttr options:AVIMConversationOptionNone callback:callback];
             }
         }
     }];
@@ -130,7 +133,7 @@ static CDChatManager *instance;
 //根据convId数组查询所有会话
 - (void)fetchConvsWithConvids:(NSSet *)convids callback:(AVIMArrayResultBlock)callback {
     if (convids.count > 0) {
-        AVIMConversationQuery *q = [[AVIMClient defaultClient] conversationQuery];
+        AVIMConversationQuery *q = [self.client conversationQuery];
         [q whereKey:@"objectId" containedIn:[convids allObjects]];
         q.cachePolicy = kAVCachePolicyNetworkOnly;
         q.limit = 1000;  // default limit:10
@@ -184,7 +187,7 @@ static CDChatManager *instance;
     [[NSNotificationCenter defaultCenter] postNotificationName:kCDNotificationConnectivityUpdated object:@(self.connect)];
 }
 - (BOOL)connect {
-    return [AVIMClient defaultClient].status == AVIMClientStatusOpened;
+    return self.client.status == AVIMClientStatusOpened;
 }
 
 #pragma mark - receive message handle

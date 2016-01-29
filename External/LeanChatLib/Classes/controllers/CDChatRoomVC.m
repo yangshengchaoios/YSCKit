@@ -214,8 +214,7 @@ ZYQAssetPickerControllerDelegate>
     return _clientStatusView;
 }
 - (void)updateStatusView {
-    NSLog(@"status=%d", [AVIMClient defaultClient].status);
-    self.clientStatusView.hidden = ([AVIMClient defaultClient].status == AVIMClientStatusOpened);
+    self.clientStatusView.hidden = ([CDChatManager manager].client.status == AVIMClientStatusOpened);
 }
 
 #pragma mark -  ui config

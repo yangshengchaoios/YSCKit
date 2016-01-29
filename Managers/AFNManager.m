@@ -31,6 +31,18 @@
          requestFailure:(RequestFailure)requestFailure {
     [self requestByUrl:kResPathAppBaseUrl withAPI:apiName andArrayParam:nil andDictParam:dictParam andBodyParam:nil dataModel:dataModel imageData:nil requestType:RequestTypePOST requestSuccessed:requestSuccessed requestFailure:requestFailure];
 }
++ (void)RequestWithApi:(NSString *)apiName
+                params:(NSDictionary *)params
+           requestType:(RequestType)requestType
+      requestSuccessed:(RequestSuccessed)requestSuccessed
+        requestFailure:(RequestFailure)requestFailure {
+    NSString *bodyParam = nil;
+    if (RequestTypePostBodyData == requestType) {
+        bodyParam = [NSString jsonStringWithObject:params];
+    }
+    [self requestByUrl:kResPathAppBaseUrl withAPI:apiName andArrayParam:nil andDictParam:params andBodyParam:bodyParam dataModel:nil imageData:nil requestType:requestType requestSuccessed:requestSuccessed requestFailure:requestFailure];
+}
+
 + (void)getDataFromUrl:(NSString *)url
                withAPI:(NSString *)apiName
           andDictParam:(NSDictionary *)dictParam
@@ -46,6 +58,18 @@
      requestSuccessed:(RequestSuccessed)requestSuccessed
        requestFailure:(RequestFailure)requestFailure {
     [self requestByUrl:url withAPI:apiName andArrayParam:nil andDictParam:dictParam andBodyParam:nil dataModel:dataModel imageData:nil requestType:RequestTypePOST requestSuccessed:requestSuccessed requestFailure:requestFailure];
+}
++ (void)RequestFromUrl:(NSString *)url
+             withAPI:(NSString *)apiName
+              params:(NSDictionary *)params
+         requestType:(RequestType)requestType
+    requestSuccessed:(RequestSuccessed)requestSuccessed
+      requestFailure:(RequestFailure)requestFailure {
+    NSString *bodyParam = nil;
+    if (RequestTypePostBodyData == requestType) {
+        bodyParam = [NSString jsonStringWithObject:params];
+    }
+     [self requestByUrl:url withAPI:apiName andArrayParam:nil andDictParam:params andBodyParam:bodyParam dataModel:nil imageData:nil requestType:requestType requestSuccessed:requestSuccessed requestFailure:requestFailure];
 }
 
 

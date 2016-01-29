@@ -131,8 +131,9 @@
         [blockSelf userLoginStatusChanged];
     }];
     
-    //APP恢复运行
+    //监控APP运行状态(恢复运行、按下home键进入后台)
     addNObserver(@selector(didAppBecomeActive), UIApplicationDidBecomeActiveNotification);
+    addNObserver(@selector(didAppEnterBackground), UIApplicationDidEnterBackgroundNotification);
 }
 
 
@@ -542,6 +543,9 @@
 }
 //APP恢复运行
 - (void)didAppBecomeActive {
+}
+//用户按下Home键APP进入后台
+- (void)didAppEnterBackground {
 }
 
 /**
