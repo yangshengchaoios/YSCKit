@@ -254,55 +254,6 @@
         }
     }];
 }
-//添加新的deviceToken
-- (void)addNewDeviceToken:(NSString *)deviceToken {
-    ReturnWhenObjectIsEmpty(deviceToken);
-    AVObject *post = [AVObject objectWithClassName:@"_Installation"];
-    [post setObject:deviceToken forKey:@"deviceToken"];
-    [post setObject:@"Asia/Shanghai" forKey:@"timeZone"];
-    [post setObject:@(0) forKey:@"badge"];
-    if (isNotEmpty(USERID)) {
-        [post setObject:@[USERID] forKey:@"channels"];
-    }
-    else {
-        [post setObject:@[] forKey:@"channels"];
-    }
-    [post setObject:@"ios" forKey:@"deviceType"];
-    [post setObject:[EZGManager deviceProfile] forKey:@"deviceProfile"];
-    [post saveInBackgroundWithBlock:^(BOOL succeeded, NSError *error) {
-        NSLog(@"save device:[%d], error:%@", succeeded, error);
-    }];
-}
-//更新_Installation，保证同一个userId只能对应一个deviceToken
-+ (void)updateInstallationToEnsureUniqueUserId:(NSString *)userId {
-    NSString *deviceToken = [AppConfigManager sharedInstance].deviceToken;
-    ReturnWhenObjectIsEmpty(userId);
-    ReturnWhenObjectIsEmpty(deviceToken);
-    AVQuery *query = [AVQuery queryWithClassName:@"_Installation"];
-    [query whereKey:@"channels" containsString:userId];
-    [query whereKey:@"deviceToken" notEqualTo:deviceToken];
-    [query findObjectsInBackgroundWithBlock: ^(NSArray *objects, NSError *error) {
-        if (isEmpty(error)) {
-            for (AVObject *object in objects) {
-                NSMutableArray *tempArray = [[object objectForKey:@"channels"] mutableCopy];
-                [tempArray removeObject:userId];
-                [object setObject:tempArray forKey:@"channels"];
-                [object setObject:@(0) forKey:@"badge"];
-                [object saveInBackgroundWithBlock:^(BOOL succeeded, NSError *error) {
-                    if (succeeded) {
-                        NSLog(@"delete successed");
-                    }
-                    else {
-                        NSLog(@"delete faild:%@", error);
-                    }
-                }];
-            }
-        }
-        else {
-            NSLog(@"error:%@", error);
-        }
-    }];
-}
 //更新在线参数
 + (void)updateOnlineParams {
     [AVCloud callFunctionInBackground:@"GetAppParams"
