@@ -117,8 +117,8 @@
 }
 + (instancetype)CreateNewDevice {
     AVOSDevice *device = [AVOSDevice new];
-    device.udid = [AppConfigManager sharedInstance].udid;
-    device.deviceToken = [AppConfigManager sharedInstance].deviceToken;
+    device.udid = YSCInstance.udid;
+    device.deviceToken = YSCInstance.deviceToken;
     device.type = @"ios";
     device.appId = kAppId;
     device.appVersion = ProductVersion;
@@ -129,7 +129,7 @@
     return device;
 }
 + (void)uploadDeviceInfo {
-    NSDate *lastUploadDate = GetCacheObject(@"lastUploadDeviceInfoDate");
+    NSDate *lastUploadDate = YSCGetCacheObject(@"lastUploadDeviceInfoDate");
     NSInteger intervalMinutes = [kUploadDeviceInfoInterval integerValue];
     if (nil == lastUploadDate) {
         lastUploadDate = [NSDate dateWithMinutesBeforeNow:2 * intervalMinutes];
@@ -141,7 +141,7 @@
     }
     //保存设备信息
     AVQuery *query = [AVOSDevice query];
-    [query whereKey:@"udid" equalTo:[AppConfigManager sharedInstance].udid];
+    [query whereKey:@"udid" equalTo:YSCInstance.udid];
     [query whereKey:@"appId" equalTo:kAppId];
     [query findObjectsInBackgroundWithBlock:^(NSArray *objects, NSError *error) {
         AVOSDevice *device = nil;
@@ -157,7 +157,7 @@
             device.deviceName = [UIDevice currentDevice].name;
             [device saveInBackgroundWithBlock:^(BOOL succeeded, NSError *error) {
                 if (succeeded) {
-                    SaveCacheObject(CURRENTDATE, @"lastUploadDeviceInfoDate");
+                    YSCSaveCacheObject(CURRENTDATE, @"lastUploadDeviceInfoDate");
                 }
             }];
         }
@@ -176,7 +176,7 @@
     NSString *tablesql_ChatUser = @"CREATE TABLE IF NOT EXISTS ChatUser ( \
     userId Varchar(100) PRIMARY KEY, \
     userInfo TEXT DEFAULT NULL)";
-    [YSCCommonUtils SqliteUpdate:tablesql_ChatUser dbPath:EZGDATA.cacheDBPath];
+    [YSCManager SqliteUpdate:tablesql_ChatUser dbPath:EZGDATA.cacheDBPath];
 }
 + (void)RefreshByUserIds:(NSArray *)userIds ezgoalType:(NSString *)ezgoalType block:(YSCResponseErrorMessageBlock)block {
     if (isEmpty(userIds)) {
@@ -227,10 +227,10 @@
 //保存模型至本地数据库
 - (void)saveToDB {
     NSString *delSql = [NSString stringWithFormat:@"DELETE FROM ChatUser WHERE userId = '%@'", Trim(self.userId)];
-    [YSCCommonUtils SqliteUpdate:delSql dbPath:EZGDATA.cacheDBPath];
+    [YSCManager SqliteUpdate:delSql dbPath:EZGDATA.cacheDBPath];
     NSString *insertSql = [NSString stringWithFormat:@"INSERT INTO ChatUser(userId,userInfo) VALUES('%@', '%@')",
                      Trim(self.userId), Trim([self toJSONString])];
-    [YSCCommonUtils SqliteUpdate:insertSql dbPath:EZGDATA.cacheDBPath];
+    [YSCManager SqliteUpdate:insertSql dbPath:EZGDATA.cacheDBPath];
 }
 @end
 @implementation BMKCustomAnnotation         @end

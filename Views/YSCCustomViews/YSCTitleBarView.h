@@ -10,9 +10,7 @@
 #import <UIKit/UIKit.h>
 
 @interface YSCTitleBarView : UIView
-
 @property (nonatomic, strong) UILabel *titleLabel;
 @property (nonatomic, strong) UILabel *netStatusLabel;
 @property (nonatomic, strong) UIImageView *backgroundImageView;
-
 @end

@@ -54,7 +54,11 @@
         }
     };
     self.tableView.clickCellBlock = ^(NSObject *object, NSIndexPath *indexPath) {
-        [ShowPhotosManager showPhotosWithImageUrls:imageUrlArray atIndex:indexPath.row fromImageView:nil];
+        YSCBaseViewController *baseVC = (YSCBaseViewController *)YSCInstance.currentViewController;
+        [baseVC pushViewController:@"YSCPhotoBrowseViewController"
+                        withParams:@{kParamImageUrls : imageUrlArray,
+                                     kParamIndex : @(indexPath.row)}
+                          animated:NO];
     };
     [self.tableView beginRefreshing];
 }

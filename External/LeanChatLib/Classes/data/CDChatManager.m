@@ -221,7 +221,7 @@ static CDChatManager *instance;
     [conversation markAsReadInBackground];
     //只要接受到消息，就表示之前所有已发送的消息都是已读的>>>
     NSString *received_convid = [NSString stringWithFormat:@"received_%@", Trim(conversation.conversationId)];
-    SaveCacheObject(@(message.sendTimestamp), received_convid);
+    YSCSaveCacheObject(@(message.sendTimestamp), received_convid);
     //在进入聊天对话框的时候就设置为已读<<<<<<<<<<<<<<<<<<
     
     [[NSNotificationCenter defaultCenter] postNotificationName:kCDNotificationMessageReceived object:message];

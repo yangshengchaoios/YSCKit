@@ -38,7 +38,7 @@ MJExtensionLogAllProperties
             block(responseObject, nil);
         }
     } requestFailure:^(ErrorType errorType, NSError *error) {
-        NSString *errMsg = [YSCCommonUtils ResolveErrorType:errorType andError:error];
+        NSString *errMsg = [YSCManager ResolveErrorType:errorType andError:error];
         if (block) {
             block(nil, errMsg);
         }

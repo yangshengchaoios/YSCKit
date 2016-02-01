@@ -42,12 +42,12 @@
         addNObserver(@selector(_didAppEnterBackground), UIApplicationDidEnterBackgroundNotification);
         
         // 初始化时间差
-        if (nil == GetObject(CachedSyncInterval)) {
-            SaveObject(@(-0.5f), CachedSyncInterval);
+        if (nil == YSCGetObject(CachedSyncInterval)) {
+            YSCSaveObject(@(-0.5f), CachedSyncInterval);
             self.syncInterval = -0.5f;
         }
         else {
-            self.syncInterval =  [GetObject(CachedSyncInterval) doubleValue];
+            self.syncInterval =  [YSCGetObject(CachedSyncInterval) doubleValue];
         }
     }
     return self;
@@ -124,7 +124,7 @@
                 NSTimeInterval serverTime = oldServerTime + httpWaste * 1000.0f / 2.0f;
                 NSTimeInterval localTime = [endDate timeIntervalSince1970] * 1000.0f;
                 self.syncInterval = serverTime - localTime;
-                SaveObject(@(self.syncInterval), CachedSyncInterval);
+                YSCSaveObject(@(self.syncInterval), CachedSyncInterval);
             }
         }
         else {
@@ -145,22 +145,22 @@
 #pragma mark - 获取配置参数(本地参数+在线参数)
 - (NSString *)udid {
     if (nil == _udid) {
-        NSString *tempUdid = GetObject(@"OpenUDID");
+        NSString *tempUdid = YSCGetObject(@"OpenUDID");
         if (isEmpty(tempUdid)) {
             tempUdid = [UIDevice openUdid];//保证只获取一次udid就保存在内存中！
             if (isNotEmpty(tempUdid)) {
-                SaveObject(tempUdid, @"OpenUDID");
+                YSCSaveObject(tempUdid, @"OpenUDID");
             }
         }
         _udid = tempUdid;
     }
-    return _udid;
+    return _udid == nil ? @"" : _udid;
 }
 - (NSString *)deviceToken {
     if (isEmpty(_deviceToken)) {
-        _deviceToken = GetObject(@"DeviceToken");
+        _deviceToken = YSCGetObject(@"DeviceToken");
     }
-    return _deviceToken;
+    return _deviceToken == nil ? @"" : _deviceToken;
 }
 - (void)resetAppParams {
     [self.onlineParams removeAllObjects];
@@ -194,7 +194,7 @@
         return Trim(self.onlineParams[name]);
     }
     [self.onlineParams removeAllObjects];
-    self.onlineParams = GetObjectByFile(@"AppParams", @"OnLineParams");
+    self.onlineParams = YSCGetObjectByFile(@"AppParams", @"OnLineParams");
     if (self.onlineParams[name]) {
         return Trim(self.onlineParams[name]);
     }
@@ -228,7 +228,7 @@
 }
 - (void)playAudioWithFilePath:(NSString *)filePath repeatCount:(NSInteger)count {
     [self stopPlaying];
-    if ([YSCFileUtils isExistsAtPath:filePath]) {
+    if ([YSCFileManager FileExistsAtPath:filePath]) {
         AVAudioSession *audioSession = [AVAudioSession sharedInstance];
         [audioSession setCategory:AVAudioSessionCategoryAmbient withOptions:AVAudioSessionCategoryOptionDefaultToSpeaker error:nil];
         [audioSession setActive:YES error:nil];

@@ -21,6 +21,10 @@
 @interface YSCData : NSObject
 @property (nonatomic, weak) UIViewController *currentViewController;
 @property (nonatomic, strong) NSString *cacheDBPath;        //缓存数据库路径
+//network status
+@property (nonatomic, assign) BOOL isReachable;             //是否处于联网状态
+@property (nonatomic, assign) BOOL isReachableViaWiFi;      //是否通过wifi联网
+
 //app config
 @property (nonatomic, strong) NSString *udid;               //设备唯一编号(UMeng)
 @property (nonatomic, strong) NSString *deviceToken;        //推送通知的token

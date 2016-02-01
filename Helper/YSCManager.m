@@ -64,7 +64,7 @@
 + (void)_CheckNewVersionWithModel:(NewVersionModel *)versionModel isCheckOnAppStore:(BOOL)isCheckOnAppStore {
     //1. 取出模型中的参数
     NSString *appVersion = Trim(versionModel.appVersion);
-    BOOL isSkipTheVersion = [GetCacheObject(SkipVersion(appVersion)) boolValue];
+    BOOL isSkipTheVersion = [YSCGetCacheObject(SkipVersion(appVersion)) boolValue];
     BOOL isForcedUpdate = versionModel.isForcedUpdate;
     NSString *appUpdateLog = Trim(versionModel.appUpdateLog);
     NSString *appDownloadUrl = Trim(versionModel.appDownloadUrl);
@@ -91,7 +91,7 @@
             }];
             if (NO == isForcedUpdate ) {   //非强制更新的话才显示更多选项
                 [alertView bk_addButtonWithTitle:@"忽略此版本" handler:^{
-                    SaveCacheObject(@(YES), SkipVersion(appVersion));
+                    YSCSaveCacheObject(@(YES), SkipVersion(appVersion));
                     isAlertShow = NO;
                 }];
                 [alertView bk_addButtonWithTitle:@"稍后再说" handler:^{

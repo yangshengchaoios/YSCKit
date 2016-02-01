@@ -29,7 +29,7 @@
         if (weakSelf.messageInputView.isRecording) {
             return ;//正在录音中
         }
-        [YSCCommonUtils MakeCall:APPDATA.chatUser.phoneNumber success:^{
+        [YSCManager MakeCall:APPDATA.chatUser.phoneNumber success:^{
             [EZGUtils FunctionStatisticsByOperaCode:@"khgn" type:@"3"];
         }];
     }];

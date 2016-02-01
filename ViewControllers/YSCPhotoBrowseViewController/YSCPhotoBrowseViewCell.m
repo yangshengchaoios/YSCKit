@@ -28,7 +28,7 @@
     self.zoomScrollView.delegate = self;
     self.zoomScrollView.userInteractionEnabled = YES;
     [self.zoomScrollView bk_whenTapped:^{
-        UIViewController *controller = [AppConfigManager sharedInstance].currentViewController;
+        UIViewController *controller = YSCInstance.currentViewController;
         [controller.navigationController popViewControllerAnimated:NO];
     }];
 }

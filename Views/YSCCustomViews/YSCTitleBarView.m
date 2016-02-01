@@ -7,32 +7,27 @@
 //
 
 #import "YSCTitleBarView.h"
-#import "ReachabilityManager.h"
 
 @implementation YSCTitleBarView
-
 - (id)init {
     return [self initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, 64.0f)];
 }
-
 - (id)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
-        [self initInterface];
+        [self _setup];
     }
     return self;
 }
-
 - (id)initWithCoder:(NSCoder *)aDecoder {
     self = [super initWithCoder:aDecoder];
     if (self) {
-        [self initInterface];
+        [self _setup];
         
     }
     return self;
 }
-
-- (void)initInterface {
+- (void)_setup {
     self.backgroundColor = [UIColor whiteColor];
     
     self.backgroundImageView = [[UIImageView alloc] initWithFrame:self.bounds];
@@ -62,23 +57,20 @@
     self.netStatusLabel.textAlignment = NSTextAlignmentCenter;
     [self addSubview:self.netStatusLabel];
     
-//    [[ReachabilityManager sharedInstance] addObserver:self
-//                                          forKeyPath:@"reachable"
-//                                             options:NSKeyValueObservingOptionOld | NSKeyValueObservingOptionNew
-//                                             context:NULL];
-    self.netStatusLabel.hidden = YES;// [ReachabilityManager sharedInstance].reachable;
+    [YSCInstance addObserver:self
+                  forKeyPath:@"isReachable"
+                     options:NSKeyValueObservingOptionOld | NSKeyValueObservingOptionNew
+                     context:NULL];
+    self.netStatusLabel.hidden = YSCInstance.isReachable;
 }
-
-
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
-    if ([keyPath isEqualToString:@"reachable"]) {
+    if ([keyPath isEqualToString:@"isReachable"]) {
         dispatch_async(dispatch_get_main_queue(), ^{
-            self.netStatusLabel.hidden = [ReachabilityManager sharedInstance].reachable;
+            self.netStatusLabel.hidden = YSCInstance.isReachable;
         });
     }
 }
-
-//- (void)dealloc {
-//    [[ReachabilityManager sharedInstance] removeObserver:self forKeyPath:@"reachable"];
-//}
+- (void)dealloc {
+    [YSCInstance removeObserver:self forKeyPath:@"isReachable"];
+}
 @end

@@ -767,7 +767,7 @@
         imageName = [NSString replaceString:imageName byRegex:@"\\]\\]\\]" to:@""];
         UIImage *emojiImage = [UIImage imageNamed:imageName];
         // 6. 将图片 Size 修改为符合字体的大小
-        textAttachment.image = [YSCImageUtils resizeImage:emojiImage toSize:CGSizeMake(emojiSize,emojiSize)];
+        textAttachment.image = [YSCImageManager ResizeImage:emojiImage toSize:CGSizeMake(emojiSize,emojiSize)];
         // 7. 将之前 match 到的图片代码替换为含有 Emoji 表情的 NSAttributeString
         NSAttributedString *rep = [NSAttributedString attributedStringWithAttachment:textAttachment];
         [parsedOutput replaceCharactersInRange:matchRange withAttributedString:rep];

@@ -27,7 +27,7 @@
     self.delegate = self;
     self.userInteractionEnabled = YES;
     [self bk_whenTapped:^{
-        UIViewController *controller = [AppConfigManager sharedInstance].currentViewController;
+        UIViewController *controller = YSCInstance.currentViewController;
         [controller.navigationController popViewControllerAnimated:NO];
     }];
 }

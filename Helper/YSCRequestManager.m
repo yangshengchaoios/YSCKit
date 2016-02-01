@@ -129,7 +129,7 @@
     requestSuccessed:(RequestSuccessed)requestSuccessed
       requestFailure:(RequestFailure)requestFailure {
     //0. 判断网络状态、判断url合法性
-    if (NO == [ReachabilityManager sharedInstance].reachable) {
+    if (NO == YSCInstance.isReachable) {
         if (requestFailure) {
             requestFailure(ErrorTypeDisconnected, CreateNSError(@"网络断开"));
         }

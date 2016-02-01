@@ -31,21 +31,21 @@ void _uncaughtExceptionHandler(NSException *exception) {
 }
 
 + (void)SaveLog:(NSString *)logString {
-    NSString *logDirectory = [STORAGEMANAGER directoryPathOfDocumentsLog];
+    NSString *logDirectory = [YSCStorageInstance directoryPathOfDocumentsLog];
     NSString *fileName =  [CURRENTDATE stringWithFormat:@"yyyy-MM-dd"];
     NSString *logFilePath = [logDirectory stringByAppendingPathComponent:fileName];
     NSString *logStringWithTime = [NSString stringWithFormat:@"%@ -> %@\r\n", [CURRENTDATE stringWithFormat:@"HH:mm:ss SSS"], logString];
     [self SaveLog:logStringWithTime intoFilePath:logFilePath overWrite:NO];
 }
 + (void)SaveLog:(NSString *)logString intoFileName:(NSString *)fileName {
-    NSString *logDirectory = [STORAGEMANAGER directoryPathOfDocumentsLog];
+    NSString *logDirectory = [YSCStorageInstance directoryPathOfDocumentsLog];
     NSString *logFilePath = [logDirectory stringByAppendingPathComponent:fileName];
     [self SaveLog:logString intoFilePath:logFilePath overWrite:YES];
 }
 + (void)SaveLog:(NSString *)logString intoFilePath:(NSString *)logFilePath overWrite:(BOOL)overwrite {
     ReturnWhenObjectIsEmpty(logString);
-    if (overwrite && [YSCFileUtils isExistsAtPath:logFilePath]) {
-        [YSCFileUtils deleteFileOrDirectory:logFilePath];
+    if (overwrite && [YSCFileManager FileExistsAtPath:logFilePath]) {
+        [YSCFileManager DeleteFileOrDirectory:logFilePath];
     }
     NSFileHandle* fh = [NSFileHandle fileHandleForWritingAtPath:logFilePath];
     if ( ! fh ) {
@@ -66,7 +66,7 @@ void _uncaughtExceptionHandler(NSException *exception) {
 }
 
 + (void)DeleteLogFilesExceptLastDays:(NSInteger)days {
-    NSArray *fileNames = [YSCFileUtils allPathsInDirectoryPath:[STORAGEMANAGER directoryPathOfDocumentsLog]];
+    NSArray *fileNames = [YSCFileManager AllPathsInDirectoryPath:[YSCStorageInstance directoryPathOfDocumentsLog]];
     NSArray *tempArray = [fileNames sortedArrayUsingComparator:^NSComparisonResult(id  _Nonnull obj1, id  _Nonnull obj2) {
         NSDate *date1 = [NSDate dateFromString:(NSString *)obj1 withFormat:DateFormat3];
         NSDate *date2 = [NSDate dateFromString:(NSString *)obj2 withFormat:DateFormat3];
@@ -78,8 +78,8 @@ void _uncaughtExceptionHandler(NSException *exception) {
         if (tempDate) {
             index++;
             if (index > days) {
-                NSString *filePath = [[STORAGEMANAGER directoryPathOfDocumentsLog] stringByAppendingPathComponent:fileName];
-                [YSCFileUtils deleteFileOrDirectory:filePath];
+                NSString *filePath = [[YSCStorageInstance directoryPathOfDocumentsLog] stringByAppendingPathComponent:fileName];
+                [YSCFileManager DeleteFileOrDirectory:filePath];
             }
         }
     }

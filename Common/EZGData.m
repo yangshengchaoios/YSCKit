@@ -11,7 +11,6 @@
 #import "CDConversationStore.h"
 #import "EZGChatRoomViewController.h"
 #import "EZGRescueChatRoomViewController.h"
-#import "ServerTimeSynchronizer.h"
 #import "SDImageCache.h"
 
 @interface EZGData () <BMKLocationServiceDelegate, BMKGeoCodeSearchDelegate>
@@ -28,18 +27,13 @@
 }
 - (id)init {
     if (self = [super init]) {
-        //0. 初始化属性
         if (IsAppTypeB) {
             self.normalConvTypeArray = @[EzgoalTypeB2B, EzgoalTypeB2C, EzgoalTypeC2B];
         }
         else {
             self.normalConvTypeArray = @[EzgoalTypeB2C, EzgoalTypeC2B, EzgoalTypeC2C];
         }
-        //1. 注册通知：其它任何地方都可以通过发送通知进入聊天界面
         addNObserver(@selector(openChatRoomByNotification:), kNotificationOpenChatRoom);
-        //2. 同步服务器时间
-        [ServerTimeSynchronizer sharedInstance];
-        //3. 拦截消息到达通知
         addNObserver(@selector(messageReceived:), kCDNotificationMessageReceived);
     }
     return self;
@@ -65,13 +59,13 @@
 }
 - (NSString *)cacheDBPath {
     NSString *dbName = [NSString stringWithFormat:@"ezgoal_cache_%@.sqlite", USERID];
-    return [[YSCFileUtils DirectoryPathOfDocuments] stringByAppendingPathComponent:dbName];
+    return [[YSCFileManager DirectoryPathOfDocuments] stringByAppendingPathComponent:dbName];
 }
 //删除本地聊天记录
 + (void)clearSpeechData {
-    [YSCFileUtils deleteFileOrDirectory:[[YSCFileUtils DirectoryPathOfDocuments] stringByAppendingPathComponent:@"speech_stat.sqlite"]];
-    [YSCFileUtils deleteFileOrDirectory:[[YSCFileUtils DirectoryPathOfDocuments] stringByAppendingPathComponent:@"speech_stat.sqlite-shm"]];
-    [YSCFileUtils deleteFileOrDirectory:[[YSCFileUtils DirectoryPathOfDocuments] stringByAppendingPathComponent:@"speech_stat.sqlite-wal"]];
+    [YSCFileManager DeleteFileOrDirectory:[[YSCFileManager DirectoryPathOfDocuments] stringByAppendingPathComponent:@"speech_stat.sqlite"]];
+    [YSCFileManager DeleteFileOrDirectory:[[YSCFileManager DirectoryPathOfDocuments] stringByAppendingPathComponent:@"speech_stat.sqlite-shm"]];
+    [YSCFileManager DeleteFileOrDirectory:[[YSCFileManager DirectoryPathOfDocuments] stringByAppendingPathComponent:@"speech_stat.sqlite-wal"]];
 }
 //清空本地缓存
 + (void)clearLocalDataByRemoveSdImages:(BOOL)removeSDImages {
@@ -85,7 +79,7 @@
     }
     
     //2.清除目录 "Library/Caches/" 下的缓存数据
-    [[StorageManager sharedInstance] clearLibraryCaches];
+    [YSCStorageInstance clearLibraryCaches];
     
     //3.移除所有的本地网络请求的缓存数据
     [[NSURLCache sharedURLCache] removeAllCachedResponses];
@@ -259,13 +253,13 @@
     [AVCloud callFunctionInBackground:@"GetAppParams"
                        withParameters:@{@"appId"    : Trim(kAppId),
                                         @"type"     : @"ios",
-                                        @"udid"     : Trim([AppConfigManager sharedInstance].udid),
+                                        @"udid"     : Trim(YSCInstance.udid),
                                         @"version"  : Trim(AppVersion),
                                         @"buildId"  : Trim(BundleVersion)}
                                 block:^(id object, NSError *error) {
                                     NSLog(@"online params:%@", object);
                                     if (isEmpty(error)) {
-                                        NSDictionary *oldParams = GetObjectByFile(@"AppParams", @"OnLineParams");
+                                        NSDictionary *oldParams = YSCGetObjectByFile(@"AppParams", @"OnLineParams");
                                         NSString *oldSign = [AppData SignatureWithParams:oldParams];
                                         NSMutableDictionary *newParams = [NSMutableDictionary dictionary];
                                         NSString *newSign = @"";
@@ -275,9 +269,9 @@
                                         }
                                         //检测是否有参数变更
                                         if (NO == [oldSign isEqualToString:newSign]) {
-                                            SaveObjectByFile(newParams, @"AppParams", @"OnLineParams");
-                                            [APPCONFIGMANAGER resetAppParams];
-                                            APPCONFIGMANAGER.isOnlineParamsChanged = YES;
+                                            YSCSaveObjectByFile(newParams, @"AppParams", @"OnLineParams");
+                                            [YSCInstance resetAppParams];
+                                            YSCInstance.isOnlineParamsChanged = YES;
                                         }
                                     }
                                     else {
@@ -478,7 +472,7 @@
 //统一入口：进入聊天对话界面
 - (void)openChatRoomByConversion:(AVIMConversation *)conversation byParams:(NSDictionary *)params {
     ReturnWhenObjectIsEmpty(conversation);
-    UIViewController *currentViewController = [AppConfigManager sharedInstance].currentViewController;
+    UIViewController *currentViewController = YSCInstance.currentViewController;
     ReturnWhenObjectIsEmpty(currentViewController);
     if ([currentViewController isKindOfClass:NSClassFromString(@"CDChatRoomVC")]) {//如果处于聊天界面，但不是即将打开的会话，则需要先关闭再打开
         if (NO == [conversation.conversationId isEqualToString:[CDChatManager manager].chattingConversationId]) {
@@ -516,7 +510,7 @@
 
 //NOTE:关闭防重复点击的开关
 - (void)resetClicked {
-    YSCBaseViewController *currentVC = (YSCBaseViewController *)[AppConfigManager sharedInstance].currentViewController;
+    YSCBaseViewController *currentVC = (YSCBaseViewController *)YSCInstance.currentViewController;
     if ([currentVC isKindOfClass:[YSCBaseViewController class]]) {
         currentVC.isClicked = NO;
     }
@@ -600,7 +594,7 @@
         //更新本地救援模型
         if ([conv.rescueId isEqualToString:APPDATA.rescueModel.rescueId]) {
             APPDATA.rescueModel.rescueStatus = rescueStatus;
-            SaveObjectByFile(APPDATA.rescueModel, kCachedRescueModel, kParamAppModel);
+            YSCSaveObjectByFile(APPDATA.rescueModel, kCachedRescueModel, kParamAppModel);
         }
         //更新conversation
         [EZGDATA updateConversation:conv byParams:@{kParamEzgoalStatus : @(rescueStatus)} refreshOnly:YES block:^(NSObject *object) {
@@ -612,7 +606,7 @@
             RescueStatusTypeCancelByB == rescueStatus ||
             RescueStatusTypeCancelByC0 == rescueStatus ||
             RescueStatusTypeUnProcess == rescueStatus) {
-            YSCBaseViewController *currentVC = (YSCBaseViewController *)[AppConfigManager sharedInstance].currentViewController;
+            YSCBaseViewController *currentVC = (YSCBaseViewController *)YSCInstance.currentViewController;
             if (RescueStatusTypeCancelBySystem == rescueStatus &&
                 ([currentVC isKindOfClass:NSClassFromString(@"EZGGiveUpCancelViewController")] ||
                 [currentVC isKindOfClass:NSClassFromString(@"EZGAgreeCancelRescueViewController")])) {

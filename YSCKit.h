@@ -32,19 +32,6 @@
 
 //工具类
 #import "YSCHelper.h"
-//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>DEPRECATED!!!
-#import "YSCFileUtils.h"
-#import "YSCImageUtils.h"
-#import "YSCCommonUtils.h"
-
-//单例、静态方法
-#import "PlayAudioManager.h"
-#import "ReachabilityManager.h"
-#import "StorageManager.h"
-#import "LogManager.h"
-#import "AppConfigManager.h"
-#import "ShowPhotosManager.h"
-//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 //自定义控件
 #import "YSCKTipsView.h"

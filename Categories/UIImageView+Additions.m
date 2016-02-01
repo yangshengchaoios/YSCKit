@@ -117,8 +117,8 @@
     newUrlString = newUrlString.URLEncodeString;
 
     //采用SDWebImage的缓存方案
-    if ([[ReachabilityManager sharedInstance].reachability isReachableViaWiFi] ||
-        [GetObject(kParamEnableDownloadImage) boolValue]) {//wifi环境下一定会从网络下载图片
+    if (YSCInstance.isReachableViaWiFi ||
+        [YSCGetObject(kParamEnableDownloadImage) boolValue]) {//wifi环境下一定会从网络下载图片
         [self sd_setImageWithURL:[NSURL URLWithString:newUrlString]
                 placeholderImage:placeholderImage
                        completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL)  {

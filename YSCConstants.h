@@ -46,9 +46,9 @@ typedef void (^YSCResponseErrorMessageBlock)(NSObject *object, NSString *errorMe
 
 
 //控制调试信息的输出
-#define DEBUGMODEL      [GetObject(@"DEBUG") boolValue]
-#define SwitchToDebug   SaveObject(@(YES), @"DEBUG")
-#define SwitchToNormal  SaveObject(@(NO), @"DEBUG")
+#define DEBUGMODEL      [YSCGetObject(@"DEBUG") boolValue]
+#define SwitchToDebug   YSCSaveObject(@(YES), @"DEBUG")
+#define SwitchToNormal  YSCSaveObject(@(NO), @"DEBUG")
 
 /**
  *  重新定义NSLog
@@ -56,7 +56,7 @@ typedef void (^YSCResponseErrorMessageBlock)(NSObject *object, NSString *errorMe
 #define __NSLog(s, ...) do { \
     NSString *logString = [NSString stringWithFormat:@"[%@(%d)] %@",[[NSString stringWithUTF8String:__FILE__] lastPathComponent],__LINE__,[NSString stringWithFormat:(s), ##__VA_ARGS__]]; \
     NSLog(@"%@", logString); \
-    [LogManager saveLog:logString]; \
+    [YSCLogManager SaveLog:logString]; \
 } while (0)
 
 #define NSLog(...) __NSLog(__VA_ARGS__)
@@ -156,7 +156,6 @@ return _sharedObject;
 #define ViewController(x)                           [[NSClassFromString(x) alloc] initWithNibName:x bundle:nil]
 #define KeyWindow                                   [UIApplication sharedApplication].keyWindow
 #define FileDefaultManager                          [NSFileManager defaultManager]
-#define AppProgramPath(x)                           [[YSCFileUtils DirectoryPathOfBundle] stringByAppendingPathComponent:x]
 #define ReturnWhenObjectIsEmpty(object)             if ([NSObject isEmpty:object]) { return ;    }
 #define ReturnNilWhenObjectIsEmpty(object)          if ([NSObject isEmpty:object]) { return nil; }
 #define ReturnEmptyWhenObjectIsEmpty(object)        if ([NSObject isEmpty:object]) { return @""; }
@@ -168,9 +167,7 @@ return _sharedObject;
 #define CreateNSErrorCode(c,errMsg)                 [NSError errorWithDomain:@"YSCKit" code:c userInfo:@{NSLocalizedDescriptionKey : Trim(errMsg)}]
 #define CreateNSError(errMsg)                       CreateNSErrorCode(0,errMsg)
 #define GetNSErrorMsg(e)                            ((NSError *)e).userInfo[NSLocalizedDescriptionKey]  //=e.localizedDescription
-#define STORAGEMANAGER                              [StorageManager sharedInstance]
-#define CURRENTDATE                                 [YSCCommonUtils currentDate]    //当前(服务器端)时间
-#define APPCONFIGMANAGER                            [AppConfigManager sharedInstance]
+#define CURRENTDATE                                 YSCInstance.currentDate    //当前(服务器端)时间
 #define AppUpdateUrl                                [@"https://itunes.apple.com/app/id" stringByAppendingString:kAppStoreId]//App升级url
 
 /**
@@ -186,7 +183,7 @@ return _sharedObject;
 #define VersionEqualsOrLater(v)         (NSOrderedAscending != [AppVersion compare:v options:NSNumericSearch])      //判断当前APP的版本号等于或大于v
 #define VersionLater(v)                 (NSOrderedDescending == [AppVersion compare:v options:NSNumericSearch])     //判断当前APP的版本号大于v
 #define VersionBefore(v)                (NSOrderedAscending == [AppVersion compare:v options:NSNumericSearch])      //判断当前APP的版本号小于v
-#define IsLoadGuideView                 [GetObject(WelcomeVersion) boolValue]                                       //判断是否加载过欢迎页面
+#define IsLoadGuideView                 [YSCGetObject(WelcomeVersion) boolValue]                                       //判断是否加载过欢迎页面
 
 /**
  *  自动布局相关代码段简写

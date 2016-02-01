@@ -49,13 +49,13 @@ ZYQAssetPickerControllerDelegate>
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.isAppeared = NO;
-    [AppConfigManager sharedInstance].currentViewController = self;
+    YSCInstance.currentViewController = self;
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(receiveMessage:) name:kCDNotificationMessageReceived object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onMessageDelivered:) name:kCDNotificationMessageDelivered object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateStatusView) name:kCDNotificationConnectivityUpdated object:nil];
     
     NSString *received_convid = [NSString stringWithFormat:@"received_%@", Trim(self.conv.conversationId)];
-    self.lastSentTimestamp = [GetCacheObject(received_convid) longLongValue];
+    self.lastSentTimestamp = [YSCGetCacheObject(received_convid) longLongValue];
     [self initBottomMenu];
     [self initEmotionView];
     [self.view addSubview:self.clientStatusView];
@@ -242,7 +242,7 @@ ZYQAssetPickerControllerDelegate>
 }
 - (BOOL)alertError:(NSError *)error {
     if (error) {
-        [YSCCommonUtils SaveNSError:error];
+        [YSCManager SaveNSError:error];
         if (error.code == 4303 || kAVIMErrorConversationNotFound == error.code) {
             [[CDConversationStore store] deleteConversationByConvId:self.conv.conversationId];//删除本地不存在的会话
             self.conv = nil;
@@ -496,7 +496,7 @@ ZYQAssetPickerControllerDelegate>
         //处理获得的图片对象
         if (pickedImage) {
             [[ALAssetsLibrary new] saveImage:pickedImage toAlbum:@"翼畅行" completion:nil failure:nil];
-            [weakSelf didSendMessageWithPhoto:[YSCImageUtils resizeImage:pickedImage]];
+            [weakSelf didSendMessageWithPhoto:[YSCImageManager ResizeImage:pickedImage]];
         }
         else {
             [UIView showResultThenHideOnWindow:@"未选择图片"];
@@ -511,7 +511,7 @@ ZYQAssetPickerControllerDelegate>
     for (int i = 0; i<assets.count; i++) {
         ALAsset *asset = assets[i];
         UIImage *pickedImage = [UIImage imageWithCGImage:asset.defaultRepresentation.fullScreenImage];
-        UIImage *sendImage = [YSCImageUtils resizeImage:pickedImage];
+        UIImage *sendImage = [YSCImageManager ResizeImage:pickedImage];
         [self didSendMessageWithPhoto:sendImage];
     }
 }
@@ -609,7 +609,7 @@ ZYQAssetPickerControllerDelegate>
 
     //>>>>>设置临时消息必要的属性，先在cell中显示出来>>>>>>>>>>>
     msg.messageId = [[CDChatManager manager] tempMessageId];
-    msg.sendTimestamp = [YSCCommonUtils currentTimeInterval] * 1000;
+    msg.sendTimestamp = YSCInstance.currentTimeInterval * 1000;
     msg.clientId = [CDChatManager manager].selfId;
     msg.conversationId = self.conv.conversationId;
     [self appendMessage:msg];
@@ -714,7 +714,7 @@ ZYQAssetPickerControllerDelegate>
         timestamp = msg.sendTimestamp;
         pageSize = 10;
         if (0 == timestamp) {//NOTEO:万一消息的发送时间为0不能当做第1页处理
-            timestamp = [YSCCommonUtils currentTimeInterval] * 1000;
+            timestamp = YSCInstance.currentTimeInterval * 1000;
         }
     }
     WEAKSELF

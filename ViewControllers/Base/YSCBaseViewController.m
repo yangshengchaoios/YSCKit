@@ -45,7 +45,7 @@
         [self.navigationController setNavigationBarHidden:[self.params[kParamIsHideNavBar] boolValue] animated:animated];
     }
     self.isAppeared = YES;
-    [AppConfigManager sharedInstance].currentViewController = self;
+    YSCInstance.currentViewController = self;
 }
 - (void)viewDidAppear:(BOOL)animated {
     UMEventBeginLogPageView;
@@ -60,7 +60,7 @@
 - (void)dealloc {
 	NSLog(@"[%@] dealloc......", NSStringFromClass(self.class));
     if (self.reachabilityManagerIdentifier) {
-        [[ReachabilityManager sharedInstance] bk_removeObserversWithIdentifier:self.reachabilityManagerIdentifier];
+        [YSCInstance bk_removeObserversWithIdentifier:self.reachabilityManagerIdentifier];
     }
     if (self.isUserChangedIdentifier) {
         [APPDATA bk_removeObserversWithIdentifier:self.isUserChangedIdentifier];
@@ -94,10 +94,9 @@
 	}
     
     //添加网络状态监控功能
-    self.reachabilityManagerIdentifier = [[ReachabilityManager sharedInstance] bk_addObserverForKeyPath:@"reachable" task:^(id target) {
+    self.reachabilityManagerIdentifier = [YSCInstance bk_addObserverForKeyPath:@"isReachable" task:^(id target) {
         dispatch_async(dispatch_get_main_queue(), ^{//更新主线程的UI
-		    BOOL reachable = [ReachabilityManager sharedInstance].reachable;
-		    [blockSelf networkReachablityChanged:reachable];
+		    [blockSelf networkReachablityChanged:YSCInstance.isReachable];
 		});
     }];
     
@@ -497,7 +496,7 @@
     NSString *fileName = [NSString stringWithFormat:@"%@%@.dat",
                           NSStringFromClass(self.class),
                           [NSString isEmpty:suffix] ? @"" :[NSString stringWithFormat:@"_%@",suffix]]; //缓存文件名称
-    return GetCacheObjectByFile(cachedKey, fileName);
+    return YSCGetCacheObjectByFile(cachedKey, fileName);
 }
 - (void)saveObject:(id)object forKey:(NSString *)cachedKey {
 	[self saveObject:object forKey:cachedKey withSuffix:nil];
@@ -507,7 +506,7 @@
                           NSStringFromClass(self.class),
                           [NSString isEmpty:suffix] ? @"" :[NSString stringWithFormat:@"_%@",suffix]]; //缓存文件名称
     
-    SaveCacheObjectByFile(object, cachedKey, fileName);
+    YSCSaveCacheObjectByFile(object, cachedKey, fileName);
 }
 
 /**

@@ -258,7 +258,7 @@
             [weakSelf.tipsView.actionButton setTitle:@"重新加载" forState:UIControlStateNormal];
             [weakSelf.tipsView.actionButton bk_removeEventHandlersForControlEvents:UIControlEventTouchUpInside];
             [weakSelf.tipsView.actionButton bk_addEventHandler:^(id sender) {
-                [[AppConfigManager sharedInstance] resetAppParams];//NOTE:初始化在线参数
+                [YSCInstance resetAppParams];//NOTE:初始化在线参数
                 [weakSelf beginRefreshing];
             } forControlEvents:UIControlEventTouchUpInside];
         }
@@ -353,16 +353,16 @@
             
             //5. 缓存数据
             if (weakSelf.enableCache && isNotEmpty(weakSelf.cacheFileName)) {
-                SaveCacheObjectByFile(weakSelf.sectionKeyArray, KeyOfSectionKey, weakSelf.cacheFileName);
-                SaveCacheObjectByFile(weakSelf.headerDataArray, KeyOfHeaderData, weakSelf.cacheFileName);
-                SaveCacheObjectByFile(weakSelf.cellDataArray, KeyOfCellData, weakSelf.cacheFileName);
-                SaveCacheObjectByFile(weakSelf.footerDataArray, KeyOfFooterData, weakSelf.cacheFileName);
+                YSCSaveCacheObjectByFile(weakSelf.sectionKeyArray, KeyOfSectionKey, weakSelf.cacheFileName);
+                YSCSaveCacheObjectByFile(weakSelf.headerDataArray, KeyOfHeaderData, weakSelf.cacheFileName);
+                YSCSaveCacheObjectByFile(weakSelf.cellDataArray, KeyOfCellData, weakSelf.cacheFileName);
+                YSCSaveCacheObjectByFile(weakSelf.footerDataArray, KeyOfFooterData, weakSelf.cacheFileName);
             }
         }
         weakSelf.tipsView.hidden = (! [weakSelf isCellDataEmpty]);
 
         //最后回调(可能会处理tipsView的显示与否的问题)
-        YSCBaseViewController *currentVC = (YSCBaseViewController *)[AppConfigManager sharedInstance].currentViewController;
+        YSCBaseViewController *currentVC = (YSCBaseViewController *)YSCInstance.currentViewController;
         if ([currentVC isKindOfClass:[YSCBaseViewController class]]) {
             currentVC.isClicked = NO;
         }
@@ -388,7 +388,7 @@
         resultBlock(dataArray, nil);
     };
     RequestFailure failureBlock = ^(ErrorType errorType, NSError *error) {
-        resultBlock(initObject, [YSCCommonUtils ResolveErrorType:errorType andError:error]);
+        resultBlock(initObject, [YSCManager ResolveErrorType:errorType andError:error]);
     };
     
     //4. 开始网络访问
@@ -446,25 +446,25 @@
         self.isLoadedCache = YES;//控制缓存只加载一次
         
         [self.sectionKeyArray removeAllObjects];
-        NSArray *array = GetCacheObjectByFile(KeyOfSectionKey, self.cacheFileName);
+        NSArray *array = YSCGetCacheObjectByFile(KeyOfSectionKey, self.cacheFileName);
         if (isNotEmpty(array)) {
             [self.sectionKeyArray addObjectsFromArray:array];
         }
         
         [self.headerDataArray removeAllObjects];
-        array = GetCacheObjectByFile(KeyOfHeaderData, self.cacheFileName);
+        array = YSCGetCacheObjectByFile(KeyOfHeaderData, self.cacheFileName);
         if (isNotEmpty(array)) {
             [self.headerDataArray addObjectsFromArray:array];
         }
         
         [self.cellDataArray removeAllObjects];
-        array = GetCacheObjectByFile(KeyOfCellData, self.cacheFileName);
+        array = YSCGetCacheObjectByFile(KeyOfCellData, self.cacheFileName);
         if (isNotEmpty(array)) {
             [self.cellDataArray addObjectsFromArray:array];
         }
         
         [self.footerDataArray removeAllObjects];
-        array = GetCacheObjectByFile(KeyOfFooterData, self.cacheFileName);
+        array = YSCGetCacheObjectByFile(KeyOfFooterData, self.cacheFileName);
         if (isNotEmpty(array)) {
             [self.footerDataArray addObjectsFromArray:array];
         }

@@ -51,9 +51,9 @@
     
     //2. 创建pagecontrol
     self.pageControl = [[SMPageControl alloc] init];
-    self.pageControl.pageIndicatorImage = [YSCImageUtils resizeImage:[UIImage imageNamed:@"circle_pagecontrol_normal"]
+    self.pageControl.pageIndicatorImage = [YSCImageManager ResizeImage:[UIImage imageNamed:@"circle_pagecontrol_normal"]
                                                            toSize:AUTOLAYOUT_SIZE_WH(HeightOfPageControl, HeightOfPageControl)];
-    self.pageControl.currentPageIndicatorImage = [YSCImageUtils resizeImage:[UIImage imageNamed:@"circle_pagecontrol_selected"]
+    self.pageControl.currentPageIndicatorImage = [YSCImageManager ResizeImage:[UIImage imageNamed:@"circle_pagecontrol_selected"]
                                                                   toSize:AUTOLAYOUT_SIZE_WH(HeightOfPageControl, HeightOfPageControl)];
     self.pageControl.userInteractionEnabled = NO;
     [self addSubview:self.pageControl];

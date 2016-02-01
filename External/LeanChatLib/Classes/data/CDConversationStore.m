@@ -125,10 +125,10 @@
 //删除本地所有会话数据库文件！
 - (void)deleteAllConversionFiles {
     NSString *libPath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0];
-    NSArray *files = [YSCFileUtils allPathsInDirectoryPath:libPath];
+    NSArray *files = [YSCFileManager AllPathsInDirectoryPath:libPath];
     for (NSString *filePath in files) {
         if ([filePath hasPrefix:@"com.leancloud.leanchatlib."] || [filePath hasPrefix:@"ezgoal_cache"]) {
-            [YSCFileUtils deleteFileOrDirectory:[libPath stringByAppendingPathComponent:filePath]];
+            [YSCFileManager DeleteFileOrDirectory:[libPath stringByAppendingPathComponent:filePath]];
         }
     }
     [self reSetupDataBase];

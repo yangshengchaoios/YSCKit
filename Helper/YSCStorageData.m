@@ -83,16 +83,16 @@
 
 // 私有方法
 - (void)_ensureCommonDirectories {
-    [YSCFileUtils ensureDirectory:[self directoryPathOfDocumentsCommon]];
-    [YSCFileUtils ensureDirectory:[self directoryPathOfDocumentsLog]];
-    [YSCFileUtils ensureDirectory:[self directoryPathOfLibraryCachesCommon]];
+    [YSCFileManager EnsureDirectory:[self directoryPathOfDocumentsCommon]];
+    [YSCFileManager EnsureDirectory:[self directoryPathOfDocumentsLog]];
+    [YSCFileManager EnsureDirectory:[self directoryPathOfLibraryCachesCommon]];
 }
 - (void)_ensureUserDirectories {
-    [YSCFileUtils ensureDirectory:[self directoryPathOfDocumentsByUserId]];
-    [YSCFileUtils ensureDirectory:[self directoryPathOfLibraryCachesByUserId]];
-    [YSCFileUtils ensureDirectory:[self directoryPathOfPicByUserId]];
-    [YSCFileUtils ensureDirectory:[self directoryPathOfAudioByUserId]];
-    [YSCFileUtils ensureDirectory:[self directoryPathOfVideoByUserId]];
+    [YSCFileManager EnsureDirectory:[self directoryPathOfDocumentsByUserId]];
+    [YSCFileManager EnsureDirectory:[self directoryPathOfLibraryCachesByUserId]];
+    [YSCFileManager EnsureDirectory:[self directoryPathOfPicByUserId]];
+    [YSCFileManager EnsureDirectory:[self directoryPathOfAudioByUserId]];
+    [YSCFileManager EnsureDirectory:[self directoryPathOfVideoByUserId]];
 }
 @end
 
@@ -210,11 +210,11 @@
 // 删除Documents和Caches目录中的缓存数据，并确保所有缓存目录都存在
 - (void)clearLibraryCaches {
     //Documents
-    [YSCFileUtils clearDirectoryPath:self.directoryPathOfDocumentsLog];
+    [YSCFileManager ClearDirectoryPath:self.directoryPathOfDocumentsLog];
     
     //Library/Caches
-    [YSCFileUtils clearDirectoryPath:self.directoryPathOfLibraryCachesCommon];
-    [YSCFileUtils clearDirectoryPath:self.directoryPathOfLibraryCachesBundleIdentifier];
+    [YSCFileManager ClearDirectoryPath:self.directoryPathOfLibraryCachesCommon];
+    [YSCFileManager ClearDirectoryPath:self.directoryPathOfLibraryCachesBundleIdentifier];
     
     [self _ensureCommonDirectories];
     [self _ensureUserDirectories];
