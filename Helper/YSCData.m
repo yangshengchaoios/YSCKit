@@ -7,6 +7,7 @@
 //
 
 #import "YSCData.h"
+#import "Reachability.h"
 #define CachedSyncInterval          @"CachedSyncInterval"
 #define ConfigPlistPath             [[NSBundle mainBundle] pathForResource:@"AppConfig" ofType:@"plist"]
 #define ConfigDebugPlistPath        [[NSBundle mainBundle] pathForResource:@"AppConfigDebug" ofType:@"plist"]
@@ -33,6 +34,7 @@
 - (id)init {
     self = [super init];
     if (self) {
+        [self _initReachability];
         self.appParams = [NSMutableDictionary dictionary];
         self.onlineParams = [NSMutableDictionary dictionary];
         self.localParams = [NSMutableDictionary dictionary];
@@ -68,6 +70,20 @@
                                                object:nil];
 }
 
+#pragma mark - 网络状态
+- (void)_initReachability {
+    [[Reachability reachabilityForInternetConnection] startNotifier];
+    self.isReachable = [[Reachability reachabilityForInternetConnection] isReachable];
+    [Reachability reachabilityForInternetConnection].reachableBlock = ^(Reachability *reach) {
+        YSCInstance.isReachable = YES;
+    };
+    [Reachability reachabilityForInternetConnection].unreachableBlock = ^(Reachability *reach) {
+        YSCInstance.isReachable = NO;
+    };
+}
+- (BOOL)isReachableViaWiFi {
+    return [[Reachability reachabilityForInternetConnection] isReachableViaWiFi];
+}
 
 #pragma mark - 获取服务器当前时间
 - (NSDate *)currentDate {
