@@ -114,8 +114,6 @@
 			self.titleBarView.hidden = YES;
 		}
 	}
-    
-    [self setDelegateOfAllTextFields:self.view];
  
     //设置返回按钮类型
     [self configBackButton];
@@ -246,18 +244,6 @@
 	                 completion: ^(BOOL finished) {
                          [blockSelf didLayoutForKeyboardHeight:0];
                      }];
-}
-//递归遍历所有子view中的textfield
-- (void)setDelegateOfAllTextFields:(UIView *)view {
-	for (UIView *subview in view.subviews) {
-		if ([subview isKindOfClass:[UITextField class]]) {
-			((UITextField *)subview).delegate = self;
-            addNObserverWithObj(@selector(textFieldChanged:), UITextFieldTextDidChangeNotification, (UITextField *)subview);
-		}
-		else if ([subview isKindOfClass:[UIView class]]) {
-                [self setDelegateOfAllTextFields:subview];
-		}
-	}
 }
 
 #pragma mark - push & pop & dismiss view controller
@@ -633,29 +619,6 @@
             weakSelf.block(nil);
         }
     } afterDelay:1];
-}
-
-#pragma mark - UITextFieldDelegate
-- (BOOL)textFieldShouldReturn:(UITextField *)textField {
-	[self hideKeyboard];//TODO:在ios8中失效！
-	return YES;
-}
-- (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string {
-    if ([NSString isEmptyConsiderWhitespace:string]) {//永远放开删除功能
-        return YES;
-    }
-	if (textField.maxLength > 0) {
-		NSMutableString *newText = [textField.text mutableCopy];
-		[newText replaceCharactersInRange:range withString:string]; //兼容从中间插入内容的情况！
-		return [newText length] <= textField.maxLength;
-	}
-	return YES;
-}
-- (void)textFieldChanged:(NSNotification *)note {
-	UITextField *textField = (UITextField *)note.object;
-	if (![textField isKindOfClass:[UITextField class]]) {
-		return;
-	}
 }
 
 #pragma mark - Observe KVO

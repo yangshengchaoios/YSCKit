@@ -1,6 +1,6 @@
 //
 //  YSCStorageData.h
-//  B_EZGoal
+//  YSCKit
 //
 //  Created by yangshengchao on 16/1/28.
 //  Copyright © 2016年 YingChuangKeXun. All rights reserved.
@@ -13,15 +13,15 @@
  */
 
 #define YSCStorageInstance                          [YSCStorageData SharedInstance]
-#define SaveObject(obj,key)                         [YSCSTORAGEDATA saveObject:obj forKey:key fileName:nil subFolder:nil]
-#define SaveObjectByFile(obj,key,file)              [YSCSTORAGEDATA saveObject:obj forKey:key fileName:file subFolder:nil]
-#define SaveCacheObject(obj,key)                    [YSCSTORAGEDATA saveCacheObject:obj forKey:key fileName:nil subFolder:nil]
-#define SaveCacheObjectByFile(obj,key,file)         [YSCSTORAGEDATA saveCacheObject:obj forKey:key fileName:file subFolder:nil]
 
-#define GetObject(key)                              [YSCSTORAGEDATA getObjectForKey:key fileName:nil subFolder:nil]
-#define GetObjectByFile(key,file)                   [YSCSTORAGEDATA getObjectForKey:key fileName:file subFolder:nil]
-#define GetCacheObject(key)                         [YSCSTORAGEDATA getCacheObjectForKey:key fileName:nil subFolder:nil]
-#define GetCacheObjectByFile(key,file)              [YSCSTORAGEDATA getCacheObjectForKey:key fileName:file subFolder:nil]
+#define YSCSaveObject(obj,key)                      [YSCStorageInstance saveObject:obj forKey:key fileName:nil subFolder:nil]
+#define YSCSaveObjectByFile(obj,key,file)           [YSCStorageInstance saveObject:obj forKey:key fileName:file subFolder:nil]
+#define YSCSaveCacheObject(obj,key)                 [YSCStorageInstance saveCacheObject:obj forKey:key fileName:nil subFolder:nil]
+#define YSCSaveCacheObjectByFile(obj,key,file)      [YSCStorageInstance saveCacheObject:obj forKey:key fileName:file subFolder:nil]
+#define YSCGetObject(key)                           [YSCStorageInstance getObjectForKey:key fileName:nil subFolder:nil]
+#define YSCGetObjectByFile(key,file)                [YSCStorageInstance getObjectForKey:key fileName:file subFolder:nil]
+#define YSCGetCacheObject(key)                      [YSCStorageInstance getCacheObjectForKey:key fileName:nil subFolder:nil]
+#define YSCGetCacheObjectByFile(key,file)           [YSCStorageInstance getCacheObjectForKey:key fileName:file subFolder:nil]
 
 
 //--------------------------------------
@@ -36,22 +36,17 @@
 @property (nonatomic, copy) NSString *directoryPathOfTmp;
 
 + (instancetype)SharedInstance;
-
-// 设置用户目录
-- (void)setUserId:(NSString *)userId;
-// Documents/YSCKit_Storage 目录下的文件和目录路径
-- (NSString *)directoryPathOfDocumentsByUserId;     // Documents/YSCKit_Storage/UserId/
-- (NSString *)filePathOfUserSettings;               // Documents/YSCKit_Storage/UserId/UserSettings.archive
+- (void)setUserId:(NSString *)userId;               // config userId
 - (NSString *)directoryPathOfDocumentsCommon;       // Documents/YSCKit_Storage/
 - (NSString *)filePathOfCommonSettings;             // Documents/YSCKit_Storage/CommonSettings.archive
-
-// Library/Caches/YSCKit_Storage 目录下的文件和目录路径
+- (NSString *)directoryPathOfDocumentsByUserId;     // Documents/YSCKit_Storage/UserId/
+- (NSString *)filePathOfUserSettings;               // Documents/YSCKit_Storage/UserId/UserSettings.archive
+- (NSString *)directoryPathOfLibraryCachesCommon;   // Library/Caches/YSCKit_Storage/
 - (NSString *)directoryPathOfLibraryCachesByUserId; // Library/Caches/YSCKit_Storage/UserId/
-- (NSString *)directoryPathOfLibraryCachesBundleIdentifier; // Library/Caches/com.xxx.yyy
 - (NSString *)directoryPathOfPicByUserId;           // Library/Caches/YSCKit_Storage/UserId/Pics/
 - (NSString *)directoryPathOfAudioByUserId;         // Library/Caches/YSCKit_Storage/UserId/Audioes/
 - (NSString *)directoryPathOfVideoByUserId;         // Library/Caches/YSCKit_Storage/UserId/Videoes/
-- (NSString *)directoryPathOfLibraryCachesCommon;   // Library/Caches/YSCKit_Storage/
+- (NSString *)directoryPathOfLibraryCachesBundleIdentifier; // Library/Caches/com.xxx.yyy
 - (NSString *)directoryPathOfDocumentsLog;          // Library/Caches/YSCKit_Storage/YSCLog/
 @end
 
@@ -82,9 +77,20 @@
 //  处理缓存数据
 //--------------------------------------
 @interface YSCStorageData (Cache)
+//------------------------------------
+//Document/YSCKit_Storage
+//该目录下的数据与业务逻辑相关，删除会影响逻辑
+//overwrite = NO
+//------------------------------------
 - (BOOL)saveObject:(NSObject *)object forKey:(NSString *)key fileName:(NSString *)fileName subFolder:(NSString *)subFoler;
-- (BOOL)saveCacheObject:(NSObject *)object forKey:(NSString *)key fileName:(NSString *)fileName subFolder:(NSString *)subFoler;
-
 - (id)getObjectForKey:(NSString *)key fileName:(NSString *)fileName subFolder:(NSString *)subFoler;
+
+//------------------------------------
+//Library/Caches/YSCKit_Storage
+//该目录下的数据随时都可以被清除，与业务逻辑无关
+//overwrite = NO
+//------------------------------------
+- (BOOL)saveCacheObject:(NSObject *)object forKey:(NSString *)key fileName:(NSString *)fileName subFolder:(NSString *)subFoler;
 - (id)getCacheObjectForKey:(NSString *)key fileName:(NSString *)fileName subFolder:(NSString *)subFoler;
 @end
+

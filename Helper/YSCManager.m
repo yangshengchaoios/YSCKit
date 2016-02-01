@@ -1,6 +1,6 @@
 //
 //  YSCManager.m
-//  B_EZGoal
+//  YSCKit
 //
 //  Created by yangshengchao on 16/1/28.
 //  Copyright © 2016年 YingChuangKeXun. All rights reserved.
@@ -15,26 +15,25 @@
 @implementation YSCManager
 // 检测新版本
 + (void)CheckNewVersion {
-    [self CheckNewVersionWithParams:nil type:[kCheckNewVersionType integerValue]];
-}
-+ (void)CheckNewVersionWithParams:(NSDictionary *)params type:(CheckNewVersionType)type {
+    CheckNewVersionType type = [kCheckNewVersionType integerValue];
     if (CheckNewVersionTypeServer == type) {
-        [AFNManager getDataFromUrl:kResPathAppCommonUrl
-                           withAPI:kResPathCheckNewVersion
-                      andDictParam:params
-                         dataModel:[NewVersionModel class]
-                  requestSuccessed:^(id responseObject) {
-                      NewVersionModel *versionModel = (NewVersionModel *)responseObject;
-                      if (isNotEmpty(versionModel.appVersion)) {
-                          [self _CheckNewVersionWithModel:versionModel isCheckOnAppStore:NO];
-                      }
-                      else {
-                          [self CheckNewVersionOnAppStore];
-                      }
-                  }
-                    requestFailure:^(ErrorType errorType, NSError *error) {
-                        [self CheckNewVersionOnAppStore];
-                    }];
+        [YSCRequestManager RequestFromUrl:kResPathAppCommonUrl
+                                  withAPI:kResPathCheckNewVersion
+                                   params:nil
+                                dataModel:[NewVersionModel class]
+                              requestType:RequestTypeGET
+                         requestSuccessed:^(id responseObject) {
+                             NewVersionModel *versionModel = (NewVersionModel *)responseObject;
+                             if (isNotEmpty(versionModel.appVersion)) {
+                                 [self _CheckNewVersionWithModel:versionModel isCheckOnAppStore:NO];
+                             }
+                             else {
+                                 [self CheckNewVersionOnAppStore];
+                             }
+                         }
+                           requestFailure:^(ErrorType errorType, NSError *error) {
+                               [self CheckNewVersionOnAppStore];
+                           }];
     }
     else if (CheckNewVersionTypeAppStore == type) {
         [self CheckNewVersionOnAppStore];

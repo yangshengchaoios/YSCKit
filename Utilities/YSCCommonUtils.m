@@ -19,22 +19,20 @@
 }
 + (void)checkNewVersionWithParams:(NSDictionary *)params type:(CheckNewVersionType)type {
     if (CheckNewVersionTypeServer == type) {
-        [AFNManager getDataFromUrl:kResPathAppCommonUrl
-                           withAPI:kResPathCheckNewVersion
-                      andDictParam:params
-                         dataModel:[NewVersionModel class]
-                  requestSuccessed:^(id responseObject) {
-                      NewVersionModel *versionModel = (NewVersionModel *)responseObject;
-                      if (isNotEmpty(versionModel.appVersion)) {
-                          [YSCCommonUtils checkNewVersionWithModel:versionModel isCheckOnAppStore:NO];
-                      }
-                      else {
-                          [YSCCommonUtils checkNewVersionOnAppStore];
-                      }
-                  }
-                    requestFailure:^(ErrorType errorType, NSError *error) {
-                        [YSCCommonUtils checkNewVersionOnAppStore];
-                    }];
+        [AppData RequestByMethod:kResPathCheckNewVersion params:params dataModel:[NewVersionModel class] block:^(NSObject *object, NSString *errorMessage) {
+            if (isEmpty(errorMessage)) {
+                NewVersionModel *versionModel = (NewVersionModel *)object;
+                if (isNotEmpty(versionModel.appVersion)) {
+                    [YSCCommonUtils checkNewVersionWithModel:versionModel isCheckOnAppStore:NO];
+                }
+                else {
+                    [YSCCommonUtils checkNewVersionOnAppStore];
+                }
+            }
+            else {
+                [YSCCommonUtils checkNewVersionOnAppStore];
+            }
+        }];
     }
     else if (CheckNewVersionTypeAppStore == type) {
         [YSCCommonUtils checkNewVersionOnAppStore];

@@ -7,7 +7,7 @@
 //
 
 #import "YSCBaseModel.h"
-#import <MJExtension/MJExtension.h>
+#import <MJExtension/MJExtension.h>//TODO:模型映射工具需要解耦
 
 @implementation YSCBaseModel
 

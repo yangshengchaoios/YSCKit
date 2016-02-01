@@ -70,32 +70,31 @@
     
 	WeakSelfType blockSelf = self;
     NSDate *date = [NSDate date];
-    [AFNManager getDataFromUrl:kResPathAppCommonUrl
-                       withAPI:kResPathGetServerTime
-                  andDictParam:nil
-                     dataModel:nil
-              requestSuccessed:^(id responseObject) {
-                  NSDate *nowDate = [NSDate date];
-                  NSTimeInterval httpWaste = [nowDate timeIntervalSinceDate:date];//计算接口调用的执行时间(秒)
-                  NSLog(@"waste:%lf", httpWaste);
-                  
-                  if (httpWaste >= 2) {//如果接口执行时间大于2秒就得重新请求
-                      [blockSelf refreshFaild];
-                  }
-                  else {
-                      [NSObject cancelPreviousPerformRequestsWithTarget:blockSelf
-                                                               selector:@selector(refreshServerTime)
-                                                                 object:nil];
-                      blockSelf.isSyncSuccessed = YES;
-                      NSString *oldServerTime = [NSString stringWithFormat:@"%@", responseObject];
-                      NSTimeInterval serverTime = [oldServerTime doubleValue] + httpWaste * ScaleOfResponseTime / 2.0f;
-                      NSTimeInterval localTime = [nowDate timeIntervalSince1970] * ScaleOfResponseTime;
-                      blockSelf.interval = serverTime - localTime;
-                      [[NSUserDefaults standardUserDefaults] setDouble:blockSelf.interval forKey:CachedKeyOfInterval];
-                  }
-              } requestFailure:^(ErrorType errorType, NSError *error) {
-                  [blockSelf refreshFaild];
-              }];
+    [AppData RequestByMethod:kResPathGetServerTime params:nil dataModel:nil block:^(NSObject *object, NSString *errorMessage) {
+        if (isEmpty(errorMessage)) {
+            NSDate *nowDate = [NSDate date];
+            NSTimeInterval httpWaste = [nowDate timeIntervalSinceDate:date];//计算接口调用的执行时间(秒)
+            NSLog(@"waste:%lf", httpWaste);
+            
+            if (httpWaste >= 2) {//如果接口执行时间大于2秒就得重新请求
+                [blockSelf refreshFaild];
+            }
+            else {
+                [NSObject cancelPreviousPerformRequestsWithTarget:blockSelf
+                                                         selector:@selector(refreshServerTime)
+                                                           object:nil];
+                blockSelf.isSyncSuccessed = YES;
+                NSString *oldServerTime = [NSString stringWithFormat:@"%@", object];
+                NSTimeInterval serverTime = [oldServerTime doubleValue] + httpWaste * ScaleOfResponseTime / 2.0f;
+                NSTimeInterval localTime = [nowDate timeIntervalSince1970] * ScaleOfResponseTime;
+                blockSelf.interval = serverTime - localTime;
+                [[NSUserDefaults standardUserDefaults] setDouble:blockSelf.interval forKey:CachedKeyOfInterval];
+            }
+        }
+        else {
+            [blockSelf refreshFaild];
+        }
+    }];
 }
 - (void)refreshFaild {
     [NSObject cancelPreviousPerformRequestsWithTarget:self

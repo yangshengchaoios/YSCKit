@@ -278,18 +278,10 @@
 
 //以下两个方法是为了兼容返回model不规范的情况，子类可以重写
 - (void)getDataByParam:(NSDictionary *)param successed:(RequestSuccessed)successed failed:(RequestFailure)failed {
-    [AFNManager getDataFromUrl:[self prefixOfUrl]
-                       withAPI:[self methodWithPath]
-                  andDictParam:param
-                     dataModel:[self modelClassOfData]
-              requestSuccessed:successed requestFailure:failed];
+    [YSCRequestManager RequestFromUrl:[self prefixOfUrl] withAPI:[self methodWithPath] params:param dataModel:[self modelClassOfData] requestType:RequestTypeGET requestSuccessed:successed requestFailure:failed];
 }
 - (void)postDataByParam:(NSDictionary *)param successed:(RequestSuccessed)successed failed:(RequestFailure)failed {
-    [AFNManager postDataToUrl:[self prefixOfUrl]
-                      withAPI:[self methodWithPath]
-                 andDictParam:param
-                    dataModel:[self modelClassOfData]
-             requestSuccessed:successed requestFailure:failed];
+    [YSCRequestManager RequestFromUrl:[self prefixOfUrl] withAPI:[self methodWithPath] params:param dataModel:[self modelClassOfData] requestType:RequestTypePOST requestSuccessed:successed requestFailure:failed];
 }
 
 

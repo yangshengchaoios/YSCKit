@@ -24,60 +24,26 @@ MJExtensionLogAllProperties
     }
 }
 + (void)GetByMethod:(NSString *)method params:(NSDictionary *)params block:(YSCResponseErrorMessageBlock)block {
-    [AFNManager getDataWithAPI:method
-                  andDictParam:params
-                     dataModel:[self class]
-              requestSuccessed:^(id responseObject) {
-                  if (block) {
-                      block(responseObject, nil);
-                  }
-              }
-                requestFailure:^(ErrorType errorType, NSError *error) {
-                    NSString *errMsg = [YSCCommonUtils ResolveErrorType:errorType andError:error];
-                    if (block) {
-                        block(nil, errMsg);
-                    }
-                }];
+    [self _RequestByMethod:method params:params requestType:RequestTypeGET block:block];
 }
 + (void)PostByMethod:(NSString *)method params:(NSDictionary *)params block:(YSCResponseErrorMessageBlock)block {
-    [AFNManager postDataWithAPI:method
-                   andDictParam:params
-                      dataModel:[self class]
-               requestSuccessed:^(id responseObject) {
-                   if (block) {
-                       block(responseObject, nil);
-                   }
-               }
-                 requestFailure:^(ErrorType errorType, NSError *error) {
-                     NSString *errMsg = [YSCCommonUtils ResolveErrorType:errorType andError:error];
-                     if (block) {
-                         block(nil, errMsg);
-                     }
-                 }];
+    [self _RequestByMethod:method params:params requestType:RequestTypePOST block:block];
 }
-//统一规范参数的提交方式：加密的json字符串写入httpBody
 + (void)RequestByMethod:(NSString *)method params:(NSDictionary *)params block:(YSCResponseErrorMessageBlock)block {
-    [AFNManager requestByUrl:kResPathAppBaseUrl
-                     withAPI:method
-               andArrayParam:nil
-                andDictParam:nil
-                andBodyParam:[NSString jsonStringWithObject:params]
-                   dataModel:[self class]
-                   imageData:nil
-                 requestType:RequestTypePostBodyData
-            requestSuccessed:^(id responseObject) {
-                if (block) {
-                    block(responseObject, nil);
-                }
-            }
-              requestFailure:^(ErrorType errorType, NSError *error) {
-                  NSString *errMsg = [YSCCommonUtils ResolveErrorType:errorType andError:error];
-                  if (block) {
-                      block(nil, errMsg);
-                  }
-              }];
+    [self _RequestByMethod:method params:params requestType:RequestTypePostBodyData block:block];
 }
-
++ (void)_RequestByMethod:(NSString *)method params:(NSDictionary *)params requestType:(RequestType)requestType block:(YSCResponseErrorMessageBlock)block {
+    [YSCRequestManager RequestWithAPI:method params:params dataModel:[self class] requestType:requestType requestSuccessed:^(id responseObject) {
+        if (block) {
+            block(responseObject, nil);
+        }
+    } requestFailure:^(ErrorType errorType, NSError *error) {
+        NSString *errMsg = [YSCCommonUtils ResolveErrorType:errorType andError:error];
+        if (block) {
+            block(nil, errMsg);
+        }
+    }];
+}
 - (NSString *)toJSONString {
     return [self mj_JSONString];
 }

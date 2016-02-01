@@ -1,6 +1,6 @@
 //
 //  YSCManager.h
-//  B_EZGoal
+//  YSCKit
 //
 //  Created by yangshengchao on 16/1/28.
 //  Copyright © 2016年 YingChuangKeXun. All rights reserved.
@@ -19,7 +19,6 @@
 @interface YSCManager : NSObject
 // 检测新版本
 + (void)CheckNewVersion;
-+ (void)CheckNewVersionWithParams:(NSDictionary *)params type:(CheckNewVersionType)type;
 + (void)CheckNewVersionOnAppStore;
 
 // 打电话
@@ -39,14 +38,13 @@
 + (NSString *)ResolveErrorType:(ErrorType)errorType;
 + (void)SaveNSError:(NSError *)error;
 
-// UIView(UILabel/UITextField/UITextView)上显示HTML
-//只能显示HTML内容，但不能点击链接
+// UIView(UILabel、UITextField、UITextView)上显示HTML
+// 只能显示HTML内容，但不能点击链接
 + (void)LayoutHtmlString:(NSString *)htmlString onView:(UIView *)view;
 // 根据正则表达式设置attributedString的各项参数
 //  regular: 正则表达式
 //  attributes: 每个满足ragular的attri
 + (void)FillMutableAttributedString:(NSMutableAttributedString *)attributedString byRegular:(NSRegularExpression *)regular attributes:(NSDictionary *)attributes;
-
 @end
 
 

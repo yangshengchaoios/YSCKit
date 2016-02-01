@@ -1,6 +1,6 @@
 //
 //  YSCLogManager.m
-//  B_EZGoal
+//  YSCKit
 //
 //  Created by yangshengchao on 16/1/28.
 //  Copyright © 2016年 YingChuangKeXun. All rights reserved.
@@ -65,7 +65,7 @@ void _uncaughtExceptionHandler(NSException *exception) {
     [fh closeFile];
 }
 
-+ (void)ManageLogFilesByRemainingDays:(NSInteger)days {
++ (void)DeleteLogFilesExceptLastDays:(NSInteger)days {
     NSArray *fileNames = [YSCFileUtils allPathsInDirectoryPath:[STORAGEMANAGER directoryPathOfDocumentsLog]];
     NSArray *tempArray = [fileNames sortedArrayUsingComparator:^NSComparisonResult(id  _Nonnull obj1, id  _Nonnull obj2) {
         NSDate *date1 = [NSDate dateFromString:(NSString *)obj1 withFormat:DateFormat3];

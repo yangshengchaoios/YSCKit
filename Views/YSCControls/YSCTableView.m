@@ -392,33 +392,14 @@
     };
     
     //4. 开始网络访问
-    if(RequestTypeGET == self.requestType) {
-        [AFNManager getDataFromUrl:self.prefixOfUrl
-                           withAPI:self.methodName
-                      andDictParam:self.dictParamBlock(pageIndex)
-                         dataModel:NSClassFromString(self.modelName)
-                  requestSuccessed:successBlock
-                    requestFailure:failureBlock];
-    }
-    else if(RequestTypePOST == self.requestType) {
-        [AFNManager postDataToUrl:self.prefixOfUrl
-                          withAPI:self.methodName
-                     andDictParam:self.dictParamBlock(pageIndex)
-                        dataModel:NSClassFromString(self.modelName)
-                 requestSuccessed:successBlock
-                   requestFailure:failureBlock];
-    }
-    else if (RequestTypePostBodyData == self.requestType) {
-        [AFNManager requestByUrl:self.prefixOfUrl
-                         withAPI:self.methodName
-                   andArrayParam:nil
-                    andDictParam:nil
-                    andBodyParam:[NSString jsonStringWithObject:self.dictParamBlock(pageIndex)]
-                       dataModel:NSClassFromString(self.modelName)
-                       imageData:nil
-                     requestType:RequestTypePostBodyData
-                requestSuccessed:successBlock
-                  requestFailure:failureBlock];
+    if (self.requestType <= RequestTypePostBodyData) {
+        [YSCRequestManager RequestFromUrl:self.prefixOfUrl
+                                  withAPI:self.methodName
+                                   params:self.dictParamBlock(pageIndex)
+                                dataModel:NSClassFromString(self.modelName)
+                              requestType:self.requestType
+                         requestSuccessed:successBlock
+                           requestFailure:failureBlock];
     }
     else {
         resultBlock(initObject, errorMessage);

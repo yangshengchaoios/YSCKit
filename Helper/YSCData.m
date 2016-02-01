@@ -1,6 +1,6 @@
 //
 //  YSCData.m
-//  B_EZGoal
+//  YSCKit
 //
 //  Created by yangshengchao on 16/1/28.
 //  Copyright © 2016年 YingChuangKeXun. All rights reserved.
@@ -77,21 +77,21 @@
     return [self.currentDate timeIntervalSince1970];
 }
 - (void)refreshServerTimeWithBlock:(YSCResultBlock)block {
-    [AFNManager getDataFromUrl:kResPathAppCommonUrl
-                       withAPI:kResPathGetServerTime
-                  andDictParam:nil
-                     dataModel:nil
-              requestSuccessed:^(id responseObject) {
-                  NSString *tempStr = [NSString stringWithFormat:@"%@", responseObject];
-                  if (block) {
-                      block(tempStr);
-                  }
-              }
-                requestFailure:^(ErrorType errorType, NSError *error) {
-                    if (block) {
-                        block(nil);
-                    }
-                }];
+    [YSCRequestManager RequestFromUrl:kResPathAppCommonUrl
+                              withAPI:kResPathGetServerTime
+                               params:nil dataModel:nil
+                          requestType:RequestTypeGET
+                     requestSuccessed:^(id responseObject) {
+                         NSString *tempStr = [NSString stringWithFormat:@"%@", responseObject];
+                         if (block) {
+                             block(tempStr);
+                         }
+                     }
+                       requestFailure:^(ErrorType errorType, NSError *error) {
+                           if (block) {
+                               block(nil);
+                           }
+                       }];
 }
 //刷新服务器时间
 - (void)_refreshServerTime {

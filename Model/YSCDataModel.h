@@ -23,7 +23,6 @@
 + (void)PostByMethod:(NSString *)method params:(NSDictionary *)params block:(YSCResponseErrorMessageBlock)block;
 //统一规范参数的提交方式：加密的json字符串写入httpBody
 + (void)RequestByMethod:(NSString *)method params:(NSDictionary *)params block:(YSCResponseErrorMessageBlock)block;
-
 - (NSString *)toJSONString;
 @end
 

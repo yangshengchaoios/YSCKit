@@ -1,6 +1,6 @@
 //
 //  YSCRequestManager.m
-//  B_EZGoal
+//  YSCKit
 //
 //  Created by yangshengchao on 16/1/28.
 //  Copyright © 2016年 YingChuangKeXun. All rights reserved.
@@ -13,60 +13,40 @@
 //  请求业务数据
 //------------------------------------------------------------------------
 @implementation YSCRequestManager
-// 最常用的GET和POST
-+ (void)getDataWithAPI:(NSString *)apiName
-          andDictParam:(NSDictionary *)dictParam
+// 常用方法
++ (void)RequestWithAPI:(NSString *)apiName
+                params:(NSDictionary *)params
              dataModel:(Class)dataModel
+           requestType:(RequestType)requestType
       requestSuccessed:(RequestSuccessed)requestSuccessed
         requestFailure:(RequestFailure)requestFailure {
-    [self requestByUrl:kResPathAppBaseUrl withAPI:apiName andArrayParam:nil andDictParam:dictParam andBodyParam:nil dataModel:dataModel imageData:nil requestType:RequestTypeGET requestSuccessed:requestSuccessed requestFailure:requestFailure];
+    [self RequestFromUrl:kResPathAppBaseUrl withAPI:apiName params:params dataModel:dataModel requestType:requestType requestSuccessed:requestSuccessed requestFailure:requestFailure];
 }
-+ (void)postDataWithAPI:(NSString *)apiName
-           andDictParam:(NSDictionary *)dictParam
-              dataModel:(Class)dataModel
-       requestSuccessed:(RequestSuccessed)requestSuccessed
-         requestFailure:(RequestFailure)requestFailure {
-    [self requestByUrl:kResPathAppBaseUrl withAPI:apiName andArrayParam:nil andDictParam:dictParam andBodyParam:nil dataModel:dataModel imageData:nil requestType:RequestTypePOST requestSuccessed:requestSuccessed requestFailure:requestFailure];
-}
-+ (void)getDataFromUrl:(NSString *)url
++ (void)RequestFromUrl:(NSString *)url
                withAPI:(NSString *)apiName
-          andDictParam:(NSDictionary *)dictParam
+                params:(NSDictionary *)params
              dataModel:(Class)dataModel
+           requestType:(RequestType)requestType
       requestSuccessed:(RequestSuccessed)requestSuccessed
         requestFailure:(RequestFailure)requestFailure {
-    [self requestByUrl:url withAPI:apiName andArrayParam:nil andDictParam:dictParam andBodyParam:nil dataModel:dataModel imageData:nil requestType:RequestTypeGET requestSuccessed:requestSuccessed requestFailure:requestFailure];
+    [self RequestFromUrl:url withAPI:apiName params:params dataModel:dataModel imageData:nil requestType:requestType requestSuccessed:requestSuccessed requestFailure:requestFailure];
 }
-+ (void)postDataToUrl:(NSString *)url
-              withAPI:(NSString *)apiName
-         andDictParam:(NSDictionary *)dictParam
-            dataModel:(Class)dataModel
-     requestSuccessed:(RequestSuccessed)requestSuccessed
-       requestFailure:(RequestFailure)requestFailure {
-    [self requestByUrl:url withAPI:apiName andArrayParam:nil andDictParam:dictParam andBodyParam:nil dataModel:dataModel imageData:nil requestType:RequestTypePOST requestSuccessed:requestSuccessed requestFailure:requestFailure];
-}
-
 
 // 处理YSCBaseModel和BaseDataModel映射、登陆过期(state=99)
-+ (void)requestByUrl:(NSString *)url
++ (void)RequestFromUrl:(NSString *)url
              withAPI:(NSString *)apiName
-       andArrayParam:(NSArray *)arrayParam
-        andDictParam:(NSDictionary *)dictParam
-        andBodyParam:(NSString *)bodyParam
+              params:(NSDictionary *)params
            dataModel:(Class)dataModel
            imageData:(NSData *)imageData
          requestType:(RequestType)requestType
     requestSuccessed:(RequestSuccessed)requestSuccessed
       requestFailure:(RequestFailure)requestFailure {
     //0. url组装、参数格式化
-    NSString *tempUrl = [@"/" stringByAppendingPathComponent:apiName];//组装完整的url地址
-    url = [url stringByAppendingString:tempUrl];
-    if ([arrayParam count] > 0) {
-        url = [url stringByAppendingFormat:@"/%@", [arrayParam componentsJoinedByString:@"/"]];//组装数组参数
-    }
-    NSDictionary *newDictParam = [AppData FormatRequestParams:dictParam];//格式化所有请求的参数
+    NSString *tempApiName = [@"/" stringByAppendingPathComponent:apiName];//组装完整的url地址
+    url = [url stringByAppendingString:tempApiName];
     
     //1. 调用网络访问通用方法
-    [self requestByUrl:url andDictParam:newDictParam andBodyParam:bodyParam customModel:[YSCBaseModel class] imageData:imageData requestType:requestType requestSuccessed:^(id responseObject) {
+    [self RequestFromUrl:url params:params customModel:[YSCBaseModel class] imageData:imageData requestType:requestType requestSuccessed:^(id responseObject) {
         YSCBaseModel *baseModel = responseObject;
         if (baseModel && [baseModel isKindOfClass:[YSCBaseModel class]]) {
             if ([baseModel isSuccess]) {//接口访问成功，开始解析data模型
@@ -109,16 +89,15 @@
 }
 
 
-//  处理自定义模型的映射，将映射好的自定义模型往上层抛
-+ (void)requestByUrl:(NSString *)url
-        andDictParam:(NSDictionary *)dictParam
-        andBodyParam:(NSString *)bodyParam
+// 处理自定义模型的映射，将映射好的自定义模型往上层抛
++ (void)RequestFromUrl:(NSString *)url
+              params:(NSDictionary *)params
          customModel:(Class)customModel
            imageData:(NSData *)imageData
          requestType:(RequestType)requestType
     requestSuccessed:(RequestSuccessed)requestSuccessed
       requestFailure:(RequestFailure)requestFailure {
-    [self requestByUrl:url andDictParam:dictParam andBodyParam:bodyParam imageData:imageData requestType:requestType requestSuccessed:^(id responseObject) {
+    [self RequestFromUrl:url params:params imageData:imageData requestType:requestType requestSuccessed:^(id responseObject) {
         NSObject *model = responseObject;
         if (customModel && [[customModel class] respondsToSelector:@selector(ObjectWithKeyValues:)]) {
             model = [customModel ObjectWithKeyValues:responseObject];
@@ -143,9 +122,8 @@
 
 
 // 通用的GET、POST和上传图片（返回最原始的未经过任何映射的JSON字符串）
-+ (void)requestByUrl:(NSString *)url
-        andDictParam:(NSDictionary *)dictParam
-        andBodyParam:(NSString *)bodyParam
++ (void)RequestFromUrl:(NSString *)url
+              params:(NSDictionary *)params
            imageData:(NSData *)imageData
          requestType:(RequestType)requestType
     requestSuccessed:(RequestSuccessed)requestSuccessed
@@ -163,6 +141,7 @@
         }
         return;
     }
+    NSDictionary *formatedParams = [AppData FormatRequestParams:params];//格式化所有请求的参数
     
     //1. 定义返回成功的block
     void (^success)(AFHTTPRequestOperation *operation, id responseObject) = ^(AFHTTPRequestOperation *operation, id responseObject) {
@@ -212,26 +191,26 @@
     //    [manager.requestSerializer setValue:@"gzip" forHTTPHeaderField:@"Accept-Encoding"];//TODO:压缩上传内容
     [manager.requestSerializer setValue:AppVersion forHTTPHeaderField:kParamVersion];
     [manager.requestSerializer setValue:kParamFromValue forHTTPHeaderField:kParamFrom];
-    [manager.requestSerializer setValue:[AppData SignatureWithParams:dictParam] forHTTPHeaderField:kParamSignature];
+    [manager.requestSerializer setValue:[AppData SignatureWithParams:formatedParams] forHTTPHeaderField:kParamSignature];
     [manager.requestSerializer setValue:[AppData EncryptHttpHeaderToken] forHTTPHeaderField:kAppHTTPTokenName];
     if (RequestTypeGET == requestType) {
         NSLog(@"getting data from url[%@]", url);
         [manager   GET:url
-            parameters:dictParam
+            parameters:formatedParams
                success:success
                failure:failed];
     }
     else if (RequestTypePOST == requestType) {
         NSLog(@"posting data to url[%@]", url);
         [manager  POST:url
-            parameters:dictParam
+            parameters:formatedParams
                success:success
                failure:failed];
     }
     else if (RequestTypeUploadFile == requestType) {
         NSLog(@"uploading data to url[%@]", url);
         [manager       POST:url
-                 parameters:dictParam
+                 parameters:formatedParams
   constructingBodyWithBlock: ^(id < AFMultipartFormData > formData) {
       if (imageData) {
           [formData appendPartWithFileData:imageData name:@"file" fileName:@"avatar.png" mimeType:@"application/octet-stream"];
@@ -242,8 +221,10 @@
     }
     else if (RequestTypePostBodyData == requestType) {
         NSLog(@"posting bodydata to url[%@]", url);
+        NSString *bodyParam = [NSString jsonStringWithObject:formatedParams];
+        bodyParam = [AppData EncryptPostBodyParam:bodyParam];
         NSMutableURLRequest *mutableRequest = [manager.requestSerializer requestWithMethod:@"POST" URLString:url parameters:nil error:nil];
-        mutableRequest.HTTPBody = [[AppData EncryptPostBodyParam:bodyParam] dataUsingEncoding:manager.requestSerializer.stringEncoding];
+        mutableRequest.HTTPBody = [bodyParam dataUsingEncoding:manager.requestSerializer.stringEncoding];
         [mutableRequest setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
         AFHTTPRequestOperation *operation = [manager HTTPRequestOperationWithRequest:mutableRequest success:success failure:failed];
         [manager.operationQueue addOperation:operation];

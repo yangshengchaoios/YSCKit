@@ -1,20 +1,22 @@
 //
 //  YSCStorageData.m
-//  B_EZGoal
+//  YSCKit
 //
 //  Created by yangshengchao on 16/1/28.
 //  Copyright © 2016年 YingChuangKeXun. All rights reserved.
 //
 
 #import "YSCStorageData.h"
-#define kCommonDirectoryName    @"YSCKit_Storage/"
+#define kCommonDirectory            @"YSCKit_Storage/"
+#define kCommonSettingFile          @"CommonSetting.archive"
+#define kUserSettingFile            @"UserSetting.archive"
 
 
 //----------------------------------------------------------------------------
 //  定义各种文件的缓存路径
 //----------------------------------------------------------------------------
 @interface YSCStorageData ()
-@property (nonatomic, copy) NSString *userDirectory;//登陆用户的缓存目录
+@property (nonatomic, copy) NSString *userId;
 @end
 @implementation YSCStorageData
 + (instancetype)SharedInstance {
@@ -22,51 +24,58 @@
         return [[self alloc] init];
     })
 }
-
+- (id)init {
+    self = [super init];
+    if (self) {
+        self.directoryPathOfHome = kPathOfSandBoxHome;
+        self.directoryPathOfDocuments = [YSCFileManager DirectoryPathOfDocuments];
+        self.directoryPathOfLibrary = [YSCFileManager DirectoryPathOfLibrary];
+        self.directoryPathOfLibraryCaches = [YSCFileManager DirectoryPathOfLibraryCaches];
+        self.directoryPathOfLibraryPreferences = [YSCFileManager DirectoryPathOfLibraryPreferences];
+        self.directoryPathOfTmp = kPathOfSandBoxTemp;
+        [self _ensureCommonDirectories];
+    }
+    return self;
+}
 - (void)setUserId:(NSString *)userId {
-    if ([NSString isNotEmpty:userId]) {
-        self.userDirectory = [userId stringByAppendingString:([userId hasSuffix:@"/"] ? @"" : @"/")];//确保最后一个字符是'/'
-        self.userDirectory = [self.userDirectory stringByAppendingString:kCommonDirectoryName];//保证用户目录在公共目录下面
+    if (isNotEmpty(userId)) {
+        _userId = userId;
+        [self _ensureUserDirectories];
     }
-    else {
-        self.userDirectory = kCommonDirectoryName;
-    }
-    
-    [self _ensureUserDirectories];
 }
 
 // Documents目录下的文件和目录路径
-- (NSString *)directoryPathOfDocumentsByUserId {
-    return [self.directoryPathOfDocuments stringByAppendingPathComponent:self.userDirectory];
-}
-- (NSString *)filePathOfUserSettings {
-    return [[self directoryPathOfDocumentsByUserId] stringByAppendingPathComponent:@"UserSettings.archive"];
-}
 - (NSString *)directoryPathOfDocumentsCommon {
-    return [self.directoryPathOfDocuments stringByAppendingPathComponent:kCommonDirectoryName];
+    return [self.directoryPathOfDocuments stringByAppendingPathComponent:kCommonDirectory];
 }
 - (NSString *)filePathOfCommonSettings {
-    return [[self directoryPathOfDocumentsCommon] stringByAppendingPathComponent:@"CommonSettings.archive"];
+    return [[self directoryPathOfDocumentsCommon] stringByAppendingPathComponent:kCommonSettingFile];
+}
+- (NSString *)directoryPathOfDocumentsByUserId {
+    return [[self directoryPathOfDocumentsCommon] stringByAppendingPathComponent:self.userId];
+}
+- (NSString *)filePathOfUserSettings {
+    return [[self directoryPathOfDocumentsByUserId] stringByAppendingPathComponent:kUserSettingFile];
 }
 
 // Library目录下的文件和目录路径
-- (NSString *)directoryPathOfLibraryCachesByUserId {
-    return [self.directoryPathOfLibraryCaches stringByAppendingPathComponent:self.userDirectory];
+- (NSString *)directoryPathOfLibraryCachesCommon {
+    return [self.directoryPathOfLibraryCaches stringByAppendingPathComponent:kCommonDirectory];
 }
-- (NSString *)directoryPathOfLibraryCachesBundleIdentifier {
-    return [self.directoryPathOfLibraryCaches stringByAppendingPathComponent:BundleIdentifier];
+- (NSString *)directoryPathOfLibraryCachesByUserId {
+    return [[self directoryPathOfLibraryCachesCommon] stringByAppendingPathComponent:self.userId];
 }
 - (NSString *)directoryPathOfPicByUserId {
     return [[self directoryPathOfLibraryCachesByUserId] stringByAppendingPathComponent:@"Pics/"];
 }
 - (NSString *)directoryPathOfAudioByUserId {
-    return [[self directoryPathOfLibraryCachesByUserId] stringByAppendingPathComponent:@"Audioes"];
+    return [[self directoryPathOfLibraryCachesByUserId] stringByAppendingPathComponent:@"Audioes/"];
 }
 - (NSString *)directoryPathOfVideoByUserId {
     return [[self directoryPathOfLibraryCachesByUserId] stringByAppendingPathComponent:@"Videoes/"];
 }
-- (NSString *)directoryPathOfLibraryCachesCommon {
-    return [self.directoryPathOfLibraryCaches stringByAppendingPathComponent:kCommonDirectoryName];
+- (NSString *)directoryPathOfLibraryCachesBundleIdentifier {
+    return [self.directoryPathOfLibraryCaches stringByAppendingPathComponent:BundleIdentifier];
 }
 - (NSString *)directoryPathOfDocumentsLog {
     return [[self directoryPathOfLibraryCachesCommon] stringByAppendingPathComponent:@"YSCLog/"];
@@ -81,15 +90,9 @@
 - (void)_ensureUserDirectories {
     [YSCFileUtils ensureDirectory:[self directoryPathOfDocumentsByUserId]];
     [YSCFileUtils ensureDirectory:[self directoryPathOfLibraryCachesByUserId]];
+    [YSCFileUtils ensureDirectory:[self directoryPathOfPicByUserId]];
     [YSCFileUtils ensureDirectory:[self directoryPathOfAudioByUserId]];
     [YSCFileUtils ensureDirectory:[self directoryPathOfVideoByUserId]];
-    [YSCFileUtils ensureDirectory:[self directoryPathOfPicByUserId]];
-}
-- (BOOL)_isEmpty:(NSString *)string {
-    if ( ! string) {
-        return YES;
-    }
-    return !([string length] && [[string stringByReplacingOccurrencesOfString:@" " withString:@""] length]);
 }
 @end
 
@@ -100,9 +103,17 @@
 @implementation YSCStorageData (Archive)
 // 公共配置文件存取
 - (void)setConfigValue:(NSObject *)value forKey:(NSString *)key {
-    [self setConfigWithValuesAndKeys:value, key, nil];
+    [self _setConfigWithValuesAndKeys:value, key, nil];
 }
-- (void)setConfigWithValuesAndKeys:(id)firstObject, ... NS_REQUIRES_NIL_TERMINATION {
+- (id)configValueForKey:(NSString *)key {
+    if (isEmpty(key)) {
+        return nil;
+    }
+    
+    NSDictionary *config = [self unarchiveDictionaryFromFilePath:[self filePathOfCommonSettings]];
+    return config[key];
+}
+- (void)_setConfigWithValuesAndKeys:(id)firstObject, ... NS_REQUIRES_NIL_TERMINATION {
     NSMutableArray *keys = [NSMutableArray array];
     NSMutableArray *values = [NSMutableArray array];
     
@@ -115,7 +126,7 @@
     }
     va_end(args);
     
-    int valueCount = [values count];
+    NSUInteger valueCount = [values count];
     if (valueCount != [keys count]) {
         NSLog(@"set config error : objects and keys don’t have the same number of elements.");
     }
@@ -128,20 +139,20 @@
     }
     
 }
-- (id)configValueForKey:(NSString *)key {
-    if ([self _isEmpty:key]) {
-        return nil;
-    }
-    
-    NSDictionary *config = [self unarchiveDictionaryFromFilePath:[self filePathOfCommonSettings]];
-    return config[key];
-}
 
 // 用户配置文件存取
 - (void)setUserConfigValue:(NSObject *)value forKey:(NSString *)key {
-    [self setUserConfigWithValuesAndKeys:value, key, nil];
+    [self _setUserConfigWithValuesAndKeys:value, key, nil];
 }
-- (void)setUserConfigWithValuesAndKeys:(id)firstObject, ... NS_REQUIRES_NIL_TERMINATION {
+- (id)userConfigValueForKey:(NSString *)key {
+    if (isEmpty(key)) {
+        return nil;
+    }
+    
+    NSDictionary *userConfig = [self unarchiveDictionaryFromFilePath:[self filePathOfUserSettings]];
+    return userConfig[key];
+}
+- (void)_setUserConfigWithValuesAndKeys:(id)firstObject, ... NS_REQUIRES_NIL_TERMINATION {
     NSMutableArray *keys = [NSMutableArray array];
     NSMutableArray *values = [NSMutableArray array];
     
@@ -154,7 +165,7 @@
     }
     va_end(args);
     
-    int valueCount = [values count];
+    NSUInteger valueCount = [values count];
     if (valueCount != [keys count]) {
         NSLog(@"set config error : objects and keys don’t have the same number of elements.");
     }
@@ -166,29 +177,8 @@
         [self archiveDictionary:configDictionary toFilePath:[self filePathOfUserSettings] overwrite:NO];
     }
 }
-- (id)userConfigValueForKey:(NSString *)key {
-    if ([self _isEmpty:key]) {
-        return nil;
-    }
-    
-    NSDictionary *userConfig = [self unarchiveDictionaryFromFilePath:[self filePathOfUserSettings]];
-    return userConfig[key];
-}
 
-// 序列化
-- (NSDictionary *)unarchiveDictionaryFromFilePath:(NSString *)filePath {
-    NSDictionary *dictionary;
-    @try {
-        dictionary = [NSKeyedUnarchiver unarchiveObjectWithFile:filePath];
-    }
-    @catch(NSException *exception) {
-        NSLog(@"unarchive error:%@", [exception debugDescription]);
-    }
-    @finally {
-        
-    }
-    return dictionary;
-}
+// 序列化 & 反序列化
 - (BOOL)archiveDictionary:(NSDictionary *)dicionary toFilePath:(NSString *)filePath {
     return [self archiveDictionary:dicionary toFilePath:filePath overwrite:NO];
 }
@@ -202,6 +192,19 @@
         [allDictionary addEntriesFromDictionary:dicionary];
         return [NSKeyedArchiver archiveRootObject:allDictionary toFile:filePath];
     }
+}
+- (NSDictionary *)unarchiveDictionaryFromFilePath:(NSString *)filePath {
+    NSDictionary *dictionary;
+    @try {
+        dictionary = [NSKeyedUnarchiver unarchiveObjectWithFile:filePath];
+    }
+    @catch(NSException *exception) {
+        NSLog(@"unarchive error:%@", [exception debugDescription]);
+    }
+    @finally {
+        
+    }
+    return dictionary;
 }
 
 // 删除Documents和Caches目录中的缓存数据，并确保所有缓存目录都存在
@@ -224,68 +227,21 @@
 //  处理缓存数据
 //----------------------------------------------------------------------------
 @implementation YSCStorageData (Cache)
-//------------------------------------
-//Document/YSCKit_Storage
-//该目录下的数据与业务逻辑相关，删除会影响逻辑
-//overwrite = NO
-//------------------------------------
-- (BOOL)saveObject:(NSObject *)object forKey:(NSString *)key {
-    return [self saveObject:object forKey:key fileName:nil subFolder:nil];
-}
-- (BOOL)saveObject:(NSObject *)object forKey:(NSString *)key fileName:(NSString *)fileName {
-    return [self saveObject:object forKey:key fileName:fileName subFolder:nil];
-}
 - (BOOL)saveObject:(NSObject *)object forKey:(NSString *)key fileName:(NSString *)fileName subFolder:(NSString *)subFoler {
-    return [self saveObject:object forKey:key fileName:fileName subFolder:subFoler folder:[STORAGEMANAGER directoryPathOfDocumentsCommon]];
-}
-
-//------------------------------------
-//Library/Caches/YSCKit_Storage
-//该目录下的数据随时都可以被清除，与用户无关
-//overwrite = NO
-//------------------------------------
-- (BOOL)saveCacheObject:(NSObject *)object forKey:(NSString *)key {
-    return [self saveCacheObject:object forKey:key fileName:nil subFolder:nil];
-}
-- (BOOL)saveCacheObject:(NSObject *)object forKey:(NSString *)key fileName:(NSString *)fileName subFolder:(NSString *)subFoler {
-    return [self saveObject:object forKey:key fileName:fileName subFolder:subFoler folder:[STORAGEMANAGER directoryPathOfLibraryCachesCommon]];
-}
-
-
-//------------------------------------
-//
-// Document/YSCKit_Storage
-//
-//------------------------------------
-- (id)getObjectForKey:(NSString *)key {
-    return [self getObjectForKey:key fileName:nil subFolder:nil];
-}
-- (id)getObjectForKey:(NSString *)key fileName:(NSString *)fileName {
-    return [self getObjectForKey:key fileName:fileName subFolder:nil];
+    return [self _saveObject:object forKey:key fileName:fileName folder:self.directoryPathOfDocumentsCommon subFolder:subFoler];
 }
 - (id)getObjectForKey:(NSString *)key fileName:(NSString *)fileName subFolder:(NSString *)subFoler {
-    return [self getObjectForKey:key fileName:fileName subFolder:subFoler folder:[STORAGEMANAGER directoryPathOfDocumentsCommon]];
+    return [self _getObjectForKey:key fileName:fileName folder:self.directoryPathOfDocumentsCommon subFolder:subFoler];
 }
-
-//------------------------------------
-//
-// Library/Caches/YSCKit_Storage
-//
-//------------------------------------
-- (id)getCacheObjectForKey:(NSString *)key {
-    return [self getCacheObjectForKey:key fileName:nil subFolder:nil];
+- (BOOL)saveCacheObject:(NSObject *)object forKey:(NSString *)key fileName:(NSString *)fileName subFolder:(NSString *)subFoler {
+    return [self _saveObject:object forKey:key fileName:fileName folder:self.directoryPathOfLibraryCachesCommon subFolder:subFoler];
 }
 - (id)getCacheObjectForKey:(NSString *)key fileName:(NSString *)fileName subFolder:(NSString *)subFoler {
-    return [self getObjectForKey:key fileName:fileName subFolder:subFoler folder:[STORAGEMANAGER directoryPathOfLibraryCachesCommon]];
+    return [self _getObjectForKey:key fileName:fileName folder:self.directoryPathOfLibraryCachesCommon subFolder:subFoler];
 }
 
-//------------------------------------
-//
 // 两个通用方法：存储数据、获取数据
-//
-//------------------------------------
-//存数据的通用方法
-- (BOOL)saveObject:(NSObject *)object forKey:(NSString *)key fileName:(NSString *)fileName subFolder:(NSString *)subFolerName folder:(NSString *)folderPath {
+- (BOOL)_saveObject:(NSObject *)object forKey:(NSString *)key fileName:(NSString *)fileName folder:(NSString *)folderPath subFolder:(NSString *)subFolerName {
     ReturnNOWhenObjectIsEmpty(key)
     ReturnNOWhenObjectIsEmpty(folderPath)
     if (nil == object) {
@@ -296,23 +252,22 @@
         folderPath = [folderPath stringByAppendingPathComponent:subFolerName];
     }
     if (isEmpty(fileName)) {
-        fileName = @"CommonSettings";
+        fileName = kCommonSettingFile;
     }
     NSString *filePath = [folderPath stringByAppendingPathComponent:fileName];
     BOOL isSuccess = NO;
     @try {
-        isSuccess = [STORAGEMANAGER archiveDictionary:@{ key : object }
+        isSuccess = [self archiveDictionary:@{ key : object }
                                            toFilePath:filePath
                                             overwrite:NO];
     }
     @catch (NSException *exception){
-        NSLog(@"将数组保存至本地缓存时出错！%@", exception); //可能是没有在对象里做序列号和反序列化！
+        NSLog(@"序列化object出错：%@", exception); //可能是没有在对象里做序列号和反序列化！
         isSuccess = NO;
     }
     return isSuccess;
 }
-//获取缓存数据通用方法
-- (id)getObjectForKey:(NSString *)key fileName:(NSString *)fileName subFolder:(NSString *)subFolerName folder:(NSString *)folderPath {
+- (id)_getObjectForKey:(NSString *)key fileName:(NSString *)fileName folder:(NSString *)folderPath subFolder:(NSString *)subFolerName {
     ReturnNilWhenObjectIsEmpty(key)
     ReturnNilWhenObjectIsEmpty(folderPath)
     
@@ -320,10 +275,10 @@
         folderPath = [folderPath stringByAppendingPathComponent:subFolerName];
     }
     if (isEmpty(fileName)) {
-        fileName = @"CommonSettings";
+        fileName = kCommonSettingFile;
     }
     NSString *filePath = [folderPath stringByAppendingPathComponent:fileName];
-    NSDictionary *cacheInfo = [STORAGEMANAGER unarchiveDictionaryFromFilePath:filePath];
+    NSDictionary *cacheInfo = [self unarchiveDictionaryFromFilePath:filePath];
     NSObject *value = cacheInfo[key];
     if (nil != value && NO == [value isKindOfClass:[NSNull class]]) {
         return value;

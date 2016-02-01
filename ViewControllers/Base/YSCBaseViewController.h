@@ -12,7 +12,7 @@
 #define CheckWeakSelfIsClicked      if(weakSelf.isClicked){ return; }weakSelf.isClicked = YES;
 #define CheckSelfIsClicked          if(self.isClicked){ return; }self.isClicked = YES;
 
-@interface YSCBaseViewController : UIViewController <UITextFieldDelegate>
+@interface YSCBaseViewController : UIViewController
 
 #pragma mark - 视图切换
 @property (nonatomic, strong) NSDictionary *params; //显示该视图控制器的时候传入的参数

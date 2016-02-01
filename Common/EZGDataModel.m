@@ -195,27 +195,19 @@
     }
     
     //调用接口
-    [AFNManager getDataFromUrl:kResPathAppCommonUrl
-                       withAPI:kResPathGetUserChatInfo
-                  andDictParam:@{kParamUserType : userType,
-                                 kParamUserIds : [userIds componentsJoinedByString:@","]}
-                     dataModel:[ChatUserModel class]
-              requestSuccessed:^(id responseObject) {
-                  NSArray *array = (NSArray *)responseObject;
-                  if (isNotEmpty(array)) {
-                      for (ChatUserModel *model in array) {
-                          [model saveToDB];
-                      }
-                  }
-                  if (block) {
-                      block(responseObject, nil);
-                  }
-              }
-                requestFailure:^(ErrorType errorType, NSError *error) {
-                    if (block) {
-                        block(nil, [YSCCommonUtils ResolveErrorType:errorType andError:error]);
-                    }
-                }];
+    [AppData RequestByMethod:kResPathGetUserChatInfo
+                      params:@{kParamUserType : userType,
+                               kParamUserIds : [userIds componentsJoinedByString:@","]}
+                   dataModel:[ChatUserModel class]
+                       block:^(NSObject *object, NSString *errorMessage) {
+                           NSArray *array = (NSArray *)object;
+                           for (ChatUserModel *model in array) {
+                               [model saveToDB];
+                           }
+                           if (block) {
+                               block(nil, errorMessage);
+                           }
+                       }];
 }
 + (instancetype)GetLocalDataByUserId:(NSString *)userId {
     FMDatabase *db = [FMDatabase databaseWithPath:EZGDATA.cacheDBPath];

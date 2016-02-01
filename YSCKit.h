@@ -16,7 +16,6 @@
 
 //系统类扩展
 #import "NSObject+Addition.h"
-#import "UITextField+Additions.h"
 #import "UIView+Addition.h"
 #import "NSDate+Additions.h"
 #import "NSTimer+Addition.h"
@@ -32,6 +31,8 @@
 #import "ALAssetsLibrary+CustomPhotoAlbum.h"
 
 //工具类
+#import "YSCHelper.h"
+//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>DEPRECATED!!!
 #import "YSCFileUtils.h"
 #import "YSCImageUtils.h"
 #import "YSCCommonUtils.h"
@@ -41,11 +42,11 @@
 #import "ReachabilityManager.h"
 #import "StorageManager.h"
 #import "LogManager.h"
-#import "AFNManager.h"
 #import "AppConfigManager.h"
 #import "ShowPhotosManager.h"
+//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
-//常用自定义控件
+//自定义控件
 #import "YSCKTipsView.h"
 #import "YSCTitleBarView.h"
 #import "YSCTextField.h"

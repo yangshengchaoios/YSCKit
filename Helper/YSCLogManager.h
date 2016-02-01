@@ -1,6 +1,6 @@
 //
 //  YSCLogManager.h
-//  B_EZGoal
+//  YSCKit
 //
 //  Created by yangshengchao on 16/1/28.
 //  Copyright © 2016年 YingChuangKeXun. All rights reserved.
@@ -21,5 +21,5 @@
 + (void)SaveLog:(NSString *)logString intoFileName:(NSString *)fileName;
 + (void)SaveLog:(NSString *)logString intoFilePath:(NSString *)logFilePath overWrite:(BOOL)overwrite;
 // 保留最近N天日志文件
-+ (void)ManageLogFilesByRemainingDays:(NSInteger)days;
++ (void)DeleteLogFilesExceptLastDays:(NSInteger)days;
 @end

@@ -47,10 +47,10 @@ typedef NS_ENUM(NSInteger, RegexType) {
 typedef NS_ENUM (NSInteger, RequestType) {
     RequestTypeGET = 0,
     RequestTypePOST,
+    RequestTypePostBodyData,
     RequestTypeUploadFile,
     RequestTypeDownloadFile,
-    RequestTypePostBodyData,
-    RequestTypeCustomResponse       //数据来源不是AFNManger
+    RequestTypeCustomResponse       //数据来源不是YSCRequestManager
 };
 
 typedef NS_ENUM(NSInteger, AudioType) {
