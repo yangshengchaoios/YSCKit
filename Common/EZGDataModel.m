@@ -176,7 +176,7 @@
     NSString *tablesql_ChatUser = @"CREATE TABLE IF NOT EXISTS ChatUser ( \
     userId Varchar(100) PRIMARY KEY, \
     userInfo TEXT DEFAULT NULL)";
-    [YSCManager SqliteUpdate:tablesql_ChatUser dbPath:EZGDATA.cacheDBPath];
+    [YSCManager SqliteUpdate:tablesql_ChatUser dbPath:YSCInstance.cacheDBPath];
 }
 + (void)RefreshByUserIds:(NSArray *)userIds ezgoalType:(NSString *)ezgoalType block:(YSCResponseErrorMessageBlock)block {
     if (isEmpty(userIds)) {
@@ -210,7 +210,7 @@
                        }];
 }
 + (instancetype)GetLocalDataByUserId:(NSString *)userId {
-    FMDatabase *db = [FMDatabase databaseWithPath:EZGDATA.cacheDBPath];
+    FMDatabase *db = [FMDatabase databaseWithPath:YSCInstance.cacheDBPath];
     ChatUserModel *userModel = nil;
     if ([db open]) {
         NSString *sql = [NSString stringWithFormat:@"SELECT * FROM ChatUser WHERE userId = '%@'", Trim(userId)];
@@ -227,10 +227,10 @@
 //保存模型至本地数据库
 - (void)saveToDB {
     NSString *delSql = [NSString stringWithFormat:@"DELETE FROM ChatUser WHERE userId = '%@'", Trim(self.userId)];
-    [YSCManager SqliteUpdate:delSql dbPath:EZGDATA.cacheDBPath];
+    [YSCManager SqliteUpdate:delSql dbPath:YSCInstance.cacheDBPath];
     NSString *insertSql = [NSString stringWithFormat:@"INSERT INTO ChatUser(userId,userInfo) VALUES('%@', '%@')",
                      Trim(self.userId), Trim([self toJSONString])];
-    [YSCManager SqliteUpdate:insertSql dbPath:EZGDATA.cacheDBPath];
+    [YSCManager SqliteUpdate:insertSql dbPath:YSCInstance.cacheDBPath];
 }
 @end
 @implementation BMKCustomAnnotation         @end

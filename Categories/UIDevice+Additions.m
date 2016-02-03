@@ -175,9 +175,10 @@
 //判断定位是否可用(包括已经授权和没有决定)
 + (BOOL)isLocationAvaible {
     CLAuthorizationStatus status = [CLLocationManager authorizationStatus];
-    return (kCLAuthorizationStatusAuthorizedWhenInUse == status ||
-            kCLAuthorizationStatusAuthorizedAlways == status ||
-            kCLAuthorizationStatusNotDetermined == status);
+    BOOL isAppAuthorized = (kCLAuthorizationStatusAuthorizedWhenInUse == status ||
+                            kCLAuthorizationStatusAuthorizedAlways == status ||
+                            kCLAuthorizationStatusNotDetermined == status);
+    return [CLLocationManager locationServicesEnabled] && isAppAuthorized;
 }
 
 // 相册是否可用

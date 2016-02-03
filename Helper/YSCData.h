@@ -20,11 +20,13 @@
 //--------------------------------------
 @interface YSCData : NSObject
 @property (nonatomic, weak) UIViewController *currentViewController;
+@property (nonatomic, strong) CLLocationManager *locationManager;
+@property (nonatomic, assign) CLLocationDegrees currentLongitude;   //当前的经度104.7
+@property (nonatomic, assign) CLLocationDegrees currentLatitude;    //当前的纬度30.2
 @property (nonatomic, strong) NSString *cacheDBPath;        //缓存数据库路径
 //network status
 @property (nonatomic, assign) BOOL isReachable;             //是否处于联网状态
 @property (nonatomic, assign) BOOL isReachableViaWiFi;      //是否通过wifi联网
-
 //app config
 @property (nonatomic, strong) NSString *udid;               //设备唯一编号(UMeng)
 @property (nonatomic, strong) NSString *deviceToken;        //推送通知的token
@@ -34,6 +36,13 @@
 @property (nonatomic, assign) NSTimeInterval currentTimeInterval;//服务器当前时间戳(秒)从1970-01-01 00:00:00开始
 
 + (instancetype)SharedInstance;
+
+#pragma mark - 定位当前位置
+- (void)startLocationService;
+- (void)stopLocationService;
+//解析当前GPS坐标成文字信息
+- (void)resolveUserLocationWithBlock:(YSCResultBlock)block;
+- (void)resolveLocationByLatitude:(CLLocationDegrees)latitude longitude:(CLLocationDegrees)longitude block:(YSCResultBlock)block;
 
 #pragma mark - 获取服务器当前时间
 - (void)refreshServerTimeWithBlock:(YSCResultBlock)block;   //如果具体项目的网络请求不同就重新该方法

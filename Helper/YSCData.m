@@ -8,14 +8,15 @@
 
 #import "YSCData.h"
 #import "Reachability.h"
-#define CachedSyncInterval          @"CachedSyncInterval"
+#define CachedSyncInterval          @"CachedSyncInterval"       //本地缓存的与服务器时间差(毫秒)
 #define ConfigPlistPath             [[NSBundle mainBundle] pathForResource:@"AppConfig" ofType:@"plist"]
 #define ConfigDebugPlistPath        [[NSBundle mainBundle] pathForResource:@"AppConfigDebug" ofType:@"plist"]
 
 //--------------------------------------
 //  定义全局变量
 //--------------------------------------
-@interface YSCData () <AVAudioPlayerDelegate>
+@interface YSCData () <AVAudioPlayerDelegate, CLLocationManagerDelegate>
+// 参数配置
 @property (nonatomic, strong) NSMutableDictionary *appParams;           //内存中的参数(high)
 @property (nonatomic, strong) NSMutableDictionary *onlineParams;        //在线参数(normal)
 @property (nonatomic, strong) NSMutableDictionary *localParams;         //本地参数(low)
@@ -45,8 +46,8 @@
         
         // 初始化时间差
         if (nil == YSCGetObject(CachedSyncInterval)) {
-            YSCSaveObject(@(-0.5f), CachedSyncInterval);
-            self.syncInterval = -0.5f;
+            YSCSaveObject(@(-500), CachedSyncInterval);
+            self.syncInterval = -500;
         }
         else {
             self.syncInterval =  [YSCGetObject(CachedSyncInterval) doubleValue];
@@ -69,6 +70,12 @@
                                              selector:@selector(_refreshServerTime)
                                                object:nil];
 }
+//缓存数据库路径
+- (NSString *)cacheDBPath {
+    NSString *dbName = [NSString stringWithFormat:@"ysckit_cache_%@.sqlite", USERID];
+    return [[YSCFileManager DirectoryPathOfDocuments] stringByAppendingPathComponent:dbName];
+}
+
 
 #pragma mark - 网络状态
 - (void)_initReachability {
@@ -84,6 +91,57 @@
 - (BOOL)isReachableViaWiFi {
     return [[Reachability reachabilityForInternetConnection] isReachableViaWiFi];
 }
+
+
+#pragma mark - 定位当前位置
+- (void)startLocationService {
+    if ([UIDevice isLocationAvaible]) {
+        if (nil == self.locationManager) {
+            self.locationManager = [CLLocationManager new];
+            self.locationManager.delegate = self;
+            self.locationManager.desiredAccuracy = kCLLocationAccuracyBest;
+            self.locationManager.distanceFilter = kCLDistanceFilterNone;//will be informed of any movement
+        }
+//        [self.locationManager requestAlwaysAuthorization];
+//        [self.locationManager requestWhenInUseAuthorization];
+        [self.locationManager startUpdatingLocation];
+    }
+    else {
+        NSLog(@"location service is not avaible!!!");
+    }
+}
+- (void)stopLocationService {
+    [self.locationManager stopUpdatingLocation];
+}
+//解析当前GPS坐标成文字信息
+- (void)resolveUserLocationWithBlock:(YSCResultBlock)block {
+    [self resolveLocationByLatitude:self.currentLatitude longitude:self.currentLongitude block:block];
+}
+- (void)resolveLocationByLatitude:(CLLocationDegrees)latitude longitude:(CLLocationDegrees)longitude block:(YSCResultBlock)block {
+    //TODO:解析地理位置信息
+}
+#pragma mark - CLLocationManagerDelegate
+- (void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)locations {
+    NSLog(@"----------didUpdateLocations--------");
+    for (CLLocation *location in locations) {
+        CLLocationCoordinate2D locationCoordinate = location.coordinate;
+        CLLocationAccuracy accuracy = location.horizontalAccuracy;
+    }
+    NSLog(@"-----------------------------------");
+}
+- (void)locationManager:(CLLocationManager *)manager didUpdateToLocation:(CLLocation *)newLocation fromLocation:(CLLocation *)oldLocation {
+    NSLog(@"----didUpdateToLocation----");
+}
+- (void)locationManager:(CLLocationManager *)manager didUpdateHeading:(CLHeading *)newHeading {
+    NSLog(@"----didUpdateHeading----");
+}
+- (void)locationManager:(CLLocationManager *)manager didFailWithError:(NSError *)error {
+    NSLog(@"----didFailWithError----");
+}
+- (void)locationManager:(CLLocationManager *)manager didChangeAuthorizationStatus:(CLAuthorizationStatus)status {
+    NSLog(@"status=%d", status);
+}
+
 
 #pragma mark - 获取服务器当前时间
 - (NSDate *)currentDate {
