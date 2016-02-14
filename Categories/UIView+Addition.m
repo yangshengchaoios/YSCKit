@@ -7,7 +7,6 @@
 //
 
 #import "UIView+Addition.h"
-#import "YSCImagePickerViewController.h"
 
 
 @implementation UIView (Addition)
@@ -314,7 +313,6 @@
     ReturnNilWhenObjectIsEmpty(view);
     return [view screenshotOfView];
 }
-
 - (UIImage *)screenshotOfView {
     UIGraphicsBeginImageContext(self.frame.size);
     [self.layer renderInContext:UIGraphicsGetCurrentContext()];
@@ -322,8 +320,6 @@
     UIGraphicsEndImageContext();
     return fullImage;
 }
-
-
 
 
 #pragma mark - 递归遍历所有子view
@@ -474,12 +470,10 @@
 - (UIViewController *)currentViewController {
     return nil;
 }
-
 + (UIViewController *)currentViewController {
     UIViewController *viewController = KeyWindow.rootViewController;//NOTE:只有当第一个viewController的viewDidLoad中无法获取
     return [UIView getVisibleViewControllerFrom:viewController];
 }
-
 + (UIViewController *)getVisibleViewControllerFrom:(UIViewController *)viewController {
     if ([viewController isKindOfClass:[UINavigationController class]]) {
         return [UIView getVisibleViewControllerFrom:[((UINavigationController *) viewController) visibleViewController]];

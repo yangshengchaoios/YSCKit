@@ -141,11 +141,11 @@
         }
         return;
     }
-    NSDictionary *formatedParams = [AppData FormatRequestParams:params];//格式化所有请求的参数
+    NSDictionary *formatedParams = [YSCManager FormatRequestParams:params];//格式化所有请求的参数
     
     //1. 定义返回成功的block
     void (^success)(AFHTTPRequestOperation *operation, id responseObject) = ^(AFHTTPRequestOperation *operation, id responseObject) {
-        NSString *resolvedString = [AppData ResolveResponseObject:responseObject];
+        NSString *resolvedString = [YSCManager ResolveResponseObject:responseObject];
         if ([resolvedString length] > 0) {
             if (requestSuccessed) {
                 requestSuccessed(resolvedString);
@@ -191,8 +191,8 @@
     //    [manager.requestSerializer setValue:@"gzip" forHTTPHeaderField:@"Accept-Encoding"];//TODO:压缩上传内容
     [manager.requestSerializer setValue:AppVersion forHTTPHeaderField:kParamVersion];
     [manager.requestSerializer setValue:kParamFromValue forHTTPHeaderField:kParamFrom];
-    [manager.requestSerializer setValue:[AppData SignatureWithParams:formatedParams] forHTTPHeaderField:kParamSignature];
-    [manager.requestSerializer setValue:[AppData EncryptHttpHeaderToken] forHTTPHeaderField:kAppHTTPTokenName];
+    [manager.requestSerializer setValue:[YSCManager SignatureWithParams:formatedParams] forHTTPHeaderField:kParamSignature];
+    [manager.requestSerializer setValue:[YSCManager EncryptHttpHeaderToken] forHTTPHeaderField:kAppHTTPTokenName];
     if (RequestTypeGET == requestType) {
         NSLog(@"getting data from url[%@]", url);
         [manager   GET:url
@@ -222,7 +222,7 @@
     else if (RequestTypePostBodyData == requestType) {
         NSLog(@"posting bodydata to url[%@]", url);
         NSString *bodyParam = [NSString jsonStringWithObject:formatedParams];
-        bodyParam = [AppData EncryptPostBodyParam:bodyParam];
+        bodyParam = [YSCManager EncryptPostBodyParam:bodyParam];
         NSMutableURLRequest *mutableRequest = [manager.requestSerializer requestWithMethod:@"POST" URLString:url parameters:nil error:nil];
         mutableRequest.HTTPBody = [bodyParam dataUsingEncoding:manager.requestSerializer.stringEncoding];
         [mutableRequest setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];

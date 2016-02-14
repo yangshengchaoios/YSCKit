@@ -487,3 +487,88 @@
     
 }
 @end
+
+
+
+//--------------------------------------
+//  Request
+//--------------------------------------
+@implementation YSCManager (Request)
++ (NSDictionary *)FormatRequestParams:(NSDictionary *)params {
+    NSMutableDictionary *newDictParam = [NSMutableDictionary dictionaryWithDictionary:params];
+    for (NSString *key in newDictParam.allKeys) {
+        NSObject *value = params[key];
+        //去掉key和value的前后空格字符
+        NSString *newKey = Trim(key);
+        NSString *newValue = [NSString stringWithFormat:@"%@", [NSString isEmpty:value] ? @"" : value];
+        newValue = Trim(newValue);
+        
+        [newDictParam removeObjectForKey:key];//移除修改前的key
+        newDictParam[newKey] = newValue;
+    }
+    //NOTE:添加通用参数
+    
+    NSLog(@"request params:\r%@", newDictParam);
+    return newDictParam;
+}
++ (NSString *)SignatureWithParams:(NSDictionary *)params {
+    NSArray *keys = [[params allKeys] sortedArrayUsingSelector:@selector(compare:)];
+    
+    //1. 按照字典顺序拼接url字符串
+    NSMutableString *joinedString = [NSMutableString string];
+    for (NSString *key in keys) {
+        if ([kParamSignature isEqualToString:key]) {//不对signature进行加密(如果有的话)
+            continue;
+        }
+        [joinedString appendFormat:@"%@%@", Trim(key), Trim(params[key])];
+    }
+    
+    //2. 对参数进行md5加密
+    NSString *newString = [NSString stringWithFormat:@"%@%@", joinedString, kParamSecretKey];
+    NSString *signature = [[NSString MD5Encrypt:newString] lowercaseString];
+    return signature;
+}
++ (NSString *)EncryptHttpHeaderToken {
+    NSString *currentLongitude = [NSString stringWithFormat:@"%f", YSCInstance.currentLongitude];
+    NSString *currentLatitude = [NSString stringWithFormat:@"%f", YSCInstance.currentLatitude];
+    NSDictionary *param = @{kParamAppId : kAppId,
+                            kParamVersion : AppVersion,
+                            kParamUdid : YSCInstance.udid,
+                            kParamFrom : kParamFromValue,
+                            kParamLongitude : currentLongitude,
+                            kParamLatitude : currentLatitude,
+                            kParamToken : TOKEN,
+                            kParamChannel : kAppChannel,
+                            kParamDeviceToken : YSCInstance.deviceToken
+                            };
+    NSLog(@"ezgoaltoken:\r%@", param);
+    NSString *encryptEzgoalToken = [NSString AESEncrypt:[NSString jsonStringWithObject:param] byKey:kParamAESSecretKey];
+    NSLog(@"ezgoalToken=\r%@", encryptEzgoalToken);
+    return encryptEzgoalToken;
+}
++ (NSString *)EncryptPostBodyParam:(NSString *)bodyParam {
+    NSLog(@"post body params:\r%@", bodyParam);
+    if ([kIsRequestEncrypted boolValue]) {
+        return [NSString AESEncrypt:bodyParam byKey:kParamAESSecretKey];
+    }
+    else {
+        return bodyParam;
+    }
+}
++ (NSString *)ResolveResponseObject:(id)responseObject {
+    NSString *resolvedString = @"";
+    if ([responseObject isKindOfClass:[NSData class]]) {
+        resolvedString = [[NSString alloc] initWithData:responseObject encoding:NSUTF8StringEncoding];
+    }
+    if ([responseObject isKindOfClass:[NSString class]]) {
+        resolvedString = [NSString replaceString:responseObject byRegex:@"[\r\n\t]" to:@""];
+    }
+    if (isNotEmpty(resolvedString) && NO == [resolvedString isContains:@"{"]) {//这里兼容了返回内容没有加密的情况
+        resolvedString = [NSString AESDecrypt:resolvedString byKey:kParamAESSecretKey];
+    }
+    NSString *formatedJsonString = [YSCManager FormatPrintJsonStringOnConsole:resolvedString];
+    formatedJsonString = isEmpty(formatedJsonString) ? resolvedString : formatedJsonString;
+    NSLog(@"request success! resolvedString:\r%@", formatedJsonString);
+    return resolvedString;
+}
+@end

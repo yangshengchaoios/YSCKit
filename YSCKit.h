@@ -9,6 +9,10 @@
 #ifndef EZGoal_YSCKit_h
 #define EZGoal_YSCKit_h
 
+//常用系统库
+#import <AVFoundation/AVFoundation.h>
+#import <CoreLocation/CoreLocation.h>
+
 //常量
 #import "YSCEnumType.h"
 #import "YSCConstants.h"

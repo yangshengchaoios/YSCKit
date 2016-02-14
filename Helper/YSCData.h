@@ -6,7 +6,6 @@
 //  Copyright © 2016年 YingChuangKeXun. All rights reserved.
 //
 
-
 /**
  *  单例类
  *  作用：存储整个项目运行过程中用到的变量

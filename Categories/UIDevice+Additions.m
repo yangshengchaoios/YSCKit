@@ -7,7 +7,6 @@
 //
 
 #import "UIDevice+Additions.h"
-#import <CoreLocation/CoreLocation.h>
 #import <MobileCoreServices/MobileCoreServices.h>
 #import <CoreMotion/CoreMotion.h>
 #include <sys/sysctl.h>

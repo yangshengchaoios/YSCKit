@@ -98,3 +98,22 @@
 + (void)OpenPrivacyOfSetting;
 @end
 
+
+
+//--------------------------------------
+//  Request
+//--------------------------------------
+@interface YSCManager (Request)
+//格式化所有提交的参数
++ (NSDictionary *)FormatRequestParams:(NSDictionary *)params;
+//对参数进行签名
++ (NSString *)SignatureWithParams:(NSDictionary *)params;
+//组装httpheader的加密token
++ (NSString *)EncryptHttpHeaderToken;
+//对postBody参数进行加密
++ (NSString *)EncryptPostBodyParam:(NSString *)bodyParam;
+//解析接口返回的数据
++ (NSString *)ResolveResponseObject:(id)responseObject;
+@end
+
+
