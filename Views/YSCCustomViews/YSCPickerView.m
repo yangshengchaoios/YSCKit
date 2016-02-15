@@ -45,7 +45,7 @@
     } forControlEvents:UIControlEventValueChanged];
     self.datePicker.locale = [[NSLocale alloc] initWithLocaleIdentifier:@"zh_CN"];
     [self.datePicker setTimeZone:[NSTimeZone timeZoneWithName:@"GMT+8"]];
-    [self.datePicker setMinimumDate:[NSDate dateFromString:@"1930-01-01" withFormat:DateFormat3]];
+    [self.datePicker setMinimumDate:[NSDate dateFromString:@"1930-01-01" withFormat:kDateFormat3]];
     [self.datePicker setMaximumDate:CURRENTDATE];
 
     

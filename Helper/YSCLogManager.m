@@ -68,13 +68,13 @@ void _uncaughtExceptionHandler(NSException *exception) {
 + (void)DeleteLogFilesExceptLastDays:(NSInteger)days {
     NSArray *fileNames = [YSCFileManager AllPathsInDirectoryPath:[YSCStorageInstance directoryPathOfDocumentsLog]];
     NSArray *tempArray = [fileNames sortedArrayUsingComparator:^NSComparisonResult(id  _Nonnull obj1, id  _Nonnull obj2) {
-        NSDate *date1 = [NSDate dateFromString:(NSString *)obj1 withFormat:DateFormat3];
-        NSDate *date2 = [NSDate dateFromString:(NSString *)obj2 withFormat:DateFormat3];
+        NSDate *date1 = [NSDate dateFromString:(NSString *)obj1 withFormat:kDateFormat3];
+        NSDate *date2 = [NSDate dateFromString:(NSString *)obj2 withFormat:kDateFormat3];
         return [date1 isEarlierThanDate:date2];
     }];
     NSInteger index = 0;
     for (NSString *fileName in tempArray) {
-        NSDate *tempDate = [NSDate dateFromString:fileName withFormat:DateFormat3];
+        NSDate *tempDate = [NSDate dateFromString:fileName withFormat:kDateFormat3];
         if (tempDate) {
             index++;
             if (index > days) {

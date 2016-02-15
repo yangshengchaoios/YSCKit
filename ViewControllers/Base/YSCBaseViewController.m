@@ -155,7 +155,7 @@
 				self.backButton.autoresizingMask = UIViewAutoresizingFlexibleBottomMargin;
 				self.backButton.backgroundColor = [UIColor clearColor];
 				[self.backButton setTitle:nil forState:UIControlStateNormal];
-				[self.backButton setImage:DefaultNaviBarArrowBackImage forState:UIControlStateNormal];
+				[self.backButton setImage:kDefaultNaviBarPopImage forState:UIControlStateNormal];
 			}
 			[self.backButton addTarget:self action:@selector(popButtonClicked:) forControlEvents:UIControlEventTouchUpInside];
 			[self.titleBarView addSubview:self.backButton];
@@ -169,7 +169,7 @@
 		}
 	}
     else if (BackTypeImage == self.backType) {//自定义返回按钮的图片(包括push和present的)
-        self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithImage:DefaultNaviBarArrowBackImage
+        self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithImage:kDefaultNaviBarPopImage
                                                                                  style:UIBarButtonItemStylePlain
                                                                                 target:self
                                                                                 action:@selector(backButtonClicked:)];

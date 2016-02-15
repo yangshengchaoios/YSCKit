@@ -9,6 +9,7 @@
 #ifndef YSCKit_YSCConstants_h
 #define YSCKit_YSCConstants_h
 
+//定义通用的block
 typedef void (^YSCBlock)();
 typedef void (^YSCResultBlock)(NSObject *object);
 typedef void (^YSCStringResultBlock)(NSString *string, NSError *error);
@@ -24,35 +25,46 @@ typedef void (^YSCImageResultBlock)(UIImage *image, NSError *error);
 typedef void (^YSCDictionaryResultBlock)(NSDictionary *dict, NSError *error);
 typedef void (^YSCResponseErrorMessageBlock)(NSObject *object, NSString *errorMessage);
 
-//常量
-#ifndef kLogManageType
-    #define kLogManageType              @"1"
-#endif
-#ifndef kDefaultTipsEmptyText
-    #define kDefaultTipsEmptyText       @"暂无数据"
-#endif
-#ifndef kDefaultTipsEmptyIcon
-    #define kDefaultTipsEmptyIcon       @"icon_empty"//列表为空时的默认icon名称
-#endif
-#ifndef kDefaultTipsFailedIcon
-    #define kDefaultTipsFailedIcon      @"icon_failed"//列表加载失败时的默认icon名称
-#endif
-#ifndef kDefaultTipsButtonTitle
-    #define kDefaultTipsButtonTitle     @"重新加载"//列表加载失败、为空时的按钮名称
-#endif
+
+//时间格式常量
+#define kDateFormat1                    @"yyyy-MM-dd HH:mm:ss"
+#define kDateFormat2                    @"yyyy.MM.dd HH:mm"
+#define kDateFormat3                    @"yyyy-MM-dd"
+#define kDateFormat4                    @"yyyy.MM.dd"
+#define kDateFormat5                    @"yyyy年M月d日"
+#define kDateFormat6                    @"yyyy-MM-dd HH:mm"
+#define kDateFormat7                    @"yyyy年M月d日 HH:mm"
+#define kDateFormat8                    @"M月d日"
+#define kDateFormat9                    @"yyyy年M月"
+#define kDateFormat10                   @"yyyy-MM-dd ccc HH:mm"//2015-12-24 周四 11:32
+#define kDateFormat11                   @"yyyy-MM-dd cccc HH:mm"//2015-12-24 星期四 11:32
+#define kDateFormat20                   @"yyyy年M月d日 HH:mm:ss"
+#define kDateFormat21                   @"HH:mm"
+#define kDateFormat22                   @"MM月dd日 HH:mm"
+#define kDateFormat23                   @"M月d日 HH:mm"
+
+
+//字符串常量
+#define kCachedUserModel                @"UserModel"
+#define kCachedUserName                 @"UserName"
+#define kCachedPassWord                 @"PassWord"
+#define kCachedUserToken                @"UserToken"
+#define kCellIdentifier                 @"Cell"
+#define kFooterIdentifier               @"Footer"
+#define kHeaderIdentifier               @"Header"
+#define kItemCellIdentifier             @"ItemCell"             //UICollectionView要用的
+
 
 //方法或属性过期标志
 #define YSCDeprecated(explain) __attribute__((deprecated(explain)))
 
 
 //控制调试信息的输出
-#define DEBUGMODEL      [YSCGetObject(@"DEBUG") boolValue]
-#define SwitchToDebug   YSCSaveObject(@(YES), @"DEBUG")
-#define SwitchToNormal  YSCSaveObject(@(NO), @"DEBUG")
+#define DEBUGMODEL                      [YSCGetObject(@"DEBUG") boolValue]
+#define SwitchToDebug                   YSCSaveObject(@(YES), @"DEBUG")
+#define SwitchToNormal                  YSCSaveObject(@(NO), @"DEBUG")
 
-/**
- *  重新定义NSLog
- */
+//定义NSLog
 #define __NSLog(s, ...) do { \
     NSString *logString = [NSString stringWithFormat:@"[%@(%d)] %@",[[NSString stringWithUTF8String:__FILE__] lastPathComponent],__LINE__,[NSString stringWithFormat:(s), ##__VA_ARGS__]]; \
     NSLog(@"%@", logString); \
@@ -61,11 +73,8 @@ typedef void (^YSCResponseErrorMessageBlock)(NSObject *object, NSString *errorMe
 
 #define NSLog(...) __NSLog(__VA_ARGS__)
 
-/**
- *  定义单例
- */
-#pragma mark - Singleton
 
+//单例
 #define DEFINE_SHARED_INSTANCE_USING_BLOCK(block) \
 static dispatch_once_t pred = 0; \
 __strong static id _sharedObject = nil; \
@@ -75,81 +84,13 @@ _sharedObject = block(); \
 return _sharedObject;
 
 
-//设置默认颜色
-#define kDefaultColorRGB(c)                 RGB(c, c, c)
-#ifndef kDefaultViewColor
-    #define kDefaultViewColor               RGB(238, 238, 238)      //self.view的默认背景颜色
-#endif
-#ifndef kDefaultColor
-    #define kDefaultColor                   RGB(47, 152, 233)       //app默认主色(普通按钮+文本)
-#endif
-#ifndef kDefaultBorderColor
-    #define kDefaultBorderColor             RGB(218, 218, 218)      //默认边框颜色
-#endif
-#ifndef kDefaultPlaceholderColor
-    #define kDefaultPlaceholderColor        RGB(200, 200, 200)      //默认占位字符颜色
-#endif
-#ifndef kDefaultTipViewButtonColor
-    #define kDefaultTipViewButtonColor      [UIColor redColor]      //默认【重新加载】按钮背景色
-#endif
-#ifndef kDefaultImageBackColor
-    #define kDefaultImageBackColor          RGB(240, 240, 240)      //默认图片背景色
-#endif
-#ifndef kDefaultNaviBarTintColor
-    #define kDefaultNaviBarTintColor        RGB(47, 152, 233)       //导航栏默认文字、icon的颜色
-#endif
-#ifndef kDefaultNaviBarTitleColor
-    #define kDefaultNaviBarTitleColor       RGB(10, 10, 10)         //导航栏标题颜色
-#endif
-#ifndef kDefaultNaviBarItemColor
-    #define kDefaultNaviBarItemColor        kDefaultNaviBarTintColor//导航栏左右文字颜色
-#endif
-#ifndef kDefaultNaviTintColor
-    #define kDefaultNaviTintColor           RGBA(255, 255, 255, 1)    //系统导航栏背景颜色(包括了StatusBar)
-#endif
-#ifndef kDefaultCustomNaviTintColor
-    #define kDefaultCustomNaviTintColor     RGB(234, 106, 84)       //自定义导航栏背景颜色(包括了StatusBar)
-#endif
-#ifndef kDefaultNaviBarTitleFont
-    #define kDefaultNaviBarTitleFont        [UIFont boldSystemFontOfSize:AUTOLAYOUT_LENGTH(34)]    //导航栏标题字体大小
-#endif
-#ifndef kDefaultNaviBarItemFont
-    #define kDefaultNaviBarItemFont         AUTOLAYOUT_FONT(28)     //导航栏左右文字大小
-#endif
-#ifndef kDefaultNaviBarSubTitleFont
-    #define kDefaultNaviBarSubTitleFont     AUTOLAYOUT_FONT(26)    //导航栏副标题字体大小
-#endif
-#ifndef kDefaultNaviBarSubTitleColor
-    #define kDefaultNaviBarSubTitleColor    kDefaultNaviBarTitleColor     //导航栏副标题字体颜色
-#endif
-
-//代码段简写
-#ifndef isEmpty
-    #define isEmpty(object) (object == nil \
-    || [object isKindOfClass:[NSNull class]] \
-    || ([object respondsToSelector:@selector(length)] && [(NSData *)object length] == 0) \
-    || ([object respondsToSelector:@selector(count)]  && [(NSArray *)object count] == 0))
-#endif
-
-#ifndef isNotEmpty
-    #define isNotEmpty(object) (! isEmpty(object))
-#endif
-
-#ifndef WeakSelfType
-    #define WeakSelfType __weak __typeof(&*self)
-#endif
-
-#ifndef WEAKSELF
-    #define WEAKSELF WeakSelfType weakSelf = self;
-#endif
-
 /**
  *  代码段简写
- *
  */
 #define RGB(r, g, b)                                [UIColor colorWithRed:r / 255.0f green:g / 255.0f blue:b / 255.0f alpha:1.0f]
 #define RGBA(r, g, b, a)                            [UIColor colorWithRed:r / 255.0f green:g / 255.0f blue:b / 255.0f alpha:a]
 #define RGBHEX(hexstring)                           [UIColor colorWithHexString:[NSString replaceString:hexstring byRegex:@"[#]" to:@""]]
+#define kDefaultColorRGB(c)                         RGB(c, c, c)
 #define ViewInXib(_xibName, _index)                 [[[NSBundle mainBundle] loadNibNamed:(_xibName) owner:nil options:nil] objectAtIndex:(_index)]
 #define FirstViewInXib(_xibName)                    ViewInXib(_xibName, 0)
 #define NavigationViewController(x)                 [[UINavigationController alloc]initWithRootViewController:[[NSClassFromString(x) alloc] initWithNibName:nil bundle:nil]]
@@ -170,9 +111,9 @@ return _sharedObject;
 #define CURRENTDATE                                 YSCInstance.currentDate    //当前(服务器端)时间
 #define AppUpdateUrl                                [@"https://itunes.apple.com/app/id" stringByAppendingString:kAppStoreId]//App升级url
 
+
 /**
  *  版本相关
- *
  */
 #define AppVersion                      [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"]//app的版本号(三位数如1.0.1)
 #define BundleVersion                   [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"]    //内部小版本号(一位数如3)
@@ -185,9 +126,27 @@ return _sharedObject;
 #define VersionBefore(v)                (NSOrderedAscending == [AppVersion compare:v options:NSNumericSearch])      //判断当前APP的版本号小于v
 #define IsLoadGuideView                 [YSCGetObject(WelcomeVersion) boolValue]                                       //判断是否加载过欢迎页面
 
+
+/**
+ *  判断设备的相关参数
+ */
+#define SYSTEM_VERSION_IS_8_0_X         ([[[UIDevice currentDevice] systemVersion] hasPrefix:@"8.0"])
+#define IOS_VERSION                     ([[[UIDevice currentDevice] systemVersion] floatValue])
+#define IOS7_OR_LATER                   __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_7_0
+#define IOS8_OR_LATER                   (IOS_VERSION >= 8.0f)
+#define IOS7_OR_EARLIER                 (IOS_VERSION < 8.0f)
+#define SCREEN_WIDTH                    ([UIScreen mainScreen].bounds.size.width) //屏幕的宽度(point)
+#define SCREEN_HEIGHT                   ([UIScreen mainScreen].bounds.size.height)//屏幕的高度(point)
+#define STATUSBAR_HEIGHT                20.0f
+#define NAVIGATIONBAR_HEIGHT            44.0f
+#define TITLEBAR_HEIGHT                 64.0f       //等于STATUSBAR_HEIGHT + NAVIGATIONBAR_HEIGHT
+#define TABBAR_HEIGHT                   49.0f
+#define KEYBOARD_HEIGHT                 216.0f      //默认键盘高度
+#define XIB_WIDTH                       640.0f      //xib布局时的宽度(point)，主要用于计算缩放比例
+
+
 /**
  *  自动布局相关代码段简写
- *
  */
 #define AUTOLAYOUT_SCALE                (SCREEN_WIDTH / XIB_WIDTH)          //缩放比例 (当前屏幕的真实宽度point / xib布局的宽度point)
 #define AUTOLAYOUT_LENGTH(x)            ((x) * AUTOLAYOUT_SCALE)            //计算缩放后的大小point
@@ -204,8 +163,6 @@ return _sharedObject;
 /**
  *  注册通知与发送通知
  */
-#pragma mark - Notification
-
 #define addNObserver(_selector,_name)               ([[NSNotificationCenter defaultCenter] addObserver:self selector:_selector name:_name object:nil])
 #define addNObserverWithObj(_selector,_name,_obj)   ([[NSNotificationCenter defaultCenter] addObserver:self selector:_selector name:_name object:_obj])
 #define removeNObserver(_name)                      ([[NSNotificationCenter defaultCenter] removeObserver:self name:_name object:nil])
@@ -214,4 +171,5 @@ return _sharedObject;
 #define postNWithObj(_name,_obj)                    ([[NSNotificationCenter defaultCenter] postNotificationName:_name object:(_obj) userInfo:nil])
 #define postNWithInfo(_name,_info)                  ([[NSNotificationCenter defaultCenter] postNotificationName:_name object:nil userInfo:(_info)])
 
-#endif
+#endif /* YSCKit_YSCConstants_h */
+

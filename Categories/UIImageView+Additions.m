@@ -66,8 +66,8 @@
     self.clipsToBounds = YES;
     NSString *newUrlString = [NSString trimString:[urlString copy]];
     if (nil == placeholderImage) {
-        placeholderImage = DefaultImage;
-        self.image = DefaultImage;
+        placeholderImage = kDefaultImage;
+        self.image = kDefaultImage;
         self.backgroundColor = kDefaultImageBackColor;
         
         //如果默认图片比imageView要小，则居中显示之

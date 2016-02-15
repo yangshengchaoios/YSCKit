@@ -6,18 +6,23 @@
 //  Copyright © 2016年 YingChuangKeXun. All rights reserved.
 //
 
-#ifndef YSCHelper_h
-#define YSCHelper_h
+#ifndef YSCKit_YSCHelper_h
+#define YSCKit_YSCHelper_h
 
+/**
+ *  常用静态类和单例
+ */
+
+//manager
 #import "YSCManager.h"
 #import "YSCLogManager.h"
 #import "YSCFileManager.h"
 #import "YSCImageManager.h"
 #import "YSCRequestManager.h"
 
+//instance
 #import "YSCData.h"
 #import "YSCSNSShareData.h"
 #import "YSCStorageData.h"
 
-
-#endif
+#endif /* YSCKit_YSCHelper_h */

@@ -34,6 +34,18 @@ typedef NS_ENUM(NSInteger, ErrorType) {
     ErrorTypeLoginExpired           = 200,//登录过期
 };
 
+typedef NS_ENUM(NSInteger, ShareType) {
+    ShareTypeWeiboSina = 1,     //新浪微博(分享+登录)
+    ShareTypeMobileQQ = 2,      //手机QQ(登录)
+    ShareTypeWeiXin = 3,        //微信(登录)
+    ShareTypeAlipay,            //暂时没有用!
+    ShareTypeWeiboTencent,      //腾讯微博(分享)
+    ShareTypeQQZone,            //QQ空间(分享)
+    ShareTypeWechatSession,     //微信好友(分享)
+    ShareTypeWechatTimeline,    //微信朋友圈(分享)
+    ShareTypeWechatFavorite,    //微信收藏(分享)
+};
+
 typedef NS_ENUM(NSInteger, RegexType) {
     RegexTypeEmail          = 0,
     RegexTypeMobilePhone,

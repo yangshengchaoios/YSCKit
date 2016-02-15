@@ -8,26 +8,6 @@
 //  FORMATED!
 //
 
-
-#import <Foundation/Foundation.h>
-
-#define DateFormat1     @"yyyy-MM-dd HH:mm:ss"
-#define DateFormat2     @"yyyy.MM.dd HH:mm"
-#define DateFormat3     @"yyyy-MM-dd"
-#define DateFormat4     @"yyyy.MM.dd"
-#define DateFormat5     @"yyyy年M月d日"
-#define DateFormat6     @"yyyy-MM-dd HH:mm"
-#define DateFormat7     @"yyyy年M月d日 HH:mm"
-#define DateFormat8     @"M月d日"
-#define DateFormat9     @"yyyy年M月"
-#define DateFormat10    @"yyyy-MM-dd ccc HH:mm"//2015-12-24 周四 11:32
-#define DateFormat11    @"yyyy-MM-dd cccc HH:mm"//2015-12-24 星期四 11:32
-#define DateFormat20    @"yyyy年M月d日 HH:mm:ss"
-#define DateFormat21    @"HH:mm"
-#define DateFormat22    @"MM月dd日 HH:mm"
-#define DateFormat23    @"M月d日 HH:mm"
-
-
 #define D_MINUTE    60
 #define D_HOUR      (60 * D_MINUTE)
 #define D_DAY       (24 * D_HOUR)

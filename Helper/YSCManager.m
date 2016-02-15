@@ -433,7 +433,7 @@
 //--------------------------------------
 @implementation YSCManager (Sqlite)
 + (BOOL)SqliteUpdate:(NSString *)sql {
-    return [self SqliteUpdate:sql dbPath:DBRealPath];
+    return [self SqliteUpdate:sql dbPath:kDBRealPath];
 }
 + (BOOL)SqliteUpdate:(NSString *)sql dbPath:(NSString *)dbPath {
     BOOL isSuccess = NO;
@@ -445,7 +445,7 @@
     return isSuccess;
 }
 + (BOOL)SqliteCheckIfExists:(NSString *)sql {
-    return [self SqliteCheckIfExists:sql dbPath:DBRealPath];
+    return [self SqliteCheckIfExists:sql dbPath:kDBRealPath];
 }
 + (BOOL)SqliteCheckIfExists:(NSString *)sql dbPath:(NSString *)dbPath {
     BOOL isExists = NO;
@@ -461,7 +461,7 @@
     return isExists;
 }
 + (int)SqliteGetRows:(NSString *)sql {
-    return [self SqliteGetRows:sql dbPath:DBRealPath];
+    return [self SqliteGetRows:sql dbPath:kDBRealPath];
 }
 + (int)SqliteGetRows:(NSString *)sql dbPath:(NSString *)dbPath {
     int num = 0;

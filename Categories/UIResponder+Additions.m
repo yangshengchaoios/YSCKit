@@ -44,8 +44,8 @@ static __weak id currentFirstResponder;
         [navigationBar setTranslucent:YES];
     }
     //设置背景颜色/图片
-    if (DefaultNaviBarBackImage) {
-        [navigationBar setBackgroundImage:DefaultNaviBarBackImage forBarMetrics:UIBarMetricsDefault];
+    if (kDefaultNaviBarBackImage) {
+        [navigationBar setBackgroundImage:kDefaultNaviBarBackImage forBarMetrics:UIBarMetricsDefault];
     }
     else {
         [navigationBar setBarTintColor:kDefaultNaviTintColor];

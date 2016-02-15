@@ -733,12 +733,12 @@
     ReturnEmptyWhenObjectIsEmpty(startDate);
     //异常时间处理
     if ([startDate isLaterThanDate:endDate]) {
-        return [startDate stringWithFormat:DateFormat1];
+        return [startDate stringWithFormat:kDateFormat1];
     }
     NSDateComponents *dateComponents = [NSDate ComponentsBetweenStartDate1:startDate withEndDate:endDate];
     //如果>=365d
     if (dateComponents.day >= 365) {
-        return [startDate stringWithFormat:DateFormat5];
+        return [startDate stringWithFormat:kDateFormat5];
     }
     //如果>=30d && <365d
     if (dateComponents.day >= 30 && dateComponents.day < 365) {
@@ -768,20 +768,20 @@
 + (NSString *)TimePassedByStartDate1:(NSDate *)startDate {
     if ([startDate isThisYear]) {
         if ([startDate isToday]) {
-            return [NSString stringWithFormat:@"今天 %@", [startDate stringWithFormat:DateFormat21]];
+            return [NSString stringWithFormat:@"今天 %@", [startDate stringWithFormat:kDateFormat21]];
         }
         else if ([startDate isYesterday]) {
-            return [NSString stringWithFormat:@"昨天 %@", [startDate stringWithFormat:DateFormat21]];
+            return [NSString stringWithFormat:@"昨天 %@", [startDate stringWithFormat:kDateFormat21]];
         }
         else if ([startDate isBeforeYesterday]) {
-            return [NSString stringWithFormat:@"前天 %@", [startDate stringWithFormat:DateFormat21]];
+            return [NSString stringWithFormat:@"前天 %@", [startDate stringWithFormat:kDateFormat21]];
         }
         else {
-            return [startDate stringWithFormat:DateFormat23];
+            return [startDate stringWithFormat:kDateFormat23];
         }
     }
     else {
-        return [startDate stringWithFormat:DateFormat7];
+        return [startDate stringWithFormat:kDateFormat7];
     }
 }
 /**

@@ -6,8 +6,8 @@
 //  Copyright (c) 2015年 Builder. All rights reserved.
 //
 
-#ifndef EZGoal_YSCKit_h
-#define EZGoal_YSCKit_h
+#ifndef YSCKit_YSCKit_h
+#define YSCKit_YSCKit_h
 
 //常用系统库
 #import <AVFoundation/AVFoundation.h>
@@ -18,43 +18,11 @@
 #import "YSCConstants.h"
 #import "YSCEmoji.h"
 
-//系统类扩展
-#import "NSObject+Addition.h"
-#import "UIView+Addition.h"
-#import "NSDate+Additions.h"
-#import "NSTimer+Addition.h"
-#import "UIColor+Expanded.h"
-#import "NSString+Addition.h"
-#import "UIImageView+Additions.h"
-#import "UIDevice+Additions.h"
-#import "UIResponder+Additions.h"
-#import "NSLayoutConstraint+Additions.h"
-#import "NSArray+Addition.h"
-#import "UIScrollView+Additions.h"
-#import "UIImage+Additions.h"
-#import "ALAssetsLibrary+CustomPhotoAlbum.h"
-
-//工具类
+//模块封装
+#import "YSCCategory.h"
 #import "YSCHelper.h"
+#import "YSCModel.h"
+#import "YSCView.h"
+#import "YSCViewController.h" 
 
-//自定义控件
-#import "YSCKTipsView.h"
-#import "YSCTitleBarView.h"
-#import "YSCTextField.h"
-#import "YSCTextView.h"
-#import "YSCPickerView.h"
-#import "YSCTableViewCell.h"
-#import "YSCTableView.h"
-#import "YSCMultiTableView.h"
-
-//基类
-#import "YSCBaseModel.h"
-#import "YSCDataModel.h"
-#import "YSCPullToRefreshTableViewController.h"
-#import "YSCPullToRefreshCollectionViewController.h"
-#import "YSCBaseTableViewCell.h"
-#import "YSCBaseCollectionViewCell.h"
-#import "YSCBaseTableHeaderFooterView.h"
-#import "YSCBaseCollectionHeaderFooterView.h"
-
-#endif
+#endif /* YSCKit_YSCKit_h */

@@ -21,9 +21,10 @@
     #import <FMDB/FMDB.h>
     #import "Masonry.h"
 
-    #import "Constants.h"   //项目全局header文件
-    #import "YSCKit.h"      //基础框架库(必须放在Constants后！原因是有些参数define了默认值，而项目里需要重新设置)
-
-    //业务逻辑相关
+    //引入YSCKit代码库
+    #import "YSCKit.h"
+    //引入本项目的头文件
     #import "AppData.h"
+    //引入YSCKit的默认变量
+    #import "YSCDefaults.h"
 #endif
