@@ -255,7 +255,7 @@
 - (UIViewController *)pushViewController:(NSString *)className withParams:(NSDictionary *)paramDict animated:(BOOL)animated {
     [self hideKeyboard];
     ReturnNilWhenObjectIsEmpty(className);
-    UIViewController *pushedViewController = [UIResponder createBaseViewController:className];
+    UIViewController *pushedViewController = [UIResponder CreateBaseViewController:className];
     NSMutableDictionary *mutableParamDict = [NSMutableDictionary dictionaryWithDictionary:paramDict];
     if ( ! mutableParamDict[kParamBackType]) {
         [mutableParamDict setValue:@(BackTypeImage) forKey:kParamBackType];   //这里设置的返回按钮由即将push出来的viewController负责处理
@@ -339,7 +339,7 @@
 }
 - (UINavigationController *)presentViewController:(NSString *)className withParams:(NSDictionary *)paramDict animated:(BOOL)animated {
     ReturnNilWhenObjectIsEmpty(className);
-    UIViewController *viewController = [UIResponder createBaseViewController:className];
+    UIViewController *viewController = [UIResponder CreateBaseViewController:className];
     NSMutableDictionary *mutableParamDict = [NSMutableDictionary dictionaryWithDictionary:paramDict];
     if ( ! mutableParamDict[kParamBackType]) {
         [mutableParamDict setValue:@(BackTypeImage) forKey:kParamBackType];   //这里设置的返回按钮由即将push出来的viewController负责处理
@@ -352,7 +352,7 @@
 }
 - (UINavigationController *)presentNormalViewController:(UIViewController *)viewController {
     [self hideKeyboard];
-    [self presentViewController:[UIResponder createNavigationControllerWithRootViewController:viewController]
+    [self presentViewController:[UIResponder CreateNavigationControllerWithRootViewController:viewController]
                        animated:YES completion:nil];
     return nil;
 }

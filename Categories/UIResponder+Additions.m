@@ -12,7 +12,7 @@ static __weak id currentFirstResponder;
 
 @implementation UIResponder (Additions)
 
-+(id)currentFirstResponder {
++(id)CurrentFirstResponder {
     currentFirstResponder = nil;
     [[UIApplication sharedApplication] sendAction:@selector(findFirstResponder:) to:nil from:nil forEvent:nil];
     return currentFirstResponder;
@@ -22,7 +22,7 @@ static __weak id currentFirstResponder;
     currentFirstResponder = self;
 }
 //统一创建UIViewController
-+ (UIViewController *)createBaseViewController:(NSString *)className {
++ (UIViewController *)CreateBaseViewController:(NSString *)className {
     UIViewController *pushedViewController = [[NSClassFromString(className) alloc] initWithNibName:className bundle:nil];
     NSAssert(pushedViewController, @"class[%@] is not exists in this project!", className);
     pushedViewController.hidesBottomBarWhenPushed = YES;
@@ -30,7 +30,7 @@ static __weak id currentFirstResponder;
     return pushedViewController;
 }
 //统一创建UINavigationController
-+ (UINavigationController *)createNavigationControllerWithRootViewController:(UIViewController *)viewController {
++ (UINavigationController *)CreateNavigationControllerWithRootViewController:(UIViewController *)viewController {
     UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:viewController];
     [self ConfigNavigationBar:navigationController.navigationBar];
     return navigationController;

@@ -11,11 +11,11 @@
 
 @interface UIResponder (Additions)
 
-+ (id)currentFirstResponder;
++ (id)CurrentFirstResponder;
 //统一创建UIViewController
-+ (UIViewController *)createBaseViewController:(NSString *)className;
++ (UIViewController *)CreateBaseViewController:(NSString *)className;
 //统一创建UINavigationController
-+ (UINavigationController *)createNavigationControllerWithRootViewController:(UIViewController *)viewController;
++ (UINavigationController *)CreateNavigationControllerWithRootViewController:(UIViewController *)viewController;
 //这里统一设置controller的各种属性
 + (void)ConfigNavigationBar:(UINavigationBar *)navigationBar;
 
