@@ -21,10 +21,10 @@
     (8). 支持多种header、cell、footer的注册
     (9). 兼容外部数据源(前提是必须和列表数据源类型一致)
     
-## 如何安装
+## How to install
   git submodule add https://github.com/yangshengchaoios/YSCKit.git YOURPROJECT/YSCKit
 
-## 如何使用
+## Demo
 见 [YSCKitDemo](https://github.com/yangshengchaoios/YSCKitDemo)
 
 ## TODO
