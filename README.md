@@ -1,6 +1,11 @@
 # YSCKit
+- 以控件的形式封装大量的"胶水代码"，减少业务层的处理逻辑，同时暴露足够多的配置点来保证控件的灵活性。如YSCTextField、YSCTableView
+- 推荐所有的UI都用XIB进行布局(不到万不得已不用代码创建UI控件)
+- 终极目标：让Control层的核心业务逻辑不被大量的“胶水代码”和其它各种小逻辑所淹没
 
-## Contents
+## Directory Structure
+
+## Summary
 - 封装了APP开发过程中常用的功能，包括：网络请求、模型映射、本地缓存策略、宏定义、枚举类型、emoji表情符号等。
 - 自定义了几个非常有用的view：
   1. YSCInfiniteLoopView: 无限循环浏览，如banner展示
