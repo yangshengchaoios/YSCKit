@@ -6,8 +6,8 @@
 //  Copyright (c) 2015年 Builder. All rights reserved.
 //
 
-#ifndef EZGoal_YSCEmoji_h
-#define EZGoal_YSCEmoji_h
+#ifndef YSCKit_YSCEmoji_h
+#define YSCKit_YSCEmoji_h
 
 //YSCKit支持的emoji表情0(source)
 #define YSCEMOJI_SUPPORT_VALUE @[ \
@@ -1002,4 +1002,4 @@
 @":zzz:"                               : @"\U0001F4A4" \
 }
 
-#endif
+#endif /* YSCKit_YSCEmoji_h */

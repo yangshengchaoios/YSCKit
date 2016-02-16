@@ -6,8 +6,8 @@
 //  Copyright (c) 2015年 Builder. All rights reserved.
 //
 
-#ifndef EZGoal_YSCEnum_h
-#define EZGoal_YSCEnum_h
+#ifndef YSCKit_YSCEnumType_h
+#define YSCKit_YSCEnumType_h
 
 //检测新版本的几种方法
 typedef NS_ENUM(NSInteger, CheckNewVersionType) {
@@ -103,4 +103,4 @@ typedef NS_ENUM(NSInteger, BackType) {
     BackTypeDismiss NS_DEPRECATED_IOS(2_0, 3_0)
 };
 
-#endif
+#endif /* YSCKit_YSCEnumType_h */

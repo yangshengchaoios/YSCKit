@@ -21,10 +21,8 @@
     #import <FMDB/FMDB.h>
     #import "Masonry.h"
 
-    //引入YSCKit代码库
-    #import "YSCKit.h"
-    //引入本项目的头文件
-    #import "AppData.h"
-    //引入YSCKit的默认变量
-    #import "YSCDefaults.h"
+
+    #import "YSCKit.h"      //引入YSCKit代码库
+    #import "AppData.h"     //引入本项目的头文件
+    #import "YSCDefaults.h" //引入YSCKit的默认变量
 #endif

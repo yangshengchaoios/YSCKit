@@ -1,9 +1,9 @@
 //
 //  YSCZoomScrollView.h
-//  B_EZGoal
+//  YSCKit
 //
 //  Created by yangshengchao on 16/1/6.
-//  Copyright © 2016年 YingChuangKeXun. All rights reserved.
+//  Copyright © 2016年 Builder. All rights reserved.
 //
 
 #import <UIKit/UIKit.h>

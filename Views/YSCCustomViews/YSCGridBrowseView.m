@@ -1,6 +1,6 @@
 //
 //  YSCGridBrowseView.m
-//  EZGoal
+//  YSCKit
 //
 //  Created by yangshengchao on 15/8/12.
 //  Copyright (c) 2015年 Builder. All rights reserved.
