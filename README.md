@@ -5,17 +5,17 @@
 
 ## Directory Structure
 &nbsp;YSCKit            根目录<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;Categories   分类目录，扩展常用的系统类<br/>
-&nbsp;&nbsp;External     第三方库目录<br/>
->>Helper       单例类和公共方法类目录<br/>
->>Model        模型基类目录<br/>
->>Views        常用view控件<br/>
->>>BaseView    基类view<br/>
->>>YSCControls 扩展系统控件功能<br/>
->>>YSCCustomViews  自定义view<br/>
->>ViewControllers        常用ViewController控件<br/>
->>>Base  基类ViewController<br/>
->>>YSCPhotoBrowseViewController  可无限浏览图片的图片查看器<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;|__Categories   分类目录，扩展常用的系统类<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;|__External     第三方库目录<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;|__Helper       单例类和公共方法类目录<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;|__Model        模型基类目录<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;|__Views        常用view控件<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|__BaseView    基类view<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|__YSCControls 扩展系统控件功能<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|__YSCCustomViews  自定义view<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;|__ViewControllers        常用ViewController控件<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|__Base  基类ViewController<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|__YSCPhotoBrowseViewController  可无限浏览图片的图片查看器<br/>
 
 ## Summary
 - 封装了APP开发过程中常用的功能，包括：网络请求、模型映射、本地缓存策略、宏定义、枚举类型、emoji表情符号等。
