@@ -4,9 +4,9 @@
 - 终极目标：让Control层的核心业务逻辑不被大量的“胶水代码”和其它各种小逻辑所淹没
 
 ## Directory Structure
->YSCKit            根目录<br/>
->>Categories   分类目录，扩展常用的系统类<br/>
->>External     第三方库目录<br/>
+&nbsp;YSCKit            根目录<br/>
+&nbsp;&nbsp;Categories   分类目录，扩展常用的系统类<br/>
+&nbsp;&nbsp;External     第三方库目录<br/>
 >>Helper       单例类和公共方法类目录<br/>
 >>Model        模型基类目录<br/>
 >>Views        常用view控件<br/>
