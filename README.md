@@ -4,11 +4,12 @@
 - 终极目标：让Control层的核心业务逻辑不被大量的“胶水代码”和其它各种小逻辑所淹没
 
 ## Directory Structure
-YSCKit            根目录<br/>
-  |__Categories   分类目录，扩展常用的系统类<br/>
-  |__External     第三方库目录<br/>
-  |__Helper       单例类和公共方法类目录<br/>
-  |__Model        模型基类目录<br/>
+>YSCKit            根目录<br/>
+>>|__Categories   分类目录，扩展常用的系统类<br/>
+>>|__External     第三方库目录<br/>
+>>|__Helper       单例类和公共方法类目录<br/>
+>>|__Model        模型基类目录<br/>
+>>|__Views        自定义view控件<br/>
 
 ## Summary
 - 封装了APP开发过程中常用的功能，包括：网络请求、模型映射、本地缓存策略、宏定义、枚举类型、emoji表情符号等。
