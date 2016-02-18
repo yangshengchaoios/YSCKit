@@ -6,9 +6,9 @@
 ## Directory Structure
 YSCKit            根目录<br/>
   |__Categories   分类目录，扩展常用的系统类<br/>
-  |__External     第三方库目录
-  |__Helper       单例类和公共方法类目录
-  |__Model        模型基类目录
+  |__External     第三方库目录<br/>
+  |__Helper       单例类和公共方法类目录<br/>
+  |__Model        模型基类目录<br/>
 
 ## Summary
 - 封装了APP开发过程中常用的功能，包括：网络请求、模型映射、本地缓存策略、宏定义、枚举类型、emoji表情符号等。
@@ -20,16 +20,16 @@ YSCKit            根目录<br/>
   5. YSCZoomScrollView：可缩放的图片浏览页，用于图片浏览器
   6. YSCTextField：可在xib上设置数据的格式，自动检测键盘的类型、长度、以及合法性
   7. YSCTextView：除了基本功能和YSCTextField类似以外，还能动态显示剩余字符数
-  8. YSCTableView：封装了列表的常用操作，支持
-    (1). 多section的上拉加载更多、下拉刷新
-    (2). GET、POST
-    (3). 列表为空的提示信息
-    (4). cell左右边界设置
-    (5). 对数据进行缓存
-    (6). 自定义任意单一确定的数据源
-    (7). 动态设置header、cell、footer的高度
-    (8). 支持多种header、cell、footer的注册
-    (9). 兼容外部数据源(前提是必须和列表数据源类型一致)
+  8. YSCTableView：封装了列表的常用操作，支持<br/>
+    (1). 多section的上拉加载更多、下拉刷新<br/>
+    (2). GET、POST<br/>
+    (3). 列表为空的提示信息<br/>
+    (4). cell左右边界设置<br/>
+    (5). 对数据进行缓存<br/>
+    (6). 自定义任意单一确定的数据源<br/>
+    (7). 动态设置header、cell、footer的高度<br/>
+    (8). 支持多种header、cell、footer的注册<br/>
+    (9). 兼容外部数据源(前提是必须和列表数据源类型一致)<br/>
     
 ## How to install
   git submodule add https://github.com/yangshengchaoios/YSCKit.git YOURPROJECT/YSCKit
