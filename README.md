@@ -5,7 +5,7 @@
 
 ## Directory Structure
 &nbsp;YSCKit            根目录<br/>
-&nbsp;&nbsp;Categories   分类目录，扩展常用的系统类<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;Categories   分类目录，扩展常用的系统类<br/>
 &nbsp;&nbsp;External     第三方库目录<br/>
 >>Helper       单例类和公共方法类目录<br/>
 >>Model        模型基类目录<br/>
