@@ -8,13 +8,11 @@
 //
 
 @interface YSCBaseModel : NSObject
-
 @property (assign, nonatomic) NSInteger state;
 @property (strong, nonatomic) NSString *message;
 @property (strong, nonatomic) NSObject *data;
 
-+ (instancetype)ObjectWithKeyValues:(id)keyValues;
++ (instancetype)objectWithKeyValues:(id)keyValues;
 - (BOOL)isSuccess;
-- (BOOL)isLoginExpired;
-
+- (void)postNotificationWhenLoginExpired;
 @end

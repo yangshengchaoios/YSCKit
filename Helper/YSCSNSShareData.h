@@ -10,14 +10,26 @@
 /**
  *  第三方分享单例类
  *  作用：封装第三方分享业务逻辑
- *  TODO:第三方平台分享需要解耦UMeng
+ *  TODO:第三方平台分享需要解耦UMeng(用钩子函数截获第三方app的交互参数)
  */
 
 #define YSCSNSInstance          [YSCSNSShareData SharedInstance]
 
+typedef NS_ENUM(NSInteger, YSCShareType) {
+    YSCShareTypeWeiboSina = 1,     //新浪微博(分享+登录)
+    YSCShareTypeMobileQQ = 2,      //手机QQ(登录)
+    YSCShareTypeWeiXin = 3,        //微信(登录)
+    YSCShareTypeAlipay,            //暂时没有用!
+    YSCShareTypeWeiboTencent,      //腾讯微博(分享)
+    YSCShareTypeQQZone,            //QQ空间(分享)
+    YSCShareTypeWechatSession,     //微信好友(分享)
+    YSCShareTypeWechatTimeline,    //微信朋友圈(分享)
+    YSCShareTypeWechatFavorite,    //微信收藏(分享)
+};
+
 @interface YSCSNSShareData : NSObject
 + (instancetype)SharedInstance;
-+ (BOOL)IsOauthAndTokenNotExpired:(ShareType)shareType;
++ (BOOL)IsOauthAndTokenNotExpired:(YSCShareType)shareType;
 
 // 分享到单个平台
 - (void)shareWithContent:(NSString *)content
@@ -31,5 +43,5 @@
               shareTypes:(NSArray *)shareTypes
                      url:(NSString *)url
      presentedController:(UIViewController *)viewController
-              completion:(YSCResultBlock)completion;
+              completion:(YSCObjectBlock)completion;
 @end

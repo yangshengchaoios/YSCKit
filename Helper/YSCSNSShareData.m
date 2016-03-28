@@ -10,8 +10,13 @@
 #import "WXApi.h"
 #import <TencentOpenAPI/TencentApiInterface.h>
 
+//Umeng
+#import "UMSocial.h"
+#import "UMSocialWechatHandler.h"
+#import "UMSocialQQHandler.h"
+
 @interface YSCSNSShareData ()<UMSocialUIDelegate>
-@property (nonatomic, copy) YSCResultBlock completion;
+@property (nonatomic, copy) YSCObjectBlock completion;
 @end
 @implementation YSCSNSShareData
 + (instancetype)SharedInstance {
@@ -19,31 +24,31 @@
         return [[self alloc] init];
     })
 }
-+ (BOOL)IsOauthAndTokenNotExpired:(ShareType)shareType {
++ (BOOL)IsOauthAndTokenNotExpired:(YSCShareType)shareType {
     NSString *platformName = [YSCSNSInstance _PlatformTypeOfUMeng:shareType];
     return [UMSocialAccountManager isOauthAndTokenNotExpired:platformName];
 }
-- (NSString *)_PlatformTypeOfUMeng:(ShareType)shareType {
+- (NSString *)_PlatformTypeOfUMeng:(YSCShareType)shareType {
     NSString *platformName = nil;
-    if (ShareTypeWeiboSina == shareType) {
+    if (YSCShareTypeWeiboSina == shareType) {
         platformName = UMShareToSina;
     }
-    else if (ShareTypeWeiboTencent == shareType) {
+    else if (YSCShareTypeWeiboTencent == shareType) {
         platformName = UMShareToTencent;
     }
-    else if (ShareTypeWechatSession == shareType || ShareTypeWeiXin == shareType) {
+    else if (YSCShareTypeWechatSession == shareType || YSCShareTypeWeiXin == shareType) {
         platformName = UMShareToWechatSession;
     }
-    else if (ShareTypeWechatTimeline == shareType) {
+    else if (YSCShareTypeWechatTimeline == shareType) {
         platformName = UMShareToWechatTimeline;
     }
-    else if (ShareTypeWechatFavorite == shareType) {
+    else if (YSCShareTypeWechatFavorite == shareType) {
         platformName = UMShareToWechatFavorite;
     }
-    else if (ShareTypeMobileQQ == shareType) {
+    else if (YSCShareTypeMobileQQ == shareType) {
         platformName = UMShareToQQ;
     }
-    else if (ShareTypeQQZone == shareType) {
+    else if (YSCShareTypeQQZone == shareType) {
         platformName = UMShareToQzone;
     }
     
@@ -63,35 +68,35 @@
               shareTypes:(NSArray *)shareTypes
                      url:(NSString *)url
      presentedController:(UIViewController *)viewController
-              completion:(YSCResultBlock)completion {
+              completion:(YSCObjectBlock)completion {
     self.completion = completion;
     NSMutableArray *umengPlatforms = [NSMutableArray array];
     for (NSNumber *platform in shareTypes) {
-        ShareType shareType = [platform integerValue];
+        YSCShareType shareType = [platform integerValue];
         NSString *umengPlatformName = [self _PlatformTypeOfUMeng:shareType];
-        if ((ShareTypeWechatSession == shareType || ShareTypeWechatTimeline == shareType || ShareTypeWechatFavorite == shareType) &&
+        if ((YSCShareTypeWechatSession == shareType || YSCShareTypeWechatTimeline == shareType || YSCShareTypeWechatFavorite == shareType) &&
             [WXApi isWXAppInstalled]) {
-            if (ShareTypeWechatSession == shareType) {
+            if (YSCShareTypeWechatSession == shareType) {
                 [UMSocialData defaultData].extConfig.wechatSessionData.url = url;
             }
-            else if (ShareTypeWechatTimeline == shareType) {
+            else if (YSCShareTypeWechatTimeline == shareType) {
                 [UMSocialData defaultData].extConfig.wechatTimelineData.url = url;
             }
             [umengPlatforms addObject:umengPlatformName];
         }
         //分享到QQ空间必须同时设置文本和图片
-        else if (ShareTypeQQZone == shareType && isNotEmpty(content) && isNotEmpty(image) &&
+        else if (YSCShareTypeQQZone == shareType && OBJECT_ISNOT_EMPTY(content) && OBJECT_ISNOT_EMPTY(image) &&
                  ([TencentApiInterface isTencentAppInstall:kIphoneQQ] || [TencentApiInterface isTencentAppInstall:kIphoneQZONE])) {
             [umengPlatforms addObject:umengPlatformName];
         }
-        else if (ShareTypeMobileQQ == shareType && [TencentApiInterface isTencentAppInstall:kIphoneQQ]) {
+        else if (YSCShareTypeMobileQQ == shareType && [TencentApiInterface isTencentAppInstall:kIphoneQQ]) {
             [umengPlatforms addObject:umengPlatformName];
         }
     }
     if (1 == [umengPlatforms count]) {//只有一个分享平台就直接打开
-        [UIView showResultThenHideOnWindow:@"正在分享中" afterDelay:5];
+        [YSCHUDManager showHUDThenHide:@"正在分享中" onView:[UIApplication sharedApplication].keyWindow afterDelay:5];
         UMSocialUrlResource *urlResource = nil;
-        if ([NSString isNotEmpty:url]) {
+        if (OBJECT_ISNOT_EMPTY(url)) {
             urlResource = [[UMSocialUrlResource alloc] initWithSnsResourceType:UMSocialUrlResourceTypeImage url:url];
         }
         [[UMSocialDataService defaultDataService] postSNSWithTypes:@[umengPlatforms[0]]
@@ -101,17 +106,17 @@
                                                        urlResource:urlResource
                                                presentedController:viewController
                                                         completion:^(UMSocialResponseEntity *response) {
+                                                            NSString *errorMessage = nil;
                                                             if (UMSResponseCodeSuccess == response.responseCode) {
-                                                                [UIView showResultThenHideOnWindow:@"分享成功"];
-                                                                [MobClick event:UMEventKeyShareSuccess];
+                                                                errorMessage = @"分享成功";
                                                             }
                                                             else if (UMSResponseCodeCancel == response.responseCode) {
-                                                                [UIView showResultThenHideOnWindow:@"取消分享"];
+                                                                errorMessage = @"取消分享";
                                                             }
                                                             else {
-                                                                NSString *errorMessage = [NSString stringWithFormat:@"分享失败(%d)", response.responseCode];
-                                                                [UIView showResultThenHideOnWindow:errorMessage];
+                                                                errorMessage = [NSString stringWithFormat:@"分享失败(%d)", response.responseCode];
                                                             }
+                                                            [YSCHUDManager showHUDThenHideOnKeyWindow:errorMessage];
                                                             
                                                             if (completion) {
                                                                 completion(response);
@@ -120,7 +125,7 @@
     }
     else if ([umengPlatforms count] > 1) {//超过一个分享平台需要弹出选择框
         [UMSocialSnsService presentSnsIconSheetView:viewController
-                                             appKey:kUMAppKey
+                                             appKey:kDefaultUMAppKey
                                           shareText:content
                                          shareImage:image
                                     shareToSnsNames:umengPlatforms
@@ -130,7 +135,7 @@
         if (completion) {
             completion(nil);
         }
-        [UIView showAlertVieWithMessage:@"请先安装要分享的平台APP"];
+        [YSCAlertManager showAlertVieWithMessage:@"请先安装要分享的平台APP"];
     }
 }
 
@@ -141,17 +146,17 @@
 }
 //各个页面执行授权完成、分享完成、或者评论完成时的回调函数
 - (void)didFinishGetUMSocialDataInViewController:(UMSocialResponseEntity *)response {
+    NSString *errorMessage = nil;
     if (UMSResponseCodeSuccess == response.responseCode) {
-        [UIView showResultThenHideOnWindow:@"分享成功"];
-        [MobClick event:UMEventKeyShareSuccess];
+        errorMessage = @"分享成功";
     }
     else if (UMSResponseCodeCancel == response.responseCode) {
-        [UIView showResultThenHideOnWindow:@"取消分享"];
+        errorMessage = @"取消分享";
     }
     else {
-        NSString *errorMessage = [NSString stringWithFormat:@"分享失败(%d)", response.responseCode];
-        [UIView showResultThenHideOnWindow:errorMessage];
+        errorMessage = [NSString stringWithFormat:@"分享失败(%d)", response.responseCode];
     }
+    [YSCHUDManager showHUDThenHideOnKeyWindow:errorMessage];
     if (self.completion) {
         self.completion(response);
     }

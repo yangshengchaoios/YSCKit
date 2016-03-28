@@ -1,4 +1,4 @@
-
+//
 //  BaseModel.m
 //  YSCKit
 //
@@ -11,16 +11,17 @@
 
 @implementation YSCBaseModel
 
-+ (instancetype)ObjectWithKeyValues:(id)keyValues {
++ (instancetype)objectWithKeyValues:(id)keyValues {
     return [self mj_objectWithKeyValues:keyValues];
 }
 - (BOOL)isSuccess {
     return 1 == self.state;
 }
-- (BOOL)isLoginExpired {
-    return 99 == self.state;
+- (void)postNotificationWhenLoginExpired {
+    if (99 == self.state) {
+        NSDictionary *param = @{kParamUserId : USER_ID, kParamMessage : TRIM_STRING(self.message)};
+        POST_NOTIFICATION_WITH_INFO(kNotificationLoginExpired, param);
+    }
 }
-
 @end
-
 

@@ -7,7 +7,7 @@
 //
 
 #import "YSCData.h"
-#import "Reachability.h"
+#import "YYReachability.h"
 #define CachedSyncInterval          @"CachedSyncInterval"       //本地缓存的与服务器时间差(毫秒)
 #define ConfigPlistPath             [[NSBundle mainBundle] pathForResource:@"AppConfig" ofType:@"plist"]
 #define ConfigDebugPlistPath        [[NSBundle mainBundle] pathForResource:@"AppConfigDebug" ofType:@"plist"]
@@ -16,6 +16,7 @@
 //  定义全局变量
 //--------------------------------------
 @interface YSCData () <AVAudioPlayerDelegate, CLLocationManagerDelegate>
+@property (nonatomic, strong) YYReachability *reachability;
 // 参数配置
 @property (nonatomic, strong) NSMutableDictionary *appParams;           //内存中的参数(high)
 @property (nonatomic, strong) NSMutableDictionary *onlineParams;        //在线参数(normal)
@@ -27,7 +28,7 @@
 @property (nonatomic, strong) AVAudioPlayer *audioPlayer;
 @end
 @implementation YSCData
-+ (instancetype)SharedInstance {
++ (instancetype)sharedInstance {
     DEFINE_SHARED_INSTANCE_USING_BLOCK(^ {
         return [[self alloc] init];
     })
@@ -35,14 +36,15 @@
 - (id)init {
     self = [super init];
     if (self) {
-        [self _initReachability];
+        self.isReachable = YES;//FIXME:test
+//        [self _initReachability];//FIXME:test
         self.appParams = [NSMutableDictionary dictionary];
         self.onlineParams = [NSMutableDictionary dictionary];
         self.localParams = [NSMutableDictionary dictionary];
         
         // 监控APP运行状态
-        addNObserver(@selector(_didAppBecomeActive), UIApplicationDidBecomeActiveNotification);
-        addNObserver(@selector(_didAppEnterBackground), UIApplicationDidEnterBackgroundNotification);
+        ADD_OBSERVER(@selector(_didAppBecomeActive), UIApplicationDidBecomeActiveNotification);
+        ADD_OBSERVER(@selector(_didAppEnterBackground), UIApplicationDidEnterBackgroundNotification);
         
         // 初始化时间差
         if (nil == YSCGetObject(CachedSyncInterval)) {
@@ -72,24 +74,21 @@
 }
 //缓存数据库路径
 - (NSString *)cacheDBPath {
-    NSString *dbName = [NSString stringWithFormat:@"ysckit_cache_%@.sqlite", USERID];
-    return [[YSCFileManager DirectoryPathOfDocuments] stringByAppendingPathComponent:dbName];
+    NSString *dbName = [NSString stringWithFormat:@"ysckit_cache_%@.sqlite", USER_ID];
+    return [[YSCFileManager directoryPathOfDocuments] stringByAppendingPathComponent:dbName];
 }
 
 
 #pragma mark - 网络状态
 - (void)_initReachability {
-    [[Reachability reachabilityForInternetConnection] startNotifier];
-    self.isReachable = [[Reachability reachabilityForInternetConnection] isReachable];
-    [Reachability reachabilityForInternetConnection].reachableBlock = ^(Reachability *reach) {
-        YSCInstance.isReachable = YES;
-    };
-    [Reachability reachabilityForInternetConnection].unreachableBlock = ^(Reachability *reach) {
-        YSCInstance.isReachable = NO;
+    self.reachability = [YYReachability reachability];
+    YSCDataInstance.isReachable = YSCDataInstance.reachability.reachable;
+    self.reachability.notifyBlock = ^(YYReachability *reachability){
+        YSCDataInstance.isReachable = YSCDataInstance.reachability.reachable;
     };
 }
 - (BOOL)isReachableViaWiFi {
-    return [[Reachability reachabilityForInternetConnection] isReachableViaWiFi];
+    return YYReachabilityStatusWiFi == self.reachability.status;
 }
 
 
@@ -114,10 +113,10 @@
     [self.locationManager stopUpdatingLocation];
 }
 //解析当前GPS坐标成文字信息
-- (void)resolveUserLocationWithBlock:(YSCResultBlock)block {
+- (void)resolveUserLocationWithBlock:(YSCObjectBlock)block {
     [self resolveLocationByLatitude:self.currentLatitude longitude:self.currentLongitude block:block];
 }
-- (void)resolveLocationByLatitude:(CLLocationDegrees)latitude longitude:(CLLocationDegrees)longitude block:(YSCResultBlock)block {
+- (void)resolveLocationByLatitude:(CLLocationDegrees)latitude longitude:(CLLocationDegrees)longitude block:(YSCObjectBlock)block {
     //TODO:解析地理位置信息
 }
 #pragma mark - CLLocationManagerDelegate
@@ -150,22 +149,23 @@
 - (NSTimeInterval)currentTimeInterval {
     return [self.currentDate timeIntervalSince1970];
 }
-- (void)refreshServerTimeWithBlock:(YSCResultBlock)block {
-    [YSCRequestManager RequestFromUrl:kResPathAppCommonUrl
-                              withAPI:kResPathGetServerTime
-                               params:nil dataModel:nil
-                          requestType:RequestTypeGET
-                     requestSuccessed:^(id responseObject) {
-                         NSString *tempStr = [NSString stringWithFormat:@"%@", responseObject];
-                         if (block) {
-                             block(tempStr);
-                         }
-                     }
-                       requestFailure:^(ErrorType errorType, NSError *error) {
-                           if (block) {
-                               block(nil);
-                           }
-                       }];
+- (void)refreshServerTimeWithBlock:(YSCObjectBlock)block {
+    [YSCRequestInstance requestFromUrl:kPathAppCommonUrl
+                               withApi:kPathGetServerTime
+                                params:nil
+                             dataModel:nil
+                                  type:YSCRequestTypeGET
+                               success:^(id responseObject) {
+                                   NSString *tempStr = [NSString stringWithFormat:@"%@", responseObject];
+                                   if (block) {
+                                       block(tempStr);
+                                   }
+                               }
+                                failed:^(YSCErrorType errorType, NSError *error) {
+                                    if (block) {
+                                        block(nil);
+                                    }
+                                }];
 }
 //刷新服务器时间
 - (void)_refreshServerTime {
@@ -178,7 +178,7 @@
     NSDate *startDate = [NSDate date];
     [self refreshServerTimeWithBlock:^(NSObject *object) {
         isRunning = NO;
-        if (isNotEmpty(object)) {
+        if (OBJECT_ISNOT_EMPTY(object)) {
             NSDate *endDate = [NSDate date];
             NSTimeInterval httpWaste = [endDate timeIntervalSinceDate:startDate];
             NSLog(@"waste:%lf", httpWaste);
@@ -220,9 +220,9 @@
 - (NSString *)udid {
     if (nil == _udid) {
         NSString *tempUdid = YSCGetObject(@"OpenUDID");
-        if (isEmpty(tempUdid)) {
+        if (OBJECT_IS_EMPTY(tempUdid)) {
             tempUdid = [UIDevice openUdid];//保证只获取一次udid就保存在内存中！
-            if (isNotEmpty(tempUdid)) {
+            if (OBJECT_ISNOT_EMPTY(tempUdid)) {
                 YSCSaveObject(tempUdid, @"OpenUDID");
             }
         }
@@ -231,20 +231,46 @@
     return _udid == nil ? @"" : _udid;
 }
 - (NSString *)deviceToken {
-    if (isEmpty(_deviceToken)) {
+    if (OBJECT_IS_EMPTY(_deviceToken)) {
         _deviceToken = YSCGetObject(@"DeviceToken");
     }
     return _deviceToken == nil ? @"" : _deviceToken;
 }
-- (void)resetAppParams {
+- (void)resetConfigParams {
     [self.onlineParams removeAllObjects];
     [self.appParams removeAllObjects];
 }
-- (NSString *)valueOfAppConfig:(NSString *)name {
-    ReturnEmptyWhenObjectIsEmpty(name);
+
+- (BOOL)boolFromConfigByName:(NSString *)name {
+    RETURN_NO_WHEN_OBJECT_IS_EMPTY(name);
+    NSString *value = [self stringFromConfigByName:name];
+    return [value boolValue];
+}
+- (float)floatFromConfigByName:(NSString *)name {
+    RETURN_ZERO_WHEN_OBJECT_IS_EMPTY(name);
+    NSString *value = [self stringFromConfigByName:name];
+    return [value floatValue];
+}
+- (NSInteger)intFromConfigByName:(NSString *)name {
+    RETURN_ZERO_WHEN_OBJECT_IS_EMPTY(name);
+    NSString *value = [self stringFromConfigByName:name];
+    return [value integerValue];
+}
+- (UIColor *)colorFromConfigByName:(NSString *)name {
+    RETURN_NIL_WHEN_OBJECT_IS_EMPTY(name);
+    NSString *value = [self stringFromConfigByName:name];
+    return [UIColor colorWithRGBString:value];
+}
+- (UIImage *)imageFromConfigByName:(NSString *)name {
+    RETURN_NIL_WHEN_OBJECT_IS_EMPTY(name);
+    NSString *value = [self stringFromConfigByName:name];
+    return [UIImage imageNamed:value];
+}
+- (NSString *)stringFromConfigByName:(NSString *)name {
+    RETURN_EMPTY_WHEN_OBJECT_IS_EMPTY(name);
     //1. 判断一级缓存
     if (self.appParams[name]) {
-        return Trim(self.appParams[name]);
+        return TRIM_STRING(self.appParams[name]);
     }
     
     NSString *tempValue = [self _valueOfOnlineConfig:name];
@@ -265,32 +291,32 @@
 // 获取本地缓存的在线参数值
 - (NSString *)_valueOfOnlineConfig:(NSString *)name {
     if (self.onlineParams[name]) {
-        return Trim(self.onlineParams[name]);
+        return TRIM_STRING(self.onlineParams[name]);
     }
     [self.onlineParams removeAllObjects];
     self.onlineParams = YSCGetObjectByFile(@"AppParams", @"OnLineParams");
     if (self.onlineParams[name]) {
-        return Trim(self.onlineParams[name]);
+        return TRIM_STRING(self.onlineParams[name]);
     }
     return nil;
 }
 // 获取本地配置文件参数值(只有第一次访问是读取硬盘的文件，以后就直接从内存中读取参数值)
 - (NSString *)_valueOfLocalConfig:(NSString *)name {
-    ReturnEmptyWhenObjectIsEmpty(name);
+    RETURN_EMPTY_WHEN_OBJECT_IS_EMPTY(name);
     //1. 检测缓存
     if (self.localParams[name]) {
-        return Trim(self.localParams[name]);
+        return TRIM_STRING(self.localParams[name]);
     }
     //2. 加载到缓存
-    NSString *plistPath = [[NSBundle mainBundle] pathForResource:@"AppConfig" ofType:@"plist"];
-    if (DEBUGMODEL) {
-        plistPath = [[NSBundle mainBundle] pathForResource:@"AppConfigDebug" ofType:@"plist"];
+    NSString *plistPath = [[NSBundle mainBundle] pathForResource:kAppConfigPlist ofType:@"plist"];
+    if (DEBUG_MODEL) {
+        plistPath = [[NSBundle mainBundle] pathForResource:kAppConfigDebugPlist ofType:@"plist"];
     }
     NSDictionary *dict = [NSDictionary dictionaryWithContentsOfFile:plistPath];
     [self.localParams removeAllObjects];
     [self.localParams addEntriesFromDictionary:dict];
     if (self.localParams[name]) {
-        return Trim(self.localParams[name]);
+        return TRIM_STRING(self.localParams[name]);
     }
     return nil;
 }
@@ -302,7 +328,7 @@
 }
 - (void)playAudioWithFilePath:(NSString *)filePath repeatCount:(NSInteger)count {
     [self stopPlaying];
-    if ([YSCFileManager FileExistsAtPath:filePath]) {
+    if ([YSCFileManager fileExistsAtPath:filePath]) {
         AVAudioSession *audioSession = [AVAudioSession sharedInstance];
         [audioSession setCategory:AVAudioSessionCategoryAmbient withOptions:AVAudioSessionCategoryOptionDefaultToSpeaker error:nil];
         [audioSession setActive:YES error:nil];

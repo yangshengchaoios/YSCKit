@@ -9,20 +9,21 @@
 #ifndef YSCKit_YSCKit_h
 #define YSCKit_YSCKit_h
 
-//常用系统库
+// system
+#import <UIKit/UIKit.h>
 #import <AVFoundation/AVFoundation.h>
 #import <CoreLocation/CoreLocation.h>
 
-//常量
-#import "YSCEnumType.h"
-#import "YSCConstants.h"
+// header
 #import "YSCEmoji.h"
 
-//模块封装
-#import "YSCCategory.h"
-#import "YSCHelper.h"
-#import "YSCModel.h"
-#import "YSCView.h"
-#import "YSCViewController.h" 
+// module
+#import "YSCKitBase.h"
+#import "YSCKitComponent.h"
+#import "YSCKitHelper.h"
+#import "YSCKitModel.h"
+#import "YSCKitView.h"
+#import "YSCKitViewController.h"
 
 #endif /* YSCKit_YSCKit_h */
+
