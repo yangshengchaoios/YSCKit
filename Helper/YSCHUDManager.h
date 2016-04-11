@@ -11,12 +11,25 @@
 @interface YSCHUDManager : NSObject
 
 // 显示HUD
-+ (void)showHUDLoading:(NSString *)hintString onView:(UIView *)view;
-+ (void)showHUDLoadingOnKeyWindow:(NSString *)hintString;
++ (void)showHUDOnView:(UIView *)view
+              message:(NSString *)message
+           edgeInsets:(UIEdgeInsets)edgeInsets
+      backgroundColor:(UIColor *)backgroundColor;
+
++ (void)showHUDOnView:(UIView *)view message:(NSString *)message;
++ (void)showHUDOnView:(UIView *)view;
++ (void)showHUDOnView:(UIView *)view showsMask:(BOOL)showsMask;
+
++ (void)showHUDOnView:(UIView *)view message:(NSString *)message edgeInsets:(UIEdgeInsets)edgeInsets;
++ (void)showHUDOnView:(UIView *)view edgeInsets:(UIEdgeInsets)edgeInsets;
++ (void)showHUDOnView:(UIView *)view edgeInsets:(UIEdgeInsets)edgeInsets showsMask:(BOOL)showsMask;
+
++ (void)showHUDOnKeyWindowWithMesage:(NSString *)hintString;
++ (void)showHUDOnKeyWindow;
 
 // 关闭HUD
-+ (void)hideHUDLoadingOnView:(UIView *)view;
-+ (void)hideHUDLoadingOnWindow;
++ (void)hideHUDOnView:(UIView *)view;
++ (void)hideHUDOnWindow;
 
 // 显示N秒后自动关闭HUD
 + (void)showHUDThenHide:(NSString *)text onView:(UIView *)view afterDelay:(NSTimeInterval)delay;

@@ -17,7 +17,7 @@ typedef NSString *(^YSCCellNameSetBlock)(NSObject *object, NSIndexPath *indexPat
 typedef NSString *(^YSCHeaderFooterNameSetBlock)(NSObject *object, NSInteger section);
 typedef void(^YSCLoadMoreBlock) (NSIndexSet *, NSArray<NSIndexPath *> *);
 typedef void (^YSCObjectIndexPathBlock)(NSObject *object, NSIndexPath *indexPath);
-typedef void (^YSCViewObjectBlock)(UIView *view, NSObject *object);
+typedef void (^YSCViewObjectIndexPathBlock)(UIView *view, NSObject *object, NSIndexPath *indexPath);
 
 //------------------------------------
 //  作用：
@@ -65,7 +65,8 @@ typedef void (^YSCViewObjectBlock)(UIView *view, NSObject *object);
 - (void)beginRefreshing;
 - (void)beginRefreshingByAnimation:(BOOL)animation;
 
-// 下载数据
+// 刷新列表
+- (void)refreshWithObjects:(NSObject *)objects;
 - (void)refreshAtPageIndex:(NSInteger)pageIndex;
 // 兼容第三方数据源
 - (void)refreshAtPageIndex:(NSInteger)pageIndex response:(NSObject *)initObject error:(NSString *)errorMessage;

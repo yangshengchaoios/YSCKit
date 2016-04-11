@@ -141,7 +141,7 @@
 + (NSString *)UTF8Decoded:(NSString *)string;
 - (NSString *)UTF8DecodedString;
 
-#pragma mark - URL编码解码
+#pragma mark - URL编码解码=UTF8
 + (NSString *)URLEncode:(NSString *)string;
 - (NSString *)URLEncodeString;
 + (NSString *)URLDecode:(NSString *)string;

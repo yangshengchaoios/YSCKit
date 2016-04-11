@@ -14,7 +14,7 @@ typedef UIView *(^YSCSegmentedViewSetBlock)(NSInteger pageIndex);
 
 @property (nonatomic, strong) UIScrollView *scrollView;
 
-//关闭YSCBaseViewController中对subview进行缩放
+//关闭subview的缩放
 @property (nonatomic, assign) BOOL closeResetFontAndConstraint;
 
 //view之间的间隔

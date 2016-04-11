@@ -28,6 +28,7 @@
 #import "YSCManager.h"
 
 #import "YSCData.h"
+#import "YSCConfigData.h"
 #import "YSCSNSShareData.h"
 
 #endif /* YSCKit_YSCKitHelper_h */

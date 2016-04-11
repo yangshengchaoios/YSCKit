@@ -22,9 +22,8 @@
 }
 - (void)awakeFromNib {
     [super awakeFromNib];
-    @weakify(self)
-    [self resetFontSizeOfView];
-    [self resetConstraintOfView];
+    @weakiy(self)
+    [self resetSize];
     self.selectedIndexArray = [NSMutableArray array];
     
     //初始化
@@ -52,15 +51,15 @@
     [self addGestureRecognizer:tapGesture];
     
     //点击取消按钮关闭选择器
-    [UIView makeRoundForView:self.cancelButton withRadius:5];
-    [UIView makeBorderForView:self.cancelButton withColor:[UIColor blackColor] borderWidth:1];
+    [self.cancelButton addCornerWithRadius:5];
+    [self.cancelButton makeBorderWithColor:[UIColor blackColor] borderWidth:1];
     [self.cancelButton bk_addEventHandler:^(id sender) {
         [weak_self hidePickerView];
     } forControlEvents:UIControlEventTouchUpInside];
     
     //点击完成按钮关闭选择器
-    [UIView makeRoundForView:self.doneButton withRadius:5];
-    [UIView makeBorderForView:self.doneButton withColor:[UIColor blackColor] borderWidth:1];
+    [self.doneButton addCornerWithRadius:5];
+    [self.doneButton makeBorderWithColor:[UIColor blackColor] borderWidth:1];
     [self.doneButton bk_addEventHandler:^(id sender) {
         [weak_self hidePickerView];
         if (weak_self.selectedBlock) {

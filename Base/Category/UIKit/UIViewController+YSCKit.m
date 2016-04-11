@@ -30,7 +30,7 @@ YYSYNTH_DYNAMIC_PROPERTY_OBJECT(params, setParams, RETAIN, NSMutableDictionary *
     RETURN_WHEN_OBJECT_IS_EMPTY(className);
     UIViewController *viewController = [[NSClassFromString(className) alloc] initWithNibName:className bundle:nil];
     NSMutableDictionary *mutableParamDict = [NSMutableDictionary dictionaryWithDictionary:params];
-    [self setParams:mutableParamDict];
+    [viewController setParams:mutableParamDict];
     //NOTE:这里设置backBarButtonItem没有用！
     [self.navigationController pushViewController:viewController animated:animated];
 }
@@ -82,7 +82,7 @@ YYSYNTH_DYNAMIC_PROPERTY_OBJECT(params, setParams, RETAIN, NSMutableDictionary *
     RETURN_WHEN_OBJECT_IS_EMPTY(className);
     UIViewController *viewController =  [[NSClassFromString(className) alloc] initWithNibName:className bundle:nil];
     NSMutableDictionary *mutableParamDict = [NSMutableDictionary dictionaryWithDictionary:params];
-    [self setParams:mutableParamDict];
+    [viewController setParams:mutableParamDict];
     UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:viewController];
     [self presentViewController:navigationController animated:YES completion:nil];
 }

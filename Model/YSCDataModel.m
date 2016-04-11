@@ -49,8 +49,8 @@ MJExtensionLogAllProperties
         if (block) {
             block(responseObject, nil);
         }
-    } failed:^(YSCErrorType errorType, NSError *error) {
-        NSString *errMsg = [YSCRequestInstance resolveErrorType:errorType andError:error];
+    } failed:^(NSString *YSCErrorType, NSError *error) {
+        NSString *errMsg = [YSCRequestInstance resolveYSCErrorType:YSCErrorType andError:error];
         if (block) {
             block(nil, errMsg);
         }

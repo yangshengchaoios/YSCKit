@@ -371,7 +371,7 @@
 + (void)addScreenBlurEffect {
     UIImageView *imageView = [[UIImageView alloc] initWithFrame:[UIScreen mainScreen].bounds];
     imageView.tag = TagOfBlurView;
-    UIImage *screenImage = [[UIApplication sharedApplication].keyWindow screenshotOfView];
+    UIImage *screenImage = [[UIApplication sharedApplication].keyWindow snapshotImage];
     imageView.image = [screenImage blurryImageWithBlurLevel:0.1];
     [[[UIApplication sharedApplication] keyWindow] addSubview:imageView];
 }

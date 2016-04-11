@@ -178,7 +178,8 @@ forHeaderFooterViewReuseIdentifier:footerName];
                 [header performSelector:@selector(layoutObject:) withObject:headerObject];
             }
             if (self.layoutHeaderView) {
-                self.layoutHeaderView(header, headerObject);
+                NSIndexPath *indexPath = [NSIndexPath indexPathForRow:0 inSection:section];
+                self.layoutHeaderView(header, headerObject, indexPath);
             }
         }
     }
@@ -222,7 +223,7 @@ forHeaderFooterViewReuseIdentifier:footerName];
         [cell performSelector:@selector(layoutObject:) withObject:cellObject];
     }
     if (self.layoutCellView) {
-        self.layoutCellView(cell, cellObject);
+        self.layoutCellView(cell, cellObject, indexPath);
     }
     return cell;
 }
@@ -263,7 +264,8 @@ forHeaderFooterViewReuseIdentifier:footerName];
                 [footer performSelector:@selector(layoutObject:) withObject:footerObject];
             }
             if (self.layoutFooterView) {
-                self.layoutFooterView(footer, footerObject);
+                NSIndexPath *indexPath = [NSIndexPath indexPathForRow:0 inSection:section];
+                self.layoutFooterView(footer, footerObject, indexPath);
             }
         }
     }

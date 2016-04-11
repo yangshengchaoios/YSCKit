@@ -39,7 +39,7 @@
     self.params = tempDict;
     
     self.view.backgroundColor = [UIColor blackColor];
-    [self.indexLabel makeRoundWithRadius:AUTOLAYOUT_LENGTH(40) / 2];
+    [self.indexLabel addCornerWithRadius:AUTOLAYOUT_LENGTH(40) / 2];
     [self.saveButton makeBorderWithColor:[UIColor lightGrayColor] borderWidth:1];
     [self.closeButton makeBorderWithColor:[UIColor lightGrayColor] borderWidth:1];
     
@@ -100,7 +100,7 @@
 - (IBAction)saveButtonClicked:(id)sender {
     YSCPhotoBrowseViewCell *cell = (YSCPhotoBrowseViewCell *)[self.photoBrowseView.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForRow:self.currentIndex inSection:0]];
     if (cell.savedImage) {
-        [YSCHUDManager showHUDLoadingOnKeyWindow:@"正在保存"];
+        [YSCHUDManager showHUDOnKeyWindowWithMesage:@"正在保存"];
         UIImageWriteToSavedPhotosAlbum(cell.savedImage, self, @selector(image:didFinishSavingWithError:contextInfo:), nil);
     }
     else {

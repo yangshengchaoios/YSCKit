@@ -17,8 +17,7 @@ NSString * const kParamItemFooterIdentifier     = @"YSCKit_ItemFooter";
     [super awakeFromNib];
     
     self.clipsToBounds = YES;
-    [self resetFontSizeOfView];
-    [self resetConstraintOfView];
+    [self resetSize];
 }
 
 #pragma mark - 注册与重用

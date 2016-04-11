@@ -21,8 +21,7 @@ NSString * const kParamCellIdentifier       = @"YSCKit_Cell";
     
     self.clipsToBounds = YES;
     self.selectionStyle = UITableViewCellSelectionStyleNone;
-    [self resetFontSizeOfView];
-    [self resetConstraintOfView];
+    [self resetSize];
 }
 
 #pragma mark - 注册与重用

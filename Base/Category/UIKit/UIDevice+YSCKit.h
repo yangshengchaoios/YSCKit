@@ -24,9 +24,7 @@ enum {
 }; typedef NSUInteger DeviceType;
 
 @interface UIDevice (YSCKit)
-/*
- * Available device memory in MB
- */
+//Available device memory in MB
 @property(readonly) double availableMemory;
 
 + (DeviceType)currentDeviceType;
@@ -34,8 +32,9 @@ enum {
 + (NSString *)platformString;
 // 通过UMeng集成的相关方法获取设备唯一编号
 + (NSString *)openUdid;
-//获取所有与设备相关的信息
+// 获取所有与设备相关的信息
 + (NSString *)deviceInfo;
++ (NSString *)stringWithUUID;
 
 // 只能判断摄像头是否可用，但不能判断是否被用户禁用了!
 + (BOOL)isCameraAvailable;
@@ -68,5 +67,107 @@ enum {
 + (BOOL)isCanUserPickPhotosFromPhotoLibrary;
 //判断是否允许后台刷新程序
 + (BOOL)isBackgroundRefreshable;
-
+//强制修改设备的方向
++ (void)forceToChangeInterfaceOrientation:(UIInterfaceOrientation)orientation;
 @end
+
+
+// @see https://github.com/ibireme/YYKit/blob/master/YYKit/Base/UIKit/UIDevice%2BYYAdd.h
+@interface UIDevice (YYAdd)
+#pragma mark - Device Information
+///=============================================================================
+/// @name Device Information
+///=============================================================================
+
+/// Device system version (e.g. 8.1)
++ (double)systemVersion;
+
+/// Whether the device is iPad/iPad mini.
+@property (nonatomic, readonly) BOOL isPad;
+
+/// Whether the device is a simulator.
+@property (nonatomic, readonly) BOOL isSimulator;
+
+/// Whether the device is jailbroken.
+@property (nonatomic, readonly) BOOL isJailbroken;
+
+/// The device's machine model.  e.g. "iPhone6,1" "iPad4,6"
+/// @see http://theiphonewiki.com/wiki/Models
+@property (nonatomic, readonly) NSString *machineModel;
+
+/// The device's machine model name. e.g. "iPhone 5s" "iPad mini 2"
+/// @see http://theiphonewiki.com/wiki/Models
+@property (nonatomic, readonly) NSString *machineModelName;
+
+/// The System's startup time.
+@property (nonatomic, readonly) NSDate *systemUptime;
+
+
+#pragma mark - Network Information
+///=============================================================================
+/// @name Network Information
+///=============================================================================
+
+/// WIFI IP address of this device (can be nil). e.g. @"192.168.1.111"
+@property (nonatomic, readonly) NSString *ipAddressWIFI;
+
+/// Cell IP address of this device (can be nil). e.g. @"10.2.2.222"
+@property (nonatomic, readonly) NSString *ipAddressCell;
+
+
+#pragma mark - Disk Space
+///=============================================================================
+/// @name Disk Space
+///=============================================================================
+
+/// Total disk space in byte. (-1 when error occurs)
+@property (nonatomic, readonly) int64_t diskSpace;
+
+/// Free disk space in byte. (-1 when error occurs)
+@property (nonatomic, readonly) int64_t diskSpaceFree;
+
+/// Used disk space in byte. (-1 when error occurs)
+@property (nonatomic, readonly) int64_t diskSpaceUsed;
+
+
+#pragma mark - Memory Information
+///=============================================================================
+/// @name Memory Information
+///=============================================================================
+
+/// Total physical memory in byte. (-1 when error occurs)
+@property (nonatomic, readonly) int64_t memoryTotal;
+
+/// Used (active + inactive + wired) memory in byte. (-1 when error occurs)
+@property (nonatomic, readonly) int64_t memoryUsed;
+
+/// Free memory in byte. (-1 when error occurs)
+@property (nonatomic, readonly) int64_t memoryFree;
+
+/// Acvite memory in byte. (-1 when error occurs)
+@property (nonatomic, readonly) int64_t memoryActive;
+
+/// Inactive memory in byte. (-1 when error occurs)
+@property (nonatomic, readonly) int64_t memoryInactive;
+
+/// Wired memory in byte. (-1 when error occurs)
+@property (nonatomic, readonly) int64_t memoryWired;
+
+/// Purgable memory in byte. (-1 when error occurs)
+@property (nonatomic, readonly) int64_t memoryPurgable;
+
+#pragma mark - CPU Information
+///=============================================================================
+/// @name CPU Information
+///=============================================================================
+
+/// Avaliable CPU processor count.
+@property (nonatomic, readonly) NSUInteger cpuCount;
+
+/// Current CPU usage, 1.0 means 100%. (-1 when error occurs)
+@property (nonatomic, readonly) float cpuUsage;
+
+/// Current CPU usage per processor (array of NSNumber), 1.0 means 100%. (nil when error occurs)
+@property (nonatomic, readonly) NSArray *cpuUsagePerProcessor;
+@end
+

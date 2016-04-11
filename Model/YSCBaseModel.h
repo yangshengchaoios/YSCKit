@@ -13,6 +13,6 @@
 @property (strong, nonatomic) NSObject *data;
 
 + (instancetype)objectWithKeyValues:(id)keyValues;
-- (BOOL)isSuccess;
+- (BOOL)checkRequestIsSuccess;
 - (void)postNotificationWhenLoginExpired;
 @end

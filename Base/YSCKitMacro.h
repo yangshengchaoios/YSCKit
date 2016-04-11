@@ -45,7 +45,7 @@ typedef void (^YSCIntegerErrorBlock)(NSInteger, NSError *);
 
 
 // 方法或属性过期标志
-#define YSCDeprecated(explain) __attribute__((deprecated(explain)))
+#define YSCDeprecated(explain) NS_DEPRECATED(2_0, 2_0, 2_0, 2_0, explain)
 
 // 定义NSLog
 #define __NSLog(s, ...) do { \
@@ -54,6 +54,10 @@ typedef void (^YSCIntegerErrorBlock)(NSInteger, NSError *);
         [YSCLogManager saveLog:logString]; \
     } while (0)
 #define NSLog(...) __NSLog(__VA_ARGS__)
+
+#define LOG_POINT(point)    NSLog(@"%s =\r { x:%f, y:%f }", #point, point.x, point.y)
+#define LOG_SIZE(size)      NSLog(@"%s =\r { w:%f, h:%f }", #size, size.width, size.height)
+#define LOG_RECT(rect)      NSLog(@"%s =\r { x:%f, y:%f, w:%f, h:%f }", #rect, rect.origin.x, rect.origin.y, rect.size.width, rect.size.height)
 
 // 定义weakSelf
 #ifndef WEAKSELF
@@ -101,7 +105,7 @@ typedef void (^YSCIntegerErrorBlock)(NSInteger, NSError *);
  */
 #define RGBA(r, g, b, a)                [UIColor colorWithRed:r / 255.0f green:g / 255.0f blue:b / 255.0f alpha:a]
 #define RGB(r, g, b)                    RGBA(r,g,b,1.0f)
-#define GRAY_COLOR(c)                   RGBA(c,c,c,1.0f)
+#define RGB_GRAY(c)                     RGBA(c,c,c,1.0f)
 #define RANDOM_INT(from,to)             ((int)((from) + arc4random() % ((to)-(from) + 1)))  //随机数 [from,to] 之间
 #define VIEW_IN_XIB(x, i)               [[[NSBundle mainBundle] loadNibNamed:(x) owner:nil options:nil] objectAtIndex:(i)]
 #define FIRST_VIEW_IN_XIB(x)            VIEW_IN_XIB(x, 0)
@@ -110,6 +114,7 @@ typedef void (^YSCIntegerErrorBlock)(NSInteger, NSError *);
 #define CREATE_NSERROR_WITH_Code(c,m)   [NSError errorWithDomain:@"YSCKit" code:c userInfo:@{NSLocalizedDescriptionKey : m}]
 #define CREATE_NSERROR(m)               CREATE_NSERROR_WITH_Code(0,m)
 #define GET_NSERROR_MESSAGE(e)          ((NSError *)e).userInfo[NSLocalizedDescriptionKey]  //=e.localizedDescription
+#define KEY_WINDOW                      [UIApplication sharedApplication].keyWindow
 
 
 /**
@@ -149,7 +154,9 @@ typedef void (^YSCIntegerErrorBlock)(NSInteger, NSError *);
 /**
  *  自动布局相关代码段简写
  */
-#define XIB_WIDTH                       640.0f      //xib布局时的宽度(point)，主要用于计算缩放比例
+#ifndef XIB_WIDTH
+    #define XIB_WIDTH                   640.0f      //xib布局时的宽度(point)，主要用于计算缩放比例
+#endif
 #define AUTOLAYOUT_SCALE                (SCREEN_WIDTH / XIB_WIDTH)          //缩放比例 (当前屏幕的真实宽度point / xib布局的宽度point)
 #define AUTOLAYOUT_LENGTH(x)            ((x) * AUTOLAYOUT_SCALE)            //计算缩放后的大小point
 #define AUTOLAYOUT_LENGTH_W(x,w)        ((x) * (SCREEN_WIDTH / (w)))        //计算任意布局的真实大小point
@@ -186,7 +193,30 @@ typedef void (^YSCIntegerErrorBlock)(NSInteger, NSError *);
     ([[NSNotificationCenter defaultCenter] removeObserver:_self])
 
 
-
+/**
+ * usage:
+ *   @interface NSObject (MyAdd)
+ *       @property (nonatomic, assign) BOOL isError;
+ *   @end
+ *
+ *   #import <objc/runtime.h>
+ *   @implementation NSObject (MyAdd)
+ *       YSC_DYNAMIC_PROPERTY_BOOL(isError, setIsError)
+ *   @end
+ */
+#ifndef YSC_DYNAMIC_PROPERTY_BOOL
+    #define YSC_DYNAMIC_PROPERTY_BOOL(_getter_, _setter_) \
+            - (void)_setter_ : (BOOL)value { \
+                NSNumber *number = [NSNumber numberWithBool:value]; \
+                [self willChangeValueForKey:@#_getter_]; \
+                objc_setAssociatedObject(self, _cmd, number, OBJC_ASSOCIATION_RETAIN); \
+                [self didChangeValueForKey:@#_getter_]; \
+            } \
+            - (BOOL)_getter_ { \
+                NSNumber *number = objc_getAssociatedObject(self, @selector(_setter_:)); \
+                return [number boolValue]; \
+            }
+#endif
 
 
 //----------------------------------------------------------------------------//
@@ -205,7 +235,7 @@ typedef void (^YSCIntegerErrorBlock)(NSInteger, NSError *);
  YYBenchmark(^{
      // code
  }, ^(double ms) {
-     NSLog("time cost: %.2f ms",ms);
+     NSLog(@"time cost: %.2f ms",ms);
  });
  */
 static inline void YYBenchmark(void (^block)(void), void (^complete)(double ms)) {
@@ -312,42 +342,42 @@ static inline void YYBenchmark(void (^block)(void), void (^complete)(double ms))
  Synthsize a weak or strong reference.
  
  Example:
- @weakify(self)
+ @weakiy(self)
  [self doSomething^{
-     @strongify(self)
+     @strongiy(self)
      if (!self) return;
      ...
  }];
  
  */
-#ifndef weakify
+#ifndef weakiy
     #if DEBUG
         #if __has_feature(objc_arc)
-            #define weakify(object) autoreleasepool{} __weak __typeof__(object) weak##_##object = object;
+            #define weakiy(object) autoreleasepool{} __weak __typeof__(object) weak##_##object = object;
         #else
-            #define weakify(object) autoreleasepool{} __block __typeof__(object) block##_##object = object;
+            #define weakiy(object) autoreleasepool{} __block __typeof__(object) block##_##object = object;
         #endif
     #else
         #if __has_feature(objc_arc)
-            #define weakify(object) try{} @finally{} {} __weak __typeof__(object) weak##_##object = object;
+            #define weakiy(object) try{} @finally{} {} __weak __typeof__(object) weak##_##object = object;
         #else
-            #define weakify(object) try{} @finally{} {} __block __typeof__(object) block##_##object = object;
+            #define weakiy(object) try{} @finally{} {} __block __typeof__(object) block##_##object = object;
         #endif
     #endif
 #endif
 
-#ifndef strongify
+#ifndef strongiy
     #if DEBUG
         #if __has_feature(objc_arc)
-            #define strongify(object) autoreleasepool{} __typeof__(object) object = weak##_##object;
+            #define strongiy(object) autoreleasepool{} __typeof__(object) object = weak##_##object;
         #else
-            #define strongify(object) autoreleasepool{} __typeof__(object) object = block##_##object;
+            #define strongiy(object) autoreleasepool{} __typeof__(object) object = block##_##object;
         #endif
     #else
         #if __has_feature(objc_arc)
-            #define strongify(object) try{} @finally{} __typeof__(object) object = weak##_##object;
+            #define strongiy(object) try{} @finally{} __typeof__(object) object = weak##_##object;
         #else
-            #define strongify(object) try{} @finally{} __typeof__(object) object = block##_##object;
+            #define strongiy(object) try{} @finally{} __typeof__(object) object = block##_##object;
         #endif
     #endif
 #endif

@@ -27,5 +27,4 @@
 + (NSString *)postByApi:(NSString *)apiName params:(NSDictionary *)params block:(YSCObjectErrorMessageBlock)block;
 // 统一规范参数的提交方式：加密的json字符串写入httpBody
 + (NSString *)requestByApi:(NSString *)apiName params:(NSDictionary *)params block:(YSCObjectErrorMessageBlock)block;
-
 @end

@@ -22,7 +22,7 @@
 //      9. 兼容外部数据源(前提是必须和列表数据源类型一致)
 //------------------------------------
 @interface YSCTableView : UITableView
-// 关闭YSCBaseViewController中对subview进行缩放
+//关闭subview的缩放
 @property (nonatomic, assign) BOOL closeResetFontAndConstraint;
 // 封装了网络请求和tipsView的处理
 @property (nonatomic, strong) YSCPullToRefreshHelper *helper;
@@ -48,9 +48,9 @@
 //  click
 @property (nonatomic, copy) YSCObjectIndexPathBlock clickCellBlock;
 //  layout
-@property (nonatomic, copy) YSCViewObjectBlock layoutHeaderView;
-@property (nonatomic, copy) YSCViewObjectBlock layoutCellView;
-@property (nonatomic, copy) YSCViewObjectBlock layoutFooterView;
+@property (nonatomic, copy) YSCViewObjectIndexPathBlock layoutHeaderView;
+@property (nonatomic, copy) YSCViewObjectIndexPathBlock layoutCellView;
+@property (nonatomic, copy) YSCViewObjectIndexPathBlock layoutFooterView;
 
 // 注册header、cell、footer
 - (void)registerHeaderName:(NSString *)headerName;

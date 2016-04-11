@@ -43,6 +43,10 @@ void _uncaughtExceptionHandler(NSException *exception) {
     [self saveLog:logString intoFilePath:logFilePath overWrite:YES];
 }
 + (void)saveLog:(NSString *)logString intoFilePath:(NSString *)logFilePath overWrite:(BOOL)overwrite {
+    if ( ! DEBUG_MODEL) {
+        return; //如果不是测试环境就不写日志
+    }
+    
     RETURN_WHEN_OBJECT_IS_EMPTY(logString);
     if (overwrite && [YSCFileManager fileExistsAtPath:logFilePath]) {
         [YSCFileManager deleteFileOrDirectory:logFilePath];

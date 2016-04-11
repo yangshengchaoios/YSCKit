@@ -96,55 +96,162 @@
         subView.hidden = YES;
     }
 }
+- (UIViewController *)viewController {
+    for (UIView *view = self; view; view = view.superview) {
+        UIResponder *nextResponder = [view nextResponder];
+        if ([nextResponder isKindOfClass:[UIViewController class]]) {
+            return (UIViewController *)nextResponder;
+        }
+    }
+    return nil;
+}
 
 #pragma mark - view边框调整
-+ (void)makeRoundForView:(UIView *)view withRadius:(CGFloat)radius {
-    RETURN_WHEN_OBJECT_IS_EMPTY(view);
-    [view makeRoundWithRadius:radius];
-}
-- (void)makeRoundWithRadius:(CGFloat)radius {
+/**
+ *  优点：兼容所有情况！
+ *  缺点：导致离屏渲染问题
+ */
+- (void)addCornerWithRadius:(CGFloat)radius {
+    // 方法一：
     self.layer.cornerRadius = radius;
     self.layer.masksToBounds = YES;
+    
+    // 方法二：
+//    [self addCorner:UIRectCornerAllCorners withRaidus:radius];
 }
-+ (void)makeBorderForView:(UIView *)view {
-    [self makeBorderForView:view withColor:kDefaultBorderColor borderWidth:1];
+- (void)addCorner:(UIRectCorner)corner withRaidus:(CGFloat)radius {
+    UIBezierPath *path = [UIBezierPath bezierPathWithRoundedRect:self.bounds
+                                               byRoundingCorners:corner
+                                                     cornerRadii:CGSizeMake(radius, radius)];
+    CAShapeLayer *layer = [CAShapeLayer layer];
+    layer.frame = self.bounds;
+    layer.path = path.CGPath;
+    self.layer.mask = layer;
 }
 - (void)makeBorderLine {
     [self makeBorderWithColor:kDefaultBorderColor borderWidth:1];
-}
-+ (void)makeBorderForView:(UIView *)view withColor:(UIColor *)color borderWidth:(CGFloat)width {
-    RETURN_WHEN_OBJECT_IS_EMPTY(view);
-    [view makeBorderWithColor:color borderWidth:width];
 }
 - (void)makeBorderWithColor:(UIColor *)color borderWidth:(CGFloat)width {
     self.layer.borderColor = color.CGColor;
     self.layer.borderWidth = AUTOLAYOUT_LENGTH(width);
 }
 
-#pragma mark - 截图
-+ (UIImage *)screenshotOfView:(UIView *) view {
-    RETURN_NIL_WHEN_OBJECT_IS_EMPTY(view)
-    return [view screenshotOfView];
+/**
+ *  专门针对UIImageView和UIView作圆角
+ *  方法的本质：画一个圆角背景图片来代替原来的。
+ *  优点：高效不会导致离屏渲染、可以控制圆角的方位
+ *  确定：无法兼容所有情况！
+ */
+- (void)makeImageViewRadius:(CGFloat)radius size:(CGSize)sizeToFit {
+    UIImageView *imageView = (UIImageView *)self;
+    if (imageView.image) {
+        [imageView setImage:[self _makeImageViewRadiusImage:radius size:AUTOLAYOUT_SIZE(imageView.image.size)]];
+        self.backgroundColor = [UIColor clearColor];
+        return;
+    }
 }
-- (UIImage *)screenshotOfView {
+- (void)makeViewRadius:(CGFloat)radius size:(CGSize)sizeToFit {
+    UIImageView *backImageView = [[UIImageView alloc] initWithImage:[self _makeViewRadiusImage:radius size:sizeToFit]];
+    self.backgroundColor = [UIColor clearColor];
+    [self insertSubview:backImageView atIndex:0];
+}
+- (UIImage *)_makeImageViewRadiusImage:(CGFloat)radius size:(CGSize)sizeToFit {
+    CGRect rect = CGRectMake(0, 0, sizeToFit.width, sizeToFit.height);
+    
+    UIGraphicsBeginImageContextWithOptions(sizeToFit, false, [UIScreen mainScreen].scale);
+    UIBezierPath *bezierPath = [UIBezierPath bezierPathWithRoundedRect:rect
+                                                     byRoundingCorners:UIRectCornerAllCorners //TODO:这里可以控制
+                                                           cornerRadii:CGSizeMake(radius, radius)];
+    CGContextAddPath(UIGraphicsGetCurrentContext(), bezierPath.CGPath);
+    CGContextClip(UIGraphicsGetCurrentContext());
+    
+    [self drawRect:rect];
+    CGContextDrawPath(UIGraphicsGetCurrentContext(), kCGPathFillStroke);
+    UIImage *output = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    return output;
+}
+- (UIImage *)_makeViewRadiusImage:(CGFloat)radius size:(CGSize)sizeToFit {
+    UIColor *borderColor = [UIColor clearColor];
+    UIColor *backgroundColor = self.backgroundColor;
+    
+    UIGraphicsBeginImageContextWithOptions(sizeToFit, false, [UIScreen mainScreen].scale);
+    CGContextRef context = UIGraphicsGetCurrentContext();
+    
+    CGContextSetLineWidth(context, 0);
+    CGContextSetStrokeColorWithColor(context, borderColor.CGColor);
+    CGContextSetFillColorWithColor(context, backgroundColor.CGColor);
+    
+    CGFloat width = sizeToFit.width, height = sizeToFit.height;
+    CGContextMoveToPoint(context, width, radius);  // 坐标右边开始
+    CGContextAddArcToPoint(context, width, height, width - radius, height, radius);  // 右下角角度
+    
+    //    CGContextAddLineToPoint(context, 0, height);
+    //    CGContextAddLineToPoint(context, 0, 0);
+    //    CGContextAddLineToPoint(context, width, 0);
+    //    CGContextAddLineToPoint(context, width, radius);
+    
+    CGContextAddArcToPoint(context, 0, height, 0, height - radius, radius); // 左下角角度
+    CGContextAddArcToPoint(context, 0, 0, width, 0, radius); // 左上角
+    CGContextAddArcToPoint(context, width, 0, width, radius, radius); // 右上角
+    
+    CGContextDrawPath(UIGraphicsGetCurrentContext(), kCGPathFillStroke);
+    UIImage *output = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    return output;
+}
+
+
+#pragma mark - 截图
+- (UIImage *)snapshotImage {
     UIGraphicsBeginImageContext(self.frame.size);
     [self.layer renderInContext:UIGraphicsGetCurrentContext()];
     __autoreleasing UIImage *fullImage = UIGraphicsGetImageFromCurrentImageContext();
     UIGraphicsEndImageContext();
     return fullImage;
 }
+- (UIImage *)snapshotImageAfterScreenUpdates:(BOOL)afterUpdates {
+    if (![self respondsToSelector:@selector(drawViewHierarchyInRect:afterScreenUpdates:)]) {
+        return [self snapshotImage];
+    }
+    UIGraphicsBeginImageContextWithOptions(self.bounds.size, self.opaque, 0);
+    [self drawViewHierarchyInRect:self.bounds afterScreenUpdates:afterUpdates];
+    UIImage *snap = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    return snap;
+}
+- (NSData *)snapshotPDF {
+    CGRect bounds = self.bounds;
+    NSMutableData *data = [NSMutableData data];
+    CGDataConsumerRef consumer = CGDataConsumerCreateWithCFData((__bridge CFMutableDataRef)data);
+    CGContextRef context = CGPDFContextCreate(consumer, &bounds, NULL);
+    CGDataConsumerRelease(consumer);
+    if (!context) return nil;
+    CGPDFContextBeginPage(context, NULL);
+    CGContextTranslateCTM(context, 0, bounds.size.height);
+    CGContextScaleCTM(context, 1.0, -1.0);
+    [self.layer renderInContext:context];
+    CGPDFContextEndPage(context);
+    CGPDFContextClose(context);
+    CGContextRelease(context);
+    return data;
+}
+- (void)setLayerShadow:(UIColor*)color offset:(CGSize)offset radius:(CGFloat)radius {
+    self.layer.shadowColor = color.CGColor;
+    self.layer.shadowOffset = offset;
+    self.layer.shadowRadius = radius;
+    self.layer.shadowOpacity = 1;
+    self.layer.shouldRasterize = YES;
+    self.layer.rasterizationScale = [UIScreen mainScreen].scale;
+}
 
 
 #pragma mark - 递归遍历所有子view
-+ (void)resetSizeOfView:(UIView *)view {
-    [self resetFontSizeOfView:view];
-    [self resetConstraintOfView:view];
+- (void)resetSize {
+    [self resetFontSize];
+    [self resetConstraint];
 }
-+ (void)resetFontSizeOfView:(UIView *)view {
-    RETURN_WHEN_OBJECT_IS_EMPTY(view);
-    [view resetFontSizeOfView];
-}
-- (void)resetFontSizeOfView {
+- (void)resetFontSize {
     for (UIView *subview in self.subviews) {
         if ([subview respondsToSelector:@selector(setCloseResetFontAndConstraint:)]) {
             continue;
@@ -165,14 +272,10 @@
             UITextView *textView = (UITextView *)subview;
             textView.font = AUTOLAYOUT_FONT(textView.font.pointSize);
         }
-        [subview resetFontSizeOfView];
+        [subview resetFontSize];
     }
 }
-+ (void)resetConstraintOfView:(UIView *)view {
-    RETURN_WHEN_OBJECT_IS_EMPTY(view);
-    [view resetConstraintOfView];
-}
-- (void)resetConstraintOfView {
+- (void)resetConstraint {
     for (NSLayoutConstraint *constraint in self.constraints) {
         if (constraint.constant > 0) {
             constraint.constant = AUTOLAYOUT_LENGTH(constraint.constant);
@@ -184,19 +287,60 @@
     
     if ([self.subviews count] > 0) {
         for (UIView *subView in self.subviews) {
-            [subView resetConstraintOfView];
+            [subView resetConstraint];
         }
     }
 }
 @end
 
 
-
+/** 手势处理 */
 @implementation UIView (Gesture)
-+ (void)animateHorizontalSwipe:(UIView *)view withSubType:(NSString *)subtype {
-    RETURN_WHEN_OBJECT_IS_EMPTY(view);
-    [view animateHorizontalSwipeWithSubType:subtype];
+// tap gesture
+- (void)addSingleTapWithBlock:(void (^)(void))block {
+    [self _addTapWithTouches:1 tapped:1 handler:block];
 }
+- (void)reAddSingleTapWithBlock:(void (^)(void))block {
+    [self removeAllGestureRecognizers];
+    [self addSingleTapWithBlock:block];
+}
+- (void)addDoubleTapWithBlock:(void (^)(void))block {
+    [self _addTapWithTouches:1 tapped:2 handler:block];
+}
+- (void)reAddDoubleTapWithBlock:(void (^)(void))block {
+    [self removeAllGestureRecognizers];
+    [self addDoubleTapWithBlock:block];
+}
+- (void)removeAllTapGestures {
+    for (UIGestureRecognizer *gesture in self.gestureRecognizers) {
+        if ([gesture isKindOfClass:[UITapGestureRecognizer class]]) {
+            [self removeGestureRecognizer:gesture];
+        }
+    }
+}
+- (void)_addTapWithTouches:(NSUInteger)numberOfTouches
+                    tapped:(NSUInteger)numberOfTaps
+                   handler:(void (^)(void))block {
+    if (!block) return;
+    
+    self.userInteractionEnabled = YES;
+    UITapGestureRecognizer *gesture = [UITapGestureRecognizer bk_recognizerWithHandler:^(UIGestureRecognizer *sender, UIGestureRecognizerState state, CGPoint location) {
+        if (state == UIGestureRecognizerStateRecognized) block();
+    }];
+    gesture.numberOfTouchesRequired = numberOfTouches;
+    gesture.numberOfTapsRequired = numberOfTaps;
+    [self.gestureRecognizers enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+        if (![obj isKindOfClass:[UITapGestureRecognizer class]]) return;
+        UITapGestureRecognizer *tap = obj;
+        BOOL rightTouches = (tap.numberOfTouchesRequired == numberOfTouches);
+        BOOL rightTaps = (tap.numberOfTapsRequired == numberOfTaps);
+        if (rightTouches && rightTaps) {
+            [gesture requireGestureRecognizerToFail:tap];
+        }
+    }];
+    [self addGestureRecognizer:gesture];
+}
+
 - (void)animateHorizontalSwipeWithSubType:(NSString *)subtype {
     CATransition *animation = [CATransition animation];
     animation.duration = 0.2;
@@ -206,12 +350,88 @@
     animation.subtype = subtype;
     [self.layer addAnimation:animation forKey:@"animation"];
 }
-+ (void)flipView:(UIView *)view withTransition:(UIViewAnimationTransition)transition duration:(CGFloat)duration {
+- (void)flipWithTransition:(UIViewAnimationTransition)transition duration:(CGFloat)duration {
     [UIView beginAnimations:@"animationID" context:nil];
     [UIView setAnimationDuration:duration];
     [UIView setAnimationCurve:UIViewAnimationCurveEaseOut];
     [UIView setAnimationRepeatAutoreverses:NO];
-    [UIView setAnimationTransition:transition forView:view cache:YES];
+    [UIView setAnimationTransition:transition forView:self cache:YES];
     [UIView commitAnimations];
 }
 @end
+
+
+
+/** 坐标转换 reference: UIView+YYAdd */
+@implementation UIView (ConvertPoint)
+- (CGPoint)convertPoint:(CGPoint)point toViewOrWindow:(UIView *)view {
+    if (!view) {
+        if ([self isKindOfClass:[UIWindow class]]) {
+            return [((UIWindow *)self) convertPoint:point toWindow:nil];
+        } else {
+            return [self convertPoint:point toView:nil];
+        }
+    }
+    
+    UIWindow *from = [self isKindOfClass:[UIWindow class]] ? (id)self : self.window;
+    UIWindow *to = [view isKindOfClass:[UIWindow class]] ? (id)view : view.window;
+    if ((!from || !to) || (from == to)) return [self convertPoint:point toView:view];
+    point = [self convertPoint:point toView:from];
+    point = [to convertPoint:point fromWindow:from];
+    point = [view convertPoint:point fromView:to];
+    return point;
+}
+- (CGPoint)convertPoint:(CGPoint)point fromViewOrWindow:(UIView *)view {
+    if (!view) {
+        if ([self isKindOfClass:[UIWindow class]]) {
+            return [((UIWindow *)self) convertPoint:point fromWindow:nil];
+        } else {
+            return [self convertPoint:point fromView:nil];
+        }
+    }
+    
+    UIWindow *from = [view isKindOfClass:[UIWindow class]] ? (id)view : view.window;
+    UIWindow *to = [self isKindOfClass:[UIWindow class]] ? (id)self : self.window;
+    if ((!from || !to) || (from == to)) return [self convertPoint:point fromView:view];
+    point = [from convertPoint:point fromView:view];
+    point = [to convertPoint:point fromWindow:from];
+    point = [self convertPoint:point fromView:to];
+    return point;
+}
+- (CGRect)convertRect:(CGRect)rect toViewOrWindow:(UIView *)view {
+    if (!view) {
+        if ([self isKindOfClass:[UIWindow class]]) {
+            return [((UIWindow *)self) convertRect:rect toWindow:nil];
+        } else {
+            return [self convertRect:rect toView:nil];
+        }
+    }
+    
+    UIWindow *from = [self isKindOfClass:[UIWindow class]] ? (id)self : self.window;
+    UIWindow *to = [view isKindOfClass:[UIWindow class]] ? (id)view : view.window;
+    if (!from || !to) return [self convertRect:rect toView:view];
+    if (from == to) return [self convertRect:rect toView:view];
+    rect = [self convertRect:rect toView:from];
+    rect = [to convertRect:rect fromWindow:from];
+    rect = [view convertRect:rect fromView:to];
+    return rect;
+}
+- (CGRect)convertRect:(CGRect)rect fromViewOrWindow:(UIView *)view {
+    if (!view) {
+        if ([self isKindOfClass:[UIWindow class]]) {
+            return [((UIWindow *)self) convertRect:rect fromWindow:nil];
+        } else {
+            return [self convertRect:rect fromView:nil];
+        }
+    }
+    
+    UIWindow *from = [view isKindOfClass:[UIWindow class]] ? (id)view : view.window;
+    UIWindow *to = [self isKindOfClass:[UIWindow class]] ? (id)self : self.window;
+    if ((!from || !to) || (from == to)) return [self convertRect:rect fromView:view];
+    rect = [from convertRect:rect fromView:view];
+    rect = [to convertRect:rect fromWindow:from];
+    rect = [self convertRect:rect fromView:to];
+    return rect;
+}
+@end
+

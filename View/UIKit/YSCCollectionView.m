@@ -45,6 +45,12 @@ UICollectionViewDelegateFlowLayout>
     self.helper.enableLoadMore = YES;
     self.helper.enableTips = YES;
     self.cellEdgeInsets = AUTOLAYOUT_EDGEINSETS(20, 20, 0, 20);
+    self.minimumLineSpacingBlock = ^CGFloat(NSInteger section){
+        return AUTOLAYOUT_LENGTH(20);
+    };
+    self.minimumInteritemSpacingBlock = ^CGFloat(NSInteger section){
+        return 0;
+    };
     WEAKSELF
     self.helper.loadMoreBlock = ^(NSIndexSet *sections, NSArray<NSIndexPath *> *indexPaths) {
         [weakSelf performBatchUpdates:^{
@@ -163,12 +169,12 @@ forSupplementaryViewOfKind:UICollectionElementKindSectionFooter
             }
             if ([kind isEqualToString:UICollectionElementKindSectionHeader]) {
                 if (self.layoutHeaderView) {
-                    self.layoutHeaderView(reusableView, reusableObject);
+                    self.layoutHeaderView(reusableView, reusableObject, indexPath);
                 }
             }
             else {
                 if (self.layoutFooterView) {
-                    self.layoutFooterView(reusableView, reusableObject);
+                    self.layoutFooterView(reusableView, reusableObject, indexPath);
                 }
             }
         }
@@ -191,7 +197,7 @@ forSupplementaryViewOfKind:UICollectionElementKindSectionFooter
         [cell performSelector:@selector(layoutObject:) withObject:cellObject];
     }
     if (self.layoutCellView) {
-        self.layoutCellView(cell, cellObject);
+        self.layoutCellView(cell, cellObject, indexPath);
     }
     return cell;
 }

@@ -7,7 +7,7 @@
 //
 
 #import "YSCPhotoBrowseViewCell.h"
-#import "BlocksKit/BlocksKit+UIKit.h"
+#import "BlocksKit+UIKit.h" //TODO:需要解耦
 
 @implementation YSCPhotoBrowseCellModel
 + (instancetype)createModelByImageUrl:(NSString *)imageUrl image:(UIImage *)image {

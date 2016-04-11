@@ -11,28 +11,91 @@
 
 @implementation YSCHUDManager
 
-// 显示HUD
-+ (void)showHUDLoading:(NSString *)hintString onView:(UIView *)view {
+#pragma mark - 显示HUD
++ (void)showHUDOnView:(UIView *)view
+              message:(NSString *)message
+           edgeInsets:(UIEdgeInsets)edgeInsets
+      backgroundColor:(UIColor *)backgroundColor {
     MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:view animated:YES];
-    hud.label.text = hintString;
+    if (backgroundColor) {
+        hud.backgroundColor = backgroundColor;
+    }
+    [hud mas_remakeConstraints:^(MASConstraintMaker *make) {
+        make.edges.insets(edgeInsets);
+    }];
+    hud.label.text = message;
     hud.mode = MBProgressHUDModeIndeterminate;
 }
-+ (void)showHUDLoadingOnKeyWindow:(NSString *)hintString {
-    [self showHUDLoading:hintString onView:[UIApplication sharedApplication].keyWindow];
++ (void)showHUDOnView:(UIView *)view backgroundColor:(UIColor *)backgroundColor edgeInsets:(UIEdgeInsets)edgeInsets {
+    [self showHUDOnView:view message:nil edgeInsets:edgeInsets backgroundColor:backgroundColor];
 }
 
-// 关闭HUD
-+ (void)hideHUDLoadingOnView:(UIView *)view {
++ (void)showHUDOnView:(UIView *)view message:(NSString *)message {
+    [self showHUDOnView:view
+                message:message
+             edgeInsets:UIEdgeInsetsZero
+        backgroundColor:nil];
+}
++ (void)showHUDOnView:(UIView *)view {
+    [self showHUDOnView:view
+                message:nil
+             edgeInsets:UIEdgeInsetsZero
+        backgroundColor:nil];
+}
++ (void)showHUDOnView:(UIView *)view showsMask:(BOOL)showsMask {
+    [self showHUDOnView:view
+                message:nil
+             edgeInsets:UIEdgeInsetsZero
+        backgroundColor:showsMask ? kDefaultViewColor : nil];
+}
+
++ (void)showHUDOnView:(UIView *)view message:(NSString *)message edgeInsets:(UIEdgeInsets)edgeInsets {
+    [self showHUDOnView:view
+                message:message
+             edgeInsets:edgeInsets
+        backgroundColor:nil];
+}
++ (void)showHUDOnView:(UIView *)view edgeInsets:(UIEdgeInsets)edgeInsets {
+    [self showHUDOnView:view
+                message:nil
+             edgeInsets:edgeInsets
+        backgroundColor:nil];
+}
++ (void)showHUDOnView:(UIView *)view edgeInsets:(UIEdgeInsets)edgeInsets showsMask:(BOOL)showsMask {
+    [self showHUDOnView:view
+                message:nil
+             edgeInsets:edgeInsets
+        backgroundColor:showsMask ? kDefaultViewColor : nil];
+}
+
++ (void)showHUDOnKeyWindowWithMesage:(NSString *)message {
+    [self showHUDOnView:KEY_WINDOW
+                message:message
+             edgeInsets:UIEdgeInsetsZero
+        backgroundColor:nil];
+}
++ (void)showHUDOnKeyWindow {
+    [self showHUDOnView:KEY_WINDOW
+                message:nil
+             edgeInsets:UIEdgeInsetsZero
+        backgroundColor:nil];
+}
+
+#pragma mark - 关闭HUD
++ (void)hideHUDOnView:(UIView *)view {
     MBProgressHUD *hud = [MBProgressHUD HUDForView:view];
     [hud hideAnimated:YES];
 }
-+ (void)hideHUDLoadingOnWindow {
-    [self hideHUDLoadingOnView:[UIApplication sharedApplication].keyWindow];
++ (void)hideHUDOnWindow {
+    [self hideHUDOnView:[UIApplication sharedApplication].keyWindow];
 }
 
-// 显示N秒后自动关闭HUD
+#pragma mark - 显示N秒后自动关闭HUD
 + (void)showHUDThenHide:(NSString *)text onView:(UIView *)view afterDelay:(NSTimeInterval)delay {
-    MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:view animated:YES];
+    MBProgressHUD *hud = [MBProgressHUD HUDForView:view];
+    if (nil == hud) {
+        hud = [MBProgressHUD showHUDAddedTo:view animated:YES];
+    }
     hud.label.text = text;
     hud.mode = MBProgressHUDModeText;
     [hud showAnimated:YES];

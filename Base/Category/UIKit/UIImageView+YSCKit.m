@@ -63,7 +63,7 @@ NSString * const kParamEnableDownloadImage  = @"EnableDownloadImage";
              placeholderImage:(UIImage *)placeholderImage
                    withFadeIn:(BOOL)withAnimate
                     completed:(SetImageCompletionBlock)complete {
-    @weakify(self);
+    @weakiy(self);
     //设置基本参数
     self.clipsToBounds = YES;
     NSString *newUrlString = [NSString trimString:[urlString copy]];

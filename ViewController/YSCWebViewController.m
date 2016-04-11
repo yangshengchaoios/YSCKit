@@ -91,7 +91,7 @@
 // which UIWebView does not have), authenticate using NSURLConnection, then use another UIWebView to complete
 // the loading and viewing of the page. See connection:didReceiveAuthenticationChallenge to see how this works.
 - (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType {
-    [YSCHUDManager showHUDLoading:@"" onView:self.view];
+    [YSCHUDManager showHUDOnView:self.view];
     NSString *scheme = [[request URL] scheme];
     if ([scheme isEqualToString:@"https"]) {
         //如果是https:的话，那么就用NSURLConnection来重发请求。从而在请求的过程当中吧要请求的URL做信任处理。
@@ -107,11 +107,12 @@
 }
 
 - (void)resizeWebviewHeight {
-    [YSCHUDManager hideHUDLoadingOnView:self.view];
+    [YSCHUDManager hideHUDOnView:self.view];
     WEAKSELF
-    [self bk_performAfterDelay:1.5 usingBlock:^(id  _Nonnull obj) {//延迟1.5秒可以解决：首次进入时webview.contentheight高度不正确的问题。
+    [self bk_performBlock:^(id obj) {
+        //延迟1.5秒可以解决：首次进入时webview.contentheight高度不正确的问题。
         [weakSelf.webView.scrollView scrollsToTop];
-    }];
+    } afterDelay:1.5];
 }
 - (void)webViewDidFinishLoad:(UIWebView *)webView {
     [self resizeWebviewHeight];

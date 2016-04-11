@@ -48,13 +48,7 @@
 - (void)refreshServerTimeWithBlock:(YSCObjectBlock)block;   //如果具体项目的网络请求不同就重新该方法
 
 #pragma mark - 获取配置参数(本地参数+在线参数)
-- (void)resetConfigParams;                                  //重置参数键值对(当有在线参数更新时调用)
-- (BOOL)boolFromConfigByName:(NSString *)name;
-- (float)floatFromConfigByName:(NSString *)name;
-- (NSInteger)intFromConfigByName:(NSString *)name;
-- (UIColor *)colorFromConfigByName:(NSString *)name;
-- (UIImage *)imageFromConfigByName:(NSString *)name;
-- (NSString *)stringFromConfigByName:(NSString *)name;      //在线参数值优先级 > 本地参数值
+
 
 #pragma mark - 播放音频
 - (void)playAudioWithFilePath:(NSString *)filePath;

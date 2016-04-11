@@ -598,20 +598,20 @@ NSString * const kRegexUrl = @"((http|ftp|https)://)(([a-zA-Z0-9\\._-]+\\.[a-zA-
                                                                                                  kCFStringEncodingUTF8));
 }
 
-#pragma mark - URL编码解码
+#pragma mark - URL编码解码=UTF8
 + (NSString *)URLEncode:(NSString *)string {
     RETURN_EMPTY_WHEN_OBJECT_IS_EMPTY(string)
     return [string URLEncodeString];
 }
 - (NSString *)URLEncodeString {
-    return [self stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+    return [self UTF8EncodedString];
 }
 + (NSString *)URLDecode:(NSString *)string {
     RETURN_EMPTY_WHEN_OBJECT_IS_EMPTY(string)
     return [string URLDecodeString];
 }
 - (NSString *)URLDecodeString {
-    return [self stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+    return [self UTF8DecodedString];
 }
 
 #pragma mark - 私有方法

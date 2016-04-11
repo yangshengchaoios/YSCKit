@@ -79,6 +79,7 @@ NSString * const kCachedSectionKey  = @"kCachedSectionKey";
     if (enableLoadMore) {
         WEAKSELF
         self.scrollView.mj_footer = [MJRefreshBackNormalFooter footerWithRefreshingBlock:^{
+            
             [weakSelf refreshAtPageIndex:weakSelf.currentPageIndex + 1];
         }];
     }
@@ -119,7 +120,10 @@ NSString * const kCachedSectionKey  = @"kCachedSectionKey";
         [self refreshAtPageIndex:kDefaultPageStartIndex];
     }
 }
-// 下载数据
+// 刷新列表
+- (void)refreshWithObjects:(NSObject *)objects {
+    [self refreshAtPageIndex:kDefaultPageStartIndex response:objects error:nil];
+}
 - (void)refreshAtPageIndex:(NSInteger)pageIndex {
     [self refreshAtPageIndex:pageIndex response:nil error:nil];
 }
@@ -131,7 +135,6 @@ NSString * const kCachedSectionKey  = @"kCachedSectionKey";
         if (errorMessage) {
             if (weakSelf.tipsView) {
                 weakSelf.tipsView.messageLabel.text = errorMessage;
-                weakSelf.tipsView.actionButton.hidden = NO;
                 [weakSelf.tipsView resetIconImage:weakSelf.tipsFailedIcon];
                 [weakSelf.tipsView resetActionWithButtonTitle:weakSelf.tipsButtonTitle buttonAction:^{
                     [weakSelf beginRefreshing];
@@ -254,8 +257,8 @@ NSString * const kCachedSectionKey  = @"kCachedSectionKey";
         
         resultBlock(dataArray, nil);
     };
-    YSCRequestFailed failedBlock = ^(YSCErrorType errorType, NSError *error) {
-        NSString *errorMessage = [YSCRequestInstance resolveErrorType:errorType andError:error];
+    YSCRequestFailed failedBlock = ^(NSString *YSCErrorType, NSError *error) {
+        NSString *errorMessage = [YSCRequestInstance resolveYSCErrorType:YSCErrorType andError:error];
         resultBlock(initObject, errorMessage);
     };
     

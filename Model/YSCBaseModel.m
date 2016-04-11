@@ -10,11 +10,11 @@
 #import <MJExtension/MJExtension.h>//TODO:模型映射工具需要解耦
 
 @implementation YSCBaseModel
-
+MJExtensionLogAllProperties
 + (instancetype)objectWithKeyValues:(id)keyValues {
     return [self mj_objectWithKeyValues:keyValues];
 }
-- (BOOL)isSuccess {
+- (BOOL)checkRequestIsSuccess {
     return 1 == self.state;
 }
 - (void)postNotificationWhenLoginExpired {

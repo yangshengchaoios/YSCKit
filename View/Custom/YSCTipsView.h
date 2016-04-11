@@ -12,6 +12,7 @@
 @property (weak, nonatomic) IBOutlet UILabel *messageLabel;
 @property (weak, nonatomic) IBOutlet UIButton *actionButton;
 
+#pragma mark - create
 + (instancetype)createYSCTipsViewOnView:(UIView *)contentView;
 + (instancetype)createYSCTipsViewOnView:(UIView *)contentView
                            buttonAction:(YSCBlock)buttonAction;
@@ -26,6 +27,8 @@
                                 iconImage:(UIImage *)image
                              buttonTitle:(NSString *)buttonTitle
                             buttonAction:(YSCBlock)buttonAction;
+
+#pragma mark - reset
 - (void)resetFrameWithEdgeInsets:(UIEdgeInsets)edgeInsets;
 - (void)resetActionWithButtonTitle:(NSString *)buttonTitle
                       buttonAction:(YSCBlock)buttonAction;

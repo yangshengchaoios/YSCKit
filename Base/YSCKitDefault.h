@@ -17,11 +17,11 @@
 #endif
 
 // 在线参数优先级 > 本地参数
-#define kPathDomain                 [YSCDataInstance stringFromConfigByName:@"kPathDomain"]
-#define kPathVersion                [YSCDataInstance stringFromConfigByName:@"kPathVersion"]
-#define kPathCommon                 [YSCDataInstance stringFromConfigByName:@"kPathCommon"]
-#define kCheckNewVersionType        [YSCDataInstance intFromConfigByName:@"kCheckNewVersionType"]
-#define kIsRequestEncrypted         [YSCDataInstance boolFromConfigByName:@"kIsRequestEncrypted"]
+#define kPathDomain                 [YSCConfigDataInstance stringFromConfigByName:@"kPathDomain"]
+#define kPathVersion                [YSCConfigDataInstance stringFromConfigByName:@"kPathVersion"]
+#define kPathCommon                 [YSCConfigDataInstance stringFromConfigByName:@"kPathCommon"]
+#define kCheckNewVersionType        [YSCConfigDataInstance intFromConfigByName:@"kCheckNewVersionType"]
+#define kIsRequestEncrypted         [YSCConfigDataInstance boolFromConfigByName:@"kIsRequestEncrypted"]
 
 /**
  * 基本接口地址
@@ -30,10 +30,10 @@
     #define kPathAppResUrl          kPathDomain
 #endif
 #ifndef kPathAppBaseUrl             //普通接口地址前缀，后跟版本号
-    #define kPathAppBaseUrl         [kPathDomain stringByAppendingPathComponent:kPathVersion]
+    #define kPathAppBaseUrl         [kPathDomain stringByAppendingFormat:@"/%@",kPathVersion]
 #endif
 #ifndef kPathAppCommonUrl           //公共接口地址前缀，与APP无关，与版本号无关
-    #define kPathAppCommonUrl       [kPathDomain stringByAppendingPathComponent:kPathCommon]
+    #define kPathAppCommonUrl       [kPathDomain stringByAppendingFormat:@"/%@",kPathCommon]
 #endif
 /**
  * 接口名称
@@ -67,6 +67,24 @@
 #ifndef kDefaultAppUpdateUrl        // app更新的网址
     #define kDefaultAppUpdateUrl    [@"https://itunes.apple.com/app/id" stringByAppendingString:kDefaultAppStoreId]
 #endif
+#ifndef kDefaultRequestTimeOut      //网络请求超时时间(s)
+    #define kDefaultRequestTimeOut  15.0f
+#endif
+
+/**
+ * 开关控制
+ */
+#ifndef kIsUseHttpHeaderSignature       //是否启用httpHeader的signature变量
+    #define kIsUseHttpHeaderSignature   1
+#endif
+#ifndef kIsUseHttpHeaderToken           //是否启用httpHeader的httpToken变量
+    #define kIsUseHttpHeaderToken       1
+#endif
+#ifndef kIsAutoRefuseWhenRequesting     //是否自动拒绝完全重复的网络请求
+    #define kIsAutoRefuseWhenRequesting 1
+#endif
+
+
 
 
 /**
@@ -128,10 +146,5 @@
 #endif
 //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
-
-//TODO:封装在网络请求层
-#define kDefaultRequestTimeOut  18.0f
-#define kDefaultMD5SecretKey    [YSCDataInstance stringFromConfigByName:@"kDefaultMD5SecretKey"]
-#define kDefaultAESSecretKey    [YSCDataInstance stringFromConfigByName:@"kDefaultMD5SecretKey"]
 
 #endif /* YSCKitConstant_h */

@@ -41,10 +41,10 @@
 }
 
 // 解析错误信息
-- (NSString *)resolveErrorType:(YSCErrorType)errorType andError:(NSError *)error {
-    NSMutableString *errMsg = [NSMutableString stringWithFormat:@"\r>>>>>>>>>>>>>>>>>>>>ErrorType[%ld]>>>>>>>>>>>>>>>>>>>>\r", (long)errorType];//错误标记开始
+- (NSString *)resolveYSCErrorType:(NSString *)errorType andError:(NSError *)error {
+    NSMutableString *errMsg = [NSMutableString stringWithString:@"\r>>>>>>>>>>>>>>>>>>>>ErrorType[0]>>>>>>>>>>>>>>>>>>>>\r"];//错误标记开始
     NSString *messageTitle = @"提示";
-    NSString *messageDetail = [self resolveErrorType:errorType];
+    NSString *messageDetail = errorType;
     if (OBJECT_IS_EMPTY(messageDetail)) {
         messageDetail = error.userInfo[NSLocalizedDescriptionKey];
     }
@@ -57,42 +57,9 @@
     if (error) {
         [errMsg appendFormat:@"  errorCode:%ld\r  errorMessage:%@\r", (long)error.code, error];//显示error的错误内容
     }
-    [errMsg appendFormat:@"<<<<<<<<<<<<<<<<<<<<ErrorType[%ld]<<<<<<<<<<<<<<<<<<<<\r\n", (long)errorType];//错误标记结束
+    [errMsg appendString:@"<<<<<<<<<<<<<<<<<<<<ErrorType[0]<<<<<<<<<<<<<<<<<<<<\r\n"];//错误标记结束
     NSLog(@"error message=%@", errMsg);
     return messageDetail;
-}
-- (NSString *)resolveErrorType:(YSCErrorType)errorType {
-    if (YSCErrorTypeDisconnected == errorType) {
-        return @"网络未连接";
-    }
-    else if (YSCErrorTypeConnectionFailed == errorType) {
-        return @"网络连接失败";
-    }
-    else if (YSCErrorTypeServerFailed == errorType) {
-        return @"服务器连接失败";
-    }
-    else if (YSCErrorTypeInternalServer == errorType) {
-        return @"";//NOTE:需要进一步解析dataModel.state 和 message
-    }
-    else if (YSCErrorTypeRequesFailed == errorType) {
-        return @"创建网络请求失败";
-    }
-    else if (YSCErrorTypeCopyFileFailed == errorType) {
-        return @"拷贝文件失败";
-    }
-    else if (YSCErrorTypeURLInvalid == errorType) {
-        return @"网络请求的URL不合法";
-    }
-    else if (YSCErrorTypeDataEmpty == errorType) {
-        return @"返回数据为空";
-    }
-    else if (YSCErrorTypeDataMappingFailed == errorType) {
-        return @"数据映射本地模型失败";
-    }
-    else if (YSCErrorTypeLoginExpired == errorType) {
-        return @"登录过期";
-    }
-    return @"";
 }
 
 // 常用网络请求方法
@@ -123,15 +90,10 @@
                         type:(YSCRequestType)type
                      success:(YSCRequestSuccess)success
                       failed:(YSCRequestFailed)failed {
-    //0. url组装、参数格式化
-    NSString *tempApiName = [@"/" stringByAppendingPathComponent:apiName];//组装完整的url地址
-    url = [url stringByAppendingString:tempApiName];
-    
-    //1. 调用网络访问通用方法
-    return [self requestFromUrl:url params:params customModel:[YSCBaseModel class] imageData:imageData type:type success:^(id responseObject) {
+    return [self requestFromUrl:url withApi:apiName params:params customModel:[YSCBaseModel class] imageData:imageData type:type success:^(id responseObject) {
         YSCBaseModel *baseModel = responseObject;
         if (baseModel && [baseModel isKindOfClass:[YSCBaseModel class]]) {
-            if ([baseModel isSuccess]) {//接口访问成功，开始解析data模型
+            if ([baseModel checkRequestIsSuccess]) {//接口访问成功，开始解析data模型
                 NSObject *dataObject = baseModel.data;
                 if (dataObject && dataModel && [[dataModel class] respondsToSelector:@selector(objectWithKeyValues:)]) {
                     dataObject = [dataModel objectWithKeyValues:dataObject];
@@ -142,7 +104,7 @@
                     }
                     else {
                         if (failed) {
-                            failed(YSCErrorTypeDataMappingFailed, CREATE_NSERROR(@"数据映射出错"));
+                            failed(YSCErrorTypeDataMappingFailed, nil);
                         }
                     }
                 }
@@ -155,13 +117,15 @@
             else {
                 [baseModel postNotificationWhenLoginExpired];
                 if (failed) {
-                    failed(YSCErrorTypeInternalServer, CREATE_NSERROR_WITH_Code(baseModel.state, baseModel.message));
+                    NSInteger state = baseModel.state;
+                    NSString *message = TRIM_STRING(baseModel.message);
+                    failed(YSCErrorTypeInternalServer, CREATE_NSERROR_WITH_Code(state, message));
                 }
             }
         }
         else {
             if (failed) {
-                failed(YSCErrorTypeDataMappingFailed, CREATE_NSERROR(@"数据映射出错"));
+                failed(YSCErrorTypeDataMappingFailed, nil);
             }
         }
     } failed:failed];
@@ -169,13 +133,14 @@
 
 // 处理自定义模型的映射，将映射好的自定义模型往上层抛
 - (NSString *)requestFromUrl:(NSString *)url
+                     withApi:(NSString *)apiName
                       params:(NSDictionary *)params
                  customModel:(Class)customModel
                    imageData:(NSData *)imageData
                         type:(YSCRequestType)type
                      success:(YSCRequestSuccess)success
                       failed:(YSCRequestFailed)failed {
-    return [self requestFromUrl:url params:params imageData:imageData type:type success:^(id responseObject) {
+    return [self requestFromUrl:url withApi:apiName params:params imageData:imageData type:type success:^(id responseObject) {
         NSObject *model = responseObject;
         if (customModel && [[customModel class] respondsToSelector:@selector(objectWithKeyValues:)]) {
             model = [customModel objectWithKeyValues:responseObject];
@@ -186,7 +151,7 @@
             }
             else {
                 if (failed) {
-                    failed(YSCErrorTypeDataMappingFailed, CREATE_NSERROR(@"数据映射出错"));
+                    failed(YSCErrorTypeDataMappingFailed, nil);
                 }
             }
         }
@@ -200,56 +165,79 @@
 
 // 通用的GET、POST和上传图片（返回最原始的未经过任何映射的JSON字符串）
 - (NSString *)requestFromUrl:(NSString *)url
+                     withApi:(NSString *)apiName
                       params:(NSDictionary *)params
                    imageData:(NSData *)imageData
                         type:(YSCRequestType)requestType
                      success:(YSCRequestSuccess)success
                       failed:(YSCRequestFailed)failed {
-    //0. 判断网络状态、判断url合法性
+    //0. url组装、判断网络状态、判断url合法性
     if (NO == YSCDataInstance.isReachable) {
         if (failed) {
-            failed(YSCErrorTypeDisconnected, CREATE_NSERROR(@"网络未连接"));
+            failed(YSCErrorTypeDisconnected, nil);
         }
         return @"";
     }
+    url = [self _formatRequestUrl:url withApi:apiName];
     if (NO == [NSString isUrl:url]) {
         if (failed) {
-            failed(YSCErrorTypeURLInvalid, CREATE_NSERROR(@"url不合法"));
+            failed(YSCErrorTypeURLInvalid, nil);
         }
         return @"";
     }
-    NSDictionary *formatedParams = [self _formatRequestParams:params];//格式化所有请求的参数
+    NSString *requestId = [self _createRequestIdByUrl:url withApi:apiName params:params type:requestType];
+    // 自动处理重复请求
+    
+    if (self.requestQueue[requestId]) {
+        #if kIsAutoRefuseWhenRequesting
+        NSLog(@"The same requstId[%@] is still running!\rurl:%@\rapi:%@\rparams:%@\rtype:%ld",
+              requestId, url, apiName, params, requestType);
+        if (failed) {
+            failed(YSCErrorTypeRequesting, nil);
+        }
+        return @"";
+        #else
+        [self removeRequestById:requestId];//自定停止之前的相同网络请求
+        #endif
+    }
+    NSDictionary *formatedParams = [self _formatRequestParams:params withApi:apiName andUrl:url];//格式化所有请求的参数
     
     //1. 组装manager
     AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];
-    manager.responseSerializer = [AFHTTPResponseSerializer serializer];
+    manager.securityPolicy.allowInvalidCertificates = YES;
+    manager.responseSerializer = [AFJSONResponseSerializer serializer];
+    manager.responseSerializer.acceptableContentTypes = [NSSet setWithObjects:@"application/json", @"text/json", @"text/javascript",@"text/html", @"text/plain", @"audio/wav", nil];
+    manager.requestSerializer = [AFJSONRequestSerializer serializer];
     manager.requestSerializer.cachePolicy = NSURLRequestReloadIgnoringLocalCacheData;
-    manager.requestSerializer.timeoutInterval = kDefaultRequestTimeOut;//设置POST和GET的超时时间
-    //解决返回的Content-Type始终是application/xml问题！
-    [manager.requestSerializer setValue:@"application/xml" forHTTPHeaderField:@"Accept"];
-    //    [manager.requestSerializer setValue:@"gzip" forHTTPHeaderField:@"Accept-Encoding"];//TODO:压缩上传内容
+    manager.requestSerializer.timeoutInterval = kDefaultRequestTimeOut;
+//    [manager.requestSerializer setValue:@"gzip" forHTTPHeaderField:@"Accept-Encoding"];//TODO:压缩上传内容
+    #if kIsUseHttpHeaderSignature
     [manager.requestSerializer setValue:[self _signatureParams:formatedParams] forHTTPHeaderField:kParamSignature];
+    #endif
+    
+    #if kIsUseHttpHeaderToken
     [manager.requestSerializer setValue:[self _httpToken] forHTTPHeaderField:kParamHttpToken];
+    #endif
     
     //2. 配置网络请求参数
     NSMutableURLRequest *mutableRequest = nil;
     NSError *serializationError = nil;
     if (YSCRequestTypeGET == requestType) {
-        NSLog(@"getting data from url[%@]", url);
+        NSLog(@"getting data from url:\r%@?%@", url, [self _queryRequestParams:formatedParams]);
         mutableRequest = [manager.requestSerializer requestWithMethod:@"GET"
                                                             URLString:url
                                                            parameters:formatedParams
                                                                 error:&serializationError];
     }
     else if (YSCRequestTypePOST == requestType) {
-        NSLog(@"posting data to url[%@]", url);
+        NSLog(@"posting data to url:\r%@", url);
         mutableRequest = [manager.requestSerializer requestWithMethod:@"POST"
                                                             URLString:url
                                                            parameters:formatedParams
                                                                 error:&serializationError];
     }
     else if (YSCRequestTypeUploadFile == requestType) {
-        NSLog(@"uploading data to url[%@]", url);
+        NSLog(@"uploading data to url:\r%@", url);
         mutableRequest = [manager.requestSerializer multipartFormRequestWithMethod:@"POST"
                                                                          URLString:url
                                                                         parameters:formatedParams
@@ -259,7 +247,7 @@
                                                                              error:&serializationError];
     }
     else if (YSCRequestTypePostBodyData == requestType) {
-        NSLog(@"posting bodydata to url[%@]", url);
+        NSLog(@"posting bodydata to url:\r%@", url);
         NSString *bodyParam = [NSString jsonStringWithObject:formatedParams];
         bodyParam = [self _encryptPostBodyParam:bodyParam];
         mutableRequest = [manager.requestSerializer requestWithMethod:@"POST"
@@ -285,9 +273,8 @@
     
     //4. 开始网络请求并返回requestId
     if (mutableRequest) {
-        @weakify(self)
+        @weakiy(self)
         NSURLSessionTask *task = [manager dataTaskWithRequest:mutableRequest completionHandler:^(NSURLResponse * _Nonnull response, id  _Nullable responseObject, NSError * _Nullable error) {
-            NSString *requestId = [NSString stringWithFormat:@"%ld", [task hash]];
             [weak_self.requestQueue removeObjectForKey:requestId];//移除网络请求
             if (error) {
                 if (200 != ((NSHTTPURLResponse *)response).statusCode) {
@@ -310,14 +297,13 @@
                 }
                 else {
                     if (failed) {
-                        failed(YSCErrorTypeDataEmpty, CREATE_NSERROR(@"返回数据为空"));
+                        failed(YSCErrorTypeReturnEmptyData, nil);
                     }
                 }
             }
         }];
         [task resume];
-        NSString *requestId = [NSString stringWithFormat:@"%ld", [task hash]];
-        self.requestQueue[requestId] = task;
+        self.requestQueue[requestId] = task;//加入网络请求队列
         return requestId;
     }
     else {
@@ -325,8 +311,17 @@
     }
 }
 
+
+#pragma mark - private methods
+// 格式化请求的url地址
+- (NSString *)_formatRequestUrl:(NSString *)url withApi:(NSString *)apiName {
+    NSString *tempApiName = [@"/" stringByAppendingPathComponent:apiName];//组装完整的url地址
+    return [url stringByAppendingString:tempApiName];
+}
 // 格式化请求参数
-- (NSDictionary *)_formatRequestParams:(NSDictionary *)params {
+- (NSDictionary *)_formatRequestParams:(NSDictionary *)params
+                               withApi:(NSString *)apiName
+                                andUrl:(NSString *)url {
     NSMutableDictionary *newDictParam = [NSMutableDictionary dictionary];
     for (NSString *key in params.allKeys) {
         NSObject *value = params[key];
@@ -354,6 +349,10 @@
     NSString *newString = [NSString stringWithFormat:@"%@%@", joinedString, TRIM_STRING(self.signatureSecretKey)];
     NSString *signature = [[NSString MD5Encrypt:newString] lowercaseString];
     return signature;
+}
+// 将请求参数拼接成url字符串
+- (NSString *)_queryRequestParams:(NSDictionary *)params {
+    return AFQueryStringFromParameters(params);
 }
 // 计算httpToken参数值
 - (NSString *)_httpToken {
@@ -391,9 +390,11 @@
     if ([responseObject isKindOfClass:[NSData class]]) {
         resolvedString = [[NSString alloc] initWithData:responseObject encoding:NSUTF8StringEncoding];
     }
-    if ([responseObject isKindOfClass:[NSString class]]) {
-        resolvedString = [NSString replaceString:responseObject byRegex:@"[\r\n\t]" to:@""];
+    else if ([responseObject isKindOfClass:[NSDictionary class]] ||
+             [responseObject isKindOfClass:[NSArray class]]) {
+        resolvedString = [NSString jsonStringWithObject:responseObject];
     }
+    
     if (OBJECT_ISNOT_EMPTY(resolvedString) &&
         OBJECT_ISNOT_EMPTY(self.requestSecretKey) &&
         NO == [resolvedString isContains:@"{"]) {//这里兼容了返回内容没有加密的情况
@@ -403,6 +404,15 @@
     formatedJsonString = OBJECT_IS_EMPTY(formatedJsonString) ? resolvedString : formatedJsonString;
     NSLog(@"resolvedString=\r%@", formatedJsonString);
     return resolvedString;
+}
+// 计算请求任务的唯一编号
+- (NSString *)_createRequestIdByUrl:(NSString *)url
+                            withApi:(NSString *)apiName
+                             params:(NSDictionary *)params
+                               type:(YSCRequestType)requestType {
+    NSString *paramsStr = [NSString jsonStringWithObject:params];
+    NSString *tempStr = [NSString stringWithFormat:@"%@_%@_%@_%ld", url, apiName, paramsStr, requestType];
+    return [tempStr MD5EncryptString];
 }
 @end
 

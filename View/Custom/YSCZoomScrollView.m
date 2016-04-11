@@ -7,7 +7,7 @@
 //
 
 #import "YSCZoomScrollView.h"
-#import "BlocksKit/BlocksKit+UIKit.h"
+#import "BlocksKit+UIKit.h" //TODO:需要解耦
 @interface YSCZoomScrollView ()
 @property (nonatomic, strong) UIImageView *photoImageView;
 @end

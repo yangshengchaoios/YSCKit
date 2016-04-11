@@ -8,7 +8,7 @@
 
 #import "YSCManager.h"
 #import <SystemConfiguration/CaptiveNetwork.h>
-#import "BlocksKit/BlocksKit+UIKit.h"
+#import "BlocksKit+UIKit.h" //TODO:需要解耦
 
 //检测新版本的几种方法
 typedef NS_ENUM(NSInteger, CheckNewVersionType) {
@@ -46,7 +46,7 @@ typedef NS_ENUM(NSInteger, CheckNewVersionType) {
                                            [self checkNewVersionOnAppStore];
                                        }
                                    }
-                                    failed:^(YSCErrorType errorType, NSError *error) {
+                                    failed:^(NSString *YSCErrorType, NSError *error) {
                                         [self checkNewVersionOnAppStore];
                                     }];
     }

@@ -16,14 +16,13 @@
 
 - (void)awakeFromNib {
     [super awakeFromNib];
-    self.backgroundColor = [UIColor clearColor];
+    self.backgroundColor = kDefaultViewColor;
     self.actionButton.backgroundColor = [UIColor redColor];//默认按钮背景色
-    [self resetConstraintOfView];
-    [self resetFontSizeOfView];
-    
-    [UIView makeRoundForView:self.actionButton withRadius:5];
+    [self resetSize];
+    [self.actionButton addCornerWithRadius:AUTOLAYOUT_LENGTH(5)];
 }
 
+#pragma mark - create
 + (instancetype)createYSCTipsViewOnView:(UIView *)contentView {
     return [self createYSCTipsViewOnView:contentView buttonAction:nil];
 }
@@ -63,44 +62,37 @@
     tipsView.iconImageView.image = image;
     tipsView.messageLabel.text = message;
     [tipsView.actionButton setTitle:buttonTitle forState:UIControlStateNormal];
-    if (buttonAction) {
-        [tipsView.actionButton bk_addEventHandler:^(id sender) {
+    [tipsView.actionButton addTouchUpInsideEventBlock:^(id sender) {
+        if (buttonAction) {
             buttonAction();
-        } forControlEvents:UIControlEventTouchUpInside];
-    }
+        }
+    }];
     
     // 2. 设置tipsview的位置和大小
-    tipsView.left = edgeInsets.left;
-    tipsView.top = edgeInsets.top;
-    tipsView.width = contentView.width - edgeInsets.left - edgeInsets.right;
-    tipsView.height = contentView.height - edgeInsets.top - edgeInsets.bottom;
     [contentView addSubview:tipsView];
+    [tipsView resetFrameWithEdgeInsets:edgeInsets];
     return tipsView;
 }
 
+#pragma mark - reset
 - (void)resetFrameWithEdgeInsets:(UIEdgeInsets)edgeInsets {
-    UIView *contentView = self.superview;
-    self.left = edgeInsets.left;
-    self.top = edgeInsets.top;
-    self.width = contentView.width - edgeInsets.left - edgeInsets.right;
-    self.height = contentView.height - edgeInsets.top - edgeInsets.bottom;
+    if (self.superview) {
+        [self mas_remakeConstraints:^(MASConstraintMaker *make) {
+            make.edges.insets(edgeInsets);
+        }];
+    }
 }
 - (void)resetActionWithButtonTitle:(NSString *)buttonTitle
                       buttonAction:(YSCBlock)buttonAction {
-    if (OBJECT_ISNOT_EMPTY(TRIM_STRING(buttonTitle))) {
-        [self.actionButton setTitle:buttonTitle forState:UIControlStateNormal];
-    }
-    if (buttonAction) {
-        [self.actionButton bk_removeEventHandlersForControlEvents:UIControlEventTouchUpInside];
-        [self.actionButton bk_addEventHandler:^(id sender) {
+    self.actionButton.hidden = NO;
+    [self.actionButton setTitle:buttonTitle forState:UIControlStateNormal];
+    [self.actionButton reAddTouchUpInsideEventBlock:^(id sender) {
+        if (buttonAction) {
             buttonAction();
-        } forControlEvents:UIControlEventTouchUpInside];
-    }
+        }
+    }];
 }
 - (void)resetIconImage:(NSString *)imageName {
-    UIImage *image = [UIImage imageNamed:imageName];
-    if (imageName) {
-        self.iconImageView.image = image;
-    }
+    self.iconImageView.image = [UIImage imageNamed:imageName];
 }
 @end

@@ -15,9 +15,11 @@ NSString * const kParamItemCellIdentifier   = @"YSCKit_ItemCell";
 - (void)awakeFromNib {
     [super awakeFromNib];
     
+    self.backgroundColor = [UIColor whiteColor];
+    self.contentView.backgroundColor = [UIColor whiteColor];
+    
     self.clipsToBounds = YES;
-    [self resetFontSizeOfView];
-    [self resetConstraintOfView];
+    [self resetSize];
 }
 
 #pragma mark - 注册与重用

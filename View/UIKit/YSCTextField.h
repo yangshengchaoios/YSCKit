@@ -49,7 +49,7 @@ typedef NS_ENUM(NSInteger, YSCTextType) {
 @property (nonatomic, assign) IBInspectable BOOL allowsEmpty;           //default NO
 @property (nonatomic, assign) IBInspectable BOOL allowsEmoji;           //default NO 所有的emoji
 @property (nonatomic, assign) IBInspectable BOOL allowsSimpleEmoji;     //default NO 常用的emoji
-@property (nonatomic, assign) IBInspectable BOOL allowsChinese;         //default NO
+@property (nonatomic, assign) IBInspectable BOOL allowsChinese;         //default NO 
 @property (nonatomic, assign) IBInspectable BOOL allowsPunctuation;     //default NO 标点符号(全)
 @property (nonatomic, assign) IBInspectable BOOL allowsKeyboardDone;    //default YES 是否响应键盘的done按钮
 @property (nonatomic, assign) IBInspectable BOOL allowsLetter;          //default YES
