@@ -49,5 +49,6 @@
 
 // ViewController
 #import "YSCBaseViewController.h"
+#import "YSCBaseNavigationViewController.h"
 
 #endif /* YSCKitBase_h */

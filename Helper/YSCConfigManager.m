@@ -38,10 +38,6 @@
                                                            NSFontAttributeName : kDefaultNaviBarItemFont}
                                                 forState:UIControlStateNormal];
 }
-+ (void)configPullToBack {
-    //    [MLBlackTransition validatePanPackWithMLBlackTransitionGestureRecognizerType:MLBlackTransitionGestureRecognizerTypeScreenEdgePan];
-    //TODO:测试自带的拖动返回功能
-}
 + (void)registerForRemoteNotification {
     UIApplication *application = [UIApplication sharedApplication];
     if ([application respondsToSelector:@selector(registerForRemoteNotifications)]) {

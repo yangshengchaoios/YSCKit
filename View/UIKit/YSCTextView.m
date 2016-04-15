@@ -7,16 +7,36 @@
 //
 
 #import "YSCTextView.h"
-#import "YSCTextDelegate.h"
 #import "Masonry.h"
-@interface YSCTextView () <UITextViewDelegate>
+
+/** YSCTextView专有delegate */
+@interface YSCTextViewDelegate : NSObject <UITextViewDelegate>  @end
+@implementation YSCTextViewDelegate
+- (BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text {
+    YSCTextView *yscTextView = (YSCTextView *)textView;
+    if ([textView isFirstResponder]) {
+        if (yscTextView.keyboardDoneBlock) {
+            yscTextView.keyboardDoneBlock(yscTextView.textString);
+        }
+        if(yscTextView.allowsKeyboardDismiss && [text isEqualToString:@"\n"]) {
+            [textView resignFirstResponder];
+            return NO;
+        }
+    }
+    return YES;
+}
+@end
+
+
+/** 重新封装UITextView */
+@interface YSCTextView ()
 @property (nonatomic, copy) NSString *oldString;
 @property (nonatomic, strong) UILabel *placeholderLabel;    //显示占位信息的label
 @property (nonatomic, strong) UILabel *remainingLabel;      //显示剩余字符数的label
+@property (nonatomic, strong) YSCTextViewDelegate *customDelegate;
 @end
 
 @implementation YSCTextView
-
 - (void)dealloc {
     self.delegate = nil;
     REMOVE_ALL_OBSERVERS(self);
@@ -44,7 +64,7 @@
     self.allowsSimpleEmoji = NO;
     self.allowsChinese = YES;
     self.allowsPunctuation = YES;
-    self.allowsKeyboardDone = YES;
+    self.allowsKeyboardDismiss = YES;
     self.allowsLetter = YES;
     self.allowsNumber = YES;
     self.stringLengthType = YES;
@@ -82,8 +102,11 @@
     self.remainingTextColor = kDefaultPlaceholderColor;
     self.maxLength = 400;
     
-    self.backgroundColor = [UIColor whiteColor];
-    self.delegate = [YSCTextDelegate sharedInstance];
+    if (nil == self.backgroundColor) {
+        self.backgroundColor = [UIColor whiteColor];
+    }
+    self.customDelegate = [YSCTextViewDelegate new];
+    self.delegate = self.customDelegate;
     self.oldString = @"";
     ADD_OBSERVER_WITH_OBJECT(@selector(textViewChanged:), UITextViewTextDidChangeNotification, self);
 }
@@ -134,6 +157,9 @@
             }
         }
         self.remainingCount = self.maxLength - [self textLength];
+        if (self.changedBlock) {
+            self.changedBlock(textView.text);
+        }
     }
 }
 //只检测配置属性 ok -> err

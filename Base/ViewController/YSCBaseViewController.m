@@ -9,15 +9,32 @@
 #import "YSCBaseViewController.h"
 
 @implementation YSCBaseViewController
+- (void)dealloc {
+    NSLog(@"[%@] is dealloc......", NSStringFromClass(self.class));
+    if (self.customTitleView) {
+        [self.customTitleView removeFromSuperview];
+        self.customTitleView = nil;
+    }
+    if (self.tipsView) {
+        [self.tipsView removeFromSuperview];
+        self.tipsView = nil;
+    }
+    [[NSNotificationCenter defaultCenter] removeObserver:self]; //等同于宏定义  removeAllObservers(self);
+}
 - (void)viewWillAppear:(BOOL)animated {
 	[super viewWillAppear:animated];
     if (self.customTitleView) {
         [self.view bringSubviewToFront:self.customTitleView];
     }
+    else {
+        BOOL isBarHidden = [self.params[kParamIsHideNavBar] boolValue];
+        if (isBarHidden != self.navigationController.navigationBar.hidden) {
+            [self.navigationController setNavigationBarHidden:isBarHidden animated:animated];
+        }
+    }
     if (self.tipsView) {
         [self.view bringSubviewToFront:self.tipsView];
     }
-    [self.navigationController setNavigationBarHidden:[self.params[kParamIsHideNavBar] boolValue] animated:animated];
     self.isAppeared = YES;
     YSCDataInstance.currentViewController = self;
     NSLog(@"%@ will appear", NSStringFromClass(self.class));
@@ -29,18 +46,6 @@
 	self.isAppeared = NO;
     [super viewDidDisappear:animated];
 }
-- (void)dealloc {
-	NSLog(@"[%@] is dealloc......", NSStringFromClass(self.class));
-    if (self.customTitleView) {
-        [self.customTitleView removeFromSuperview];
-        self.customTitleView = nil;
-    }
-    if (self.tipsView) {
-        [self.tipsView removeFromSuperview];
-        self.tipsView = nil;
-    }
-	[[NSNotificationCenter defaultCenter] removeObserver:self]; //等同于宏定义  removeAllObservers(self);
-}
 // 初始化
 - (void)viewDidLoad {
 	[super viewDidLoad];
@@ -51,7 +56,7 @@
     self.block = self.params[kParamBlock];
     //相对布局——自动调整约束值和font大小
     if (1 != AUTOLAYOUT_SCALE &&
-        NO == [self respondsToSelector:@selector(setCloseResetFontAndConstraint:)]) {
+        ( ! [self respondsToSelector:@selector(setCloseResetFontAndConstraint:)])) {
         [self.view resetSize];
     }
     //设置title
@@ -65,14 +70,14 @@
     }
     //设置tipsview
     self.tipsView = [YSCTipsView createYSCTipsViewOnView:self.view];
+    self.tipsView.hidden = YES;
     if (self.customTitleView) {
         [self.tipsView resetFrameWithEdgeInsets:UIEdgeInsetsMake(64, 0, 0, 0)];
     }
-    self.tipsView.hidden = YES;
-    
-    //设置返回按钮类型
-    if (NO == [self.params[kParamIsHideNavBar] boolValue]) {
-        [self _configBackButton];
+    else {
+        if ( ! [self.params[kParamIsHideNavBar] boolValue]) {
+            [self _configBackButton];//设置返回按钮类型
+        }
     }
     
     //监控APP运行状态(恢复运行、按下home键进入后台)
@@ -82,36 +87,18 @@
 //设置title
 - (void)_configTitleView {
     if (OBJECT_ISNOT_EMPTY(self.customTitleViewName)) {
-        if ([NSClassFromString(self.customTitleViewName) respondsToSelector:@selector(createTitleView)]) {
-            self.customTitleView = [NSClassFromString(self.customTitleViewName) performSelector:@selector(createTitleView) withObject:nil];
+        Class class = NSClassFromString(self.customTitleViewName);
+        if ([class respondsToSelector:@selector(createTitleView)]) {
+            self.customTitleView = [class performSelector:@selector(createTitleView) withObject:nil];
         }
         if (self.customTitleView) {
             //添加自定义title view
             [self.view addSubview:self.customTitleView];
             //强制隐藏系统navi bar
             self.params[kParamIsHideNavBar] = @YES;
-            //设置自定义title view的title
-            if ([self.customTitleView respondsToSelector:@selector(setTitle:)]) {
-                [self.customTitleView performSelector:@selector(setTitle:)
-                                           withObject:TRIM_STRING(self.params[kParamTitle])];
-            }
-            //设置返回事件
-            if ([self.customTitleView respondsToSelector:@selector(setGoBackBlock:)]) {
-                @weakiy(self);
-                YSCBlock block = ^{
-                    [weak_self backViewController];
-                };
-                [self.customTitleView performSelector:@selector(setGoBackBlock:)
-                                           withObject:block];
-            }
         }
     }
-    else {
-        if (OBJECT_IS_EMPTY(self.navigationItem.title) &&
-            OBJECT_ISNOT_EMPTY(self.params[kParamTitle])) {
-            self.navigationItem.title = TRIM_STRING(self.params[kParamTitle]);
-        }
-    }
+    [self resetTitle:self.params[kParamTitle]];
 }
 // 配置返回按钮
 - (void)_configBackButton {
@@ -131,7 +118,7 @@
         self.navigationItem.leftBarButtonItem = barButtonItem;
         
 	}
-    else if (BackArrowTypeSystemWithNoText == self.backArrowType) {
+    else if (BackArrowTypeSystemWithoutText == self.backArrowType) {
         UIBarButtonItem *temporaryBarButtonItem = [[UIBarButtonItem alloc] init];
         temporaryBarButtonItem.title = @"";//去掉返回按钮的文字
         self.navigationItem.backBarButtonItem = temporaryBarButtonItem;
@@ -144,14 +131,16 @@
 }
 // 重新设置title
 - (void)resetTitle:(NSString *)title {
-    if ([self.params[kParamIsHideNavBar] boolValue]) {
+    if (self.customTitleView) {
         if ([self.customTitleView respondsToSelector:@selector(setTitle:)]) {
             [self.customTitleView performSelector:@selector(setTitle:)
                                        withObject:TRIM_STRING(title)];
         }
     }
-    else if (OBJECT_ISNOT_EMPTY(self.customTitleViewName)) {
-        self.navigationItem.title = TRIM_STRING(title);
+    else {
+        if ( ! [self.params[kParamIsHideNavBar] boolValue]) {
+            self.navigationItem.title = TRIM_STRING(title);
+        }
     }
 }
 

@@ -584,7 +584,7 @@ NSString * const kRegexUrl = @"((http|ftp|https)://)(([a-zA-Z0-9\\._-]+\\.[a-zA-
     return (NSString *)CFBridgingRelease(CFURLCreateStringByAddingPercentEscapes(kCFAllocatorDefault,
                                                                                  (CFStringRef)self,
                                                                                  NULL,
-                                                                                 CFSTR("!*'();:@&=+$,/?%#[]"),
+                                                                                 CFSTR("!*'();@&=+$,?%#[]"),
                                                                                  kCFStringEncodingUTF8));
 }
 + (NSString *)UTF8Decoded:(NSString *)string {
@@ -604,7 +604,14 @@ NSString * const kRegexUrl = @"((http|ftp|https)://)(([a-zA-Z0-9\\._-]+\\.[a-zA-
     return [string URLEncodeString];
 }
 - (NSString *)URLEncodeString {
-    return [self UTF8EncodedString];
+    
+    return  [self stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+
+//    return (NSString *)CFBridgingRelease(CFURLCreateStringByAddingPercentEscapes(kCFAllocatorDefault,
+//                                                                                 (CFStringRef)self,
+//                                                                                 NULL,
+//                                                                                 CFSTR("/?#[]@!$ &'()*+,;=\"<>%{}|\\^~`"),
+//                                                                                 kCFStringEncodingUTF8));
 }
 + (NSString *)URLDecode:(NSString *)string {
     RETURN_EMPTY_WHEN_OBJECT_IS_EMPTY(string)
@@ -613,6 +620,22 @@ NSString * const kRegexUrl = @"((http|ftp|https)://)(([a-zA-Z0-9\\._-]+\\.[a-zA-
 - (NSString *)URLDecodeString {
     return [self UTF8DecodedString];
 }
+#pragma mark - bin2hex
++ (NSString *)hexFromString:(NSString *)string {
+    NSUInteger len = [string length];
+    unichar *chars = malloc(len * sizeof(unichar));
+    [string getCharacters:chars];
+    NSMutableString *hexString = [[NSMutableString alloc] init];
+    for(NSUInteger i = 0; i < len; i++ ) {
+        [hexString appendString:[NSString stringWithFormat:@"%x", chars[i]]];
+    }
+    free(chars);
+    return hexString;
+}
++ (NSString *)stringFromHex:(NSString *)hexString {
+    return hexString;//TODO:
+}
+
 
 #pragma mark - 私有方法
 /**

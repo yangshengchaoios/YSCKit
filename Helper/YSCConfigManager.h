@@ -10,6 +10,5 @@
 
 @interface YSCConfigManager : NSObject
 + (void)configNavigationBar:(UINavigationBar *)navigationBar;
-+ (void)configPullToBack;
 + (void)registerForRemoteNotification;
 @end

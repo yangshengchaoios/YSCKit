@@ -18,7 +18,7 @@
 @property (nonatomic, assign) IBInspectable BOOL allowsSimpleEmoji;     //default NO 常用的emoji
 @property (nonatomic, assign) IBInspectable BOOL allowsChinese;         //default YES
 @property (nonatomic, assign) IBInspectable BOOL allowsPunctuation;     //default YES 标点符号(全)
-@property (nonatomic, assign) IBInspectable BOOL allowsKeyboardDone;    //default YES 是否响应键盘的done按钮
+@property (nonatomic, assign) IBInspectable BOOL allowsKeyboardDismiss; //default YES 点击done 键盘是否隐藏
 @property (nonatomic, assign) IBInspectable BOOL allowsLetter;          //default YES
 @property (nonatomic, assign) IBInspectable BOOL allowsNumber;          //default YES
 @property (nonatomic, assign) IBInspectable BOOL stringLengthType;      //YES-string.length NO-char length default YES
@@ -29,6 +29,10 @@
 @property (nonatomic, strong) IBInspectable NSString *placeholderString;//
 @property (nonatomic, strong) IBInspectable UIColor *placeholderColor;  //
 @property (nonatomic, strong) IBInspectable UIColor *remainingTextColor;//
+
+//blocks
+@property (nonatomic, copy) YSCObjectBlock changedBlock;
+@property (nonatomic, copy) YSCObjectBlock keyboardDoneBlock;
 
 //外面可以监听这个属性的变化
 @property (nonatomic, assign) NSInteger remainingCount;     //剩余字符数

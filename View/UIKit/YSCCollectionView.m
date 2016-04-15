@@ -44,7 +44,7 @@ UICollectionViewDelegateFlowLayout>
     self.helper.enableRefresh = YES;
     self.helper.enableLoadMore = YES;
     self.helper.enableTips = YES;
-    self.cellEdgeInsets = AUTOLAYOUT_EDGEINSETS(20, 20, 0, 20);
+    self.cellEdgeInsets = AUTOLAYOUT_EDGEINSETS_TLBR(20, 20, 20, 20);
     self.minimumLineSpacingBlock = ^CGFloat(NSInteger section){
         return AUTOLAYOUT_LENGTH(20);
     };
@@ -221,7 +221,7 @@ forSupplementaryViewOfKind:UICollectionElementKindSectionFooter
     }
 }
 - (UIEdgeInsets)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout insetForSectionAtIndex:(NSInteger)section {
-    return self.cellEdgeInsets;//NOTE:这里设置bottom没有任何作用！
+    return self.cellEdgeInsets;
 }
 //cell的最小行间距
 - (CGFloat)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout minimumLineSpacingForSectionAtIndex:(NSInteger)section {

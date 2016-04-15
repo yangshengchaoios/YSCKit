@@ -147,6 +147,10 @@
 + (NSString *)URLDecode:(NSString *)string;
 - (NSString *)URLDecodeString;
 
+#pragma mark - bin2hex
++ (NSString *)hexFromString:(NSString *)string;
++ (NSString *)stringFromHex:(NSString *)hexString;
+
 @end
 
 

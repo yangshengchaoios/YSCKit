@@ -21,33 +21,33 @@ NSString * const kParamEnableDownloadImage  = @"EnableDownloadImage";
  */
 @implementation UIImageView (Cache)
 
-- (void)setImageWithURLString:(NSString *)urlString {
-    [self setImageWithURLString:urlString completed:nil];
+- (void)ysc_setImageWithURLString:(NSString *)urlString {
+    [self _setImageWithURLString:urlString placeholderImage:nil withFadeIn:YES completed:nil];
 }
-- (void)setImageWithURLString:(NSString *)urlString completed:(SetImageCompletionBlock)complete {
+- (void)ysc_setImageWithURLString:(NSString *)urlString completed:(SetImageCompletionBlock)complete {
     [self _setImageWithURLString:urlString placeholderImage:nil withFadeIn:YES completed:complete];
 }
-- (void)setImageWithURLString:(NSString *)urlString withFadeIn:(BOOL)withAnimate {
+- (void)ysc_setImageWithURLString:(NSString *)urlString withFadeIn:(BOOL)withAnimate {
     [self _setImageWithURLString:urlString placeholderImage:nil withFadeIn:withAnimate completed:nil];
 }
 
-- (void)setImageWithURLString:(NSString *)urlString placeholderImageName:(NSString *)placeholderImageName {
-    [self setImageWithURLString:urlString placeholderImageName:placeholderImageName completed:nil];
+- (void)ysc_setImageWithURLString:(NSString *)urlString placeholderImageName:(NSString *)placeholderImageName {
+    [self _setImageWithURLString:urlString placeholderImage:[UIImage imageNamed:placeholderImageName] withFadeIn:YES completed:nil];
 }
-- (void)setImageWithURLString:(NSString *)urlString placeholderImageName:(NSString *)placeholderImageName completed:(SetImageCompletionBlock)complete {
+- (void)ysc_setImageWithURLString:(NSString *)urlString placeholderImageName:(NSString *)placeholderImageName completed:(SetImageCompletionBlock)complete {
     [self _setImageWithURLString:urlString placeholderImage:[UIImage imageNamed:placeholderImageName] withFadeIn:YES completed:complete];
 }
-- (void)setImageWithURLString:(NSString *)urlString placeholderImageName:(NSString *)placeholderImageName withFadeIn:(BOOL)withAnimate {
+- (void)ysc_setImageWithURLString:(NSString *)urlString placeholderImageName:(NSString *)placeholderImageName withFadeIn:(BOOL)withAnimate {
     [self _setImageWithURLString:urlString placeholderImage:[UIImage imageNamed:placeholderImageName] withFadeIn:withAnimate completed:nil];
 }
 
-- (void)setImageWithURLString:(NSString *)urlString placeholderImage:(UIImage *)holderImage {
-    [self setImageWithURLString:urlString placeholderImage:holderImage completed:nil];
+- (void)ysc_setImageWithURLString:(NSString *)urlString placeholderImage:(UIImage *)holderImage {
+    [self _setImageWithURLString:urlString placeholderImage:holderImage withFadeIn:YES completed:nil];
 }
-- (void)setImageWithURLString:(NSString *)urlString placeholderImage:(UIImage *)holderImage completed:(SetImageCompletionBlock)complete {
+- (void)ysc_setImageWithURLString:(NSString *)urlString placeholderImage:(UIImage *)holderImage completed:(SetImageCompletionBlock)complete {
     [self _setImageWithURLString:urlString placeholderImage:holderImage withFadeIn:YES completed:complete];
 }
-- (void)setImageWithURLString:(NSString *)urlString placeholderImage:(UIImage *)holderImage withFadeIn:(BOOL)withAnimate {
+- (void)ysc_setImageWithURLString:(NSString *)urlString placeholderImage:(UIImage *)holderImage withFadeIn:(BOOL)withAnimate {
     [self _setImageWithURLString:urlString placeholderImage:holderImage withFadeIn:withAnimate completed:nil];
 }
 
@@ -90,11 +90,13 @@ NSString * const kParamEnableDownloadImage  = @"EnableDownloadImage";
             UIImage *localImage = [UIImage imageNamed:newUrlString];
             if(localImage) {
                 [self _setCustomImage:localImage];
+                if (complete) { complete(localImage,nil); }
                 return;
             }
         }
     }
     else {
+        if (complete) { complete(placeholderImage,nil); }
         return;//url为空就直接返回默认图片
     }
     
@@ -103,6 +105,7 @@ NSString * const kParamEnableDownloadImage  = @"EnableDownloadImage";
         UIImage *cacheImage = [UIImage imageWithContentsOfFile:newUrlString];
         if (cacheImage) {
             [self _setCustomImage:cacheImage];
+            if (complete) { complete(cacheImage,nil); }
             return;
         }
     }
@@ -114,13 +117,12 @@ NSString * const kParamEnableDownloadImage  = @"EnableDownloadImage";
     }
     //处理相对路径后仍然不是合法的url，则返回默认图片
     if ([NSString isNotUrl:newUrlString]) {
+        if (complete) { complete(placeholderImage,nil); }
         return;
     }
-    newUrlString = newUrlString.URLEncodeString;
 
-    //采用SDWebImage的缓存方案
-    if (YSCDataInstance.isReachableViaWiFi ||
-        [YSCGetObject(kParamEnableDownloadImage) boolValue]) {//wifi环境下一定会从网络下载图片
+    //采用SDWebImage的缓存方案(wifi环境下一定会从网络下载图片)
+    if (YSCDataInstance.isReachableViaWiFi || [YSCGetObject(kParamEnableDownloadImage) boolValue]) {
         [self sd_setImageWithURL:[NSURL URLWithString:newUrlString]
                 placeholderImage:placeholderImage
                        completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL)  {

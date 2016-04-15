@@ -63,7 +63,7 @@
         else {
             WEAKSELF
             [self.indicatorView startAnimating];
-            [self.photoImageView setImageWithURLString:dataModel.imageUrl completed:^(UIImage *image, NSError *error) {
+            [self.photoImageView ysc_setImageWithURLString:dataModel.imageUrl completed:^(UIImage *image, NSError *error) {
                 [weakSelf.indicatorView stopAnimating];
                 if (image) {
                     weakSelf.photoImageView.contentMode = UIViewContentModeScaleAspectFit;

@@ -53,10 +53,10 @@
 }
 - (UIEdgeInsets)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout insetForSectionAtIndex:(NSInteger)section {
     if (self.isScrollHor) {
-        return AUTOLAYOUT_EDGEINSETS(0, self.minimumLineSpacing / 2, 0, self.minimumLineSpacing / 2);
+        return AUTOLAYOUT_EDGEINSETS_TLBR(0, self.minimumLineSpacing / 2, 0, self.minimumLineSpacing / 2);
     }
     else {
-        return AUTOLAYOUT_EDGEINSETS(self.minimumLineSpacing / 2, 0, self.minimumLineSpacing / 2, 0);
+        return AUTOLAYOUT_EDGEINSETS_TLBR(self.minimumLineSpacing / 2, 0, self.minimumLineSpacing / 2, 0);
     }
 }
 

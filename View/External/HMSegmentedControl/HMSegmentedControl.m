@@ -691,6 +691,10 @@
     [self setSelectedSegmentIndex:index animated:animated notify:NO];
 }
 
+- (void)setSelectedSegmentIndex:(NSUInteger)index notify:(BOOL)notify {
+    [self setSelectedSegmentIndex:index animated:NO notify:notify];
+}
+
 - (void)setSelectedSegmentIndex:(NSUInteger)index animated:(BOOL)animated notify:(BOOL)notify {
     _selectedSegmentIndex = index;
     [self setNeedsDisplay];

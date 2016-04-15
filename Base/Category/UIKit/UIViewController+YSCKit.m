@@ -83,8 +83,8 @@ YYSYNTH_DYNAMIC_PROPERTY_OBJECT(params, setParams, RETAIN, NSMutableDictionary *
     UIViewController *viewController =  [[NSClassFromString(className) alloc] initWithNibName:className bundle:nil];
     NSMutableDictionary *mutableParamDict = [NSMutableDictionary dictionaryWithDictionary:params];
     [viewController setParams:mutableParamDict];
-    UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:viewController];
-    [self presentViewController:navigationController animated:YES completion:nil];
+    UINavigationController *navigationController = [[YSCBaseNavigationViewController alloc] initWithRootViewController:viewController];
+    [self presentViewController:navigationController animated:animated completion:nil];
 }
 
 /** dismiss viewcontroller */

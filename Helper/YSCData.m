@@ -79,7 +79,7 @@
     @weakiy(self);
     self.reachability = [YYReachability reachability];
     self.isReachable = self.reachability.reachable;
-    self.reachability.notifyBlock = ^(YYReachability *reachability){
+    self.reachability.notifyBlock = ^(YYReachability *reachability) {
         weak_self.isReachable = weak_self.reachability.reachable;
     };
 }

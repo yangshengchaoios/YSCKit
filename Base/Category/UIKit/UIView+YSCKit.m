@@ -133,7 +133,7 @@
 }
 - (void)makeBorderWithColor:(UIColor *)color borderWidth:(CGFloat)width {
     self.layer.borderColor = color.CGColor;
-    self.layer.borderWidth = AUTOLAYOUT_LENGTH(width);
+    self.layer.borderWidth = width;
 }
 
 /**
@@ -236,7 +236,7 @@
     CGContextRelease(context);
     return data;
 }
-- (void)setLayerShadow:(UIColor*)color offset:(CGSize)offset radius:(CGFloat)radius {
+- (void)addLayerShadow:(UIColor*)color offset:(CGSize)offset radius:(CGFloat)radius {
     self.layer.shadowColor = color.CGColor;
     self.layer.shadowOffset = offset;
     self.layer.shadowRadius = radius;
@@ -263,6 +263,9 @@
         else if ([subview isMemberOfClass:[UIButton class]]) {
             UIButton *button = (UIButton *)subview;
             button.titleLabel.font = AUTOLAYOUT_FONT(button.titleLabel.font.pointSize);
+            button.contentEdgeInsets = AUTOLAYOUT_EDGEINSETS(button.contentEdgeInsets);
+            button.titleEdgeInsets = AUTOLAYOUT_EDGEINSETS(button.titleEdgeInsets);
+            button.imageEdgeInsets = AUTOLAYOUT_EDGEINSETS(button.imageEdgeInsets);
         }
         else if ([subview isKindOfClass:[UITextField class]]) {
             UITextField *textField = (UITextField *)subview;

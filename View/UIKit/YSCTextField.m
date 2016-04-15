@@ -7,10 +7,30 @@
 //
 
 #import "YSCTextField.h"
-#import "YSCTextDelegate.h"
 
-@interface YSCTextField () <UITextFieldDelegate>
+/** YSCTextField专有delegate */
+@interface YSCTextFieldDelegate : NSObject <UITextFieldDelegate> @end
+@implementation YSCTextFieldDelegate
+- (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string {
+    return YES;//NOTE:主要是为了放开删除按钮
+}
+- (BOOL)textFieldShouldReturn:(UITextField *)textField {
+    YSCTextField *yscTextField = (YSCTextField *)textField;
+    if (yscTextField.keyboardDoneBlock) {
+        yscTextField.keyboardDoneBlock(yscTextField.textString);
+    }
+    if(yscTextField.allowsKeyboardDismiss) {
+        [textField resignFirstResponder];
+    }
+    return YES;
+}
+@end
+
+
+/** 重新封装UITextField */
+@interface YSCTextField ()
 @property (nonatomic, copy) NSString *oldString;
+@property (nonatomic, strong) YSCTextFieldDelegate *customDelegate;
 @end
 
 @implementation YSCTextField
@@ -45,7 +65,7 @@
     self.allowsSimpleEmoji = NO;
     self.allowsChinese = NO;
     self.allowsPunctuation = NO;
-    self.allowsKeyboardDone = YES;
+    self.allowsKeyboardDismiss = YES;
     self.allowsLetter = YES;
     self.allowsNumber = YES;
     self.stringLengthType = YES;
@@ -59,7 +79,8 @@
     if (nil == self.backgroundColor) {
         self.backgroundColor = [UIColor whiteColor];
     }
-    self.delegate = [YSCTextDelegate sharedInstance];
+    self.customDelegate = [YSCTextFieldDelegate new];
+    self.delegate = self.customDelegate;
     self.oldString = @"";
     ADD_OBSERVER_WITH_OBJECT(@selector(textFieldChanged:), UITextFieldTextDidChangeNotification, self);
 }
@@ -67,6 +88,13 @@
     _borderColor = borderColor;
     self.layer.borderColor = borderColor.CGColor;
     self.layer.borderWidth = AUTOLAYOUT_LENGTH(1);
+}
+- (void)setPlaceholderColor:(UIColor *)placeholderColor {
+    _placeholderColor = placeholderColor;
+    // 方法一：
+    self.attributedPlaceholder = [[NSAttributedString alloc] initWithString:self.placeholder attributes:@{NSForegroundColorAttributeName: placeholderColor}];
+    // 方法二：
+//    [self setValue:placeholderColor forKeyPath:@"_placeholderLabel.textColor"];
 }
 - (void)setCornerRadius:(CGFloat)cornerRadius {
     _cornerRadius = cornerRadius;
@@ -116,6 +144,9 @@
             else {
                 textField.text = self.oldString;
             }
+        }
+        if (self.changedBlock) {
+            self.changedBlock(textField.text);
         }
     }
 }

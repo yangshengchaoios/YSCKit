@@ -7,10 +7,11 @@
 //
 
 #import <UIKit/UIKit.h>
-//NOTE:
-//  1. 输入内容一般包括：字母、数字、汉字、表情符号、标点符号、其它特殊符号
-//  2. 正则表达式只判断内容合法性，不判断长度
-//  3. IBInspectable暂时只支持的类型为：Int、CGFloat、Double、String、Bool、CGPoint、CGSize、CGRect、UIColor、UIImage
+/**
+ *  1. 输入内容一般包括：字母、数字、汉字、表情符号、标点符号、其它特殊符号
+ *  2. 正则表达式只判断内容合法性，不判断长度
+ *  3. IBInspectable暂时只支持的类型为：Int、CGFloat、Double、String、Bool、CGPoint、CGSize、CGRect、UIColor、UIImage
+ */
 
 //.              匹配除换行符以外的任意字符
 //\d             与[0-9]相同
@@ -51,15 +52,20 @@ typedef NS_ENUM(NSInteger, YSCTextType) {
 @property (nonatomic, assign) IBInspectable BOOL allowsSimpleEmoji;     //default NO 常用的emoji
 @property (nonatomic, assign) IBInspectable BOOL allowsChinese;         //default NO 
 @property (nonatomic, assign) IBInspectable BOOL allowsPunctuation;     //default NO 标点符号(全)
-@property (nonatomic, assign) IBInspectable BOOL allowsKeyboardDone;    //default YES 是否响应键盘的done按钮
+@property (nonatomic, assign) IBInspectable BOOL allowsKeyboardDismiss; //default YES 点击done 键盘是否隐藏
 @property (nonatomic, assign) IBInspectable BOOL allowsLetter;          //default YES
 @property (nonatomic, assign) IBInspectable BOOL allowsNumber;          //default YES
 @property (nonatomic, assign) IBInspectable BOOL stringLengthType;      //YES-string.length NO-char length default YES
 //控制UI样式
 @property (nonatomic, assign) IBInspectable CGFloat cornerRadius;       //圆角弧度
 @property (nonatomic, strong) IBInspectable UIColor *borderColor;       //边框颜色
+@property (nonatomic, strong) IBInspectable UIColor *placeholderColor;  //默认字体颜色
 @property (nonatomic, assign) IBInspectable CGFloat textLeftMargin;
 @property (nonatomic, assign) IBInspectable CGFloat textRightMargin;
+
+//blocks
+@property (nonatomic, copy) YSCObjectBlock changedBlock;
+@property (nonatomic, copy) YSCObjectBlock keyboardDoneBlock;
 
 - (BOOL)isValid;            //检测输入内容是否有效
 - (NSString *)textString;   //返回去掉首位空格后的字符串

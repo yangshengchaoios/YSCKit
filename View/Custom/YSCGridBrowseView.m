@@ -96,7 +96,7 @@ UICollectionViewDelegateFlowLayout>
     return CGSizeMake(290, 290);
 }
 - (UIEdgeInsets)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout insetForSectionAtIndex:(NSInteger)section {
-    return AUTOLAYOUT_EDGEINSETS(self.itemEdgeTop, self.itemEdgeLeft, self.itemEdgeBottom, self.itemEdgeRight);
+    return AUTOLAYOUT_EDGEINSETS_TLBR(self.itemEdgeTop, self.itemEdgeLeft, self.itemEdgeBottom, self.itemEdgeRight);
 }
 //cell的最小行间距
 - (CGFloat)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout minimumLineSpacingForSectionAtIndex:(NSInteger)section {

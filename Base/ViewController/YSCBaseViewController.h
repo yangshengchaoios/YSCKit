@@ -11,7 +11,7 @@
 // 定义返回按钮的箭头样式
 typedef NS_ENUM(NSInteger, BackArrowType) {
     BackArrowTypeDefault = 0,       //默认用箭头图片代替返回按钮
-    BackArrowTypeSystemWithNoText,  //用系统自带的返回箭头(去掉文字)
+    BackArrowTypeSystemWithoutText,  //用系统自带的返回箭头(去掉文字)
 };
 
 // 默认返回按钮图片名称

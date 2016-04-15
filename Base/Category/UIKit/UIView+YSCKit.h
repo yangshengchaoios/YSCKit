@@ -38,7 +38,7 @@
 - (UIImage *)snapshotImage;
 - (UIImage *)snapshotImageAfterScreenUpdates:(BOOL)afterUpdates;
 - (NSData *)snapshotPDF;
-- (void)setLayerShadow:(UIColor*)color offset:(CGSize)offset radius:(CGFloat)radius;
+- (void)addLayerShadow:(UIColor*)color offset:(CGSize)offset radius:(CGFloat)radius;
 
 
 /** 递归遍历所有子view */
