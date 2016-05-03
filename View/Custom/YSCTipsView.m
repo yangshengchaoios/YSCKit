@@ -7,16 +7,16 @@
 //
 
 #import "YSCTipsView.h"
-#import "UIControl+BlocksKit.h"
-@interface YSCTipsView ()
 
+@interface YSCTipsView ()
+@property (nonatomic, assign) UIEdgeInsets edgeInsets;
 @end
 
 @implementation YSCTipsView
 
 - (void)awakeFromNib {
     [super awakeFromNib];
-    self.backgroundColor = kDefaultViewColor;
+    self.backgroundColor = [UIColor clearColor];
     self.actionButton.backgroundColor = [UIColor redColor];//默认按钮背景色
     [self resetSize];
     [self.actionButton addCornerWithRadius:AUTOLAYOUT_LENGTH(5)];
@@ -28,62 +28,75 @@
 }
 + (instancetype)createYSCTipsViewOnView:(UIView *)contentView
                            buttonAction:(YSCBlock)buttonAction {
-    return [self createYSCTipsViewOnView:contentView withMessage:nil iconImage:nil buttonTitle:nil buttonAction:buttonAction];
+    return [self createYSCTipsViewOnView:contentView withMessage:nil imageName:nil buttonTitle:nil buttonAction:buttonAction];
 }
 + (instancetype)createYSCTipsViewOnView:(UIView *)contentView
                             withMessage:(NSString *)message
-                              iconImage:(UIImage *)image
+                              imageName:(NSString *)imageName
                             buttonTitle:(NSString *)buttonTitle
                            buttonAction:(YSCBlock)buttonAction {
-    return [self createYSCTipsViewOnView:contentView edgeInsets:UIEdgeInsetsZero withMessage:nil iconImage:nil buttonTitle:nil buttonAction:buttonAction];
+    return [self createYSCTipsViewOnView:contentView edgeInsets:UIEdgeInsetsZero withMessage:message imageName:imageName buttonTitle:buttonTitle buttonAction:buttonAction];
 }
 + (instancetype)createYSCTipsViewOnView:(UIView *)contentView
                              edgeInsets:(UIEdgeInsets)edgeInsets
                             withMessage:(NSString *)message
-                              iconImage:(UIImage *)image
+                              imageName:(NSString *)imageName
                             buttonTitle:(NSString *)buttonTitle
                            buttonAction:(YSCBlock)buttonAction {
     // 0. 设置默认提示信息
     if (nil == contentView) {
         return nil;
     }
-    if (OBJECT_IS_EMPTY(TRIM_STRING(message))) {
-        message = @"暂无数据";
-    }
-    if (OBJECT_IS_EMPTY(image)) {
-        image = [UIImage imageNamed:@"icon_empty"];
-    }
-    if (OBJECT_IS_EMPTY(TRIM_STRING(buttonTitle))) {
-        buttonTitle = @"重新加载";
-    }
-    
     // 1. 创建tipsview
     YSCTipsView *tipsView = FIRST_VIEW_IN_XIB(@"YSCTipsView");
-    tipsView.iconImageView.image = image;
-    tipsView.messageLabel.text = message;
-    [tipsView.actionButton setTitle:buttonTitle forState:UIControlStateNormal];
-    [tipsView.actionButton addTouchUpInsideEventBlock:^(id sender) {
-        if (buttonAction) {
-            buttonAction();
-        }
-    }];
-    
-    // 2. 设置tipsview的位置和大小
     [contentView addSubview:tipsView];
+    [tipsView resetImageName:imageName];
+    [tipsView resetMessage:message];
+    [tipsView resetActionWithButtonTitle:buttonTitle buttonAction:buttonAction];
     [tipsView resetFrameWithEdgeInsets:edgeInsets];
     return tipsView;
 }
 
+- (void)layoutSubviews {
+    [super layoutSubviews];
+    [self resetFrameWithEdgeInsets:self.edgeInsets];
+}
+
 #pragma mark - reset
 - (void)resetFrameWithEdgeInsets:(UIEdgeInsets)edgeInsets {
-    if (self.superview) {
-        [self mas_remakeConstraints:^(MASConstraintMaker *make) {
-            make.edges.insets(edgeInsets);
-        }];
+    //NOTE: size is zero when put on UITableView !
+//    [self mas_remakeConstraints:^(MASConstraintMaker *make) {
+//        make.edges.insets(edgeInsets);
+//    }];
+    
+    _edgeInsets = edgeInsets;
+    CGRect frame = self.superview.bounds;
+    frame.origin.x = edgeInsets.left;
+    frame.origin.y = edgeInsets.top;
+    frame.size.width = CGRectGetWidth(self.superview.bounds) - (edgeInsets.left + edgeInsets.right);
+    frame.size.height = CGRectGetHeight(self.superview.bounds) - (edgeInsets.top + edgeInsets.bottom);
+    self.frame = frame;
+}
+- (void)resetImageName:(NSString *)imageName {
+    if (OBJECT_IS_EMPTY(TRIM_STRING(imageName))) {
+        imageName = kDefaultEmptyImageName;
     }
+    @weakiy(self);
+    [self.iconImageView ysc_setImageWithURLString:imageName completed:^(UIImage *image, NSError *error) {
+        weak_self.iconImageView.backgroundColor = [UIColor clearColor];
+    }];//兼容网络图片
+}
+- (void)resetMessage:(NSString *)message {
+    if (OBJECT_IS_EMPTY(TRIM_STRING(message))) {
+        message = kDefaultEmptyMessage;
+    }
+    self.messageLabel.text = message;
 }
 - (void)resetActionWithButtonTitle:(NSString *)buttonTitle
                       buttonAction:(YSCBlock)buttonAction {
+    if (OBJECT_IS_EMPTY(TRIM_STRING(buttonTitle))) {
+        buttonTitle = @"重新加载";
+    }
     self.actionButton.hidden = NO;
     [self.actionButton setTitle:buttonTitle forState:UIControlStateNormal];
     [self.actionButton reAddTouchUpInsideEventBlock:^(id sender) {
@@ -92,7 +105,5 @@
         }
     }];
 }
-- (void)resetIconImage:(NSString *)imageName {
-    self.iconImageView.image = [UIImage imageNamed:imageName];
-}
+
 @end

@@ -32,11 +32,16 @@
 - (id)init {
     self = [super init];
     if (self) {
+        self.autoLayoutScale = SCREEN_WIDTH / XIB_WIDTH;
         [self _initReachability];
         
         // 监控APP运行状态
         ADD_OBSERVER(@selector(_didAppBecomeActive), UIApplicationDidBecomeActiveNotification);
         ADD_OBSERVER(@selector(_didAppEnterBackground), UIApplicationDidEnterBackgroundNotification);
+        ADD_OBSERVER(@selector(_keyboardDidShow:), UIKeyboardDidShowNotification);
+        ADD_OBSERVER(@selector(_keyboardDidHide:), UIKeyboardDidHideNotification);
+//        ADD_OBSERVER(@selector(_keyboardWillShow:), UIKeyboardWillShowNotification);
+//        ADD_OBSERVER(@selector(_keyboardWillHide:), UIKeyboardWillHideNotification);
         
         // 初始化时间差
         if (nil == YSCGetObject(CachedSyncInterval)) {
@@ -66,6 +71,28 @@
     [NSObject cancelPreviousPerformRequestsWithTarget:self
                                              selector:@selector(_refreshServerTime)
                                                object:nil];
+}
+//键盘弹出
+- (void)_keyboardWillShow:(NSNotification*)notification {
+    NSDictionary *info = [notification userInfo];
+    CGSize kbSize = [[info objectForKey:UIKeyboardFrameEndUserInfoKey] CGRectValue].size;
+    self.currentKeyboardHeight = kbSize.height;
+    NSLog(@"will show:%f", self.currentKeyboardHeight);
+}
+- (void)_keyboardDidShow:(NSNotification*)notification {
+    NSDictionary *info = [notification userInfo];
+    CGSize kbSize = [[info objectForKey:UIKeyboardFrameEndUserInfoKey] CGRectValue].size;
+    self.currentKeyboardHeight = kbSize.height;
+    NSLog(@"did show:%f", self.currentKeyboardHeight);
+}
+//键盘关闭
+- (void)_keyboardWillHide:(NSNotification*)notification {
+    self.currentKeyboardHeight = 0.0f;
+    NSLog(@"will hide:%f", self.currentKeyboardHeight);
+}
+- (void)_keyboardDidHide:(NSNotification*)notification {
+    self.currentKeyboardHeight = 0.0f;
+    NSLog(@"did hide:%f", self.currentKeyboardHeight);
 }
 //缓存数据库路径
 - (NSString *)cacheDBPath {

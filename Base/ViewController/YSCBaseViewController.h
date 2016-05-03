@@ -49,11 +49,28 @@ static NSString * const kDefaultBackArrowImageName = @"arrow_left_default";
 /**
  *  自动判断hud的背景是否透明，以及HUD的edgeInsets
  */
-- (void)showHUDOnSelfView:(BOOL)showsMask;
+- (void)showHUDOnSelfViewWithMask:(BOOL)showsMask message:(NSString *)message;
+- (void)showHUDOnSelfViewWithMessage:(NSString *)message;
 - (void)showHUDOnSelfView;
+- (void)showHUDOnSelfViewThenHideWithMessage:(NSString *)message;
 - (void)hideHUDOnSelfView;
 
-- (void)didAppBecomeActive;                         //APP恢复运行
-- (void)didAppEnterBackground;                      //用户按下Home键APP进入后台
+/**
+ *  监控APP恢复运行、按下home键
+ */
+- (void)didAppBecomeActive;
+- (void)didAppEnterBackground;
+
+/**
+ *  管理网络请求队列
+ */
+- (void)addRequestId:(NSString *)requestId forKey:(NSString *)requestKey;
+- (void)removeRequestIdByKey:(NSString *)requestKey;
+
+/**
+ *  其它
+ */
 - (IBAction)backButtonClicked:(id)sender;
+
 @end
+

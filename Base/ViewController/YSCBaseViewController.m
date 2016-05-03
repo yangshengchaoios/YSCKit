@@ -7,7 +7,9 @@
 //
 
 #import "YSCBaseViewController.h"
-
+@interface YSCBaseViewController ()
+@property (nonatomic, strong) NSMutableDictionary *requestIdDictionary;
+@end
 @implementation YSCBaseViewController
 - (void)dealloc {
     NSLog(@"[%@] is dealloc......", NSStringFromClass(self.class));
@@ -19,6 +21,14 @@
         [self.tipsView removeFromSuperview];
         self.tipsView = nil;
     }
+    
+    // 取消未结束的网络请求
+    for (NSString *requestKey in self.requestIdDictionary) {
+        NSString *requestId = self.requestIdDictionary[requestKey];
+        [YSCRequestInstance removeRequestById:requestId];
+    }
+    [self.requestIdDictionary removeAllObjects];
+    self.requestIdDictionary = nil;
     [[NSNotificationCenter defaultCenter] removeObserver:self]; //等同于宏定义  removeAllObservers(self);
 }
 - (void)viewWillAppear:(BOOL)animated {
@@ -49,6 +59,7 @@
 // 初始化
 - (void)viewDidLoad {
 	[super viewDidLoad];
+    self.requestIdDictionary = [NSMutableDictionary dictionary];
     if (nil == self.params) {
         self.params = [NSMutableDictionary dictionary];
     }
@@ -70,6 +81,7 @@
     }
     //设置tipsview
     self.tipsView = [YSCTipsView createYSCTipsViewOnView:self.view];
+    self.tipsView.backgroundColor = kDefaultViewColor;
     self.tipsView.hidden = YES;
     if (self.customTitleView) {
         [self.tipsView resetFrameWithEdgeInsets:UIEdgeInsetsMake(64, 0, 0, 0)];
@@ -84,7 +96,8 @@
     ADD_OBSERVER(@selector(didAppBecomeActive), UIApplicationDidBecomeActiveNotification);
     ADD_OBSERVER(@selector(didAppEnterBackground), UIApplicationDidEnterBackgroundNotification);
 }
-//设置title
+
+#pragma mark - Private Methods
 - (void)_configTitleView {
     if (OBJECT_ISNOT_EMPTY(self.customTitleViewName)) {
         Class class = NSClassFromString(self.customTitleViewName);
@@ -96,18 +109,27 @@
             [self.view addSubview:self.customTitleView];
             //强制隐藏系统navi bar
             self.params[kParamIsHideNavBar] = @YES;
+            //设置返回事件
+            if ([self.customTitleView respondsToSelector:@selector(setGoBackBlock:)]) {
+                @weakiy(self);
+                YSCBlock block = ^{
+                    [weak_self backButtonClicked:nil];
+                };
+                [self.customTitleView performSelector:@selector(setGoBackBlock:)
+                                           withObject:block];
+            }
+            
         }
     }
     [self resetTitle:self.params[kParamTitle]];
 }
-// 配置返回按钮
 - (void)_configBackButton {
     if (self.params[kParamBackType]) {
-		self.backArrowType = [self.params[kParamBackType] integerValue];
-	}
-	else {
-		self.backArrowType = BackArrowTypeDefault;
-	}
+        self.backArrowType = [self.params[kParamBackType] integerValue];
+    }
+    else {
+        self.backArrowType = BackArrowTypeDefault;
+    }
     
     if (BackArrowTypeDefault == self.backArrowType) {//自定义返回按钮的图片(包括push和present的)
         UIImage *backArrowImage = [UIImage imageNamed:kDefaultBackArrowImageName];
@@ -117,7 +139,7 @@
                                                                          action:@selector(backButtonClicked:)];
         self.navigationItem.leftBarButtonItem = barButtonItem;
         
-	}
+    }
     else if (BackArrowTypeSystemWithoutText == self.backArrowType) {
         UIBarButtonItem *temporaryBarButtonItem = [[UIBarButtonItem alloc] init];
         temporaryBarButtonItem.title = @"";//去掉返回按钮的文字
@@ -125,11 +147,10 @@
     }
 }
 
-// 配置自定义titleview的名称
+#pragma mark - 自定义titleView
 - (NSString *)customTitleViewName {
     return @"";
 }
-// 重新设置title
 - (void)resetTitle:(NSString *)title {
     if (self.customTitleView) {
         if ([self.customTitleView respondsToSelector:@selector(setTitle:)]) {
@@ -144,6 +165,7 @@
     }
 }
 
+#pragma mark - 显示/隐藏tipsview
 - (void)showTipsWithMessage:(NSString *)message buttonAction:(YSCBlock)buttonAction {
     if (nil == self.tipsView) {
         [YSCAlertManager showAlertVieWithMessage:message];
@@ -152,11 +174,11 @@
         self.tipsView.hidden = NO;
         self.tipsView.messageLabel.text = message;
         if (OBJECT_IS_EMPTY(message)) {
-            self.tipsView.iconImageView.image = [UIImage imageNamed:@""];//TODO:
+            [self.tipsView resetImageName:kDefaultEmptyImageName];
             self.tipsView.actionButton.hidden = YES;
         }
         else {
-            self.tipsView.iconImageView.image = [UIImage imageNamed:@""];//TODO:
+            [self.tipsView resetImageName:kDefaultErrorImageName];
             [self.tipsView resetActionWithButtonTitle:@"重新加载" buttonAction:buttonAction];
         }
     }
@@ -169,31 +191,51 @@
         self.tipsView = nil;
     }
 }
-// 自动判断hud的背景是否透明，以及HUD的edgeInsets
-- (void)showHUDOnSelfView:(BOOL)showsMask {
+
+#pragma mark - 自动判断hud的背景是否透明，以及HUD的edgeInsets
+- (void)showHUDOnSelfViewWithMask:(BOOL)showsMask message:(NSString *)message {
     UIEdgeInsets edgeInsets = UIEdgeInsetsZero;
     if (self.customTitleView) {
         edgeInsets = UIEdgeInsetsMake(64, 0, 0, 0);
     }
     [YSCHUDManager showHUDOnView:self.view
+                         message:message
                       edgeInsets:edgeInsets
-                       showsMask:showsMask];
+                 backgroundColor:showsMask ? kDefaultViewColor : nil];
+}
+- (void)showHUDOnSelfViewWithMessage:(NSString *)message {
+    [self showHUDOnSelfViewWithMask:(nil != self.tipsView) message:message];
 }
 - (void)showHUDOnSelfView {
-    [self showHUDOnSelfView:(nil != self.tipsView)];
+    [self showHUDOnSelfViewWithMask:(nil != self.tipsView) message:nil];
+}
+- (void)showHUDOnSelfViewThenHideWithMessage:(NSString *)message {
+    [YSCHUDManager showHUDThenHide:message onView:self.view afterDelay:1];
 }
 - (void)hideHUDOnSelfView {
     [YSCHUDManager hideHUDOnView:self.view];
 }
 
-// APP恢复运行
+#pragma mark - 监控APP恢复运行、按下home键
 - (void)didAppBecomeActive {
 }
-// 用户按下Home键APP进入后台
 - (void)didAppEnterBackground {
 }
-// 点击返回箭头按钮
-- (IBAction)backButtonClicked:(id)sender {
-	[self backViewController];
+
+#pragma mark - 管理网络请求队列
+- (void)addRequestId:(NSString *)requestId forKey:(NSString *)requestKey {
+    RETURN_WHEN_OBJECT_IS_EMPTY(requestId);
+    RETURN_WHEN_OBJECT_IS_EMPTY(requestKey);
+    self.requestIdDictionary[requestKey] = requestId;
 }
+- (void)removeRequestIdByKey:(NSString *)requestKey {
+    RETURN_WHEN_OBJECT_IS_EMPTY(requestKey);
+    [self.requestIdDictionary removeObjectForKey:requestKey];
+}
+
+#pragma mark - 其它
+- (IBAction)backButtonClicked:(id)sender {
+    [self backViewController];
+}
+
 @end

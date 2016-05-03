@@ -67,6 +67,10 @@ NSString * const kCachedSectionKey  = @"kCachedSectionKey";
     if (enableRefresh) {
         WEAKSELF
         self.scrollView.mj_header = [MJRefreshNormalHeader headerWithRefreshingBlock:^{
+            if (weakSelf.customRefreshBlock) {
+                weakSelf.customRefreshBlock(kDefaultPageStartIndex);
+                return ;
+            }
             [weakSelf refreshAtPageIndex:kDefaultPageStartIndex];
         }];
     }
@@ -79,7 +83,10 @@ NSString * const kCachedSectionKey  = @"kCachedSectionKey";
     if (enableLoadMore) {
         WEAKSELF
         self.scrollView.mj_footer = [MJRefreshBackNormalFooter footerWithRefreshingBlock:^{
-            
+            if (weakSelf.customRefreshBlock) {
+                weakSelf.customRefreshBlock(weakSelf.currentPageIndex + 1);
+                return ;
+            }
             [weakSelf refreshAtPageIndex:weakSelf.currentPageIndex + 1];
         }];
     }
@@ -134,8 +141,8 @@ NSString * const kCachedSectionKey  = @"kCachedSectionKey";
         isPullToRefresh ? [weakSelf.scrollView.mj_header endRefreshing] : [weakSelf.scrollView.mj_footer endRefreshing];
         if (errorMessage) {
             if (weakSelf.tipsView) {
-                weakSelf.tipsView.messageLabel.text = errorMessage;
-                [weakSelf.tipsView resetIconImage:weakSelf.tipsFailedIcon];
+                [weakSelf.tipsView resetMessage:errorMessage];
+                [weakSelf.tipsView resetImageName:weakSelf.tipsFailedIcon];
                 [weakSelf.tipsView resetActionWithButtonTitle:weakSelf.tipsButtonTitle buttonAction:^{
                     [weakSelf beginRefreshing];
                 }];
@@ -192,12 +199,12 @@ NSString * const kCachedSectionKey  = @"kCachedSectionKey";
                         [weakSelf.cellDataArray addObject:tempArray];
                         
                         //add new section
-                        if (NO == isPullToRefresh && OBJECT_ISNOT_EMPTY(sectionKey)) {
+                        if (( ! isPullToRefresh) && OBJECT_ISNOT_EMPTY(sectionKey)) {
                             [insertedSections addIndex:section];
                         }
                     }
                     //add new row
-                    if (NO == isPullToRefresh) {
+                    if ( ! isPullToRefresh) {
                         [insertedIndexPaths addObject:[NSIndexPath indexPathForRow:row inSection:section]];
                     }
                 }
@@ -214,16 +221,16 @@ NSString * const kCachedSectionKey  = @"kCachedSectionKey";
                 //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
             }
             else {
-                if (NO == isPullToRefresh) {
-                    [YSCHUDManager showHUDThenHideOnKeyWindow:@"没有更多了"];
+                if ( ! isPullToRefresh) {
+                    [YSCHUDManager showHUDThenHideOnKeyWindow:kDefaultNoMoreMessage];
                 }
             }
             
             //4. 数据为空的tips
             if (weakSelf.tipsView) {
-                weakSelf.tipsView.messageLabel.text = weakSelf.tipsEmptyText;
                 weakSelf.tipsView.actionButton.hidden = YES;
-                [weakSelf.tipsView resetIconImage:weakSelf.tipsEmptyIcon];
+                [weakSelf.tipsView resetMessage:weakSelf.tipsEmptyText];
+                [weakSelf.tipsView resetImageName:weakSelf.tipsEmptyIcon];
             }
             
             //5. 缓存数据
@@ -264,13 +271,16 @@ NSString * const kCachedSectionKey  = @"kCachedSectionKey";
     
     //4. 开始网络访问
     if (self.requestType <= YSCRequestTypePostBodyData) {
-        [YSCRequestInstance requestFromUrl:self.prefixOfUrl
-                                   withApi:self.apiName
-                                    params:self.dictParamBlock(pageIndex)
-                                 dataModel:NSClassFromString(self.modelName)
-                                      type:self.requestType
-                                   success:successBlock
-                                    failed:failedBlock];
+        NSString *requestId = [YSCRequestInstance requestFromUrl:self.prefixOfUrl
+                                                    withApi:self.apiName
+                                                     params:self.dictParamBlock(pageIndex)
+                                                  dataModel:NSClassFromString(self.modelName)
+                                                       type:self.requestType
+                                                    success:successBlock
+                                                     failed:failedBlock];
+        if (self.startLoadBlock) {
+            self.startLoadBlock(requestId);
+        }
     }
     else {
         resultBlock(initObject, errorMessage);
@@ -340,7 +350,7 @@ NSString * const kCachedSectionKey  = @"kCachedSectionKey";
 
 // 加载缓存
 - (void)_loadCacheData {
-    if (OBJECT_ISNOT_EMPTY(self.cacheFileName) && NO == self.isLoadedCache) {
+    if (OBJECT_ISNOT_EMPTY(self.cacheFileName) && ( ! self.isLoadedCache)) {
         self.isLoadedCache = YES;//控制缓存只加载一次
         
         [self.sectionKeyArray removeAllObjects];
@@ -375,11 +385,3 @@ NSString * const kCachedSectionKey  = @"kCachedSectionKey";
     }
 }
 @end
-
-
-
-
-
-
-
-

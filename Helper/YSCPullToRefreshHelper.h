@@ -8,16 +8,23 @@
 
 #import "YSCTipsView.h"
 
+#ifndef kDefaultNoMoreMessage
+    #define kDefaultNoMoreMessage          @"没有更多了"
+#endif
+
 /** 定义(分页)加载功能用到的block */
-typedef NSDictionary *(^YSCDictionarySetBlock)(NSInteger pageIndex);
+typedef NSDictionary *(^YSCIntegerSetBlock)(NSInteger pageIndex);
 typedef NSArray *(^YSCArraySetBlock)(NSArray *array);
-typedef CGFloat (^YSCIndexPathSetBlock)(NSIndexPath *indexPath);
+typedef CGFloat (^YSCObjectIndexPathSetBlock)(NSObject *object, NSIndexPath *indexPath);
+typedef CGFloat (^YSCObjectSectionSetBlock)(NSObject *object, NSInteger section);
 typedef CGFloat (^YSCSectionSetBlock)(NSInteger section);
 typedef NSString *(^YSCCellNameSetBlock)(NSObject *object, NSIndexPath *indexPath);
 typedef NSString *(^YSCHeaderFooterNameSetBlock)(NSObject *object, NSInteger section);
+typedef CGSize (^YSCHeaderFooterSizeSetBlock)(NSObject *object, NSInteger section);
 typedef void(^YSCLoadMoreBlock) (NSIndexSet *, NSArray<NSIndexPath *> *);
 typedef void (^YSCObjectIndexPathBlock)(NSObject *object, NSIndexPath *indexPath);
 typedef void (^YSCViewObjectIndexPathBlock)(UIView *view, NSObject *object, NSIndexPath *indexPath);
+typedef void (^YSCIntegerBlock)(NSInteger pageIndex);
 
 //------------------------------------
 //  作用：
@@ -44,12 +51,14 @@ typedef void (^YSCViewObjectIndexPathBlock)(UIView *view, NSObject *object, NSIn
 @property (nonatomic, strong) NSString *apiName;
 @property (nonatomic, strong) NSString *modelName;
 @property (nonatomic, strong) NSString *prefixOfUrl;//接口地址前缀
-@property (nonatomic, assign) BOOL enableRefresh;//是否启用下拉刷新(YES)
-@property (nonatomic, assign) BOOL enableLoadMore;//是否启用上拉加载更多(YES)
+@property (nonatomic, assign) BOOL enableRefresh;   //是否启用下拉刷新(YES)
+@property (nonatomic, assign) BOOL enableLoadMore;  //是否启用上拉加载更多(YES)
 
 // blocks
-@property (nonatomic, copy) YSCDictionarySetBlock dictParamBlock;
-@property (nonatomic, copy) YSCObjectBlock finishLoadBlock;
+@property (nonatomic, copy) YSCIntegerSetBlock dictParamBlock;
+@property (nonatomic, copy) YSCIntegerBlock customRefreshBlock;
+@property (nonatomic, copy) YSCObjectBlock startLoadBlock;      // 开始数据加载
+@property (nonatomic, copy) YSCObjectBlock finishLoadBlock;     // 加载数据结束
 @property (nonatomic, copy) YSCArraySetBlock preProcessBlock;//对于下载回来的一维数组进行清洗过滤
 @property (nonatomic, copy) YSCLoadMoreBlock loadMoreBlock;
 

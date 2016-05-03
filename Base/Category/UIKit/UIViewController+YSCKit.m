@@ -28,11 +28,17 @@ YYSYNTH_DYNAMIC_PROPERTY_OBJECT(params, setParams, RETAIN, NSMutableDictionary *
 - (void)pushViewController:(NSString *)className withParams:(NSDictionary *)params animated:(BOOL)animated {
     [self hideKeyboard];
     RETURN_WHEN_OBJECT_IS_EMPTY(className);
-    UIViewController *viewController = [[NSClassFromString(className) alloc] initWithNibName:className bundle:nil];
-    NSMutableDictionary *mutableParamDict = [NSMutableDictionary dictionaryWithDictionary:params];
-    [viewController setParams:mutableParamDict];
-    //NOTE:这里设置backBarButtonItem没有用！
-    [self.navigationController pushViewController:viewController animated:animated];
+    UIViewController *viewController = [[NSClassFromString(className) alloc] init];
+    //[[NSClassFromString(className) alloc] initWithNibName:className bundle:nil];//该方法对于没有xib的实例化会crash！
+    if ([viewController isKindOfClass:[UIViewController class]]) {
+        NSMutableDictionary *mutableParamDict = [NSMutableDictionary dictionaryWithDictionary:params];
+        [viewController setParams:mutableParamDict];
+        //NOTE:这里设置backBarButtonItem没有用！
+        [self.navigationController pushViewController:viewController animated:animated];
+    }
+    else {
+        NSLog(@"view controller [%@] instance failed!", className);
+    }
 }
 
 /** pop & dismiss view controller */

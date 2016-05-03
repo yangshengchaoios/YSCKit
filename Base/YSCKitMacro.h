@@ -64,9 +64,16 @@ typedef void (^YSCIntegerErrorBlock)(NSInteger, NSError *);
     #define WEAKSELF __weak __typeof(&*self) weakSelf = self;
 #endif
 
+// 去掉字符串的头尾空格
+#define TRIM_STRING(_string) (\
+        (NO == [_string isKindOfClass:[NSString class]]) ? \
+        @"" : [_string stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]] \
+        )
+
 
 /**
  *  对象判空
+ *  注意：只对原始数据进行判断，即全空的字符串不为空
  */
 #define OBJECT_IS_EMPTY(_object) (_object == nil \
         || [_object isKindOfClass:[NSNull class]] \
@@ -79,11 +86,6 @@ typedef void (^YSCIntegerErrorBlock)(NSInteger, NSError *);
 #define RETURN_YES_WHEN_OBJECT_IS_EMPTY(_object)    if (OBJECT_IS_EMPTY(_object)) { return YES; }
 #define RETURN_NO_WHEN_OBJECT_IS_EMPTY(_object)     if (OBJECT_IS_EMPTY(_object)) { return NO; }
 #define RETURN_ZERO_WHEN_OBJECT_IS_EMPTY(_object)   if (OBJECT_IS_EMPTY(_object)) { return 0; }
-// 去掉字符串的头尾空格
-#define TRIM_STRING(_string) (\
-        (OBJECT_IS_EMPTY(_string) || NO == [_string isKindOfClass:[NSString class]]) ? \
-        @"" : [_string stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]] \
-        )
 
 
 /**
@@ -115,6 +117,7 @@ typedef void (^YSCIntegerErrorBlock)(NSInteger, NSError *);
 #define CREATE_NSERROR(m)               CREATE_NSERROR_WITH_Code(0,m)
 #define GET_NSERROR_MESSAGE(e)          ((NSError *)e).userInfo[NSLocalizedDescriptionKey]  //=e.localizedDescription
 #define KEY_WINDOW                      [UIApplication sharedApplication].keyWindow
+#define FUNCTION_NAME                   [NSString stringWithUTF8String:__FUNCTION__]
 
 
 /**
@@ -157,7 +160,7 @@ typedef void (^YSCIntegerErrorBlock)(NSInteger, NSError *);
 #ifndef XIB_WIDTH
     #define XIB_WIDTH                   640.0f      //xib布局时的宽度(point)，主要用于计算缩放比例
 #endif
-#define AUTOLAYOUT_SCALE                (SCREEN_WIDTH / XIB_WIDTH)          //缩放比例 (当前屏幕的真实宽度point / xib布局的宽度point)
+#define AUTOLAYOUT_SCALE                YSCDataInstance.autoLayoutScale          //缩放比例 (当前屏幕的真实宽度point / xib布局的宽度point)
 #define AUTOLAYOUT_LENGTH(x)            ((x) * AUTOLAYOUT_SCALE)            //计算缩放后的大小point
 #define AUTOLAYOUT_LENGTH_W(x,w)        ((x) * (SCREEN_WIDTH / (w)))        //计算任意布局的真实大小point
 #define AUTOLAYOUT_SIZE_WH(w,h)         CGSizeMake(AUTOLAYOUT_LENGTH(w), AUTOLAYOUT_LENGTH(h))
@@ -239,26 +242,6 @@ typedef void (^YSCIntegerErrorBlock)(NSInteger, NSError *);
      NSLog(@"time cost: %.2f ms",ms);
  });
  */
-static inline void YYBenchmark(void (^block)(void), void (^complete)(double ms)) {
-    // <QuartzCore/QuartzCore.h> version
-    /*
-     extern double CACurrentMediaTime (void);
-     double begin, end, ms;
-     begin = CACurrentMediaTime();
-     block();
-     end = CACurrentMediaTime();
-     ms = (end - begin) * 1000.0;
-     complete(ms);
-     */
-    
-    // <sys/time.h> version
-    struct timeval t0, t1;
-    gettimeofday(&t0, NULL);
-    block();
-    gettimeofday(&t1, NULL);
-    double ms = (double)(t1.tv_sec - t0.tv_sec) * 1e3 + (double)(t1.tv_usec - t0.tv_usec) * 1e-3;
-    complete(ms);
-}
 
 
 /**

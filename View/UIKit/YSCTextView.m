@@ -31,7 +31,6 @@
 /** 重新封装UITextView */
 @interface YSCTextView ()
 @property (nonatomic, copy) NSString *oldString;
-@property (nonatomic, strong) UILabel *placeholderLabel;    //显示占位信息的label
 @property (nonatomic, strong) UILabel *remainingLabel;      //显示剩余字符数的label
 @property (nonatomic, strong) YSCTextViewDelegate *customDelegate;
 @end

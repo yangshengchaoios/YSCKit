@@ -104,6 +104,7 @@ UICollectionViewDelegateFlowLayout>
 #pragma mark - 注册header、cell、footer
 - (void)registerHeaderName:(NSString *)headerName {
     if (OBJECT_ISNOT_EMPTY(headerName)) {
+        _headerName = headerName;
         [self registerNib:[UINib nibWithNibName:headerName bundle:nil]
 forSupplementaryViewOfKind:UICollectionElementKindSectionHeader
       withReuseIdentifier:headerName];
@@ -111,12 +112,14 @@ forSupplementaryViewOfKind:UICollectionElementKindSectionHeader
 }
 - (void)registerCellName:(NSString *)cellName {
     if (OBJECT_ISNOT_EMPTY(cellName)) {
+        _cellName = cellName;
         [self registerNib:[UINib nibWithNibName:cellName bundle:nil]
 forCellWithReuseIdentifier:cellName];
     }
 }
 - (void)registerFooterName:(NSString *)footerName {
     if (OBJECT_ISNOT_EMPTY(footerName)) {
+        _footerName = footerName;
         [self registerNib:[UINib nibWithNibName:footerName bundle:nil]
 forSupplementaryViewOfKind:UICollectionElementKindSectionFooter
       withReuseIdentifier:footerName];
@@ -202,7 +205,57 @@ forSupplementaryViewOfKind:UICollectionElementKindSectionFooter
     return cell;
 }
 
-#pragma mark - UICollectionFlowLayout
+#pragma mark - UICollectionViewDelegateFlowLayout
+- (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout referenceSizeForHeaderInSection:(NSInteger)section {
+    if ((section < 0 || section >= [self.helper.headerDataArray count])) {
+        return CGSizeZero;
+    }
+    
+    NSObject *headerObject = self.helper.headerDataArray[section];
+    NSString *headerName = self.headerName;
+    if (self.headerNameBlock) {
+        NSString *tempName = self.headerNameBlock(headerObject, section);
+        if (OBJECT_ISNOT_EMPTY(tempName)) {
+            headerName = tempName;
+        }
+    }
+    if (OBJECT_ISNOT_EMPTY(headerName)) {
+        if (self.headerSizeBlock) {
+            return self.headerSizeBlock(headerObject, section);
+        }
+        else {
+            if ([NSClassFromString(headerName) respondsToSelector:@selector(sizeOfViewByObject:)]) {
+                return [NSClassFromString(headerName) sizeOfViewByObject:headerObject];
+            }
+        }
+    }
+    return CGSizeZero;
+}
+- (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout referenceSizeForFooterInSection:(NSInteger)section {
+    if ((section < 0 || section >= [self.helper.footerDataArray count])) {
+        return CGSizeZero;
+    }
+    
+    NSObject *footerObject = self.helper.footerDataArray[section];
+    NSString *footerName = self.footerName;
+    if (self.footerNameBlock) {
+        NSString *tempName = self.footerNameBlock(footerObject, section);
+        if (OBJECT_ISNOT_EMPTY(tempName)) {
+            footerName = tempName;
+        }
+    }
+    if (OBJECT_ISNOT_EMPTY(footerName)) {
+        if (self.footerSizeBlock) {
+            return self.footerSizeBlock(footerObject, section);
+        }
+        else {
+            if ([NSClassFromString(footerName) respondsToSelector:@selector(sizeOfViewByObject:)]) {
+                return [NSClassFromString(footerName) sizeOfViewByObject:footerObject];
+            }
+        }
+    }
+    return CGSizeZero;
+}
 - (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath {
     NSObject *cellObject = [self.helper getObjectByIndexPath:indexPath];
     NSString *cellName = self.cellName;
@@ -247,6 +300,38 @@ forSupplementaryViewOfKind:UICollectionElementKindSectionFooter
     if (self.clickCellBlock) {
         NSObject *object = [self.helper getObjectByIndexPath:indexPath];
         self.clickCellBlock(object, indexPath);
+    }
+}
+
+#pragma mark - UIScrollViewDelegate
+- (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView {
+    if (self.helper.willBeginDraggingBlock) {
+        self.helper.willBeginDraggingBlock();
+    }
+}
+- (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate {
+    if (self.helper.didEndDraggingBlock) {
+        self.helper.didEndDraggingBlock();
+    }
+}
+- (void)scrollViewDidScroll:(UIScrollView *)scrollView {
+    if (self.helper.didScrollBlock) {
+        self.helper.didScrollBlock();
+    }
+}
+- (void)scrollViewDidEndScrollingAnimation:(UIScrollView *)scrollView {
+    if (self.helper.didEndScrollingAnimationBlock) {
+        self.helper.didEndScrollingAnimationBlock();
+    }
+}
+- (void)scrollViewWillBeginDecelerating:(UIScrollView *)scrollView {
+    if (self.helper.willBeginDeceleratingBlock) {
+        self.helper.willBeginDeceleratingBlock();
+    }
+}
+- (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView {
+    if (self.helper.didEndDeceleratingBlock) {
+        self.helper.didEndDeceleratingBlock();
     }
 }
 

@@ -11,6 +11,7 @@
 static NSString * const kParamId                   = @"id"         ;
 static NSString * const kParamTitle                = @"title"      ;
 static NSString * const kParamUrl                  = @"url"        ;
+static NSString * const kParamUrls                 = @"urls"       ;
 static NSString * const kParamContent              = @"content"    ;
 static NSString * const kParamEmail                = @"email"      ;
 static NSString * const kParamTrue                 = @"true"       ;
@@ -62,6 +63,7 @@ static NSString * const kParamBlock                = @"block"      ;
 static NSString * const kParamAppChannel           = @"appChannel" ;
 static NSString * const kParamChannel              = @"channel"    ;
 static NSString * const kParamType                 = @"type"       ;
+static NSString * const kParamStep                 = @"step"       ;
 static NSString * const kParamNumber               = @"number"     ;
 static NSString * const kParamSortType             = @"sortType"   ;
 static NSString * const kParamIsAsc                = @"isAsc"      ;

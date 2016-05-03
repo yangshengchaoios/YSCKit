@@ -137,7 +137,8 @@
             NSArray *indexArray = initObject;
             if ([indexArray isKindOfClass:[NSArray class]]) {
                 for (int i = 0; i < MIN(self.pickerView.numberOfComponents, [indexArray count]); i++) {
-                    NSInteger tempRow = MIN([self.customDataArray[i] count] - 1, [indexArray[i] integerValue]);
+                    NSInteger tempRow = MIN([((NSArray *)self.customDataArray[i]) count] - 1,
+                                            [indexArray[i] integerValue]);
                     [self.pickerView selectRow:tempRow inComponent:i animated:YES];
                     self.selectedIndexArray[i] = @(tempRow);
                 }
@@ -166,7 +167,7 @@
 }
 - (NSInteger)pickerView:(UIPickerView *)pickerView numberOfRowsInComponent:(NSInteger)component {
     if (YSCPickerTypeCustom == self.pickerType) {
-        return [self.customDataArray[component] count];
+        return [((NSArray *)self.customDataArray[component]) count];
     }
     return 0;
 }

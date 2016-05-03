@@ -38,9 +38,9 @@
 // blocks
 @property (nonatomic, copy) YSCObjectIndexPathBlock deleteCellBlock;
 //  height
-@property (nonatomic, copy) YSCSectionSetBlock headerHeightBlock;
-@property (nonatomic, copy) YSCIndexPathSetBlock cellHeightBlock;
-@property (nonatomic, copy) YSCSectionSetBlock footerHeightBlock;
+@property (nonatomic, copy) YSCObjectSectionSetBlock headerHeightBlock;
+@property (nonatomic, copy) YSCObjectIndexPathSetBlock cellHeightBlock;
+@property (nonatomic, copy) YSCObjectSectionSetBlock footerHeightBlock;
 //  name
 @property (nonatomic, copy) YSCHeaderFooterNameSetBlock headerNameBlock;
 @property (nonatomic, copy) YSCCellNameSetBlock cellNameBlock;

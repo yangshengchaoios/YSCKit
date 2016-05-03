@@ -192,7 +192,7 @@ typedef NS_ENUM(NSInteger, CheckNewVersionType) {
     for (NSString *ifnam in ifs) {
         info = (__bridge_transfer id)CNCopyCurrentNetworkInfo((__bridge CFStringRef)ifnam);
         NSLog(@"%@ => %@", ifnam, info);
-        if (info && [info count]) { break; }
+        if (OBJECT_ISNOT_EMPTY(info) ) { break; }
     }
     return info;
 }

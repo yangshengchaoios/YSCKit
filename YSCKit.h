@@ -19,7 +19,6 @@
 
 // module
 #import "YSCKitBase.h"
-#import "YSCKitComponent.h"
 #import "YSCKitHelper.h"
 #import "YSCKitModel.h"
 #import "YSCKitView.h"

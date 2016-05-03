@@ -241,6 +241,7 @@
     self.layer.shadowOffset = offset;
     self.layer.shadowRadius = radius;
     self.layer.shadowOpacity = 1;
+    self.layer.masksToBounds = NO;
     self.layer.shouldRasterize = YES;
     self.layer.rasterizationScale = [UIScreen mainScreen].scale;
 }

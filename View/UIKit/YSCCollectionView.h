@@ -41,6 +41,10 @@
 @property (nonatomic, copy) YSCCellNameSetBlock cellNameBlock;
 @property (nonatomic, copy) YSCHeaderFooterNameSetBlock footerNameBlock;
 
+//  size
+@property (nonatomic, copy) YSCHeaderFooterSizeSetBlock headerSizeBlock;
+@property (nonatomic, copy) YSCHeaderFooterSizeSetBlock footerSizeBlock;
+
 //  layout
 @property (nonatomic, copy) YSCViewObjectIndexPathBlock layoutHeaderView;
 @property (nonatomic, copy) YSCViewObjectIndexPathBlock layoutCellView;

@@ -24,6 +24,7 @@
 @property (nonatomic, assign) IBInspectable BOOL stringLengthType;      //YES-string.length NO-char length default YES
 
 //控制UI样式
+@property (nonatomic, strong) UILabel *placeholderLabel;                //显示占位信息的label
 @property (nonatomic, assign) IBInspectable CGFloat cornerRadius;       //圆角弧度
 @property (nonatomic, strong) IBInspectable UIColor *borderColor;       //边框颜色
 @property (nonatomic, strong) IBInspectable NSString *placeholderString;//

@@ -481,7 +481,7 @@
     NSError *error = nil;
     NSDictionary *attrs = [[NSFileManager defaultManager] attributesOfFileSystemForPath:NSHomeDirectory() error:&error];
     if (error) return -1;
-    int64_t space =  [[attrs objectForKey:NSFileSystemSize] longLongValue];
+    int64_t space =  [[attrs objectForKey:NSFileSystemSize] unsignedLongLongValue];
     if (space < 0) space = -1;
     return space;
 }
@@ -489,7 +489,7 @@
     NSError *error = nil;
     NSDictionary *attrs = [[NSFileManager defaultManager] attributesOfFileSystemForPath:NSHomeDirectory() error:&error];
     if (error) return -1;
-    int64_t space =  [[attrs objectForKey:NSFileSystemFreeSize] longLongValue];
+    int64_t space =  [[attrs objectForKey:NSFileSystemFreeSize] unsignedLongLongValue];
     if (space < 0) space = -1;
     return space;
 }

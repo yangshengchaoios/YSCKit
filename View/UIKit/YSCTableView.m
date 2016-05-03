@@ -115,18 +115,21 @@
 #pragma mark - 注册header、cell、footer
 - (void)registerHeaderName:(NSString *)headerName {
     if (OBJECT_ISNOT_EMPTY(headerName)) {
+        _headerName = headerName;
         [self registerNib:[UINib nibWithNibName:headerName bundle:nil]
 forHeaderFooterViewReuseIdentifier:headerName];
     }
 }
 - (void)registerCellName:(NSString *)cellName {
     if (OBJECT_ISNOT_EMPTY(cellName)) {
+        _cellName = cellName;
         [self registerNib:[UINib nibWithNibName:cellName bundle:nil]
    forCellReuseIdentifier:cellName];
     }
 }
 - (void)registerFooterName:(NSString *)footerName {
     if (OBJECT_ISNOT_EMPTY(footerName)) {
+        _footerName = footerName;
         [self registerNib:[UINib nibWithNibName:footerName bundle:nil]
 forHeaderFooterViewReuseIdentifier:footerName];
     }
@@ -151,11 +154,11 @@ forHeaderFooterViewReuseIdentifier:footerName];
         }
         if (OBJECT_ISNOT_EMPTY(headerName)) {
             if (self.headerHeightBlock) {
-                return self.headerHeightBlock(section);
+                return self.headerHeightBlock(headerObject, section);
             }
             else {
                 if ([NSClassFromString(headerName) respondsToSelector:@selector(heightOfViewByObject:)]) {
-                    [NSClassFromString(headerName) performSelector:@selector(heightOfViewByObject:) withObject:headerObject];
+                    return [NSClassFromString(headerName) heightOfViewByObject:headerObject];
                 }
             }
         }
@@ -187,12 +190,12 @@ forHeaderFooterViewReuseIdentifier:footerName];
 }
 //CELL
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
+    NSObject *cellObject = [self.helper getObjectByIndexPath:indexPath];
     //0. 屏蔽通用cell的高度
     if (self.cellHeightBlock) {
-        return self.cellHeightBlock(indexPath);
+        return self.cellHeightBlock(cellObject, indexPath);
     }
     //1. 单个情况下的高度
-    NSObject *cellObject = [self.helper getObjectByIndexPath:indexPath];
     NSString *cellName = self.cellName;
     if (self.cellNameBlock) {
         NSString *tempName = self.cellNameBlock(cellObject, indexPath);
@@ -237,11 +240,11 @@ forHeaderFooterViewReuseIdentifier:footerName];
         }
         if (OBJECT_ISNOT_EMPTY(footerName)) {
             if (self.footerHeightBlock) {
-                return self.footerHeightBlock(section);
+                return self.footerHeightBlock(footerObject, section);
             }
             else {
                 if ([NSClassFromString(footerName) respondsToSelector:@selector(heightOfViewByObject:)]) {
-                    [NSClassFromString(footerName) performSelector:@selector(heightOfViewByObject:) withObject:footerObject];
+                    return [NSClassFromString(footerName) heightOfViewByObject:footerObject];
                 }
             }
         }
