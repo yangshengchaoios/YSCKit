@@ -8,11 +8,21 @@
 
 
 /**
+ * 1. if (NSOrderedAscending != COMPARE_VERSION(v1,v2))  { //v1 >= v2 }
+ * 2. if (NSOrderedDescending == COMPARE_VERSION(v1,v2)) { //v1 > v2 }
+ * 3. if (NSOrderedAscending == COMPARE_VERSION(v1,v2))  { //v1 < v2 }
+ */
+#define COMPARE_VERSION(v1,v2)          [v1 compare:v2 options:NSNumericSearch]
+#define COMPARE_CURRENT_VERSION(v)      COMPARE_VERSION([[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"], (v))
+#define APP_SKIP_VERSION(v)             [NSString stringWithFormat:@"APP_SKIP_VERSION_%@", v]
+
+/**
  *  公共方法类
  *  作用：管理各种小方法(convenient methods)
  */
 
 #import "YSCKitConstant.h"
+
 //--------------------------------------
 //  常用操作
 //--------------------------------------
@@ -39,5 +49,8 @@
 
 // 保存错误日志
 + (void)saveNSError:(NSError *)error;
+
+//检测是否用测试证书打包
++ (BOOL)isArchiveByDevelopment;
 @end
 

@@ -66,13 +66,13 @@
     NSLog(@"self.params = %@", self.params);
     self.block = self.params[kParamBlock];
     //相对布局——自动调整约束值和font大小
-    if (1 != AUTOLAYOUT_SCALE &&
+    if (1 != YSCConfigDataInstance.autoLayoutScale &&
         ( ! [self respondsToSelector:@selector(setCloseResetFontAndConstraint:)])) {
-        [self.view resetSize];
+        [self.view performSelectorInBackground:@selector(resetSize) withObject:nil];
     }
     //设置title
     [self _configTitleView];
-    self.view.backgroundColor = kDefaultViewColor; //设置默认背景颜色
+    self.view.backgroundColor = YSCConfigDataInstance.defaultViewColor; //设置默认背景颜色
     self.hidesBottomBarWhenPushed = YES;
     self.view.clipsToBounds = YES;
 	self.view.layer.masksToBounds = YES;//解决自定义导航条在移出时的延迟问题
@@ -81,7 +81,7 @@
     }
     //设置tipsview
     self.tipsView = [YSCTipsView createYSCTipsViewOnView:self.view];
-    self.tipsView.backgroundColor = kDefaultViewColor;
+    self.tipsView.backgroundColor = YSCConfigDataInstance.defaultViewColor;
     self.tipsView.hidden = YES;
     if (self.customTitleView) {
         [self.tipsView resetFrameWithEdgeInsets:UIEdgeInsetsMake(64, 0, 0, 0)];
@@ -168,22 +168,22 @@
 #pragma mark - 显示/隐藏tipsview
 - (void)showTipsWithMessage:(NSString *)message buttonAction:(YSCBlock)buttonAction {
     if (nil == self.tipsView) {
-        [YSCAlertManager showAlertVieWithMessage:message];
+        [YSCAlertManager showAlertViewWithMessage:message];
     }
     else {
         self.tipsView.hidden = NO;
         self.tipsView.messageLabel.text = message;
         if (OBJECT_IS_EMPTY(message)) {
-            [self.tipsView resetImageName:kDefaultEmptyImageName];
+            [self.tipsView resetImageName:YSCConfigDataInstance.defaultEmptyImageName];
             self.tipsView.actionButton.hidden = YES;
         }
         else {
-            [self.tipsView resetImageName:kDefaultErrorImageName];
+            [self.tipsView resetImageName:YSCConfigDataInstance.defaultErrorImageName];
             [self.tipsView resetActionWithButtonTitle:@"重新加载" buttonAction:buttonAction];
         }
     }
 }
-- (void)hideTipsViewByRemoving:(BOOL)remove {
+- (void)hideTipsView:(BOOL)remove {
     RETURN_WHEN_OBJECT_IS_EMPTY(self.tipsView)
     self.tipsView.hidden = YES;
     if (remove) {
@@ -201,7 +201,7 @@
     [YSCHUDManager showHUDOnView:self.view
                          message:message
                       edgeInsets:edgeInsets
-                 backgroundColor:showsMask ? kDefaultViewColor : nil];
+                 backgroundColor:showsMask ? YSCConfigDataInstance.defaultViewColor : nil];
 }
 - (void)showHUDOnSelfViewWithMessage:(NSString *)message {
     [self showHUDOnSelfViewWithMask:(nil != self.tipsView) message:message];
@@ -210,7 +210,7 @@
     [self showHUDOnSelfViewWithMask:(nil != self.tipsView) message:nil];
 }
 - (void)showHUDOnSelfViewThenHideWithMessage:(NSString *)message {
-    [YSCHUDManager showHUDThenHide:message onView:self.view afterDelay:1];
+    [YSCHUDManager showHUDThenHideOnView:self.view message:message];
 }
 - (void)hideHUDOnSelfView {
     [YSCHUDManager hideHUDOnView:self.view];

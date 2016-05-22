@@ -40,8 +40,8 @@
 }
 //弹出系统相机进行拍照
 + (void)presentCameraPickerOnViewController:(UIViewController *)viewController {
-    if (NO == [UIDevice isCanUseCamera]) {
-        [YSCHUDManager showHUDThenHideOnKeyWindow:@"请在设置->隐私->相机,打开本应用的权限"];
+    if ( ! [UIDevice isCanUseCamera]) {
+        [YSCHUDManager showHUDThenHideOnKeyWindowWithMessage:@"请在设置->隐私->相机,打开本应用的权限"];
     }
     else {
         UIImagePickerController *imagePickerController = [self createImagePickerController:UIImagePickerControllerSourceTypeCamera allowsEditing:NO delegate:(id)viewController];
@@ -50,8 +50,8 @@
 }
 //弹出图片选择器
 + (void)presentImagePickerOnViewController:(UIViewController *)viewController numberOfSelection:(NSInteger)numberOfSelection {
-    if (NO == [UIDevice isPhotoLibraryAvailable]) {
-        [YSCHUDManager showHUDThenHideOnKeyWindow:@"请在设置->隐私->照片,打开本应用的权限"];
+    if ( ! [UIDevice isPhotoLibraryAvailable]) {
+        [YSCHUDManager showHUDThenHideOnKeyWindowWithMessage:@"请在设置->隐私->照片,打开本应用的权限"];
     }
     else {
         if (numberOfSelection > 1) {//多张图片

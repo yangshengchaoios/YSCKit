@@ -129,7 +129,7 @@
     self.layer.mask = layer;
 }
 - (void)makeBorderLine {
-    [self makeBorderWithColor:kDefaultBorderColor borderWidth:1];
+    [self makeBorderWithColor:YSCConfigDataInstance.defaultBorderColor borderWidth:1];
 }
 - (void)makeBorderWithColor:(UIColor *)color borderWidth:(CGFloat)width {
     self.layer.borderColor = color.CGColor;

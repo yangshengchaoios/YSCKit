@@ -43,12 +43,12 @@
     self.helper.enableRefresh = YES;
     self.helper.enableLoadMore = YES;
     self.helper.enableTips = YES;
-    WEAKSELF
+    @weakiy(self);
     self.helper.loadMoreBlock = ^(NSIndexSet *sections, NSArray<NSIndexPath *> *indexPaths) {
-        [weakSelf beginUpdates];
-        [weakSelf insertSections:sections withRowAnimation:UITableViewRowAnimationNone];
-        [weakSelf insertRowsAtIndexPaths:indexPaths withRowAnimation:UITableViewRowAnimationAutomatic];
-        [weakSelf endUpdates];
+        [weak_self beginUpdates];
+        [weak_self insertSections:sections withRowAnimation:UITableViewRowAnimationNone];
+        [weak_self insertRowsAtIndexPaths:indexPaths withRowAnimation:UITableViewRowAnimationAutomatic];
+        [weak_self endUpdates];
     };
     [self initTableView];
 }
@@ -61,7 +61,7 @@
     //2. 设置cell的分割线
     [self resetCellEdgeInsets];
     self.separatorStyle = UITableViewCellSeparatorStyleSingleLine;
-    self.separatorColor = kDefaultBorderColor;//NOTE:xib < this
+    self.separatorColor = YSCConfigDataInstance.defaultBorderColor;//NOTE:xib < this
     
     //3. 设置其他参数
     self.tableHeaderView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 0, 0.01)];
@@ -298,9 +298,11 @@ forHeaderFooterViewReuseIdentifier:footerName];
             NSObject *object = [self.helper getObjectByIndexPath:indexPath];
             self.deleteCellBlock(object, indexPath);
         }
+        [self.helper removeDataAtIndexPath:indexPath];
+        [self deleteRowAtIndexPath:indexPath withRowAnimation:UITableViewRowAnimationAutomatic];
     }
 }
-//NOTE:系统自动多语言返回"删除"
+//NOTE:系统自动返回支持多语言的"删除"
 //- (NSString *)tableView:(UITableView *)tableView titleForDeleteConfirmationButtonForRowAtIndexPath:(NSIndexPath *)indexPath {
 //    return @"删除";
 //}

@@ -54,7 +54,7 @@
 }
 + (BOOL)copyFileFromPath:(NSString *)sourceFilePath toPath:(NSString *)targetFilePath {
     BOOL isSucces = NO;
-    if (NO == [[NSFileManager defaultManager] fileExistsAtPath:sourceFilePath]) {
+    if ( ! [[NSFileManager defaultManager] fileExistsAtPath:sourceFilePath]) {
         NSLog(@"The source file is not exists!sourceFilePath=%@", sourceFilePath);
         return NO;
     }
@@ -64,7 +64,7 @@
     return [[NSFileManager defaultManager] copyItemAtPath:sourceFilePath toPath:targetFilePath error:NULL];
 }
 + (BOOL)deleteFileOrDirectory:(NSString *)deletePath {
-    if (NO == [self fileExistsAtPath:deletePath]) {
+    if ( ! [self fileExistsAtPath:deletePath]) {
         NSLog(@"The path has been deleted! deletePath=%@", deletePath);
         return YES;
     }

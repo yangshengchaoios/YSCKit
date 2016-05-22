@@ -8,16 +8,10 @@
 
 #import <UIKit/UIKit.h>
 
-FOUNDATION_EXPORT NSString * const kParamHeaderIdentifier;
-FOUNDATION_EXPORT NSString * const kParamFooterIdentifier;
+static NSString * const kParamHeaderIdentifier     = @"YSCKit_Header";
+static NSString * const kParamFooterIdentifier     = @"YSCKit_Footer";
 
 @interface YSCBaseTableHeaderFooterView : UITableViewHeaderFooterView
-
-#pragma mark - 注册与重用
-+ (void)registerHeaderFooterToTableView:(UITableView *)tableView;
-+ (instancetype)dequeueHeaderFooterByTableView:(UITableView *)tableView;
-+ (NSString *)identifier;
-+ (UINib *)nibNameOfView;
 
 #pragma mark - 计算高度
 + (CGFloat)heightOfViewByObject:(NSObject *)object;//NOTE:子类只能实现这个

@@ -6,18 +6,6 @@
 //  Copyright (c) 2015年 yangshengchao. All rights reserved.
 //
 
-#ifndef kDefaultEmptyImageName
-    #define kDefaultEmptyImageName          @"image_default_empty"
-#endif
-
-#ifndef kDefaultErrorImageName
-    #define kDefaultErrorImageName          @"image_default_error"
-#endif
-
-#ifndef kDefaultEmptyMessage
-    #define kDefaultEmptyMessage            @"暂无数据"
-#endif
-
 @interface YSCTipsView : UIView
 
 @property (weak, nonatomic) IBOutlet UIImageView *iconImageView;

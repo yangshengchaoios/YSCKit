@@ -10,6 +10,7 @@
 /** 常用参数名称定义 */
 static NSString * const kParamId                   = @"id"         ;
 static NSString * const kParamTitle                = @"title"      ;
+static NSString * const kParamTitleView            = @"titleView"  ;
 static NSString * const kParamUrl                  = @"url"        ;
 static NSString * const kParamUrls                 = @"urls"       ;
 static NSString * const kParamContent              = @"content"    ;

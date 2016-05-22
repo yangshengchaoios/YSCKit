@@ -68,7 +68,7 @@
     self.allowsNumber = YES;
     self.stringLengthType = YES;
     self.cornerRadius = 8;
-    self.borderColor = kDefaultBorderColor;
+    self.borderColor = YSCConfigDataInstance.defaultBorderColor;
     
     //创建placeholerLabel
     self.placeholderLabel = [[UILabel alloc] initWithFrame:CGRectZero];
@@ -82,7 +82,7 @@
         make.width.equalTo(self.mas_width).offset(0);
     }];
     self.placeholderString = @"";
-    self.placeholderColor = kDefaultPlaceholderColor;
+    self.placeholderColor = YSCConfigDataInstance.defaultPlaceholderColor;
     
     //创建remainingLabel
     self.remainingLabel = [[UILabel alloc] initWithFrame:CGRectZero];
@@ -98,7 +98,7 @@
         make.width.equalTo(@100);
     }];
     self.showsRemainingCount = NO;
-    self.remainingTextColor = kDefaultPlaceholderColor;
+    self.remainingTextColor = YSCConfigDataInstance.defaultPlaceholderColor;
     self.maxLength = 400;
     
     if (nil == self.backgroundColor) {
@@ -144,7 +144,7 @@
         if (nil == inputMode) {//ios8 默认emoji键盘会返回nil 这是bug???
             inputMode = [[UITextInputMode currentInputMode] primaryLanguage];
         }
-        if ([@"emoji" isEqualToString:inputMode] && NO == self.allowsEmoji) {//针对emoji键盘控制是否可以输入
+        if ([@"emoji" isEqualToString:inputMode] && ( ! self.allowsEmoji)) {//针对emoji键盘控制是否可以输入
             textView.text = self.oldString;
         }
         else {
@@ -219,7 +219,7 @@
     //0. 暂存输入的字符串
     NSString *tempString = [self textString];
     //1.0 根据自定义的正则表达式来校验
-    if (NO == OBJECT_IS_EMPTY(self.customRegex)) {
+    if ( ! OBJECT_IS_EMPTY(self.customRegex)) {
         return [self checkString:tempString isMatchRegex:self.customRegex];
     }
     //1.1 判空

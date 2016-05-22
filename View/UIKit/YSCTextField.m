@@ -72,7 +72,7 @@
     self.cornerRadius = 8;
     self.textLeftMargin = 10;
     self.textRightMargin = 10;
-    self.borderColor = kDefaultBorderColor;
+    self.borderColor = YSCConfigDataInstance.defaultBorderColor;
     
     self.borderStyle = UITextBorderStyleNone;
     self.clearButtonMode = UITextFieldViewModeWhileEditing;
@@ -134,7 +134,7 @@
         if (nil == inputMode) {//ios8 默认emoji键盘会返回nil 这是bug???
             inputMode = [[UITextInputMode currentInputMode] primaryLanguage];
         }
-        if ([@"emoji" isEqualToString:inputMode] && NO == self.allowsEmoji) {//针对emoji键盘控制是否可以输入
+        if ([@"emoji" isEqualToString:inputMode] && ( ! self.allowsEmoji)) {//针对emoji键盘控制是否可以输入
             textField.text = self.oldString;
         }
         else {
@@ -211,7 +211,7 @@
     //1. 根据property设置来校验
     if (YSCTextTypeProperty == self.textType) {
         //1.0 根据自定义的正则表达式来校验
-        if (NO == OBJECT_IS_EMPTY(self.customRegex)) {
+        if ( ! OBJECT_IS_EMPTY(self.customRegex)) {
             return [self checkString:tempString isMatchRegex:self.customRegex];
         }
         //1.1 判空

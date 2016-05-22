@@ -44,7 +44,7 @@ static NSString * const kDefaultBackArrowImageName = @"arrow_left_default";
  *  显示/隐藏tipsview
  */
 - (void)showTipsWithMessage:(NSString *)message buttonAction:(YSCBlock)buttonAction;
-- (void)hideTipsViewByRemoving:(BOOL)remove;
+- (void)hideTipsView:(BOOL)remove;
 
 /**
  *  自动判断hud的背景是否透明，以及HUD的edgeInsets

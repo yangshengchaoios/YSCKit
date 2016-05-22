@@ -8,10 +8,6 @@
 
 #import "YSCTipsView.h"
 
-#ifndef kDefaultNoMoreMessage
-    #define kDefaultNoMoreMessage          @"没有更多了"
-#endif
-
 /** 定义(分页)加载功能用到的block */
 typedef NSDictionary *(^YSCIntegerSetBlock)(NSInteger pageIndex);
 typedef NSArray *(^YSCArraySetBlock)(NSArray *array);
@@ -21,6 +17,7 @@ typedef CGFloat (^YSCSectionSetBlock)(NSInteger section);
 typedef NSString *(^YSCCellNameSetBlock)(NSObject *object, NSIndexPath *indexPath);
 typedef NSString *(^YSCHeaderFooterNameSetBlock)(NSObject *object, NSInteger section);
 typedef CGSize (^YSCHeaderFooterSizeSetBlock)(NSObject *object, NSInteger section);
+typedef CGSize (^YSCCellSizeSetBlock)(NSObject *object, NSIndexPath *indexPath);
 typedef void(^YSCLoadMoreBlock) (NSIndexSet *, NSArray<NSIndexPath *> *);
 typedef void (^YSCObjectIndexPathBlock)(NSObject *object, NSIndexPath *indexPath);
 typedef void (^YSCViewObjectIndexPathBlock)(UIView *view, NSObject *object, NSIndexPath *indexPath);
@@ -70,15 +67,17 @@ typedef void (^YSCIntegerBlock)(NSInteger pageIndex);
 @property (nonatomic, copy) YSCBlock willBeginDeceleratingBlock;
 @property (nonatomic, copy) YSCBlock didEndDeceleratingBlock;
 
+// 是否正在加载数据
+- (BOOL)isLoading;
+
 // 启动刷新(能加载一次缓存)
 - (void)beginRefreshing;
 - (void)beginRefreshingByAnimation:(BOOL)animation;
 
 // 刷新列表
 - (void)refreshWithObjects:(NSObject *)objects;
-- (void)refreshAtPageIndex:(NSInteger)pageIndex;
 // 兼容第三方数据源
-- (void)refreshAtPageIndex:(NSInteger)pageIndex response:(NSObject *)initObject error:(NSString *)errorMessage;
+- (void)loadDataByPageIndex:(NSInteger)pageIndex response:(NSObject *)initObject error:(NSString *)errorMessage;
 
 - (void)beginRefreshingWhenCellDataIsEmpty;             //当数据为空时执行下拉刷新
 - (void)clearDataAndRefreshView;                        //清空列表并刷新界面
@@ -87,5 +86,6 @@ typedef void (^YSCIntegerBlock)(NSInteger pageIndex);
 - (BOOL)isLastCellByIndexPath:(NSIndexPath *)indexPath;
 - (BOOL)isLastSectionByIndexPath:(NSIndexPath *)indexPath;
 - (NSObject *)getObjectByIndexPath:(NSIndexPath *)indexPath;
+- (void)removeDataAtIndexPath:(NSIndexPath *)indexPath;
 @end
 

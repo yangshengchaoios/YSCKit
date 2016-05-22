@@ -25,7 +25,6 @@
 @property (nonatomic, strong) NSString *cacheDBPath;        //缓存数据库路径
 @property (nonatomic, assign) BOOL isUserLoginChanged;      //用户登录状态改变
 @property (nonatomic, assign) CGFloat currentKeyboardHeight;//当前键盘高度
-@property (nonatomic, assign) CGFloat autoLayoutScale;      //程序启动后必须固定的参数，防止在旋转后计算不正确
 //network status
 @property (nonatomic, assign) BOOL isReachable;             //是否处于联网状态
 @property (nonatomic, assign) BOOL isReachableViaWiFi;      //是否通过wifi联网

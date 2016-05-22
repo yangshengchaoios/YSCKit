@@ -8,18 +8,10 @@
 
 #import <UIKit/UIKit.h>
 
-FOUNDATION_EXPORT NSString * const kParamItemHeaderIdentifier;
-FOUNDATION_EXPORT NSString * const kParamItemFooterIdentifier;
+static NSString * const kParamItemHeaderIdentifier     = @"YSCKit_ItemHeader";
+static NSString * const kParamItemFooterIdentifier     = @"YSCKit_ItemFooter";
 
 @interface YSCBaseCollectionHeaderFooterView : UICollectionReusableView
-
-#pragma mark - 注册与重用
-+ (void)registerHeaderToCollectionView:(UICollectionView *)collectionView;
-+ (void)registerFooterToCollectionView:(UICollectionView *)collectionView;
-+ (instancetype)dequeueHeaderByCollectionView:(UICollectionView *)collectionView forIndexPath:(NSIndexPath *)indexPath;
-+ (instancetype)dequeueFooterByCollectionView:(UICollectionView *)collectionView forIndexPath:(NSIndexPath *)indexPath;
-+ (NSString *)identifier;
-+ (UINib *)nibNameOfView;
 
 #pragma mark - 计算大小
 + (CGSize)sizeOfViewByObject:(NSObject *)object;

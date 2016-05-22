@@ -43,6 +43,7 @@
 
 //  size
 @property (nonatomic, copy) YSCHeaderFooterSizeSetBlock headerSizeBlock;
+@property (nonatomic, copy) YSCCellSizeSetBlock cellSizeBlock;
 @property (nonatomic, copy) YSCHeaderFooterSizeSetBlock footerSizeBlock;
 
 //  layout

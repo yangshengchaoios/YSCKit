@@ -7,81 +7,35 @@
 //
 
 #import "YSCWebViewController.h"
-#import "NSObject+BKBlockExecution.h"
-#define KeyOfCachedHtmlString(type)       [NSString stringWithFormat:@"KeyOfCachedHtmlString_%@", (type)]
 
 @interface YSCWebViewController () <UIWebViewDelegate, NSURLConnectionDelegate>
-
 @property (weak, nonatomic) IBOutlet UIWebView *webView;
-@property (strong, nonatomic) NSString *htmlString;
-@property (strong, nonatomic) NSString *type;
-
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *webViewTop;//64
+@property (strong, nonatomic) NSString *webUrl;
 @property (strong, nonatomic) NSURLConnection *urlConnection;
 @property (strong, nonatomic) NSURLRequest *request;
 @property (assign, nonatomic) BOOL authenticated;
-@property (strong, nonatomic) YSCTipsView *tipsView;
-
 @end
 
 @implementation YSCWebViewController
-
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.tipsView = [YSCTipsView createYSCTipsViewOnView:self.webView];
-    self.tipsView.actionButton.hidden = YES;
-    self.tipsView.hidden = YES;
-    
-    if (self.params[kParamUrl]) {
-        NSString *url = TRIM_STRING(self.params[kParamUrl]);
-        if (NO == [url isContains:@"http"]) {//兼容没有输入http://的情况
-            url = [NSString stringWithFormat:@"http://%@", url];
-        }
-        if ([url isUrl]) {
-            [self.webView loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:url]]];
-        }
-        else {
-            self.tipsView.hidden = NO;
-            self.tipsView.messageLabel.text = @"传入的URL为空";
-        }
+    self.webViewTop.constant = (nil != self.customTitleView) ? 64 : 0;
+    [self showHUDOnSelfView];
+    self.webUrl = [NSString stringWithFormat:@"%@", self.params[kParamUrl]];
+    if ( ! [self.webUrl isContains:@"http"]) {//兼容没有输入http://的情况
+        self.webUrl = [NSString stringWithFormat:@"http://%@", self.webUrl];
     }
-    else if (self.params[kParamContent]) {
-        NSString *content = TRIM_STRING(self.params[kParamContent]);
-        [self.webView loadHTMLString:content baseURL:nil];
+    if ([self.webUrl isWebUrl]) {
+        [self.webView loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:self.webUrl]]];
     }
-    else if (self.params[kParamMethod]) {
-        NSString *method = TRIM_STRING(self.params[kParamMethod]);
-        NSDictionary *params = self.params[kParamParams];
-        self.type = params[kParamType];
-        if (OBJECT_IS_EMPTY(self.type) || OBJECT_IS_EMPTY(method)) {
-            [YSCHUDManager showHUDThenHideOnKeyWindow:@"参数有误"];
-            return;
-        }
-//        self.htmlString = [self cachedObjectForKey:KeyOfCachedHtmlString(self.type)];//FIXME:test
-        [self layoutHtmlString];
-        [self laodHtmlWithMethod:method andParams:params];
+    else {
+        [self showTipsWithMessage:@"传入的URL为空" buttonAction:nil];
+        self.tipsView.actionButton.hidden = YES;
     }
 }
-
-//直接显示html数据
-- (void)layoutHtmlString {
-    [self.webView loadHTMLString:self.htmlString baseURL:nil];
-}
-
-#pragma mark - 网络访问
-- (void)laodHtmlWithMethod:(NSString *)method andParams:(NSDictionary *)params {
-    WEAKSELF
-    [YSCDataModel getByApi:method
-                    params:params
-                     block:^(NSObject *object, NSString *errorMessage) {
-                         if (OBJECT_IS_EMPTY(errorMessage)) {
-                             weakSelf.htmlString = (NSString *)object;
-//                                 [weakSelf saveObject:object forKey:KeyOfCachedHtmlString(weakSelf.type)];//FIXME:test
-                             [weakSelf layoutHtmlString];
-                         }
-                         else {
-                             [YSCHUDManager showHUDThenHideOnKeyWindow:errorMessage];
-                         }
-                     }];
+- (NSString *)customTitleViewName {
+    return [NSString stringWithFormat:@"%@", self.params[kParamTitleView]];
 }
 
 #pragma mark - UIWebViewDelegate
@@ -91,11 +45,10 @@
 // which UIWebView does not have), authenticate using NSURLConnection, then use another UIWebView to complete
 // the loading and viewing of the page. See connection:didReceiveAuthenticationChallenge to see how this works.
 - (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType {
-    [YSCHUDManager showHUDOnView:self.view];
     NSString *scheme = [[request URL] scheme];
     if ([scheme isEqualToString:@"https"]) {
         //如果是https:的话，那么就用NSURLConnection来重发请求。从而在请求的过程当中吧要请求的URL做信任处理。
-        if (NO == self.authenticated) {
+        if ( ! self.authenticated) {
             self.request = request;
             NSURLConnection* conn = [[NSURLConnection alloc] initWithRequest:request delegate:self];
             [conn start];
@@ -105,27 +58,29 @@
     }
     return YES;
 }
-
 - (void)resizeWebviewHeight {
-    [YSCHUDManager hideHUDOnView:self.view];
-    WEAKSELF
+    @weakiy(self);
     [self bk_performBlock:^(id obj) {
         //延迟1.5秒可以解决：首次进入时webview.contentheight高度不正确的问题。
-        [weakSelf.webView.scrollView scrollsToTop];
+        [weak_self.webView.scrollView scrollsToTop];
     } afterDelay:1.5];
 }
 - (void)webViewDidFinishLoad:(UIWebView *)webView {
     [self resizeWebviewHeight];
-    self.tipsView.hidden = YES;
     NSString *title = [webView stringByEvaluatingJavaScriptFromString:@"document.title"];
     if (OBJECT_IS_EMPTY(self.navigationItem.title) && OBJECT_ISNOT_EMPTY(title)) {
         self.navigationItem.title = title;
     }
+    [self hideTipsView:YES];
 }
 - (void)webView:(UIWebView *)webView didFailLoadWithError:(NSError *)error {
+    @weakiy(self);
     [self resizeWebviewHeight];
-    self.tipsView.hidden = NO;
-    self.tipsView.messageLabel.text = GET_NSERROR_MESSAGE(error);
+    NSString *errorMessage = GET_NSERROR_MESSAGE(error);
+    [self hideHUDOnSelfView];
+    [self showTipsWithMessage:errorMessage buttonAction:^{
+        [weak_self.webView loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:weak_self.webUrl]]];
+    }];
 }
 
 #pragma mark - NURLConnection delegate
@@ -140,9 +95,8 @@
 }
 - (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response; {
     [connection cancel];
+    [self showHUDOnSelfView];
     self.authenticated = YES;
     [self.webView loadRequest:self.request];
 }
-
-
 @end

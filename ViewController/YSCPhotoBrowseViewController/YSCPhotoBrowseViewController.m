@@ -69,10 +69,10 @@
     //3. 初始化当前页码
     if (self.params[kParamIndex]) {
         self.photoBrowseView.hidden = YES;
-        WEAKSELF
+        @weakiy(self);
         [self bk_performBlock:^(id obj) {
-            weakSelf.photoBrowseView.hidden = NO;
-            [weakSelf.photoBrowseView resetCurrentIndex:[weakSelf.params[kParamIndex] integerValue]];
+            weak_self.photoBrowseView.hidden = NO;
+            [weak_self.photoBrowseView resetCurrentIndex:[weak_self.params[kParamIndex] integerValue]];
         } afterDelay:0.3];
         self.currentIndex = [self.params[kParamIndex] integerValue];
     }
@@ -81,12 +81,12 @@
     }
 }
 - (void)initPhotoBrowseView {
-    WEAKSELF
+    @weakiy(self);
     self.photoBrowseView.tapPageAtIndex = ^(NSInteger index, NSError *error) {
-        [weakSelf.navigationController popViewControllerAnimated:NO];
+        [weak_self.navigationController popViewControllerAnimated:NO];
     };
     self.photoBrowseView.scrollAtIndex = ^(NSInteger index, NSError *error) {
-        weakSelf.currentIndex = index;
+        weak_self.currentIndex = index;
     };
     self.photoBrowseView.minimumLineSpacing = 10;
     [self.photoBrowseView refreshCollectionViewByItemArray:self.dataArray];
@@ -104,7 +104,7 @@
         UIImageWriteToSavedPhotosAlbum(cell.savedImage, self, @selector(image:didFinishSavingWithError:contextInfo:), nil);
     }
     else {
-        [YSCHUDManager showHUDThenHideOnKeyWindow:@"图片为空"];
+        [YSCHUDManager showHUDThenHideOnKeyWindowWithMessage:@"图片为空"];
     }
 }
 - (IBAction)closeButtonClicked:(id)sender {
@@ -113,10 +113,10 @@
 // 写到文件的完成时执行
 - (void)image:(UIImage *)image didFinishSavingWithError:(NSError *)error contextInfo:(void *)contextInfo {
     if (nil == error) {
-        [YSCHUDManager showHUDThenHideOnKeyWindow:@"保存成功"];
+        [YSCHUDManager showHUDThenHideOnKeyWindowWithMessage:@"保存成功"];
     }
     else {
-        [YSCHUDManager showHUDThenHideOnKeyWindow:@"保存失败！"];
+        [YSCHUDManager showHUDThenHideOnKeyWindowWithMessage:@"保存失败！"];
     }
 }
 

@@ -9,7 +9,6 @@
 
 #import <UIKit/UIKit.h>
 
-FOUNDATION_EXPORT NSString * const kParamEnableDownloadImage;
 typedef void(^SetImageCompletionBlock)(UIImage *image, NSError *error);
 
 @interface UIImageView (YSCKit)

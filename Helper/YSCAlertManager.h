@@ -9,7 +9,7 @@
 #import <Foundation/Foundation.h>
 
 @interface YSCAlertManager : NSObject
-+ (UIAlertView *)showAlertVieWithMessage:(NSString *)message;
++ (UIAlertView *)showAlertViewWithMessage:(NSString *)message;
 + (UIAlertView *)showAlertViewWithMessage:(NSString *)message block:(YSCBlock)block;
 + (UIAlertView *)showAlertViewWithTitle:(NSString *)title message:(NSString *)message;
 + (UIAlertView *)showAlertViewWithTitle:(NSString *)title

@@ -8,9 +8,6 @@
 
 #import "YSCBaseTableHeaderFooterView.h"
 
-NSString * const kParamHeaderIdentifier     = @"YSCKit_Header";
-NSString * const kParamFooterIdentifier     = @"YSCKit_Footer";
-
 @implementation YSCBaseTableHeaderFooterView
 
 - (void)awakeFromNib {

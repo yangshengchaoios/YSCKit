@@ -140,7 +140,7 @@
                         type:(YSCRequestType)type
                      success:(YSCRequestSuccess)success
                       failed:(YSCRequestFailed)failed {
-    return [self requestFromUrl:url withApi:apiName params:params imageData:imageData type:type success:^(id responseObject) {
+    return [self requestFromUrl:url withApi:apiName params:params httpHeaderParams:nil imageData:imageData type:type success:^(id responseObject) {
         NSObject *model = responseObject;
         if (customModel && [[customModel class] respondsToSelector:@selector(objectWithKeyValues:)]) {
             model = [customModel objectWithKeyValues:responseObject];
@@ -167,19 +167,20 @@
 - (NSString *)requestFromUrl:(NSString *)url
                      withApi:(NSString *)apiName
                       params:(NSDictionary *)params
+            httpHeaderParams:(NSDictionary *)httpHeaderParams
                    imageData:(NSData *)imageData
                         type:(YSCRequestType)requestType
                      success:(YSCRequestSuccess)success
                       failed:(YSCRequestFailed)failed {
     //0. url组装、判断网络状态、判断url合法性
-    if (NO == YSCDataInstance.isReachable) {
+    if ( ! YSCDataInstance.isReachable) {
         if (failed) {
             failed(YSCErrorTypeDisconnected, nil);
         }
         return @"";
     }
     url = [self _formatRequestUrl:url withApi:apiName];
-    if (NO == [NSString isUrl:url]) {
+    if ( ! [NSString isWebUrl:url]) {
         if (failed) {
             failed(YSCErrorTypeURLInvalid, nil);
         }
@@ -189,16 +190,16 @@
     // 自动处理重复请求
     
     if (self.requestQueue[requestId]) {
-        #if kIsAutoRefuseWhenRequesting
-        NSLog(@"The same requstId[%@] is still running!\rurl:%@\rapi:%@\rparams:%@\rtype:%ld",
-              requestId, url, apiName, params, requestType);
-        if (failed) {
-            failed(YSCErrorTypeRequesting, nil);
+        if (YSCConfigDataInstance.isAutoCancelTheLastSameRequesting) {
+            [self removeRequestById:requestId];//自动停止之前的相同网络请求
         }
-        return @"";
-        #else
-        [self removeRequestById:requestId];//自定停止之前的相同网络请求
-        #endif
+        else {NSLog(@"The same requstId[%@] is still running!\rurl:%@\rapi:%@\rparams:%@\rtype:%ld",
+                    requestId, url, apiName, params, requestType);
+            if (failed) {
+                failed(YSCErrorTypeRequesting, nil);
+            }
+            return @"";
+        }
     }
     NSDictionary *formatedParams = [self _formatRequestParams:params withApi:apiName andUrl:url];//格式化所有请求的参数
     
@@ -209,15 +210,19 @@
     manager.responseSerializer.acceptableContentTypes = [NSSet setWithObjects:@"application/json", @"text/json", @"text/javascript",@"text/html", @"text/plain", @"audio/wav", nil];
     manager.requestSerializer = [AFJSONRequestSerializer serializer];
     manager.requestSerializer.cachePolicy = NSURLRequestReloadIgnoringLocalCacheData;
-    manager.requestSerializer.timeoutInterval = kDefaultRequestTimeOut;
-//    [manager.requestSerializer setValue:@"gzip" forHTTPHeaderField:@"Accept-Encoding"];//TODO:压缩上传内容
-    #if kIsUseHttpHeaderSignature
-    [manager.requestSerializer setValue:[self _signatureParams:formatedParams] forHTTPHeaderField:kParamSignature];
-    #endif
-    
-    #if kIsUseHttpHeaderToken
-    [manager.requestSerializer setValue:[self _httpToken] forHTTPHeaderField:kParamHttpToken];
-    #endif
+    manager.requestSerializer.timeoutInterval = YSCConfigDataInstance.defaultRequestTimeOut;
+    if (YSCConfigDataInstance.isUseHttpHeaderSignature) {
+        [manager.requestSerializer setValue:[self _signatureParams:formatedParams] forHTTPHeaderField:kParamSignature];
+    }
+    if (YSCConfigDataInstance.isUseHttpHeaderToken) {
+        [manager.requestSerializer setValue:[self _httpToken] forHTTPHeaderField:kParamHttpToken];
+    }
+    if (OBJECT_ISNOT_EMPTY(httpHeaderParams)) {
+        for (NSString *key in [httpHeaderParams allKeys]) {
+            NSString *value = httpHeaderParams[key];
+            [manager.requestSerializer setValue:value forHTTPHeaderField:key];
+        }
+    }
     
     //2. 配置网络请求参数
     NSMutableURLRequest *mutableRequest = nil;
@@ -255,7 +260,6 @@
                                                            parameters:formatedParams
                                                                 error:&serializationError];
         mutableRequest.HTTPBody = [bodyParam dataUsingEncoding:manager.requestSerializer.stringEncoding];
-        [mutableRequest setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
     }
     
     //3. 创建网络请求出错
@@ -356,11 +360,10 @@
 }
 // 计算httpToken参数值
 - (NSString *)_httpToken {
-    NSDictionary *param = @{kParamAppId : APP_BUNDLE_IDENTIFIER,
-                            kParamAppVersion : APP_VERSION,
-                            kParamAppChannel : APP_CHANNEL,
-                            kParamFrom : @"1",//1-ios 2-android 3-wap
-                            kParamLoginToken : LOGIN_TOKEN,
+    NSDictionary *param = @{kParamAppId : YSCConfigDataInstance.appBundleIdentifier,
+                            kParamAppVersion : YSCConfigDataInstance.appVersion,
+                            kParamAppChannel : YSCConfigDataInstance.appChannel,
+                            kParamFrom : @"ios",
                             kParamLongitude : [NSString stringWithFormat:@"%f", YSCDataInstance.currentLongitude],
                             kParamLatitude : [NSString stringWithFormat:@"%f", YSCDataInstance.currentLatitude],
                             kParamUdid : YSCDataInstance.udid,
@@ -370,8 +373,8 @@
     NSString *httpToken = [NSString jsonStringWithObject:param];
     if (OBJECT_ISNOT_EMPTY(self.httpTokenSecretKey)) {
         httpToken = [NSString DESEncrypt:httpToken byKey:self.httpTokenSecretKey];
+        NSLog(@"httpToken string=\r%@", httpToken);
     }
-    NSLog(@"httpToken string=\r%@", httpToken);
     return httpToken;
 }
 // 计算post body的参数值
@@ -397,7 +400,7 @@
     
     if (OBJECT_ISNOT_EMPTY(resolvedString) &&
         OBJECT_ISNOT_EMPTY(self.requestSecretKey) &&
-        NO == [resolvedString isContains:@"{"]) {//这里兼容了返回内容没有加密的情况
+        ( ! [resolvedString isContains:@"{"])) {//这里兼容了返回内容没有加密的情况
         resolvedString = [NSString DESDecrypt:resolvedString byKey:self.requestSecretKey];
     }
     NSString *formatedJsonString = [YSCFormatManager formatPrintJsonStringOnConsole:resolvedString];

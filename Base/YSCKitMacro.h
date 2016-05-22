@@ -21,37 +21,16 @@ typedef void (^YSCIdErrorMessageBlock)(id object, NSString *errorMessage);
 typedef void (^YSCIntegerErrorBlock)(NSInteger, NSError *);
 
 
-#ifndef APP_CHANNEL
-    #define APP_CHANNEL     @"AppStore"
-#endif
-
-#ifndef CURRENT_DATE
-    #define CURRENT_DATE    [YSCDataInstance currentDate]
-#endif
-
-#ifndef USER_ID
-    #define USER_ID  @""//TODO:
-#endif
-
-#ifndef DEBUG_MODEL
-    #define DEBUG_MODEL @""//TODO:
-#endif
-
-#ifndef LOGIN_TOKEN
-    #define LOGIN_TOKEN   @""//TODO:
-#endif
-
-
-
-
 // 方法或属性过期标志
 #define YSCDeprecated(explain) NS_DEPRECATED(2_0, 2_0, 2_0, 2_0, explain)
 
 // 定义NSLog
 #define __NSLog(s, ...) do { \
-        NSString *logString = [NSString stringWithFormat:@"[%@(%d)] %@",[[NSString stringWithUTF8String:__FILE__] lastPathComponent],__LINE__,[NSString stringWithFormat:(s), ##__VA_ARGS__]]; \
-        NSLog(@"%@", logString); \
-        [YSCLogManager saveLog:logString]; \
+        if (YSCConfigDataInstance.isDebugModel || [YSCManager isArchiveByDevelopment]) { \
+            NSString *logString = [NSString stringWithFormat:@"[%@(%d)] %@",[[NSString stringWithUTF8String:__FILE__] lastPathComponent],__LINE__,[NSString stringWithFormat:(s), ##__VA_ARGS__]]; \
+            NSLog(@"%@", logString); \
+            [YSCLogManager saveLog:logString]; \
+        } \
     } while (0)
 #define NSLog(...) __NSLog(__VA_ARGS__)
 
@@ -59,14 +38,10 @@ typedef void (^YSCIntegerErrorBlock)(NSInteger, NSError *);
 #define LOG_SIZE(size)      NSLog(@"%s =\r { w:%f, h:%f }", #size, size.width, size.height)
 #define LOG_RECT(rect)      NSLog(@"%s =\r { x:%f, y:%f, w:%f, h:%f }", #rect, rect.origin.x, rect.origin.y, rect.size.width, rect.size.height)
 
-// 定义weakSelf
-#ifndef WEAKSELF
-    #define WEAKSELF __weak __typeof(&*self) weakSelf = self;
-#endif
 
 // 去掉字符串的头尾空格
 #define TRIM_STRING(_string) (\
-        (NO == [_string isKindOfClass:[NSString class]]) ? \
+        ( ! [_string isKindOfClass:[NSString class]]) ? \
         @"" : [_string stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]] \
         )
 
@@ -79,13 +54,13 @@ typedef void (^YSCIntegerErrorBlock)(NSInteger, NSError *);
         || [_object isKindOfClass:[NSNull class]] \
         || ([_object respondsToSelector:@selector(length)] && [(NSData *)_object length] == 0) \
         || ([_object respondsToSelector:@selector(count)]  && [(NSArray *)_object count] == 0))
-#define OBJECT_ISNOT_EMPTY(_object) (NO == OBJECT_IS_EMPTY(_object))
+#define OBJECT_ISNOT_EMPTY(_object) ( ! OBJECT_IS_EMPTY(_object))
 #define RETURN_WHEN_OBJECT_IS_EMPTY(_object)        if (OBJECT_IS_EMPTY(_object)) { return ;    }
 #define RETURN_NIL_WHEN_OBJECT_IS_EMPTY(_object)    if (OBJECT_IS_EMPTY(_object)) { return nil; }
 #define RETURN_EMPTY_WHEN_OBJECT_IS_EMPTY(_object)  if (OBJECT_IS_EMPTY(_object)) { return @""; }
 #define RETURN_YES_WHEN_OBJECT_IS_EMPTY(_object)    if (OBJECT_IS_EMPTY(_object)) { return YES; }
-#define RETURN_NO_WHEN_OBJECT_IS_EMPTY(_object)     if (OBJECT_IS_EMPTY(_object)) { return NO; }
-#define RETURN_ZERO_WHEN_OBJECT_IS_EMPTY(_object)   if (OBJECT_IS_EMPTY(_object)) { return 0; }
+#define RETURN_NO_WHEN_OBJECT_IS_EMPTY(_object)     if (OBJECT_IS_EMPTY(_object)) { return NO;  }
+#define RETURN_ZERO_WHEN_OBJECT_IS_EMPTY(_object)   if (OBJECT_IS_EMPTY(_object)) { return 0;   }
 
 
 /**
@@ -120,57 +95,18 @@ typedef void (^YSCIntegerErrorBlock)(NSInteger, NSError *);
 #define FUNCTION_NAME                   [NSString stringWithUTF8String:__FUNCTION__]
 
 
-/**
- *  版本相关
- */
-#define APP_SHORT_VERSION               [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"]//app的版本号(三位数如1.0.1)
-#define APP_BUNDLE_VERSION              [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"]        //内部小版本号(一位数如3)
-#define APP_VERSION                     [NSString stringWithFormat:@"%@ (%@)", APP_SHORT_VERSION, APP_BUNDLE_VERSION]   //产品版本(1.0.1 (15))
-#define APP_DISPLAYED_VERSION           [NSString stringWithFormat:@"APP_DISPLAYED_VERSION_%@.%@", APP_SHORT_VERSION, APP_BUNDLE_VERSION]
-#define APP_SKIP_VERSION(v)             [NSString stringWithFormat:@"APP_SKIP_VERSION_%@", v]
-#define APP_BUNDLE_IDENTIFIER           [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleIdentifier"]     //com.builder.app
-/**
- * 1. if (NSOrderedAscending != COMPARE_VERSION(v1,v2))  { //v1 >= v2 }
- * 2. if (NSOrderedDescending == COMPARE_VERSION(v1,v2)) { //v1 > v2 }
- * 3. if (NSOrderedAscending == COMPARE_VERSION(v1,v2))  { //v1 < v2 }
- */
-#define COMPARE_VERSION(v1,v2)          [v1 compare:v2 options:NSNumericSearch]
-#define COMPARE_CURRENT_VERSION(v)      COMPARE_VERSION(APP_SHORT_VERSION,v)
-
-
-/**
- *  判断设备的相关参数
- */
-#ifndef IOS_VERSION
-    #define IOS_VERSION                 ([[[UIDevice currentDevice] systemVersion] floatValue])
-#endif
-#ifndef SCREEN_WIDTH
-    #define SCREEN_WIDTH                ([UIScreen mainScreen].bounds.size.width) //屏幕的宽度(point)
-#endif
-#ifndef SCREEN_HEIGHT
-    #define SCREEN_HEIGHT               ([UIScreen mainScreen].bounds.size.height)//屏幕的高度(point)
-#endif
-#ifndef IOS7_OR_LATER
-    #define IOS7_OR_LATER               __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_7_0
-#endif
 
 /**
  *  自动布局相关代码段简写
  */
-#ifndef XIB_WIDTH
-    #define XIB_WIDTH                   640.0f      //xib布局时的宽度(point)，主要用于计算缩放比例
-#endif
-#define AUTOLAYOUT_SCALE                YSCDataInstance.autoLayoutScale          //缩放比例 (当前屏幕的真实宽度point / xib布局的宽度point)
-#define AUTOLAYOUT_LENGTH(x)            ((x) * AUTOLAYOUT_SCALE)            //计算缩放后的大小point
-#define AUTOLAYOUT_LENGTH_W(x,w)        ((x) * (SCREEN_WIDTH / (w)))        //计算任意布局的真实大小point
+#define AUTOLAYOUT_LENGTH(x)            ((x) * YSCConfigDataInstance.autoLayoutScale)            //计算缩放后的大小point
+#define AUTOLAYOUT_LENGTH_W(x,w)        ((x) * ([UIScreen mainScreen].bounds.size.width / (w)))        //计算任意布局的真实大小point
 #define AUTOLAYOUT_SIZE_WH(w,h)         CGSizeMake(AUTOLAYOUT_LENGTH(w), AUTOLAYOUT_LENGTH(h))
 #define AUTOLAYOUT_SIZE(size)           CGSizeMake(AUTOLAYOUT_LENGTH(size.width), AUTOLAYOUT_LENGTH(size.height))//计算自动布局后的size
 #define AUTOLAYOUT_EDGEINSETS_TLBR(t,l,b,r)  UIEdgeInsetsMake(AUTOLAYOUT_LENGTH(t), AUTOLAYOUT_LENGTH(l), AUTOLAYOUT_LENGTH(b), AUTOLAYOUT_LENGTH(r))
 #define AUTOLAYOUT_EDGEINSETS(e)        AUTOLAYOUT_EDGEINSETS_TLBR(e.top, e.left, e.bottom, e.right)
 #define AUTOLAYOUT_CGRECT(x,y,w,h)      CGRectMake(AUTOLAYOUT_LENGTH(x),AUTOLAYOUT_LENGTH(y),AUTOLAYOUT_LENGTH(w),AUTOLAYOUT_LENGTH(h))
-#define AUTOLAYOUT_FONT(f)              ([UIFont systemFontOfSize:((f) * AUTOLAYOUT_SCALE)])
-#define SCREEN_WIDTH_SCALE              (SCREEN_WIDTH / AUTOLAYOUT_SCALE)
-#define SCREEN_HEIGHT_SCALE             (SCREEN_HEIGHT / AUTOLAYOUT_SCALE)
+#define AUTOLAYOUT_FONT(f)              ([UIFont systemFontOfSize:((f) * YSCConfigDataInstance.autoLayoutScale)])
 
 
 /**

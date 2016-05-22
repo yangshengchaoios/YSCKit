@@ -9,13 +9,6 @@
 #ifndef YSCKitConstant_h
 #define YSCKitConstant_h
 
-#ifndef kAppConfigPlist
-    #define kAppConfigPlist         @"YSCKit_AppConfig"
-#endif
-#ifndef kAppConfigPlist
-    #define kAppConfigDebugPlist    @"YSCKit_AppConfigDebug"
-#endif
-
 // 在线参数优先级 > 本地参数
 #define kPathDomain                 [YSCConfigDataInstance stringFromConfigByName:@"kPathDomain"]
 #define kPathVersion                [YSCConfigDataInstance stringFromConfigByName:@"kPathVersion"]
@@ -26,15 +19,16 @@
 /**
  * 基本接口地址
  */
-#ifndef kPathAppResUrl              //资源文件前缀
-    #define kPathAppResUrl          kPathDomain
-#endif
 #ifndef kPathAppBaseUrl             //普通接口地址前缀，后跟版本号
     #define kPathAppBaseUrl         [kPathDomain stringByAppendingFormat:@"/%@",kPathVersion]
+#endif
+#ifndef kPathAppResUrl              //资源文件前缀
+    #define kPathAppResUrl          kPathDomain
 #endif
 #ifndef kPathAppCommonUrl           //公共接口地址前缀，与APP无关，与版本号无关
     #define kPathAppCommonUrl       [kPathDomain stringByAppendingFormat:@"/%@",kPathCommon]
 #endif
+
 /**
  * 接口名称
  */
@@ -47,103 +41,24 @@
 
 
 /**
- * 默认变量值
+ *  判断设备的相关参数
  */
-#ifndef kDefaultPageStartIndex      // 默认分页起始页码
-    #define kDefaultPageStartIndex  1
+#ifndef SCREEN_WIDTH
+    #define SCREEN_WIDTH            ([UIScreen mainScreen].bounds.size.width) //屏幕的宽度(point)
 #endif
-#ifndef kDefaultPageSize            // 默认分页每页的条数
-    #define kDefaultPageSize        10
+#ifndef SCREEN_HEIGHT
+    #define SCREEN_HEIGHT           ([UIScreen mainScreen].bounds.size.height)//屏幕的高度(point)
 #endif
-#ifndef kDefaultAppChannel          // 发布的渠道
-    #define kDefaultAppChannel      @"AppStore"
-#endif
-#ifndef kDefaultUMAppKey            // 友盟key
-    #define kDefaultUMAppKey        @""
-#endif
-#ifndef kDefaultAppStoreId          // app在app store上的唯一编号
-    #define kDefaultAppStoreId      @""
-#endif
-#ifndef kDefaultAppUpdateUrl        // app更新的网址
-    #define kDefaultAppUpdateUrl    [@"https://itunes.apple.com/app/id" stringByAppendingString:kDefaultAppStoreId]
-#endif
-#ifndef kDefaultRequestTimeOut      //网络请求超时时间(s)
-    #define kDefaultRequestTimeOut  15.0f
-#endif
-
-/**
- * 开关控制
- */
-#ifndef kIsUseHttpHeaderSignature       //是否启用httpHeader的signature变量
-    #define kIsUseHttpHeaderSignature   1
-#endif
-#ifndef kIsUseHttpHeaderToken           //是否启用httpHeader的httpToken变量
-    #define kIsUseHttpHeaderToken       1
-#endif
-#ifndef kIsAutoRefuseWhenRequesting     //是否自动拒绝完全重复的网络请求
-    #define kIsAutoRefuseWhenRequesting 1
+#ifndef IOS7_OR_LATER
+    #define IOS7_OR_LATER           __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_7_0
 #endif
 
 
-
-/**
- * 默认图片
- */
-#ifndef kDefaultImage
-    #define kDefaultImage                   [UIImage imageNamed:@"default_image"]
+#ifndef CURRENT_DATE
+    #define CURRENT_DATE            [YSCDataInstance currentDate]
 #endif
-
-
-
-#ifndef kDefaultNaviBarBackImage
-    #define kDefaultNaviBarBackImage        [UIImage imageNamed:@"bg_navigationbar"]
+#ifndef USER_ID
+    #define USER_ID                 @""//TODO:
 #endif
-
-
-/**
- * 默认颜色
- */
-#ifndef kDefaultColor
-    #define kDefaultColor                   RGB(47, 152, 233)       //app默认主色(普通按钮+文本)
-#endif
-#ifndef kDefaultViewColor
-    #define kDefaultViewColor               RGB(238, 238, 238)      //self.view的默认背景颜色
-#endif
-#ifndef kDefaultBorderColor
-    #define kDefaultBorderColor             RGB(218, 218, 218)      //默认边框颜色
-#endif
-#ifndef kDefaultPlaceholderColor
-    #define kDefaultPlaceholderColor        RGB(200, 200, 200)      //默认占位字符颜色
-#endif
-#ifndef kDefaultImageBackColor
-    #define kDefaultImageBackColor          RGB(240, 240, 240)      //默认图片背景色
-#endif
-
-
-
-
-
-
-//>>>>>>>>>>>>>>>默认导航栏颜色（TODO:需要封装UI配置层）>>>>>>>>>>>>>>>
-#ifndef kDefaultNaviBarTintColor
-    #define kDefaultNaviBarTintColor        RGB(47, 152, 233)       //导航栏默认文字、icon的颜色
-#endif
-#ifndef kDefaultNaviBarTitleColor
-    #define kDefaultNaviBarTitleColor       RGB(10, 10, 10)         //导航栏标题颜色
-#endif
-#ifndef kDefaultNaviBarTitleFont
-    #define kDefaultNaviBarTitleFont        [UIFont boldSystemFontOfSize:AUTOLAYOUT_LENGTH(34)]    //导航栏标题字体大小
-#endif
-#ifndef kDefaultNaviTintColor
-    #define kDefaultNaviTintColor           RGBA(255, 255, 255, 1)  //系统导航栏背景颜色(包括了StatusBar)
-#endif
-#ifndef kDefaultNaviBarItemColor
-    #define kDefaultNaviBarItemColor        kDefaultNaviBarTintColor//导航栏左右文字颜色
-#endif
-#ifndef kDefaultNaviBarItemFont
-    #define kDefaultNaviBarItemFont         AUTOLAYOUT_FONT(28)     //导航栏左右文字大小
-#endif
-//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-
 
 #endif /* YSCKitConstant_h */

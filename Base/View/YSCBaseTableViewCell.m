@@ -8,8 +8,6 @@
 
 #import "YSCBaseTableViewCell.h"
 
-NSString * const kParamCellIdentifier       = @"YSCKit_Cell";
-
 @implementation YSCBaseTableViewCell
 
 - (void)awakeFromNib {
@@ -22,21 +20,6 @@ NSString * const kParamCellIdentifier       = @"YSCKit_Cell";
     self.clipsToBounds = YES;
     self.selectionStyle = UITableViewCellSelectionStyleNone;
     [self resetSize];
-}
-
-#pragma mark - 注册与重用
-+ (void)registerCellToTableView: (UITableView *)tableView {
-    [tableView registerNib:[[self class] nibNameOfCell] forCellReuseIdentifier:[[self class] identifier]];
-}
-+ (instancetype)dequeueCellByTableView :(UITableView *)tableView {
-    YSCBaseTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:[[self class] identifier]];
-    return cell;
-}
-+ (NSString *)identifier {
-    return NSStringFromClass(self.class);
-}
-+ (UINib *)nibNameOfCell {
-    return [UINib nibWithNibName:NSStringFromClass(self.class) bundle:nil];
 }
 
 #pragma mark - 计算高度

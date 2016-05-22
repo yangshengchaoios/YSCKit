@@ -37,13 +37,13 @@ NSString * const kCachedSectionKey  = @"kCachedSectionKey";
     self.headerDataArray = [NSMutableArray array];
     self.footerDataArray = [NSMutableArray array];
     self.cellDataArray = [NSMutableArray array];
-    self.currentPageIndex = kDefaultPageStartIndex;
+    self.currentPageIndex = YSCConfigDataInstance.defaultPageStartIndex;
     self.requestType = YSCRequestTypeGET;
     
     //必要的属性
     self.dictParamBlock = ^NSDictionary *(NSInteger pageIndex) {
         return @{kParamPageIndex : @(pageIndex),
-                 kParamPageSize : @(kDefaultPageSize)};
+                 kParamPageSize : @(YSCConfigDataInstance.defaultPageSize)};
     };
     
     //只要该block不能为nil！
@@ -65,13 +65,14 @@ NSString * const kCachedSectionKey  = @"kCachedSectionKey";
 - (void)setEnableRefresh:(BOOL)enableRefresh {
     _enableRefresh = enableRefresh;
     if (enableRefresh) {
-        WEAKSELF
+        @weakiy(self);
         self.scrollView.mj_header = [MJRefreshNormalHeader headerWithRefreshingBlock:^{
-            if (weakSelf.customRefreshBlock) {
-                weakSelf.customRefreshBlock(kDefaultPageStartIndex);
-                return ;
+            if (weak_self.customRefreshBlock) {
+                weak_self.customRefreshBlock(YSCConfigDataInstance.defaultPageStartIndex);
             }
-            [weakSelf refreshAtPageIndex:kDefaultPageStartIndex];
+            else {
+                [weak_self loadDataByPageIndex:YSCConfigDataInstance.defaultPageStartIndex response:nil error:nil];
+            }
         }];
     }
     else {
@@ -81,13 +82,14 @@ NSString * const kCachedSectionKey  = @"kCachedSectionKey";
 - (void)setEnableLoadMore:(BOOL)enableLoadMore {
     _enableLoadMore = enableLoadMore;
     if (enableLoadMore) {
-        WEAKSELF
+        @weakiy(self);
         self.scrollView.mj_footer = [MJRefreshBackNormalFooter footerWithRefreshingBlock:^{
-            if (weakSelf.customRefreshBlock) {
-                weakSelf.customRefreshBlock(weakSelf.currentPageIndex + 1);
-                return ;
+            if (weak_self.customRefreshBlock) {
+                weak_self.customRefreshBlock(weak_self.currentPageIndex + 1);
             }
-            [weakSelf refreshAtPageIndex:weakSelf.currentPageIndex + 1];
+            else {
+                [weak_self loadDataByPageIndex:weak_self.currentPageIndex + 1 response:nil error:nil];
+            }
         }];
     }
     else {
@@ -96,12 +98,14 @@ NSString * const kCachedSectionKey  = @"kCachedSectionKey";
 }
 - (void)setEnableTips:(BOOL)enableTips {
     _enableTips = enableTips;
-    if (enableTips && OBJECT_IS_EMPTY(self.tipsView)) {
-        WEAKSELF
-        self.tipsView = [YSCTipsView createYSCTipsViewOnView:self.scrollView
-                                                buttonAction:^{
-                                                    [weakSelf.scrollView.mj_header beginRefreshing];
-                                                }];
+    if (enableTips) {
+        @weakiy(self);
+        if ( ! self.tipsView) {
+            self.tipsView = [YSCTipsView createYSCTipsViewOnView:self.scrollView
+                                                    buttonAction:^{
+                                                        [weak_self.scrollView.mj_header beginRefreshing];
+                                                    }];
+        }
         self.tipsView.hidden = YES;
     }
     else {
@@ -113,6 +117,10 @@ NSString * const kCachedSectionKey  = @"kCachedSectionKey";
 }
 
 #pragma mark - 外部调用方法
+// 是否正在加载数据
+- (BOOL)isLoading {
+    return self.scrollView.mj_header.isRefreshing || self.scrollView.mj_footer.isRefreshing;
+}
 // 启动刷新(能加载一次缓存)
 - (void)beginRefreshing {
     [self beginRefreshingByAnimation:YES];
@@ -124,27 +132,29 @@ NSString * const kCachedSectionKey  = @"kCachedSectionKey";
         [self.scrollView.mj_header beginRefreshing];
     }
     else {
-        [self refreshAtPageIndex:kDefaultPageStartIndex];
+        if (self.customRefreshBlock) {
+            self.customRefreshBlock(YSCConfigDataInstance.defaultPageStartIndex);
+        }
+        else {
+            [self loadDataByPageIndex:YSCConfigDataInstance.defaultPageStartIndex response:nil error:nil];
+        }
     }
 }
 // 刷新列表
 - (void)refreshWithObjects:(NSObject *)objects {
-    [self refreshAtPageIndex:kDefaultPageStartIndex response:objects error:nil];
+    [self loadDataByPageIndex:YSCConfigDataInstance.defaultPageStartIndex response:objects error:nil];
 }
-- (void)refreshAtPageIndex:(NSInteger)pageIndex {
-    [self refreshAtPageIndex:pageIndex response:nil error:nil];
-}
-- (void)refreshAtPageIndex:(NSInteger)pageIndex response:(NSObject *)initObject error:(NSString *)errorMessage {
-    WEAKSELF
+- (void)loadDataByPageIndex:(NSInteger)pageIndex response:(NSObject *)initObject error:(NSString *)errorMessage {
+    @weakiy(self);
     YSCObjectErrorMessageBlock resultBlock = ^(NSObject *object, NSString *errorMessage) {
-        BOOL isPullToRefresh = (kDefaultPageStartIndex == pageIndex); //是否下拉刷新
-        isPullToRefresh ? [weakSelf.scrollView.mj_header endRefreshing] : [weakSelf.scrollView.mj_footer endRefreshing];
+        BOOL isPullToRefresh = (YSCConfigDataInstance.defaultPageStartIndex == pageIndex); //是否下拉刷新
+        isPullToRefresh ? [weak_self.scrollView.mj_header endRefreshing] : [weak_self.scrollView.mj_footer endRefreshing];
         if (errorMessage) {
-            if (weakSelf.tipsView) {
-                [weakSelf.tipsView resetMessage:errorMessage];
-                [weakSelf.tipsView resetImageName:weakSelf.tipsFailedIcon];
-                [weakSelf.tipsView resetActionWithButtonTitle:weakSelf.tipsButtonTitle buttonAction:^{
-                    [weakSelf beginRefreshing];
+            if (weak_self.tipsView) {
+                [weak_self.tipsView resetMessage:errorMessage];
+                [weak_self.tipsView resetImageName:weak_self.tipsFailedIcon];
+                [weak_self.tipsView resetActionWithButtonTitle:weak_self.tipsButtonTitle buttonAction:^{
+                    [weak_self beginRefreshing];
                 }];
             }
         }
@@ -152,18 +162,18 @@ NSString * const kCachedSectionKey  = @"kCachedSectionKey";
             //1. 根据组装后的数组刷新列表
             NSArray *newDataArray = nil;
             if (OBJECT_ISNOT_EMPTY(object)) {
-                weakSelf.currentPageIndex = pageIndex;  //只要接口成功返回了数据，就把当前请求的页码保存起来
-                if (weakSelf.preProcessBlock) {
-                    newDataArray = weakSelf.preProcessBlock((NSArray *)object);
+                weak_self.currentPageIndex = pageIndex;  //只要接口成功返回了数据，就把当前请求的页码保存起来
+                if (weak_self.preProcessBlock) {
+                    newDataArray = weak_self.preProcessBlock((NSArray *)object);
                 }
             }
             
             //-----------开始对tableView进行操作-----------
             if (isPullToRefresh) {
-                [weakSelf.sectionKeyArray removeAllObjects];
-                [weakSelf.headerDataArray removeAllObjects];
-                [weakSelf.footerDataArray removeAllObjects];
-                [weakSelf.cellDataArray removeAllObjects];
+                [weak_self.sectionKeyArray removeAllObjects];
+                [weak_self.headerDataArray removeAllObjects];
+                [weak_self.footerDataArray removeAllObjects];
+                [weak_self.cellDataArray removeAllObjects];
             }
             
             //3. 根据新数组刷新界面显示(包括下拉刷新、上拉加载更多、并且支持多section)
@@ -179,24 +189,24 @@ NSString * const kCachedSectionKey  = @"kCachedSectionKey";
                         sectionKey = TRIM_STRING(((YSCDataModel *)object).sectionKey);
                     }
                     
-                    if ([weakSelf.sectionKeyArray containsObject:TRIM_STRING(sectionKey)]) {
-                        section = [weakSelf.sectionKeyArray indexOfObject:TRIM_STRING(sectionKey)];
-                        NSMutableArray *tempArray = weakSelf.cellDataArray[section];
+                    if ([weak_self.sectionKeyArray containsObject:TRIM_STRING(sectionKey)]) {
+                        section = [weak_self.sectionKeyArray indexOfObject:TRIM_STRING(sectionKey)];
+                        NSMutableArray *tempArray = weak_self.cellDataArray[section];
                         [tempArray addObject:object];
                         row = [tempArray count] - 1;
                     }
                     else {
                         row = 0;
-                        section = [weakSelf.sectionKeyArray count];
-                        [weakSelf.sectionKeyArray addObject:TRIM_STRING(sectionKey)];
+                        section = [weak_self.sectionKeyArray count];
+                        [weak_self.sectionKeyArray addObject:TRIM_STRING(sectionKey)];
                         
                         //处理section header model(直接保存原始的model，在具体显示的时候再确定显示哪个属性)
-                        [weakSelf.headerDataArray addObject:object];
-                        [weakSelf.footerDataArray addObject:object];
+                        [weak_self.headerDataArray addObject:object];
+                        [weak_self.footerDataArray addObject:object];
                         
                         NSMutableArray *tempArray = [NSMutableArray array];
                         [tempArray addObject:object];
-                        [weakSelf.cellDataArray addObject:tempArray];
+                        [weak_self.cellDataArray addObject:tempArray];
                         
                         //add new section
                         if (( ! isPullToRefresh) && OBJECT_ISNOT_EMPTY(sectionKey)) {
@@ -211,40 +221,43 @@ NSString * const kCachedSectionKey  = @"kCachedSectionKey";
                 
                 // 3.2 更新列表
                 if (isPullToRefresh) {
-                    [weakSelf _reloadData];
+                    [weak_self _reloadData];
                 }
                 else {
-                    if (weakSelf.loadMoreBlock) {
-                        weakSelf.loadMoreBlock(insertedSections, insertedIndexPaths);
+                    if (weak_self.loadMoreBlock) {
+                        weak_self.loadMoreBlock(insertedSections, insertedIndexPaths);
                     }
                 }
                 //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
             }
             else {
-                if ( ! isPullToRefresh) {
-                    [YSCHUDManager showHUDThenHideOnKeyWindow:kDefaultNoMoreMessage];
+                if (isPullToRefresh) {
+                    [weak_self _reloadData];//防止旧数据得不到清除
+                }
+                else {
+                    [YSCHUDManager showHUDThenHideOnKeyWindowWithMessage:YSCConfigDataInstance.defaultNoMoreMessage];
                 }
             }
             
             //4. 数据为空的tips
-            if (weakSelf.tipsView) {
-                weakSelf.tipsView.actionButton.hidden = YES;
-                [weakSelf.tipsView resetMessage:weakSelf.tipsEmptyText];
-                [weakSelf.tipsView resetImageName:weakSelf.tipsEmptyIcon];
+            if (weak_self.tipsView) {
+                weak_self.tipsView.actionButton.hidden = YES;
+                [weak_self.tipsView resetMessage:weak_self.tipsEmptyText];
+                [weak_self.tipsView resetImageName:weak_self.tipsEmptyIcon];
             }
             
             //5. 缓存数据
-            if (OBJECT_ISNOT_EMPTY(weakSelf.cacheFileName)) {
-                YSCSaveCacheObjectByFile(weakSelf.sectionKeyArray, kCachedSectionKey, weakSelf.cacheFileName);
-                YSCSaveCacheObjectByFile(weakSelf.headerDataArray, kCachedHeaderData, weakSelf.cacheFileName);
-                YSCSaveCacheObjectByFile(weakSelf.cellDataArray, kCachedCellData, weakSelf.cacheFileName);
-                YSCSaveCacheObjectByFile(weakSelf.footerDataArray, kCachedFooterData, weakSelf.cacheFileName);
+            if (OBJECT_ISNOT_EMPTY(weak_self.cacheFileName)) {
+                YSCSaveCacheObjectByFile(weak_self.sectionKeyArray, kCachedSectionKey, weak_self.cacheFileName);
+                YSCSaveCacheObjectByFile(weak_self.headerDataArray, kCachedHeaderData, weak_self.cacheFileName);
+                YSCSaveCacheObjectByFile(weak_self.cellDataArray, kCachedCellData, weak_self.cacheFileName);
+                YSCSaveCacheObjectByFile(weak_self.footerDataArray, kCachedFooterData, weak_self.cacheFileName);
             }
         }
         
-        weakSelf.tipsView.hidden = (! [weakSelf isCellDataEmpty]);
-        if (weakSelf.finishLoadBlock) {
-            weakSelf.finishLoadBlock(errorMessage);
+        weak_self.tipsView.hidden = ( ! [weak_self isCellDataEmpty]);
+        if (weak_self.finishLoadBlock) {
+            weak_self.finishLoadBlock(errorMessage);
         }
     };
     YSCRequestSuccess successBlock = ^(id responseObject) {
@@ -346,6 +359,14 @@ NSString * const kCachedSectionKey  = @"kCachedSectionKey";
         return nil;
     }
     return array[indexPath.row];
+}
+- (void)removeDataAtIndexPath:(NSIndexPath *)indexPath {
+    if (indexPath.section < [self.cellDataArray count]) {
+        NSMutableArray *array = self.cellDataArray[indexPath.section];
+        if (indexPath.row < [array count]) {
+            [array removeObjectAtIndex:indexPath.row];
+        }
+    }
 }
 
 // 加载缓存

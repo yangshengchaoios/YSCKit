@@ -39,9 +39,9 @@
 + (BOOL)isMatchRegex:(NSString*)pattern withString:(NSString *)string options:(NSRegularExpressionOptions)options;
 - (BOOL)isMatchRegex:(NSString*)pattern options:(NSRegularExpressionOptions)options;
 
-+ (BOOL)isUrl:(NSString *)string;
-- (BOOL)isUrl;
-+ (BOOL)isNotUrl:(NSString *)string;
++ (BOOL)isWebUrl:(NSString *)string;
+- (BOOL)isWebUrl;
++ (BOOL)isNotWebUrl:(NSString *)string;
 
 
 

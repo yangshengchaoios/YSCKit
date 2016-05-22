@@ -8,8 +8,6 @@
 
 #import "YSCBaseCollectionViewCell.h"
 
-NSString * const kParamItemCellIdentifier   = @"YSCKit_ItemCell";
-
 @implementation YSCBaseCollectionViewCell
 
 - (void)awakeFromNib {
@@ -20,21 +18,6 @@ NSString * const kParamItemCellIdentifier   = @"YSCKit_ItemCell";
     
     self.clipsToBounds = YES;
     [self resetSize];
-}
-
-#pragma mark - 注册与重用
-+ (void)registerCellToCollectionView:(UICollectionView *)collectionView {
-    [collectionView registerNib:[[self class] nibNameOfCell] forCellWithReuseIdentifier:[[self class] identifier]];
-}
-+ (instancetype)dequeueCellByCollectionView:(UICollectionView *)collectionView forIndexPath:(NSIndexPath*)indexPath {
-    YSCBaseCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:[[self class] identifier] forIndexPath:indexPath];
-    return cell;
-}
-+ (NSString *)identifier {
-    return NSStringFromClass(self.class);
-}
-+ (UINib *)nibNameOfCell {
-    return [UINib nibWithNibName:NSStringFromClass(self.class) bundle:nil];
 }
 
 #pragma mark - 计算大小

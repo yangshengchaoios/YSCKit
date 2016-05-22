@@ -75,7 +75,8 @@
     return [[self directoryPathOfLibraryCachesByUserId] stringByAppendingPathComponent:@"Videoes/"];
 }
 - (NSString *)directoryPathOfLibraryCachesBundleIdentifier {
-    return [self.directoryPathOfLibraryCaches stringByAppendingPathComponent:APP_BUNDLE_IDENTIFIER];
+    NSString *appBundleId = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleIdentifier"];
+    return [self.directoryPathOfLibraryCaches stringByAppendingPathComponent:appBundleId];
 }
 - (NSString *)directoryPathOfDocumentsLog {
     return [[self directoryPathOfLibraryCachesCommon] stringByAppendingPathComponent:@"YSCLog/"];
@@ -274,7 +275,7 @@
     NSString *filePath = [folderPath stringByAppendingPathComponent:fileName];
     NSDictionary *cacheInfo = [self unarchiveDictionaryFromFilePath:filePath];
     NSObject *value = cacheInfo[key];
-    if (nil != value && NO == [value isKindOfClass:[NSNull class]]) {
+    if (nil != value && ( ! [value isKindOfClass:[NSNull class]])) {
         return value;
     }
     else {

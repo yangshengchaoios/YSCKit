@@ -9,20 +9,113 @@
 #import <Foundation/Foundation.h>
 
 /**
- *  单例类
- *  作用：管理配置文件里的参数
+ *  YSCKit基础框架所有的配置参数类
  */
 
-#define YSCConfigDataInstance             [YSCConfigData sharedInstance]
+#define YSCConfigDataInstance               [YSCConfigData sharedInstance]
+
 
 @interface YSCConfigData : NSObject
 + (instancetype)sharedInstance;
 
-- (void)resetConfigParams;                                  //重置参数键值对(当有在线参数更新时调用)
+//=========================================================================
+// 属性开关
+// 优先级：临时内存变量 > 在线参数 > 本地运行时配置文件YSCConfigData > 属性变量
+//=========================================================================
+#pragma mark - 全局开关
+/** 是否通过数据连接下载图片 */
+@property (nonatomic, assign) BOOL isDownloadImageViaWWAN;
+/** 是否处于测试模式(不检测在线参数) */
+@property (nonatomic, assign) BOOL isDebugModel;
+/** 是否启用httpHeader的signature变量 */
+@property (nonatomic, assign) BOOL isUseHttpHeaderSignature;
+/** 是否启用httpHeader的httpToken变量 */
+@property (nonatomic, assign) BOOL isUseHttpHeaderToken;
+/** 是否自动取消之前未完成的网络请求 */
+@property (nonatomic, assign) BOOL isAutoCancelTheLastSameRequesting;
+
+
+#pragma mark - 相对布局
+/** xib布局宽度(默认750) */
+@property (nonatomic, assign) CGFloat xibWidth;
+/** 缩放比例 (当前屏幕的真实宽度point / xib布局的宽度point) 程序启动后必须固定的参数，防止在旋转后计算不正确 */
+@property (nonatomic, assign) CGFloat autoLayoutScale;
+
+
+#pragma mark - app属性
+/**  */
+@property (nonatomic, strong) NSString *appStoreId;
+/** app发布的渠道(默认AppStore) */
+@property (nonatomic, strong) NSString *appChannel;
+/** app的版本号(三位数如1.0.1) */
+@property (nonatomic, strong) NSString *appShortVersion;
+/** 编译号(一位数如3) */
+@property (nonatomic, strong) NSString *appBundleVersion;
+/** 产品版本(如1.0.1 (15)) */
+@property (nonatomic, strong) NSString *appVersion;
+/** com.builder.app */
+@property (nonatomic, strong) NSString *appBundleIdentifier;
+/** 定义正式环境配置文件 */
+@property (nonatomic, strong) NSString *appConfigPlistName;
+/** 定义测试环境配置文件 */
+@property (nonatomic, strong) NSString *appConfigDebugPlistName;
+
+
+#pragma mark - 设置默认颜色
+/** app默认主色 */
+@property (nonatomic, strong) UIColor *defaultColor;
+/** self.view的默认背景颜色 */
+@property (nonatomic, strong) UIColor *defaultViewColor;
+/** 默认边框颜色 */
+@property (nonatomic, strong) UIColor *defaultBorderColor;
+/** 默认占位字符颜色 */
+@property (nonatomic, strong) UIColor *defaultPlaceholderColor;
+/** 默认图片背景色 */
+@property (nonatomic, strong) UIColor *defaultImageBackColor;
+
+
+#pragma mark - 设置默认图片名称及提示语
+/** app默认图片名称 */
+@property (nonatomic, strong) NSString *defaultImageName;
+/** app默认导航栏背景图片名称 */
+@property (nonatomic, strong) NSString *defaultNaviBarBackImageName;
+/** 上拉加载更多没有数据的提示语 */
+@property (nonatomic, strong) NSString *defaultNoMoreMessage;
+/** tipsview提示数据为空的icon */
+@property (nonatomic, strong) NSString *defaultEmptyImageName;
+/** tipsview发生错误的icon */
+@property (nonatomic, strong) NSString *defaultErrorImageName;
+/** tipsview数据为空的默认提示语 */
+@property (nonatomic, strong) NSString *defaultEmptyMessage;
+/** 默认分页起始页码 */
+@property (nonatomic, assign) NSInteger defaultPageStartIndex;
+/** 默认分页每页的条数 */
+@property (nonatomic, assign) NSInteger defaultPageSize;
+/** 网络请求超时时间(s) */
+@property (nonatomic, assign) CGFloat defaultRequestTimeOut;
+
+
+
+//=========================================================================
+// 缓存属性至运行时配置文件
+//=========================================================================
+- (void)saveIsDownloadImageViaWWAN:(BOOL)isDownloadImageViaWWAN;
+- (void)saveIsDebugModel:(BOOL)isDebugModel;
+
+// 存取运行时配置文件的通用方法
+- (void)saveValue:(NSObject *)value toLocalConfigByName:(NSString *)name;
+- (NSObject *)getLocalConfigValueByName:(NSString *)name;
+
+//=========================================================================
+// 管理配置文件里的参数
+// 优先级：临时内存变量 > 在线参数 > 本地配置文件XXX_AppConfig.plist
+//=========================================================================
+/** 重置参数键值对(当有在线参数更新时调用) */
+- (void)resetConfigParams;
 - (BOOL)boolFromConfigByName:(NSString *)name;
 - (float)floatFromConfigByName:(NSString *)name;
 - (NSInteger)intFromConfigByName:(NSString *)name;
 - (UIColor *)colorFromConfigByName:(NSString *)name;
 - (UIImage *)imageFromConfigByName:(NSString *)name;
-- (NSString *)stringFromConfigByName:(NSString *)name;      //在线参数值优先级 > 本地参数值
+- (NSString *)stringFromConfigByName:(NSString *)name;
 @end

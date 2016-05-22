@@ -266,6 +266,9 @@
 
 //强制修改设备的方向
 + (void)forceToChangeInterfaceOrientation:(UIInterfaceOrientation)orientation {
+    if ([[UIApplication sharedApplication] statusBarOrientation] == orientation) {
+        return;// 只有当设备方向不一致时才发消息
+    }
 #if __has_feature(objc_arc)
     if ([[UIDevice currentDevice] respondsToSelector:@selector(setOrientation:)]) {
         SEL selector             = NSSelectorFromString(@"setOrientation:");

@@ -51,7 +51,7 @@
         self.indicatorLabel.hidden = self.indicatorView.hidden = NO;
         self.zoomScrollView.hidden = YES;
         self.indicatorLabel.text = @"图片加载中";
-        if ([NSString isNotUrl:dataModel.imageUrl]) {
+        if ([NSString isNotWebUrl:dataModel.imageUrl]) {
             UIImage *cacheImage = [UIImage imageWithContentsOfFile:dataModel.imageUrl];
             if (cacheImage) {
                 [self layoutPhotoImage:cacheImage];
@@ -61,16 +61,16 @@
             }
         }
         else {
-            WEAKSELF
+            @weakiy(self);
             [self.indicatorView startAnimating];
             [self.photoImageView ysc_setImageWithURLString:dataModel.imageUrl completed:^(UIImage *image, NSError *error) {
-                [weakSelf.indicatorView stopAnimating];
+                [weak_self.indicatorView stopAnimating];
                 if (image) {
-                    weakSelf.photoImageView.contentMode = UIViewContentModeScaleAspectFit;
-                    [weakSelf layoutPhotoImage:image];
+                    weak_self.photoImageView.contentMode = UIViewContentModeScaleAspectFit;
+                    [weak_self layoutPhotoImage:image];
                 }
                 else {
-                    [weakSelf loadImageFailed];
+                    [weak_self loadImageFailed];
                 }
             }];
         }

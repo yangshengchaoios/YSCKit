@@ -24,16 +24,16 @@
 + (void)showHUDOnView:(UIView *)view edgeInsets:(UIEdgeInsets)edgeInsets;
 + (void)showHUDOnView:(UIView *)view edgeInsets:(UIEdgeInsets)edgeInsets showsMask:(BOOL)showsMask;
 
-+ (void)showHUDOnKeyWindowWithMesage:(NSString *)hintString;
++ (void)showHUDOnKeyWindowWithMesage:(NSString *)message;
 + (void)showHUDOnKeyWindow;
 
 // 关闭HUD
 + (void)hideHUDOnView:(UIView *)view;
-+ (void)hideHUDOnWindow;
++ (void)hideHUDOnKeyWindow;
 
 // 显示N秒后自动关闭HUD
-+ (void)showHUDThenHide:(NSString *)text onView:(UIView *)view afterDelay:(NSTimeInterval)delay;
-+ (void)showHUDThenHide:(NSString *)text onView:(UIView *)view;
-+ (void)showHUDThenHideOnKeyWindow:(NSString *)text;
++ (void)showHUDThenHideOnView:(UIView *)view message:(NSString *)message afterDelay:(NSTimeInterval)delay;
++ (void)showHUDThenHideOnView:(UIView *)view message:(NSString *)message;
++ (void)showHUDThenHideOnKeyWindowWithMessage:(NSString *)message;
 
 @end

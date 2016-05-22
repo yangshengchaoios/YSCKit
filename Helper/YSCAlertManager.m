@@ -16,7 +16,7 @@
 - (void)dealloc {
     NSLog(@"YSCAlertManager is deallocing...");
 }
-+ (UIAlertView *)showAlertVieWithMessage:(NSString *)message {
++ (UIAlertView *)showAlertViewWithMessage:(NSString *)message {
     return [self showAlertViewWithMessage:message block:nil];
 }
 + (UIAlertView *)showAlertViewWithMessage:(NSString *)message block:(YSCBlock)block {

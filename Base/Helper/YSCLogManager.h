@@ -12,6 +12,7 @@
  */
 
 @interface YSCLogManager : NSObject
++ (instancetype)sharedInstance;
 // 设置crash的hook(一般不用自己设置，因为通常都被第三方重置了，比如UMeng)
 + (void)setUncaughtExceptionHandler;
 // 保存NSError对象

@@ -8,6 +8,10 @@
 
 #import "YSCLogManager.h"
 
+@interface YSCLogManager ()
+@property (nonatomic, strong) dispatch_queue_t saveLogQueue;
+@end
+
 //记录APP的crash日志
 void _uncaughtExceptionHandler(NSException *exception) {
     NSArray *stackArray = [exception callStackSymbols];// 异常的堆栈信息
@@ -20,14 +24,26 @@ void _uncaughtExceptionHandler(NSException *exception) {
     [errMsg appendString:@"<<<<<<<<<<<<<<<<<<<<CrashLog<<<<<<<<<<<<<<<<<<<<\r\n"];//错误标记结束
     [YSCLogManager saveLog:errMsg];
 }
-@implementation YSCLogManager
 
+@implementation YSCLogManager
++ (instancetype)sharedInstance {
+    DEFINE_SHARED_INSTANCE_USING_BLOCK(^ {
+        return [[self alloc] init];
+    })
+}
+- (id)init {
+    self = [super init];
+    if (self) {
+        self.saveLogQueue = dispatch_queue_create("com.YSCKit.saveLog", DISPATCH_QUEUE_CONCURRENT);
+    }
+    return self;
+}
 + (void)setUncaughtExceptionHandler {
     NSSetUncaughtExceptionHandler(&_uncaughtExceptionHandler);
 }
 + (void)saveLogError:(NSError *)error {
     NSString *errMsg = [NSString stringWithFormat:@"%@", error];
-    [YSCLogManager saveLog:errMsg];
+    [self saveLog:errMsg];
 }
 
 + (void)saveLog:(NSString *)logString {
@@ -43,30 +59,29 @@ void _uncaughtExceptionHandler(NSException *exception) {
     [self saveLog:logString intoFilePath:logFilePath overWrite:YES];
 }
 + (void)saveLog:(NSString *)logString intoFilePath:(NSString *)logFilePath overWrite:(BOOL)overwrite {
-    if ( ! DEBUG_MODEL) {
-        return; //如果不是测试环境就不写日志
-    }
-    
     RETURN_WHEN_OBJECT_IS_EMPTY(logString);
     if (overwrite && [YSCFileManager fileExistsAtPath:logFilePath]) {
         [YSCFileManager deleteFileOrDirectory:logFilePath];
     }
-    NSFileHandle* fh = [NSFileHandle fileHandleForWritingAtPath:logFilePath];
-    if ( ! fh ) {
-        [[NSFileManager defaultManager] createFileAtPath:logFilePath contents:nil attributes:nil];
-        fh = [NSFileHandle fileHandleForWritingAtPath:logFilePath];
-    }
-    @try {
-        [fh seekToEndOfFile];
-        [fh writeData:[logString dataUsingEncoding:NSUTF8StringEncoding]];
-    }
-    @catch (NSException *exception) {
-        
-    }
-    @finally {
-        
-    }
-    [fh closeFile];
+    
+    dispatch_async([YSCLogManager sharedInstance].saveLogQueue , ^{
+        NSFileHandle* fh = [NSFileHandle fileHandleForWritingAtPath:logFilePath];
+        if ( ! fh ) {
+            [[NSFileManager defaultManager] createFileAtPath:logFilePath contents:nil attributes:nil];
+            fh = [NSFileHandle fileHandleForWritingAtPath:logFilePath];
+        }
+        @try {
+            [fh seekToEndOfFile];
+            [fh writeData:[logString dataUsingEncoding:NSUTF8StringEncoding]];
+        }
+        @catch (NSException *exception) {
+            
+        }
+        @finally {
+            
+        }
+        [fh closeFile];
+    });
 }
 
 + (void)deleteLogFilesExceptLastDays:(NSInteger)days {

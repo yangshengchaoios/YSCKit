@@ -79,7 +79,7 @@
 }
 - (void)resetImageName:(NSString *)imageName {
     if (OBJECT_IS_EMPTY(TRIM_STRING(imageName))) {
-        imageName = kDefaultEmptyImageName;
+        imageName = YSCConfigDataInstance.defaultEmptyImageName;
     }
     @weakiy(self);
     [self.iconImageView ysc_setImageWithURLString:imageName completed:^(UIImage *image, NSError *error) {
@@ -88,7 +88,7 @@
 }
 - (void)resetMessage:(NSString *)message {
     if (OBJECT_IS_EMPTY(TRIM_STRING(message))) {
-        message = kDefaultEmptyMessage;
+        message = YSCConfigDataInstance.defaultEmptyMessage;
     }
     self.messageLabel.text = message;
 }

@@ -16,10 +16,11 @@
               message:(NSString *)message
            edgeInsets:(UIEdgeInsets)edgeInsets
       backgroundColor:(UIColor *)backgroundColor {
-    MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:view animated:YES];
-    if (backgroundColor) {
-        hud.backgroundColor = backgroundColor;
+    MBProgressHUD *hud = [MBProgressHUD HUDForView:view];
+    if (nil == hud) {
+        hud = [MBProgressHUD showHUDAddedTo:view animated:YES];
     }
+    hud.backgroundColor = (nil != backgroundColor) ? backgroundColor : [UIColor clearColor];
     [hud mas_remakeConstraints:^(MASConstraintMaker *make) {
         make.edges.insets(edgeInsets);
     }];
@@ -46,7 +47,7 @@
     [self showHUDOnView:view
                 message:nil
              edgeInsets:UIEdgeInsetsZero
-        backgroundColor:showsMask ? kDefaultViewColor : nil];
+        backgroundColor:showsMask ? YSCConfigDataInstance.defaultViewColor : nil];
 }
 
 + (void)showHUDOnView:(UIView *)view message:(NSString *)message edgeInsets:(UIEdgeInsets)edgeInsets {
@@ -65,7 +66,7 @@
     [self showHUDOnView:view
                 message:nil
              edgeInsets:edgeInsets
-        backgroundColor:showsMask ? kDefaultViewColor : nil];
+        backgroundColor:showsMask ? YSCConfigDataInstance.defaultViewColor : nil];
 }
 
 + (void)showHUDOnKeyWindowWithMesage:(NSString *)message {
@@ -86,26 +87,27 @@
     MBProgressHUD *hud = [MBProgressHUD HUDForView:view];
     [hud hideAnimated:YES];
 }
-+ (void)hideHUDOnWindow {
++ (void)hideHUDOnKeyWindow {
     [self hideHUDOnView:[UIApplication sharedApplication].keyWindow];
 }
 
 #pragma mark - 显示N秒后自动关闭HUD
-+ (void)showHUDThenHide:(NSString *)text onView:(UIView *)view afterDelay:(NSTimeInterval)delay {
++ (void)showHUDThenHideOnView:(UIView *)view message:(NSString *)message afterDelay:(NSTimeInterval)delay {
     MBProgressHUD *hud = [MBProgressHUD HUDForView:view];
     if (nil == hud) {
         hud = [MBProgressHUD showHUDAddedTo:view animated:YES];
     }
-    hud.label.text = text;
+    hud.backgroundColor = [UIColor clearColor];
+    hud.label.text = message;
     hud.mode = MBProgressHUDModeText;
     [hud showAnimated:YES];
     [hud hideAnimated:YES afterDelay:delay];
 }
-+ (void)showHUDThenHide:(NSString *)text onView:(UIView *)view {
-    [self showHUDThenHide:text onView:view afterDelay:1];
++ (void)showHUDThenHideOnView:(UIView *)view message:(NSString *)message {
+    [self showHUDThenHideOnView:view message:message afterDelay:1];
 }
-+ (void)showHUDThenHideOnKeyWindow:(NSString *)text {
-    [self showHUDThenHide:text onView:[UIApplication sharedApplication].keyWindow];
++ (void)showHUDThenHideOnKeyWindowWithMessage:(NSString *)message {
+    [self showHUDThenHideOnView:[UIApplication sharedApplication].keyWindow message:message];
 }
 
 @end

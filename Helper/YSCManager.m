@@ -55,7 +55,7 @@ typedef NS_ENUM(NSInteger, CheckNewVersionType) {
     }
 }
 + (void)checkNewVersionOnAppStore {
-    NSURL *checkUrl = [NSURL URLWithString:[NSString stringWithFormat:@"http://itunes.apple.com/lookup?id=%@", kDefaultAppStoreId]];
+    NSURL *checkUrl = [NSURL URLWithString:[NSString stringWithFormat:@"http://itunes.apple.com/lookup?id=%@", YSCConfigDataInstance.appStoreId]];
     [[[NSURLSession sharedSession] dataTaskWithURL:checkUrl completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
         NSString *dataString = [[NSString alloc] initWithBytes:[data bytes] length:[data length] encoding:NSUTF8StringEncoding];
         NSDictionary *resultsDict = (NSDictionary *)[NSString jsonObjectOfString:dataString];
@@ -83,12 +83,12 @@ typedef NS_ENUM(NSInteger, CheckNewVersionType) {
     BOOL isForcedUpdate = versionModel.isForcedUpdate;
     NSString *appUpdateLog = TRIM_STRING(versionModel.appUpdateLog);
     NSString *appDownloadUrl = TRIM_STRING(versionModel.appDownloadUrl);
-    if (NO == [appDownloadUrl isUrl]) {
-        appDownloadUrl = kDefaultAppUpdateUrl;
+    if ( ! [appDownloadUrl isWebUrl]) {
+        appDownloadUrl = [@"https://itunes.apple.com/app/id" stringByAppendingString:YSCConfigDataInstance.appStoreId];
     }
     
     //2. 判断是否需要更新
-    if (NO == isSkipTheVersion) {
+    if ( ! isSkipTheVersion) {
         if (NSOrderedAscending == COMPARE_CURRENT_VERSION(appVersion)) {
             //0. 判断是否重复调用(APP第一次运行时如果有alertView需要处理，则applicationDidBecomeActive在处理完后会再次被调用，从而导致版本检测调用多次而出问题)
             static BOOL isAlertShow = NO;
@@ -104,7 +104,7 @@ typedef NS_ENUM(NSInteger, CheckNewVersionType) {
                 [[UIApplication sharedApplication] openURL:[NSURL URLWithString:appDownloadUrl]];
                 exit(0);
             }];
-            if (NO == isForcedUpdate ) {   //非强制更新的话才显示更多选项
+            if ( ! isForcedUpdate ) {   //非强制更新的话才显示更多选项
                 [alertView bk_addButtonWithTitle:@"忽略此版本" handler:^{
                     YSCSaveCacheObject(@(YES), APP_SKIP_VERSION(appVersion));
                     isAlertShow = NO;
@@ -116,13 +116,13 @@ typedef NS_ENUM(NSInteger, CheckNewVersionType) {
             [alertView show];
         }
         else {
-            if (NO == isCheckOnAppStore) {//如果接口未来得及更新升级信息，就自动检测AppStore上的新版本
+            if ( ! isCheckOnAppStore) {//如果接口未来得及更新升级信息，就自动检测AppStore上的新版本
                 [self checkNewVersionOnAppStore];
             }
         }
     }
     else {
-        if (NO == isCheckOnAppStore) {//如果接口未来得及更新升级信息，就自动检测AppStore上的新版本
+        if ( ! isCheckOnAppStore) {//如果接口未来得及更新升级信息，就自动检测AppStore上的新版本
             [self checkNewVersionOnAppStore];
         }
     }
@@ -134,8 +134,8 @@ typedef NS_ENUM(NSInteger, CheckNewVersionType) {
 }
 + (void)makeCall:(NSString *)phoneNumber success:(YSCBlock)block {
     RETURN_WHEN_OBJECT_IS_EMPTY(phoneNumber)
-    if (NO == [UIDevice isCanMakeCall]) {
-        [YSCHUDManager showHUDThenHideOnKeyWindow:@"无法拨打电话"];
+    if ( ! [UIDevice isCanMakeCall]) {
+        [YSCHUDManager showHUDThenHideOnKeyWindowWithMessage:@"无法拨打电话"];
         return;
     }
     phoneNumber = [phoneNumber stringByReplacingOccurrencesOfString:@"-" withString:@""];//去掉-
@@ -247,5 +247,53 @@ typedef NS_ENUM(NSInteger, CheckNewVersionType) {
     [errMsg appendFormat:@"<<<<<<<<<<<<<<<<<<<<errorCode(%ld)<<<<<<<<<<<<<<<<<<<<\r\n", (long)error.code];
     NSLog(@"error=%@", errMsg);
 }
+
+//检测是否用测试证书打包
++ (BOOL)isArchiveByDevelopment {
+    // Special case of simulator
+    if ([UIDevice isRunningOnSimulator]) {
+        return YES;
+    }
+    
+    // There is no provisioning profile in AppStore Apps
+    NSString *profilePath = [[NSBundle mainBundle] pathForResource:@"embedded" ofType:@"mobileprovision"];
+    
+    // Check provisioning profile existence
+    if (profilePath) {
+        // Get hex representation
+        NSData *profileData = [NSData dataWithContentsOfFile:profilePath];
+        NSString *profileString = [NSString stringWithFormat:@"%@", profileData];
+        
+        // Remove brackets at beginning and end
+        profileString = [profileString stringByReplacingCharactersInRange:NSMakeRange(0, 1) withString:@""];
+        profileString = [profileString stringByReplacingCharactersInRange:NSMakeRange(profileString.length - 1, 1) withString:@""];
+        
+        // Remove spaces
+        profileString = [profileString stringByReplacingOccurrencesOfString:@" " withString:@""];
+        
+        // Convert hex values to readable characters
+        NSMutableString *profileText = [NSMutableString new];
+        for (int i = 0; i < profileString.length; i += 2) {
+            NSString *hexChar = [profileString substringWithRange:NSMakeRange(i, 2)];
+            int value = 0;
+            sscanf([hexChar cStringUsingEncoding:NSASCIIStringEncoding], "%x", &value);
+            [profileText appendFormat:@"%c", (char)value];
+        }
+        
+        // Remove whitespaces and new lines characters
+        NSArray *profileWords = [profileText componentsSeparatedByCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+        NSString *profileClearText = [profileWords componentsJoinedByString:@""];
+        
+        // Look for debug value
+        NSRange debugRange = [profileClearText rangeOfString:@"<key>get-task-allow</key><true/>"];
+        if (debugRange.location != NSNotFound) {
+            return YES;
+        }
+    }
+    
+    // Return NO by default to avoid security leaks
+    return NO;
+}
+
 @end
 

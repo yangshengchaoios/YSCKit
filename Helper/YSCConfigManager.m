@@ -19,8 +19,9 @@
         [navigationBar setTranslucent:YES];
     }
     //1. 设置背景颜色/图片
-    if (kDefaultNaviBarBackImage) {
-        [navigationBar setBackgroundImage:kDefaultNaviBarBackImage forBarMetrics:UIBarMetricsDefault];
+    UIImage *backImage = [UIImage imageNamed:YSCConfigDataInstance.defaultNaviBarBackImageName];
+    if (backImage) {
+        [navigationBar setBackgroundImage:backImage forBarMetrics:UIBarMetricsDefault];
     }
     else {
         [navigationBar setBarTintColor:kDefaultNaviTintColor];

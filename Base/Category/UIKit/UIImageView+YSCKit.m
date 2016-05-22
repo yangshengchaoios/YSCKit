@@ -9,8 +9,6 @@
 #import "UIImageView+YSCKit.h"
 #import <SDWebImage/UIImageView+WebCache.h>
 
-NSString * const kParamEnableDownloadImage  = @"EnableDownloadImage";
-
 @implementation UIImageView (YSCKit)
 
 @end
@@ -68,9 +66,9 @@ NSString * const kParamEnableDownloadImage  = @"EnableDownloadImage";
     self.clipsToBounds = YES;
     NSString *newUrlString = [NSString trimString:[urlString copy]];
     if (nil == placeholderImage) {
-        placeholderImage = kDefaultImage;
-        self.image = kDefaultImage;
-        self.backgroundColor = kDefaultImageBackColor;
+        placeholderImage = [UIImage imageNamed:YSCConfigDataInstance.defaultImageName];
+        self.image = [UIImage imageNamed:YSCConfigDataInstance.defaultImageName];
+        self.backgroundColor = YSCConfigDataInstance.defaultImageBackColor;
         
         //如果默认图片比imageView要小，则居中显示之
         if (self.image.size.width < self.width && self.image.size.height < self.height) {
@@ -86,7 +84,7 @@ NSString * const kParamEnableDownloadImage  = @"EnableDownloadImage";
     
     //判断是否本地图片
     if(OBJECT_ISNOT_EMPTY(newUrlString)) {
-        if (NO == [NSString isContains:@"/" inString:newUrlString]) {//简单判断是不是本地图片
+        if ( ! [NSString isContains:@"/" inString:newUrlString]) {//简单判断是不是本地图片
             UIImage *localImage = [UIImage imageNamed:newUrlString];
             if(localImage) {
                 [self _setCustomImage:localImage];
@@ -101,7 +99,7 @@ NSString * const kParamEnableDownloadImage  = @"EnableDownloadImage";
     }
     
     //是否本地缓存图片
-    if ([NSString isNotUrl:newUrlString]) {
+    if ([NSString isNotWebUrl:newUrlString]) {
         UIImage *cacheImage = [UIImage imageWithContentsOfFile:newUrlString];
         if (cacheImage) {
             [self _setCustomImage:cacheImage];
@@ -111,18 +109,18 @@ NSString * const kParamEnableDownloadImage  = @"EnableDownloadImage";
     }
     
     //处理相对路径
-    if ([NSString isNotUrl:newUrlString]) {
+    if ([NSString isNotWebUrl:newUrlString]) {
         newUrlString = [[NSString replaceString:kPathAppResUrl byRegex:@"/+$" to:@""] stringByAppendingFormat:@"/%@",
                         [NSString replaceString:newUrlString byRegex:@"^/+" to:@""]];
     }
     //处理相对路径后仍然不是合法的url，则返回默认图片
-    if ([NSString isNotUrl:newUrlString]) {
+    if ([NSString isNotWebUrl:newUrlString]) {
         if (complete) { complete(placeholderImage,nil); }
         return;
     }
 
     //采用SDWebImage的缓存方案(wifi环境下一定会从网络下载图片)
-    if (YSCDataInstance.isReachableViaWiFi || [YSCGetObject(kParamEnableDownloadImage) boolValue]) {
+    if (YSCDataInstance.isReachableViaWiFi || YSCConfigDataInstance.isDownloadImageViaWWAN) {
         [self sd_setImageWithURL:[NSURL URLWithString:newUrlString]
                 placeholderImage:placeholderImage
                        completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL)  {
@@ -152,6 +150,10 @@ NSString * const kParamEnableDownloadImage  = @"EnableDownloadImage";
             image = [[SDImageCache sharedImageCache] imageFromDiskCacheForKey:[[NSURL URLWithString:newUrlString] absoluteString]];//再从硬盘中查找
         }
         [self _setCustomImage:image];
+        //设置回调
+        if (complete) {
+            complete(image, nil);
+        }
     }
 }
 

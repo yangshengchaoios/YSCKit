@@ -45,17 +45,17 @@ UICollectionViewDelegateFlowLayout>
     self.helper.enableLoadMore = YES;
     self.helper.enableTips = YES;
     self.cellEdgeInsets = AUTOLAYOUT_EDGEINSETS_TLBR(20, 20, 20, 20);
-    self.minimumLineSpacingBlock = ^CGFloat(NSInteger section){
+    self.minimumLineSpacingBlock = ^CGFloat(NSInteger section) {
         return AUTOLAYOUT_LENGTH(20);
     };
-    self.minimumInteritemSpacingBlock = ^CGFloat(NSInteger section){
+    self.minimumInteritemSpacingBlock = ^CGFloat(NSInteger section) {
         return 0;
     };
-    WEAKSELF
+    @weakiy(self);
     self.helper.loadMoreBlock = ^(NSIndexSet *sections, NSArray<NSIndexPath *> *indexPaths) {
-        [weakSelf performBatchUpdates:^{
-            [weakSelf insertSections:sections];
-            [weakSelf insertItemsAtIndexPaths:indexPaths];
+        [weak_self performBatchUpdates:^{
+            [weak_self insertSections:sections];
+            [weak_self insertItemsAtIndexPaths:indexPaths];
         } completion:^(BOOL finished) {
             
         }];
@@ -223,10 +223,8 @@ forSupplementaryViewOfKind:UICollectionElementKindSectionFooter
         if (self.headerSizeBlock) {
             return self.headerSizeBlock(headerObject, section);
         }
-        else {
-            if ([NSClassFromString(headerName) respondsToSelector:@selector(sizeOfViewByObject:)]) {
-                return [NSClassFromString(headerName) sizeOfViewByObject:headerObject];
-            }
+        else if ([NSClassFromString(headerName) respondsToSelector:@selector(sizeOfViewByObject:)]) {
+            return [NSClassFromString(headerName) sizeOfViewByObject:headerObject];
         }
     }
     return CGSizeZero;
@@ -248,10 +246,8 @@ forSupplementaryViewOfKind:UICollectionElementKindSectionFooter
         if (self.footerSizeBlock) {
             return self.footerSizeBlock(footerObject, section);
         }
-        else {
-            if ([NSClassFromString(footerName) respondsToSelector:@selector(sizeOfViewByObject:)]) {
-                return [NSClassFromString(footerName) sizeOfViewByObject:footerObject];
-            }
+        else if ([NSClassFromString(footerName) respondsToSelector:@selector(sizeOfViewByObject:)]) {
+            return [NSClassFromString(footerName) sizeOfViewByObject:footerObject];
         }
     }
     return CGSizeZero;
@@ -265,13 +261,15 @@ forSupplementaryViewOfKind:UICollectionElementKindSectionFooter
             cellName = tempName;
         }
     }
-    if (OBJECT_ISNOT_EMPTY(cellName) &&
-        [NSClassFromString(cellName) respondsToSelector:@selector(sizeOfCellByObject:)]) {
-        return [NSClassFromString(cellName) sizeOfCellByObject:cellObject];
+    if (OBJECT_ISNOT_EMPTY(cellName)) {
+        if (self.cellSizeBlock) {
+            return self.cellSizeBlock(cellObject, indexPath);
+        }
+        else if ([NSClassFromString(cellName) respondsToSelector:@selector(sizeOfCellByObject:)]) {
+            return [NSClassFromString(cellName) sizeOfCellByObject:cellObject];
+        }
     }
-    else {
-        return CGSizeMake(290, 290);
-    }
+    return CGSizeMake(290, 290);
 }
 - (UIEdgeInsets)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout insetForSectionAtIndex:(NSInteger)section {
     return self.cellEdgeInsets;

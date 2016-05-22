@@ -8,9 +8,6 @@
 
 #import "YSCBaseCollectionHeaderFooterView.h"
 
-NSString * const kParamItemHeaderIdentifier     = @"YSCKit_ItemHeader";
-NSString * const kParamItemFooterIdentifier     = @"YSCKit_ItemFooter";
-
 @implementation YSCBaseCollectionHeaderFooterView
 
 - (void)awakeFromNib {
@@ -18,36 +15,6 @@ NSString * const kParamItemFooterIdentifier     = @"YSCKit_ItemFooter";
     
     self.clipsToBounds = YES;
     [self resetSize];
-}
-
-#pragma mark - 注册与重用
-+ (void)registerHeaderToCollectionView:(UICollectionView *)collectionView {
-    [collectionView registerNib:[[self class] nibNameOfView]
-     forSupplementaryViewOfKind:UICollectionElementKindSectionHeader
-            withReuseIdentifier:[[self class] identifier]];
-}
-+ (void)registerFooterToCollectionView:(UICollectionView *)collectionView {
-    [collectionView registerNib:[[self class] nibNameOfView]
-     forSupplementaryViewOfKind:UICollectionElementKindSectionFooter
-            withReuseIdentifier:[[self class] identifier]];
-}
-+ (instancetype)dequeueHeaderByCollectionView:(UICollectionView *)collectionView forIndexPath:(NSIndexPath *)indexPath {
-    YSCBaseCollectionHeaderFooterView *header = [collectionView dequeueReusableSupplementaryViewOfKind:UICollectionElementKindSectionHeader
-                                                                                   withReuseIdentifier:[[self class] identifier]
-                                                                                          forIndexPath:indexPath];
-    return header;
-}
-+ (instancetype)dequeueFooterByCollectionView:(UICollectionView *)collectionView forIndexPath:(NSIndexPath *)indexPath {
-    YSCBaseCollectionHeaderFooterView *footer = [collectionView dequeueReusableSupplementaryViewOfKind:UICollectionElementKindSectionFooter
-                                                                                   withReuseIdentifier:[[self class] identifier]
-                                                                                          forIndexPath:indexPath];
-    return footer;
-}
-+ (NSString *)identifier {
-    return NSStringFromClass(self.class);
-}
-+ (UINib *)nibNameOfView {
-    return [UINib nibWithNibName:NSStringFromClass(self.class) bundle:nil];
 }
 
 #pragma mark - 计算大小

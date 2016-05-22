@@ -8,7 +8,8 @@
 
 #import <Foundation/Foundation.h>
 
-#define YSCRequestInstance      [YSCRequestHelper sharedInstance]
+#define YSCRequestInstance              [YSCRequestHelper sharedInstance]
+
 
 // 网络请求方式
 typedef NS_ENUM (NSInteger, YSCRequestType) {
@@ -98,6 +99,7 @@ typedef void (^YSCRequestFailed)(NSString *YSCErrorType, NSError *error);
 - (NSString *)requestFromUrl:(NSString *)url
                      withApi:(NSString *)apiName
                       params:(NSDictionary *)params
+            httpHeaderParams:(NSDictionary *)httpHeaderParams
                    imageData:(NSData *)imageData
                         type:(YSCRequestType)type
                      success:(YSCRequestSuccess)success

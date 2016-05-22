@@ -11,7 +11,7 @@
 #import <CommonCrypto/CommonDigest.h>
 #import <CommonCrypto/CommonCryptor.h>
 
-NSString * const kRegexUrl = @"((http|ftp|https)://)(([a-zA-Z0-9\\._-]+\\.[a-zA-Z]{2,6})|([0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}))(:[0-9]{1,4})*(/[a-zA-Z0-9\\&%_\\./-~-]*)?";
+NSString * const kRegexWebUrl = @"((http|ftp|https)://)(([a-zA-Z0-9\\._-]+\\.[a-zA-Z]{2,6})|([0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}))(:[0-9]{1,4})*(/[a-zA-Z0-9\\&%_\\./-~-]*)?";
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -69,15 +69,15 @@ NSString * const kRegexUrl = @"((http|ftp|https)://)(([a-zA-Z0-9\\._-]+\\.[a-zA-
     return ([expression numberOfMatchesInString:self options:0 range:NSMakeRange(0, [self length])] > 0);
 }
 
-+ (BOOL)isUrl:(NSString *)string {
++ (BOOL)isWebUrl:(NSString *)string {
     RETURN_NO_WHEN_OBJECT_IS_EMPTY(string)
-    return [string isUrl];
+    return [string isWebUrl];
 }
-- (BOOL)isUrl {
-    return [NSString isMatchRegex:kRegexUrl withString:self];
+- (BOOL)isWebUrl {
+    return [NSString isMatchRegex:kRegexWebUrl withString:self];
 }
-+ (BOOL)isNotUrl:(NSString *)string {
-    return ![self isUrl:string];
++ (BOOL)isNotWebUrl:(NSString *)string {
+    return ![self isWebUrl:string];
 }
 
 
@@ -837,7 +837,7 @@ NSString * const kRegexUrl = @"((http|ftp|https)://)(([a-zA-Z0-9\\._-]+\\.[a-zA-
     NSString *regex = [NSString stringWithFormat:@"%@%@%@", area, yyyyMmdd  , @"[0-9]{3}[0-9Xx]"];
     
     NSPredicate *regexTest = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", regex];
-    if (NO == [regexTest evaluateWithObject:value]) {
+    if ( ! [regexTest evaluateWithObject:value]) {
         return NO;
     }
     int summary = ([value substringWithRange:NSMakeRange(0,1)].intValue + [value substringWithRange:NSMakeRange(10,1)].intValue) *7

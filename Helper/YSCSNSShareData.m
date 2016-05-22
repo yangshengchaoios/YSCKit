@@ -59,14 +59,6 @@
                    image:(UIImage *)image
               shareTypes:(NSArray *)shareTypes
                      url:(NSString *)url
-     presentedController:(UIViewController *)viewController {
-    [self shareWithContent:content image:image shareTypes:shareTypes url:url presentedController:viewController completion:nil];
-}
-
-- (void)shareWithContent:(NSString *)content
-                   image:(UIImage *)image
-              shareTypes:(NSArray *)shareTypes
-                     url:(NSString *)url
      presentedController:(UIViewController *)viewController
               completion:(YSCObjectBlock)completion {
     self.completion = completion;
@@ -74,7 +66,9 @@
     for (NSNumber *platform in shareTypes) {
         YSCShareType shareType = [platform integerValue];
         NSString *umengPlatformName = [self _PlatformTypeOfUMeng:shareType];
-        if ((YSCShareTypeWechatSession == shareType || YSCShareTypeWechatTimeline == shareType || YSCShareTypeWechatFavorite == shareType) &&
+        if ((YSCShareTypeWechatSession == shareType ||
+             YSCShareTypeWechatTimeline == shareType ||
+             YSCShareTypeWechatFavorite == shareType) &&
             [WXApi isWXAppInstalled]) {
             if (YSCShareTypeWechatSession == shareType) {
                 [UMSocialData defaultData].extConfig.wechatSessionData.url = url;
@@ -92,9 +86,12 @@
         else if (YSCShareTypeMobileQQ == shareType && [TencentApiInterface isTencentAppInstall:kIphoneQQ]) {
             [umengPlatforms addObject:umengPlatformName];
         }
+        else if (YSCShareTypeWeiboSina == shareType) {
+            [umengPlatforms addObject:umengPlatformName];
+        }
     }
     if (1 == [umengPlatforms count]) {//只有一个分享平台就直接打开
-        [YSCHUDManager showHUDThenHide:@"正在分享中" onView:[UIApplication sharedApplication].keyWindow afterDelay:5];
+        [YSCHUDManager showHUDThenHideOnView:[UIApplication sharedApplication].keyWindow message:@"正在分享中" afterDelay:3];
         UMSocialUrlResource *urlResource = nil;
         if (OBJECT_ISNOT_EMPTY(url)) {
             urlResource = [[UMSocialUrlResource alloc] initWithSnsResourceType:UMSocialUrlResourceTypeImage url:url];
@@ -112,11 +109,13 @@
                                                             }
                                                             else if (UMSResponseCodeCancel == response.responseCode) {
                                                                 errorMessage = @"取消分享";
+                                                                [YSCHUDManager hideHUDOnKeyWindow];
                                                             }
                                                             else {
                                                                 errorMessage = [NSString stringWithFormat:@"分享失败(%d)", response.responseCode];
+                                                                [YSCHUDManager hideHUDOnKeyWindow];
                                                             }
-                                                            [YSCHUDManager showHUDThenHideOnKeyWindow:errorMessage];
+                                                            [YSCHUDManager showHUDThenHideOnKeyWindowWithMessage:errorMessage];
                                                             
                                                             if (completion) {
                                                                 completion(response);
@@ -125,7 +124,7 @@
     }
     else if ([umengPlatforms count] > 1) {//超过一个分享平台需要弹出选择框
         [UMSocialSnsService presentSnsIconSheetView:viewController
-                                             appKey:kDefaultUMAppKey
+                                             appKey:[UMSocialData appKey]
                                           shareText:content
                                          shareImage:image
                                     shareToSnsNames:umengPlatforms
@@ -135,7 +134,7 @@
         if (completion) {
             completion(nil);
         }
-        [YSCAlertManager showAlertVieWithMessage:@"请先安装要分享的平台APP"];
+        [YSCAlertManager showAlertViewWithMessage:@"请先安装要分享的平台APP"];
     }
 }
 
@@ -156,7 +155,7 @@
     else {
         errorMessage = [NSString stringWithFormat:@"分享失败(%d)", response.responseCode];
     }
-    [YSCHUDManager showHUDThenHideOnKeyWindow:errorMessage];
+    [YSCHUDManager showHUDThenHideOnKeyWindowWithMessage:errorMessage];
     if (self.completion) {
         self.completion(response);
     }

@@ -8,15 +8,9 @@
 
 #import <UIKit/UIKit.h>
 
-FOUNDATION_EXPORT NSString * const kParamItemCellIdentifier;
+static NSString * const kParamItemCellIdentifier   = @"YSCKit_ItemCell";
 
 @interface YSCBaseCollectionViewCell : UICollectionViewCell
-
-#pragma mark - 注册与重用
-+ (void)registerCellToCollectionView:(UICollectionView *)collectionView;
-+ (instancetype)dequeueCellByCollectionView:(UICollectionView *)collectionView forIndexPath:(NSIndexPath*)indexPath;
-+ (NSString *)identifier;
-+ (UINib *)nibNameOfCell;
 
 #pragma mark - 计算大小
 + (CGSize)sizeOfCellByObject:(NSObject *)object;

@@ -114,7 +114,7 @@ static NSString * const kDateFormat15    = @"M月d日 HH:mm";
 //缺陷：最多只能计算到天数
 + (NSDateComponents *)ComponentsBetweenStartDate1:(NSDate *)startDate withEndDate:(NSDate *)endDate;
 
-//过去了多长时间 TODO:待优化
+//过去了多长时间
 + (NSString *)TimePassedByStartDate:(NSDate *)startDate;
 + (NSString *)TimePassedByStartTimeStamp:(NSString *)timeStamp;
 + (NSString *)TimePassedByStartDate1:(NSDate *)startDate;

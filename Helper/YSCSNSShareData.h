@@ -31,13 +31,7 @@ typedef NS_ENUM(NSInteger, YSCShareType) {
 + (instancetype)SharedInstance;
 + (BOOL)IsOauthAndTokenNotExpired:(YSCShareType)shareType;
 
-// 分享到单个平台
-- (void)shareWithContent:(NSString *)content
-                   image:(UIImage *)image
-              shareTypes:(NSArray *)shareTypes
-                     url:(NSString *)url
-     presentedController:(UIViewController *)viewController;
-// 分享到多个平台
+// 兼容分享到多个平台
 - (void)shareWithContent:(NSString *)content
                    image:(UIImage *)image
               shareTypes:(NSArray *)shareTypes

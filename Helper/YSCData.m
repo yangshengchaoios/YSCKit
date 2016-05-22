@@ -32,7 +32,6 @@
 - (id)init {
     self = [super init];
     if (self) {
-        self.autoLayoutScale = SCREEN_WIDTH / XIB_WIDTH;
         [self _initReachability];
         
         // 监控APP运行状态
@@ -40,8 +39,8 @@
         ADD_OBSERVER(@selector(_didAppEnterBackground), UIApplicationDidEnterBackgroundNotification);
         ADD_OBSERVER(@selector(_keyboardDidShow:), UIKeyboardDidShowNotification);
         ADD_OBSERVER(@selector(_keyboardDidHide:), UIKeyboardDidHideNotification);
-//        ADD_OBSERVER(@selector(_keyboardWillShow:), UIKeyboardWillShowNotification);
-//        ADD_OBSERVER(@selector(_keyboardWillHide:), UIKeyboardWillHideNotification);
+        ADD_OBSERVER(@selector(_keyboardWillShow:), UIKeyboardWillShowNotification);
+        ADD_OBSERVER(@selector(_keyboardWillHide:), UIKeyboardWillHideNotification);
         
         // 初始化时间差
         if (nil == YSCGetObject(CachedSyncInterval)) {
@@ -233,7 +232,7 @@
     [NSObject cancelPreviousPerformRequestsWithTarget:self
                                              selector:@selector(_refreshServerTime)
                                                object:nil];
-    if (NO == self.isSyncSuccess) {
+    if ( ! self.isSyncSuccess) {
         [self performSelector:@selector(_refreshServerTime) withObject:nil afterDelay:30];
     }
 }
