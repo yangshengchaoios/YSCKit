@@ -12,7 +12,7 @@
 @implementation YSCDataModel
 MJExtensionCodingImplementation
 MJExtensionLogAllProperties
--(instancetype)copyWithZone:(NSZone *)zone {
+- (instancetype)copyWithZone:(NSZone *)zone {
     return [NSKeyedUnarchiver unarchiveObjectWithData:[NSKeyedArchiver archivedDataWithRootObject:self]];
 }
 

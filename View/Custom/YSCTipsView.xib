@@ -21,7 +21,7 @@
                                 <constraint firstAttribute="width" constant="145" id="PtO-fv-OeQ"/>
                             </constraints>
                         </imageView>
-                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Xec-eu-fcz">
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Xec-eu-fcz">
                             <rect key="frame" x="185" y="240" width="270" height="80"/>
                             <color key="backgroundColor" red="0.75686274509803919" green="0.015686274509803921" blue="0.031372549019607843" alpha="1" colorSpace="calibratedRGB"/>
                             <constraints>
@@ -32,12 +32,18 @@
                             <state key="normal" title="重新加载">
                                 <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                             </state>
+                            <state key="selected">
+                                <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                            </state>
+                            <state key="highlighted">
+                                <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                            </state>
                         </button>
                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="返回数据为空" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="8n7-OA-8aT">
-                            <rect key="frame" x="95" y="150" width="450" height="80"/>
+                            <rect key="frame" x="80" y="150" width="480" height="80"/>
                             <constraints>
                                 <constraint firstAttribute="height" constant="80" id="Yet-2V-lHg"/>
-                                <constraint firstAttribute="width" constant="450" id="u9c-bn-vk9"/>
+                                <constraint firstAttribute="width" constant="480" id="u9c-bn-vk9"/>
                             </constraints>
                             <fontDescription key="fontDescription" type="system" pointSize="30"/>
                             <color key="textColor" red="0.47843137254901957" green="0.47843137254901957" blue="0.47843137254901957" alpha="1" colorSpace="calibratedRGB"/>

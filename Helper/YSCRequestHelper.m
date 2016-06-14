@@ -23,14 +23,14 @@
     }
     return self;
 }
-- (void)removeRequestById:(NSString *)requestId {
+- (void)cancelRequestById:(NSString *)requestId {
     NSURLSessionTask *task = self.requestQueue[requestId];
     if (NSURLSessionTaskStateRunning == task.state) {
         [task cancel];
     }
     [self.requestQueue removeObjectForKey:requestId];
 }
-- (void)removeAllRequests {
+- (void)cancelAllRequests {
     for (NSString *requestId in self.requestQueue) {
         NSURLSessionTask *task = self.requestQueue[requestId];
         if (NSURLSessionTaskStateRunning == task.state) {
@@ -104,7 +104,7 @@
                     }
                     else {
                         if (failed) {
-                            failed(YSCErrorTypeDataMappingFailed, nil);
+                            failed(YSCConfigDataInstance.networkErrorDataMappingFailed, nil);
                         }
                     }
                 }
@@ -119,13 +119,13 @@
                 if (failed) {
                     NSInteger state = baseModel.state;
                     NSString *message = TRIM_STRING(baseModel.message);
-                    failed(YSCErrorTypeInternalServer, CREATE_NSERROR_WITH_Code(state, message));
+                    failed(@"", CREATE_NSERROR_WITH_Code(state, message));// 服务器内部错误(需要进一步解析dataModel.state 和 message)
                 }
             }
         }
         else {
             if (failed) {
-                failed(YSCErrorTypeDataMappingFailed, nil);
+                failed(YSCConfigDataInstance.networkErrorDataMappingFailed, nil);
             }
         }
     } failed:failed];
@@ -151,7 +151,7 @@
             }
             else {
                 if (failed) {
-                    failed(YSCErrorTypeDataMappingFailed, nil);
+                    failed(YSCConfigDataInstance.networkErrorDataMappingFailed, nil);
                 }
             }
         }
@@ -175,14 +175,14 @@
     //0. url组装、判断网络状态、判断url合法性
     if ( ! YSCDataInstance.isReachable) {
         if (failed) {
-            failed(YSCErrorTypeDisconnected, nil);
+            failed(YSCConfigDataInstance.networkErrorDisconnected, nil);
         }
         return @"";
     }
     url = [self _formatRequestUrl:url withApi:apiName];
     if ( ! [NSString isWebUrl:url]) {
         if (failed) {
-            failed(YSCErrorTypeURLInvalid, nil);
+            failed(YSCConfigDataInstance.networkErrorURLInvalid, nil);
         }
         return @"";
     }
@@ -191,12 +191,13 @@
     
     if (self.requestQueue[requestId]) {
         if (YSCConfigDataInstance.isAutoCancelTheLastSameRequesting) {
-            [self removeRequestById:requestId];//自动停止之前的相同网络请求
+            [self cancelRequestById:requestId];
         }
-        else {NSLog(@"The same requstId[%@] is still running!\rurl:%@\rapi:%@\rparams:%@\rtype:%ld",
+        else {
+            NSLog(@"The same requstId[%@] is still running!\rurl:%@\rapi:%@\rparams:%@\rtype:%ld",
                     requestId, url, apiName, params, requestType);
             if (failed) {
-                failed(YSCErrorTypeRequesting, nil);
+                failed(YSCConfigDataInstance.networkErrorRequesting, nil);
             }
             return @"";
         }
@@ -268,7 +269,7 @@
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wgnu"
             dispatch_async(manager.completionQueue ?: dispatch_get_main_queue(), ^{
-                failed(YSCErrorTypeRequesFailed, serializationError);
+                failed(YSCConfigDataInstance.networkErrorRequesFailed, serializationError);
             });
 #pragma clang diagnostic pop
         }
@@ -281,14 +282,30 @@
         NSURLSessionTask *task = [manager dataTaskWithRequest:mutableRequest completionHandler:^(NSURLResponse * _Nonnull response, id  _Nullable responseObject, NSError * _Nullable error) {
             [weak_self.requestQueue removeObjectForKey:requestId];//移除网络请求
             if (error) {
-                if (200 != ((NSHTTPURLResponse *)response).statusCode) {
+                NSInteger statusCode = error.code;
+                if (200 == statusCode) {// 服务器无法连接
                     if (failed) {
-                        failed(YSCErrorTypeServerFailed, error);
+                        failed(YSCConfigDataInstance.networkErrorServerFailed, error);
                     }
                 }
-                else {
+                else if (-1001 == statusCode) {// 网络连接超时
                     if (failed) {
-                        failed(YSCErrorTypeConnectionFailed, error);
+                        failed(YSCConfigDataInstance.networkErrorTimeout, error);
+                    }
+                }
+                else if (-1009 == statusCode || -1004 == statusCode) {// 网络处于断开状态
+                    if (failed) {
+                        failed(YSCConfigDataInstance.networkErrorDisconnected, error);
+                    }
+                }
+                else if (-999 == statusCode) {// 网络连接取消
+                    if (failed) {
+                        failed(YSCConfigDataInstance.networkErrorCancel, error);
+                    }
+                }
+                else {// 其它网络错误
+                    if (failed) {
+                        failed(YSCConfigDataInstance.networkErrorConnectionFailed, error);
                     }
                 }
             }
@@ -301,7 +318,7 @@
                 }
                 else {
                     if (failed) {
-                        failed(YSCErrorTypeReturnEmptyData, nil);
+                        failed(YSCConfigDataInstance.networkErrorReturnEmptyData, nil);
                     }
                 }
             }
@@ -359,23 +376,26 @@
     return AFQueryStringFromParameters(params);
 }
 // 计算httpToken参数值
+// 采用这种方式：NSString *httpToken = [NSString jsonStringWithObject:param];
+// 无法写入http header, why???
 - (NSString *)_httpToken {
-    NSDictionary *param = @{kParamAppId : YSCConfigDataInstance.appBundleIdentifier,
-                            kParamAppVersion : YSCConfigDataInstance.appVersion,
-                            kParamAppChannel : YSCConfigDataInstance.appChannel,
-                            kParamFrom : @"ios",
-                            kParamLongitude : [NSString stringWithFormat:@"%f", YSCDataInstance.currentLongitude],
-                            kParamLatitude : [NSString stringWithFormat:@"%f", YSCDataInstance.currentLatitude],
-                            kParamUdid : YSCDataInstance.udid,
-                            kParamDeviceToken : YSCDataInstance.deviceToken
-                            };
-    NSLog(@"httpToken param=\r%@", param);
-    NSString *httpToken = [NSString jsonStringWithObject:param];
+    NSMutableString *tokenString = [NSMutableString stringWithString:@"{"];
+    [tokenString appendFormat:@"\"%@\":\"%@\",", kParamFrom, @"ios"];
+    [tokenString appendFormat:@"\"%@\":\"%@\",", kParamAppId, YSCConfigDataInstance.appBundleIdentifier];
+    [tokenString appendFormat:@"\"%@\":\"%@\",", kParamAppVersion, YSCConfigDataInstance.appVersion];
+    [tokenString appendFormat:@"\"%@\":\"%@\",", kParamAppChannel, YSCConfigDataInstance.appChannel];
+    [tokenString appendFormat:@"\"%@\":\"%f\",", kParamLongitude, YSCDataInstance.currentLongitude];
+    [tokenString appendFormat:@"\"%@\":\"%f\",", kParamLatitude, YSCDataInstance.currentLatitude];
+    [tokenString appendFormat:@"\"%@\":\"%@\",", kParamUdid, YSCDataInstance.udid];
+    [tokenString appendFormat:@"\"%@\":\"%@\"}", kParamDeviceToken, YSCDataInstance.deviceToken];
     if (OBJECT_ISNOT_EMPTY(self.httpTokenSecretKey)) {
-        httpToken = [NSString DESEncrypt:httpToken byKey:self.httpTokenSecretKey];
-        NSLog(@"httpToken string=\r%@", httpToken);
+        NSString *tempString = [NSString DESEncrypt:tokenString byKey:self.httpTokenSecretKey];
+        NSLog(@"httpToken string=\r%@", tempString);
+        return tempString;
     }
-    return httpToken;
+    else {
+        return tokenString;
+    }
 }
 // 计算post body的参数值
 - (NSString *)_encryptPostBodyParam:(NSString *)bodyParam {

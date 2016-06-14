@@ -18,11 +18,9 @@
 
 + (void)showHUDOnView:(UIView *)view message:(NSString *)message;
 + (void)showHUDOnView:(UIView *)view;
-+ (void)showHUDOnView:(UIView *)view showsMask:(BOOL)showsMask;
 
 + (void)showHUDOnView:(UIView *)view message:(NSString *)message edgeInsets:(UIEdgeInsets)edgeInsets;
 + (void)showHUDOnView:(UIView *)view edgeInsets:(UIEdgeInsets)edgeInsets;
-+ (void)showHUDOnView:(UIView *)view edgeInsets:(UIEdgeInsets)edgeInsets showsMask:(BOOL)showsMask;
 
 + (void)showHUDOnKeyWindowWithMesage:(NSString *)message;
 + (void)showHUDOnKeyWindow;

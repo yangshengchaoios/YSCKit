@@ -36,8 +36,10 @@
 
 
 #pragma mark - 相对布局
-/** xib布局宽度(默认750) */
+/** xib布局宽度(默认750point) */
 @property (nonatomic, assign) CGFloat xibWidth;
+/** 用于计算缩放比例(只能初始化一次！否则会导致旋转后屏幕计算不正确) */
+@property (nonatomic, assign) CGFloat screenWidth;
 /** 缩放比例 (当前屏幕的真实宽度point / xib布局的宽度point) 程序启动后必须固定的参数，防止在旋转后计算不正确 */
 @property (nonatomic, assign) CGFloat autoLayoutScale;
 
@@ -77,23 +79,49 @@
 #pragma mark - 设置默认图片名称及提示语
 /** app默认图片名称 */
 @property (nonatomic, strong) NSString *defaultImageName;
-/** app默认导航栏背景图片名称 */
-@property (nonatomic, strong) NSString *defaultNaviBarBackImageName;
-/** 上拉加载更多没有数据的提示语 */
-@property (nonatomic, strong) NSString *defaultNoMoreMessage;
 /** tipsview提示数据为空的icon */
 @property (nonatomic, strong) NSString *defaultEmptyImageName;
 /** tipsview发生错误的icon */
 @property (nonatomic, strong) NSString *defaultErrorImageName;
+/** tipsview请求超时的icon */
+@property (nonatomic, strong) NSString *defaultTimeoutImageName;
+/** 导航栏返回按钮默认图片名称 */
+@property (nonatomic, strong) NSString *defaultBackButtonImageName;
+/** app默认导航栏背景图片名称 */
+@property (nonatomic, strong) NSString *defaultNaviBackgroundImageName;
+/** 上拉加载更多没有数据的提示语 */
+@property (nonatomic, strong) NSString *defaultNoMoreMessage;
 /** tipsview数据为空的默认提示语 */
 @property (nonatomic, strong) NSString *defaultEmptyMessage;
 /** 默认分页起始页码 */
 @property (nonatomic, assign) NSInteger defaultPageStartIndex;
 /** 默认分页每页的条数 */
 @property (nonatomic, assign) NSInteger defaultPageSize;
-/** 网络请求超时时间(s) */
+/** 网络连接超时时间(s) */
 @property (nonatomic, assign) CGFloat defaultRequestTimeOut;
 
+
+#pragma mark - 网络访问错误提示
+/** 网络未连接：网络处于断开状态 -1009 == statusCode || -1004 == statusCode */
+@property (nonatomic, strong) NSString *networkErrorDisconnected;
+/** 服务器连接失败：statusCode == 200, 网络是正常的，服务器不可访问*/
+@property (nonatomic, strong) NSString *networkErrorServerFailed;
+/** 网络连接超时：statusCode == 1001 */
+@property (nonatomic, strong) NSString *networkErrorTimeout;
+/** 网络连接取消：0 == statusCode */
+@property (nonatomic, strong) NSString *networkErrorCancel;
+/** 网络连接失败：statusCode其它值 */
+@property (nonatomic, strong) NSString *networkErrorConnectionFailed;
+/** 创建网络连接失败 */
+@property (nonatomic, strong) NSString *networkErrorRequesFailed;
+/** 网络请求的URL不合法 */
+@property (nonatomic, strong) NSString *networkErrorURLInvalid;
+/** 返回数据为空 */
+@property (nonatomic, strong) NSString *networkErrorReturnEmptyData;
+/** 数据映射本地模型失败 */
+@property (nonatomic, strong) NSString *networkErrorDataMappingFailed;
+/** 数据获取中 */
+@property (nonatomic, strong) NSString *networkErrorRequesting;
 
 
 //=========================================================================
@@ -112,6 +140,9 @@
 //=========================================================================
 /** 重置参数键值对(当有在线参数更新时调用) */
 - (void)resetConfigParams;
+/** 缓存至内存中，方便快速读取 */
+- (void)saveObject:(NSObject *)object toMemoryByName:(NSString *)name;
+
 - (BOOL)boolFromConfigByName:(NSString *)name;
 - (float)floatFromConfigByName:(NSString *)name;
 - (NSInteger)intFromConfigByName:(NSString *)name;

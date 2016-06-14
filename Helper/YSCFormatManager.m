@@ -70,11 +70,11 @@
         id data = [NSJSONSerialization JSONObjectWithData:[jsonString dataUsingEncoding:NSUTF8StringEncoding]
                                                   options:0
                                                     error:&error];
-        if (nil == error) {
+        if ( ! error) {
             NSData *jsonData = [NSJSONSerialization dataWithJSONObject:data
                                                                options:(NSJSONWritingOptions)NSJSONWritingPrettyPrinted
                                                                  error:&error];
-            if (nil == error) {
+            if ( ! error) {
                 return (jsonData) ? [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding] : @"";
             }
             else {

@@ -43,7 +43,7 @@
         ADD_OBSERVER(@selector(_keyboardWillHide:), UIKeyboardWillHideNotification);
         
         // 初始化时间差
-        if (nil == YSCGetObject(CachedSyncInterval)) {
+        if ( ! YSCGetObject(CachedSyncInterval)) {
             YSCSaveObject(@(-500), CachedSyncInterval);
             self.syncInterval = -500;
         }
@@ -76,22 +76,18 @@
     NSDictionary *info = [notification userInfo];
     CGSize kbSize = [[info objectForKey:UIKeyboardFrameEndUserInfoKey] CGRectValue].size;
     self.currentKeyboardHeight = kbSize.height;
-    NSLog(@"will show:%f", self.currentKeyboardHeight);
 }
 - (void)_keyboardDidShow:(NSNotification*)notification {
     NSDictionary *info = [notification userInfo];
     CGSize kbSize = [[info objectForKey:UIKeyboardFrameEndUserInfoKey] CGRectValue].size;
     self.currentKeyboardHeight = kbSize.height;
-    NSLog(@"did show:%f", self.currentKeyboardHeight);
 }
 //键盘关闭
 - (void)_keyboardWillHide:(NSNotification*)notification {
     self.currentKeyboardHeight = 0.0f;
-    NSLog(@"will hide:%f", self.currentKeyboardHeight);
 }
 - (void)_keyboardDidHide:(NSNotification*)notification {
     self.currentKeyboardHeight = 0.0f;
-    NSLog(@"did hide:%f", self.currentKeyboardHeight);
 }
 //缓存数据库路径
 - (NSString *)cacheDBPath {
@@ -105,9 +101,9 @@
     @weakiy(self);
     self.reachability = [YYReachability reachability];
     self.isReachable = self.reachability.reachable;
-    self.reachability.notifyBlock = ^(YYReachability *reachability) {
-        weak_self.isReachable = weak_self.reachability.reachable;
-    };
+    [self.reachability setTheNotifyBlock:^(YYReachability * _Nonnull reachability) {
+        weak_self.isReachable = reachability.reachable;
+    }];
 }
 - (BOOL)isReachableViaWiFi {
     return YYReachabilityStatusWiFi == self.reachability.status;
@@ -117,7 +113,7 @@
 #pragma mark - 定位当前位置
 - (void)startLocationService {
     if ([UIDevice isLocationAvaible]) {
-        if (nil == self.locationManager) {
+        if ( ! self.locationManager) {
             self.locationManager = [CLLocationManager new];
             self.locationManager.delegate = self;
             self.locationManager.desiredAccuracy = kCLLocationAccuracyBest;
@@ -239,7 +235,7 @@
 
 #pragma mark - getter
 - (NSString *)udid {
-    if (nil == _udid) {
+    if ( ! _udid) {
         NSString *tempUdid = YSCGetObject(@"OpenUDID");
         if (OBJECT_IS_EMPTY(tempUdid)) {
             tempUdid = [UIDevice openUdid];//保证只获取一次udid就保存在内存中！

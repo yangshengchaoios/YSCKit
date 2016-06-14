@@ -39,6 +39,9 @@ NSString * const kCachedSectionKey  = @"kCachedSectionKey";
     self.cellDataArray = [NSMutableArray array];
     self.currentPageIndex = YSCConfigDataInstance.defaultPageStartIndex;
     self.requestType = YSCRequestTypeGET;
+    self.tipsTimeoutIcon = YSCConfigDataInstance.defaultTimeoutImageName;
+    self.tipsFailedIcon = YSCConfigDataInstance.defaultErrorImageName;
+    self.tipsEmptyIcon = YSCConfigDataInstance.defaultEmptyImageName;
     
     //必要的属性
     self.dictParamBlock = ^NSDictionary *(NSInteger pageIndex) {
@@ -140,6 +143,12 @@ NSString * const kCachedSectionKey  = @"kCachedSectionKey";
         }
     }
 }
+// 取消网络请求
+- (void)cancelRequesting {
+    RETURN_WHEN_OBJECT_IS_EMPTY(self.requestId);
+    [YSCRequestInstance cancelRequestById:self.requestId];
+    self.requestId = nil;// 因为会延迟一段时间才调用resultBlock，这里先置nil，防止重复cancel request
+}
 // 刷新列表
 - (void)refreshWithObjects:(NSObject *)objects {
     [self loadDataByPageIndex:YSCConfigDataInstance.defaultPageStartIndex response:objects error:nil];
@@ -147,12 +156,21 @@ NSString * const kCachedSectionKey  = @"kCachedSectionKey";
 - (void)loadDataByPageIndex:(NSInteger)pageIndex response:(NSObject *)initObject error:(NSString *)errorMessage {
     @weakiy(self);
     YSCObjectErrorMessageBlock resultBlock = ^(NSObject *object, NSString *errorMessage) {
+        weak_self.requestId = nil;
         BOOL isPullToRefresh = (YSCConfigDataInstance.defaultPageStartIndex == pageIndex); //是否下拉刷新
         isPullToRefresh ? [weak_self.scrollView.mj_header endRefreshing] : [weak_self.scrollView.mj_footer endRefreshing];
         if (errorMessage) {
             if (weak_self.tipsView) {
                 [weak_self.tipsView resetMessage:errorMessage];
-                [weak_self.tipsView resetImageName:weak_self.tipsFailedIcon];
+                if ([YSCConfigDataInstance.networkErrorTimeout isEqualToString:errorMessage]) {
+                    [weak_self.tipsView resetImageName:weak_self.tipsTimeoutIcon];
+                }
+                else if ([YSCConfigDataInstance.networkErrorReturnEmptyData isEqualToString:errorMessage]) {
+                    [weak_self.tipsView resetImageName:weak_self.tipsEmptyIcon];
+                }
+                else {
+                    [weak_self.tipsView resetImageName:weak_self.tipsFailedIcon];
+                }
                 [weak_self.tipsView resetActionWithButtonTitle:weak_self.tipsButtonTitle buttonAction:^{
                     [weak_self beginRefreshing];
                 }];
@@ -284,7 +302,7 @@ NSString * const kCachedSectionKey  = @"kCachedSectionKey";
     
     //4. 开始网络访问
     if (self.requestType <= YSCRequestTypePostBodyData) {
-        NSString *requestId = [YSCRequestInstance requestFromUrl:self.prefixOfUrl
+        self.requestId = [YSCRequestInstance requestFromUrl:self.prefixOfUrl
                                                     withApi:self.apiName
                                                      params:self.dictParamBlock(pageIndex)
                                                   dataModel:NSClassFromString(self.modelName)
@@ -292,7 +310,7 @@ NSString * const kCachedSectionKey  = @"kCachedSectionKey";
                                                     success:successBlock
                                                      failed:failedBlock];
         if (self.startLoadBlock) {
-            self.startLoadBlock(requestId);
+            self.startLoadBlock(self.requestId);
         }
     }
     else {
@@ -367,6 +385,20 @@ NSString * const kCachedSectionKey  = @"kCachedSectionKey";
             [array removeObjectAtIndex:indexPath.row];
         }
     }
+}
+- (NSIndexPath *)indexPathByObject:(NSObject *)object {
+    NSIndexPath *indexPath = nil;
+    for (int i = 0; i < [self.cellDataArray count]; i++) {
+        NSArray *array = self.cellDataArray[i];
+        for (int j = 0; j < [array count]; j++) {
+            NSObject *tempObject = array[j];
+            if ([tempObject isEqual:object]) {
+                indexPath = [NSIndexPath indexPathForRow:j inSection:i];
+                break;
+            }
+        }
+    }
+    return indexPath;
 }
 
 // 加载缓存

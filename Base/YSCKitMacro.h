@@ -27,15 +27,21 @@ typedef void (^YSCIntegerErrorBlock)(NSInteger, NSError *);
 // 定义NSLog
 #define __NSLog(s, ...) do { \
         if (YSCConfigDataInstance.isDebugModel || [YSCManager isArchiveByDevelopment]) { \
-            NSString *logString = [NSString stringWithFormat:@"[%@(%d)] %@",[[NSString stringWithUTF8String:__FILE__] lastPathComponent],__LINE__,[NSString stringWithFormat:(s), ##__VA_ARGS__]]; \
+            NSMutableString *logString = [NSMutableString stringWithFormat:@"[%@(%d)] ",[[NSString stringWithUTF8String:__FILE__] lastPathComponent], __LINE__]; \
+            if (s) { \
+                [logString appendFormat:(s), ##__VA_ARGS__]; \
+            } \
+            else { \
+                [logString appendString:@"(null)"]; \
+            } \
             NSLog(@"%@", logString); \
             [YSCLogManager saveLog:logString]; \
         } \
     } while (0)
 #define NSLog(...) __NSLog(__VA_ARGS__)
 
-#define LOG_POINT(point)    NSLog(@"%s =\r { x:%f, y:%f }", #point, point.x, point.y)
-#define LOG_SIZE(size)      NSLog(@"%s =\r { w:%f, h:%f }", #size, size.width, size.height)
+#define LOG_POINT(point)    NSLog(@"%s = { x:%f, y:%f }", #point, point.x, point.y)
+#define LOG_SIZE(size)      NSLog(@"%s = { w:%f, h:%f }", #size, size.width, size.height)
 #define LOG_RECT(rect)      NSLog(@"%s =\r { x:%f, y:%f, w:%f, h:%f }", #rect, rect.origin.x, rect.origin.y, rect.size.width, rect.size.height)
 
 
@@ -99,14 +105,17 @@ typedef void (^YSCIntegerErrorBlock)(NSInteger, NSError *);
 /**
  *  自动布局相关代码段简写
  */
-#define AUTOLAYOUT_LENGTH(x)            ((x) * YSCConfigDataInstance.autoLayoutScale)            //计算缩放后的大小point
-#define AUTOLAYOUT_LENGTH_W(x,w)        ((x) * ([UIScreen mainScreen].bounds.size.width / (w)))        //计算任意布局的真实大小point
+#define AUTOLAYOUT_LENGTH(x)            ((x) * YSCConfigDataInstance.autoLayoutScale)       //计算缩放后的大小point
+#define AUTOLAYOUT_LENGTH_W(x,w)        ((x) * (YSCConfigDataInstance.screenWidth / (w)))   //计算任意xib布局的真实大小point
+#define AUTOLAYOUT_FONT(f)              [UIFont systemFontOfSize:AUTOLAYOUT_LENGTH(f)]
+#define AUTOLAYOUT_FONT_W(f,w)          [UIFont systemFontOfSize:AUTOLAYOUT_LENGTH_W(f,w)]
+
 #define AUTOLAYOUT_SIZE_WH(w,h)         CGSizeMake(AUTOLAYOUT_LENGTH(w), AUTOLAYOUT_LENGTH(h))
-#define AUTOLAYOUT_SIZE(size)           CGSizeMake(AUTOLAYOUT_LENGTH(size.width), AUTOLAYOUT_LENGTH(size.height))//计算自动布局后的size
-#define AUTOLAYOUT_EDGEINSETS_TLBR(t,l,b,r)  UIEdgeInsetsMake(AUTOLAYOUT_LENGTH(t), AUTOLAYOUT_LENGTH(l), AUTOLAYOUT_LENGTH(b), AUTOLAYOUT_LENGTH(r))
+#define AUTOLAYOUT_SIZE(s)              AUTOLAYOUT_SIZE_WH(s.width, s.height)
+#define AUTOLAYOUT_EDGEINSETS_TLBR(t,l,b,r)     UIEdgeInsetsMake(AUTOLAYOUT_LENGTH(t), AUTOLAYOUT_LENGTH(l), AUTOLAYOUT_LENGTH(b), AUTOLAYOUT_LENGTH(r))
 #define AUTOLAYOUT_EDGEINSETS(e)        AUTOLAYOUT_EDGEINSETS_TLBR(e.top, e.left, e.bottom, e.right)
-#define AUTOLAYOUT_CGRECT(x,y,w,h)      CGRectMake(AUTOLAYOUT_LENGTH(x),AUTOLAYOUT_LENGTH(y),AUTOLAYOUT_LENGTH(w),AUTOLAYOUT_LENGTH(h))
-#define AUTOLAYOUT_FONT(f)              ([UIFont systemFontOfSize:((f) * YSCConfigDataInstance.autoLayoutScale)])
+#define AUTOLAYOUT_RECT_XYWH(x,y,w,h)   CGRectMake(AUTOLAYOUT_LENGTH(x), AUTOLAYOUT_LENGTH(y), AUTOLAYOUT_LENGTH(w), AUTOLAYOUT_LENGTH(h))
+#define AUTOLAYOUT_RECT(r)              AUTOLAYOUT_RECT_XYWH(r.origin.x, r.origin.y, r.size.width, r.size.height)
 
 
 /**
@@ -172,13 +181,32 @@ typedef void (^YSCIntegerErrorBlock)(NSInteger, NSError *);
  @param ^complete  code time cost (millisecond)
  
  Usage:
- YYBenchmark(^{
+ YSCBenchmark(^{
      // code
  }, ^(double ms) {
      NSLog(@"time cost: %.2f ms",ms);
  });
  */
-
+static inline void YSCBenchmark(void (^block)(void), void (^complete)(double ms)) {
+    // <QuartzCore/QuartzCore.h> version
+    /*
+     extern double CACurrentMediaTime (void);
+     double begin, end, ms;
+     begin = CACurrentMediaTime();
+     block();
+     end = CACurrentMediaTime();
+     ms = (end - begin) * 1000.0;
+     complete(ms);
+     */
+    
+    // <sys/time.h> version
+    struct timeval t0, t1;
+    gettimeofday(&t0, NULL);
+    block();
+    gettimeofday(&t1, NULL);
+    double ms = (double)(t1.tv_sec - t0.tv_sec) * 1e3 + (double)(t1.tv_usec - t0.tv_usec) * 1e-3;
+    complete(ms);
+}
 
 /**
  Add this macro before each category implementation, so we don't have to use

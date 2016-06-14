@@ -23,6 +23,7 @@ typedef void(^SetImageCompletionBlock)(UIImage *image, NSError *error);
 - (void)ysc_setImageWithURLString:(NSString *)urlString;
 - (void)ysc_setImageWithURLString:(NSString *)urlString completed:(SetImageCompletionBlock)complete;
 - (void)ysc_setImageWithURLString:(NSString *)urlString withFadeIn:(BOOL)withAnimate;
+- (void)ysc_setImageWithURLString:(NSString *)urlString withFadeIn:(BOOL)withAnimate completed:(SetImageCompletionBlock)complete;
 
 - (void)ysc_setImageWithURLString:(NSString *)urlString placeholderImageName:(NSString *)placeholderImageName;
 - (void)ysc_setImageWithURLString:(NSString *)urlString placeholderImageName:(NSString *)placeholderImageName completed:(SetImageCompletionBlock)complete;

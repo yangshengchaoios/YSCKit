@@ -7,7 +7,7 @@
 //
 
 #import "UIImageView+YSCKit.h"
-#import <SDWebImage/UIImageView+WebCache.h>
+#import "UIImageView+WebCache.h"
 
 @implementation UIImageView (YSCKit)
 
@@ -27,6 +27,9 @@
 }
 - (void)ysc_setImageWithURLString:(NSString *)urlString withFadeIn:(BOOL)withAnimate {
     [self _setImageWithURLString:urlString placeholderImage:nil withFadeIn:withAnimate completed:nil];
+}
+- (void)ysc_setImageWithURLString:(NSString *)urlString withFadeIn:(BOOL)withAnimate completed:(SetImageCompletionBlock)complete {
+    [self _setImageWithURLString:urlString placeholderImage:nil withFadeIn:withAnimate completed:complete];
 }
 
 - (void)ysc_setImageWithURLString:(NSString *)urlString placeholderImageName:(NSString *)placeholderImageName {
@@ -65,7 +68,7 @@
     //设置基本参数
     self.clipsToBounds = YES;
     NSString *newUrlString = [NSString trimString:[urlString copy]];
-    if (nil == placeholderImage) {
+    if ( ! placeholderImage) {
         placeholderImage = [UIImage imageNamed:YSCConfigDataInstance.defaultImageName];
         self.image = [UIImage imageNamed:YSCConfigDataInstance.defaultImageName];
         self.backgroundColor = YSCConfigDataInstance.defaultImageBackColor;
@@ -146,7 +149,7 @@
     }
     else {//读取缓存图片
         UIImage *image = [[SDImageCache sharedImageCache] imageFromMemoryCacheForKey:[[NSURL URLWithString:newUrlString] absoluteString]];//先从内存中查找
-        if (nil == image) {
+        if ( ! image) {
             image = [[SDImageCache sharedImageCache] imageFromDiskCacheForKey:[[NSURL URLWithString:newUrlString] absoluteString]];//再从硬盘中查找
         }
         [self _setCustomImage:image];
@@ -161,7 +164,7 @@
     RETURN_WHEN_OBJECT_IS_EMPTY(image);
     self.image = image;
     self.backgroundColor = [UIColor clearColor];
-    self.contentMode = UIViewContentModeScaleAspectFill;//等比例缩放，且全部显示出来
+    self.contentMode = UIViewContentModeScaleAspectFit;//等比例缩放，且全部显示出来
 }
 
 @end

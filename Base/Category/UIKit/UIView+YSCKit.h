@@ -44,7 +44,9 @@
 /** 递归遍历所有子view */
 - (void)resetSize;
 - (void)resetFontSize;
+- (void)resetFontSizeByXibWidth:(CGFloat)xibWidth;
 - (void)resetConstraint;
+- (void)resetConstraintByXibWidth:(CGFloat)xibWidth;
 @end
 
 

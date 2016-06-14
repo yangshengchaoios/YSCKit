@@ -40,7 +40,8 @@ static NSString * const kSaveLocalConfigFileName = @"YSCConfigData";
     self.isUseHttpHeaderToken = YES;
     self.isAutoCancelTheLastSameRequesting = YES;
     
-    self.xibWidth = 640.0f;
+    self.screenWidth = [UIScreen mainScreen].bounds.size.width;
+    self.xibWidth = 750.0f;
     self.appStoreId = @"";
     self.appChannel = @"AppStore";
     self.appShortVersion = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"];
@@ -57,14 +58,27 @@ static NSString * const kSaveLocalConfigFileName = @"YSCConfigData";
     self.defaultImageBackColor = [UIColor colorWithRed:240 / 255.0f green:240 / 255.0f blue:240 / 255.0f alpha:1.0f];
     
     self.defaultImageName = @"image_default";
-    self.defaultNaviBarBackImageName = @"bg_navigationbar";
+    self.defaultEmptyImageName = @"icon_empty_default";
+    self.defaultErrorImageName = @"icon_error_default";
+    self.defaultTimeoutImageName = @"icon_timeout_default";
+    self.defaultBackButtonImageName = @"arrow_left_default";
+    self.defaultNaviBackgroundImageName = @"background_navigationbar_default";
     self.defaultNoMoreMessage = @"没有更多了";
-    self.defaultEmptyImageName = @"icon_default_empty";
-    self.defaultErrorImageName = @"icon_default_error";
-    self.defaultEmptyMessage = @"暂无记录";
+    self.defaultEmptyMessage = @"暂无数据";
     self.defaultPageStartIndex = 1;
     self.defaultPageSize = 10;
     self.defaultRequestTimeOut = 15.0f;
+    
+    self.networkErrorDisconnected = @"网络未连接";
+    self.networkErrorServerFailed = @"服务器连接失败";
+    self.networkErrorTimeout = @"网络连接超时";
+    self.networkErrorCancel = @"网络连接取消";
+    self.networkErrorConnectionFailed = @"网络连接失败";
+    self.networkErrorRequesFailed = @"创建网络连接失败";
+    self.networkErrorURLInvalid = @"网络请求的URL不合法";
+    self.networkErrorReturnEmptyData = @"返回数据为空";
+    self.networkErrorDataMappingFailed = @"数据映射本地模型失败";
+    self.networkErrorRequesting = @"数据获取中";
     
     [self _setupCustomValue];
 }
@@ -79,7 +93,7 @@ static NSString * const kSaveLocalConfigFileName = @"YSCConfigData";
 //=========================================================================
 - (BOOL)isDownloadImageViaWWAN {
     NSString *name = @"YSCConfigData_isDownloadImageViaWWAN";
-    NSObject *tempObject = [self _objectOfLocalConfigFileByName:name];
+    NSObject *tempObject = [self getLocalConfigValueByName:name];
     if (tempObject) {// 优先在线参数
         NSString *tempValue = [NSString stringWithFormat:@"%@", tempObject];
         return [tempValue boolValue];
@@ -91,7 +105,7 @@ static NSString * const kSaveLocalConfigFileName = @"YSCConfigData";
 }
 - (BOOL)isDebugModel {
     NSString *name = @"YSCConfigData_isDebugModel";
-    NSObject *tempObject = nil;
+    NSObject *tempObject = nil;// 不检测在线参数
     if (self.appParams[name]) {
         tempObject = self.appParams[name];
     }
@@ -112,7 +126,7 @@ static NSString * const kSaveLocalConfigFileName = @"YSCConfigData";
 //=========================================================================
 - (void)setXibWidth:(CGFloat)xibWidth {
     _xibWidth = xibWidth;
-    self.autoLayoutScale = [UIScreen mainScreen].bounds.size.width / xibWidth;
+    self.autoLayoutScale = self.screenWidth / xibWidth;
 }
 
 
@@ -147,6 +161,13 @@ static NSString * const kSaveLocalConfigFileName = @"YSCConfigData";
     [self.onlineParams removeAllObjects];
     [self.appParams removeAllObjects];
 }
+- (void)saveObject:(NSObject *)object toMemoryByName:(NSString *)name {
+    RETURN_WHEN_OBJECT_IS_EMPTY(name);
+    if (object) {
+        self.appParams[name] = object;
+    }
+}
+
 - (BOOL)boolFromConfigByName:(NSString *)name {
     RETURN_NO_WHEN_OBJECT_IS_EMPTY(name);
     NSString *value = [self stringFromConfigByName:name];
@@ -214,7 +235,7 @@ static NSString * const kSaveLocalConfigFileName = @"YSCConfigData";
     
     NSString *tempValue = [self _valueOfOnlineConfig:name];
     //2. 获取在线配置的参数
-    if (nil != tempValue) {
+    if (tempValue) {
         self.appParams[name] = tempValue;
         return tempValue;
     }

@@ -239,7 +239,7 @@
 - (BOOL)_saveObject:(NSObject *)object forKey:(NSString *)key fileName:(NSString *)fileName folder:(NSString *)folderPath subFolder:(NSString *)subFolerName {
     RETURN_NO_WHEN_OBJECT_IS_EMPTY(key)
     RETURN_NO_WHEN_OBJECT_IS_EMPTY(folderPath)
-    if (nil == object) {
+    if ( ! object) {
         object = [NSNull null];
     }
     
@@ -275,7 +275,7 @@
     NSString *filePath = [folderPath stringByAppendingPathComponent:fileName];
     NSDictionary *cacheInfo = [self unarchiveDictionaryFromFilePath:filePath];
     NSObject *value = cacheInfo[key];
-    if (nil != value && ( ! [value isKindOfClass:[NSNull class]])) {
+    if (value && ( ! [value isKindOfClass:[NSNull class]])) {
         return value;
     }
     else {

@@ -17,18 +17,20 @@
            edgeInsets:(UIEdgeInsets)edgeInsets
       backgroundColor:(UIColor *)backgroundColor {
     MBProgressHUD *hud = [MBProgressHUD HUDForView:view];
-    if (nil == hud) {
+    if ( ! hud) {
         hud = [MBProgressHUD showHUDAddedTo:view animated:YES];
     }
-    hud.backgroundColor = (nil != backgroundColor) ? backgroundColor : [UIColor clearColor];
-    [hud mas_remakeConstraints:^(MASConstraintMaker *make) {
-        make.edges.insets(edgeInsets);
-    }];
+    hud.backgroundColor = (backgroundColor ? backgroundColor : [UIColor clearColor]);
     hud.label.text = message;
     hud.mode = MBProgressHUDModeIndeterminate;
-}
-+ (void)showHUDOnView:(UIView *)view backgroundColor:(UIColor *)backgroundColor edgeInsets:(UIEdgeInsets)edgeInsets {
-    [self showHUDOnView:view message:nil edgeInsets:edgeInsets backgroundColor:backgroundColor];
+    [hud showAnimated:YES];
+    // 调整hud位置
+    CGRect frame = view.bounds;
+    frame.origin.x = edgeInsets.left;
+    frame.origin.y = edgeInsets.top;
+    frame.size.width = CGRectGetWidth(view.bounds) - (edgeInsets.left + edgeInsets.right);
+    frame.size.height = CGRectGetHeight(view.bounds) - (edgeInsets.top + edgeInsets.bottom);
+    hud.frame = frame;
 }
 
 + (void)showHUDOnView:(UIView *)view message:(NSString *)message {
@@ -43,12 +45,6 @@
              edgeInsets:UIEdgeInsetsZero
         backgroundColor:nil];
 }
-+ (void)showHUDOnView:(UIView *)view showsMask:(BOOL)showsMask {
-    [self showHUDOnView:view
-                message:nil
-             edgeInsets:UIEdgeInsetsZero
-        backgroundColor:showsMask ? YSCConfigDataInstance.defaultViewColor : nil];
-}
 
 + (void)showHUDOnView:(UIView *)view message:(NSString *)message edgeInsets:(UIEdgeInsets)edgeInsets {
     [self showHUDOnView:view
@@ -61,12 +57,6 @@
                 message:nil
              edgeInsets:edgeInsets
         backgroundColor:nil];
-}
-+ (void)showHUDOnView:(UIView *)view edgeInsets:(UIEdgeInsets)edgeInsets showsMask:(BOOL)showsMask {
-    [self showHUDOnView:view
-                message:nil
-             edgeInsets:edgeInsets
-        backgroundColor:showsMask ? YSCConfigDataInstance.defaultViewColor : nil];
 }
 
 + (void)showHUDOnKeyWindowWithMesage:(NSString *)message {
@@ -94,7 +84,7 @@
 #pragma mark - 显示N秒后自动关闭HUD
 + (void)showHUDThenHideOnView:(UIView *)view message:(NSString *)message afterDelay:(NSTimeInterval)delay {
     MBProgressHUD *hud = [MBProgressHUD HUDForView:view];
-    if (nil == hud) {
+    if ( ! hud) {
         hud = [MBProgressHUD showHUDAddedTo:view animated:YES];
     }
     hud.backgroundColor = [UIColor clearColor];
@@ -109,5 +99,7 @@
 + (void)showHUDThenHideOnKeyWindowWithMessage:(NSString *)message {
     [self showHUDThenHideOnView:[UIApplication sharedApplication].keyWindow message:message];
 }
+
+#pragma mark - Private Methods
 
 @end

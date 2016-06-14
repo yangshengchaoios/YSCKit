@@ -58,14 +58,14 @@
     [self.scrollView removeAllSubviews];
     for (int i = 0; i < self.numbersOfViews; i++) {
         UIView *segmentedView = self.segmentedViewSetBlock(i);
-        if (nil == segmentedView) {
+        if ( ! segmentedView) {
             continue;
         }
         
         [self.scrollView addSubview:segmentedView];
         [segmentedView mas_makeConstraints:^(MASConstraintMaker *make) {
-            make.height.equalTo(self.mas_height);
-            make.width.equalTo(self.mas_width);
+            make.height.equalTo(self.scrollView.mas_height);
+            make.width.equalTo(self.scrollView.mas_width);
             make.top.equalTo(self.scrollView.mas_top);
             make.bottom.equalTo(self.scrollView.mas_bottom);
             

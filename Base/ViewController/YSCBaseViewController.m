@@ -23,9 +23,9 @@
     }
     
     // 取消未结束的网络请求
-    for (NSString *requestKey in self.requestIdDictionary) {
-        NSString *requestId = self.requestIdDictionary[requestKey];
-        [YSCRequestInstance removeRequestById:requestId];
+    NSArray *requestIds = [self.requestIdDictionary.allValues copy];
+    for (NSString *requestId in requestIds) {
+        [YSCRequestInstance cancelRequestById:requestId];
     }
     [self.requestIdDictionary removeAllObjects];
     self.requestIdDictionary = nil;
@@ -60,7 +60,7 @@
 - (void)viewDidLoad {
 	[super viewDidLoad];
     self.requestIdDictionary = [NSMutableDictionary dictionary];
-    if (nil == self.params) {
+    if ( ! self.params) {
         self.params = [NSMutableDictionary dictionary];
     }
     NSLog(@"self.params = %@", self.params);
@@ -68,7 +68,7 @@
     //相对布局——自动调整约束值和font大小
     if (1 != YSCConfigDataInstance.autoLayoutScale &&
         ( ! [self respondsToSelector:@selector(setCloseResetFontAndConstraint:)])) {
-        [self.view performSelectorInBackground:@selector(resetSize) withObject:nil];
+        [self.view resetSize];
     }
     //设置title
     [self _configTitleView];
@@ -132,7 +132,7 @@
     }
     
     if (BackArrowTypeDefault == self.backArrowType) {//自定义返回按钮的图片(包括push和present的)
-        UIImage *backArrowImage = [UIImage imageNamed:kDefaultBackArrowImageName];
+        UIImage *backArrowImage = [UIImage imageNamed:YSCConfigDataInstance.defaultBackButtonImageName];
         UIBarButtonItem *barButtonItem = [[UIBarButtonItem alloc] initWithImage:backArrowImage
                                                                           style:UIBarButtonItemStylePlain
                                                                          target:self
@@ -167,20 +167,25 @@
 
 #pragma mark - 显示/隐藏tipsview
 - (void)showTipsWithMessage:(NSString *)message buttonAction:(YSCBlock)buttonAction {
-    if (nil == self.tipsView) {
-        [YSCAlertManager showAlertViewWithMessage:message];
-    }
-    else {
+    if (self.tipsView) {
         self.tipsView.hidden = NO;
         self.tipsView.messageLabel.text = message;
-        if (OBJECT_IS_EMPTY(message)) {
+        if (OBJECT_IS_EMPTY(message)) {// 没有错误信息就显示空数据提示
             [self.tipsView resetImageName:YSCConfigDataInstance.defaultEmptyImageName];
             self.tipsView.actionButton.hidden = YES;
         }
         else {
-            [self.tipsView resetImageName:YSCConfigDataInstance.defaultErrorImageName];
+            if ([YSCConfigDataInstance.networkErrorTimeout isEqualToString:message]) {
+                [self.tipsView resetImageName:YSCConfigDataInstance.defaultTimeoutImageName];
+            }
+            else {
+                [self.tipsView resetImageName:YSCConfigDataInstance.defaultErrorImageName];
+            }
             [self.tipsView resetActionWithButtonTitle:@"重新加载" buttonAction:buttonAction];
         }
+    }
+    else {
+        [YSCAlertManager showAlertViewWithMessage:message];
     }
 }
 - (void)hideTipsView:(BOOL)remove {
@@ -192,22 +197,15 @@
     }
 }
 
-#pragma mark - 自动判断hud的背景是否透明，以及HUD的edgeInsets
-- (void)showHUDOnSelfViewWithMask:(BOOL)showsMask message:(NSString *)message {
-    UIEdgeInsets edgeInsets = UIEdgeInsetsZero;
-    if (self.customTitleView) {
-        edgeInsets = UIEdgeInsetsMake(64, 0, 0, 0);
-    }
+#pragma mark - 显示/隐藏HUD，自动判断hud的背景是否透明，以及HUD的edgeInsets
+- (void)showHUDOnSelfViewWithMessage:(NSString *)message {
     [YSCHUDManager showHUDOnView:self.view
                          message:message
-                      edgeInsets:edgeInsets
-                 backgroundColor:showsMask ? YSCConfigDataInstance.defaultViewColor : nil];
-}
-- (void)showHUDOnSelfViewWithMessage:(NSString *)message {
-    [self showHUDOnSelfViewWithMask:(nil != self.tipsView) message:message];
+                      edgeInsets:(self.customTitleView ? UIEdgeInsetsMake(64, 0, 0, 0) : UIEdgeInsetsZero)
+                 backgroundColor:(self.tipsView ? YSCConfigDataInstance.defaultViewColor : nil)];
 }
 - (void)showHUDOnSelfView {
-    [self showHUDOnSelfViewWithMask:(nil != self.tipsView) message:nil];
+    [self showHUDOnSelfViewWithMessage:nil];
 }
 - (void)showHUDOnSelfViewThenHideWithMessage:(NSString *)message {
     [YSCHUDManager showHUDThenHideOnView:self.view message:message];
@@ -230,7 +228,18 @@
 }
 - (void)removeRequestIdByKey:(NSString *)requestKey {
     RETURN_WHEN_OBJECT_IS_EMPTY(requestKey);
-    [self.requestIdDictionary removeObjectForKey:requestKey];
+    NSString *requestId = self.requestIdDictionary[requestKey];
+    if (requestId && ! YSCRequestInstance.requestQueue[requestId]) {
+        // 只有当网络请求队列里移除了requestId才移除对应的requestKey
+        [self.requestIdDictionary removeObjectForKey:requestKey];
+    }
+}
+- (void)cancelRequestIdByKey:(NSString *)requestKey {
+    NSString *requestId = self.requestIdDictionary[requestKey];
+    if (requestId) {
+        [YSCRequestInstance cancelRequestById:requestId];
+        [self.requestIdDictionary removeObjectForKey:requestKey];
+    }
 }
 
 #pragma mark - 其它

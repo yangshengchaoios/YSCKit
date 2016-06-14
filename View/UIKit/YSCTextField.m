@@ -11,6 +11,9 @@
 /** YSCTextField专有delegate */
 @interface YSCTextFieldDelegate : NSObject <UITextFieldDelegate> @end
 @implementation YSCTextFieldDelegate
+- (void)textFieldDidBeginEditing:(UITextField *)textField {
+    POST_NOTIFICATION_WITH_OBJECT(UITextFieldTextDidChangeNotification, textField);
+}
 - (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string {
     return YES;//NOTE:主要是为了放开删除按钮
 }
@@ -76,13 +79,19 @@
     
     self.borderStyle = UITextBorderStyleNone;
     self.clearButtonMode = UITextFieldViewModeWhileEditing;
-    if (nil == self.backgroundColor) {
+    if ( ! self.backgroundColor) {
         self.backgroundColor = [UIColor whiteColor];
     }
     self.customDelegate = [YSCTextFieldDelegate new];
     self.delegate = self.customDelegate;
     self.oldString = @"";
     ADD_OBSERVER_WITH_OBJECT(@selector(textFieldChanged:), UITextFieldTextDidChangeNotification, self);
+}
+- (void)setText:(NSString *)text notify:(BOOL)isNotify {
+    self.text = text;
+    if (isNotify) {
+        POST_NOTIFICATION_WITH_OBJECT(UITextFieldTextDidChangeNotification, self);
+    }
 }
 - (void)setBorderColor:(UIColor *)borderColor {
     _borderColor = borderColor;
@@ -131,7 +140,7 @@
     }
     else {
         NSString *inputMode = [self.textInputMode primaryLanguage];
-        if (nil == inputMode) {//ios8 默认emoji键盘会返回nil 这是bug???
+        if ( ! inputMode) {//ios8 默认emoji键盘会返回nil 这是bug???
             inputMode = [[UITextInputMode currentInputMode] primaryLanguage];
         }
         if ([@"emoji" isEqualToString:inputMode] && ( ! self.allowsEmoji)) {//针对emoji键盘控制是否可以输入

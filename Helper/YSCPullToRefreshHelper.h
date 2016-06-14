@@ -36,6 +36,7 @@ typedef void (^YSCIntegerBlock)(NSInteger pageIndex);
 @property (nonatomic, strong) NSString *tipsEmptyText;
 @property (nonatomic, strong) NSString *tipsEmptyIcon;
 @property (nonatomic, strong) NSString *tipsFailedIcon;
+@property (nonatomic, strong) NSString *tipsTimeoutIcon;
 @property (nonatomic, strong) NSString *tipsButtonTitle;
 @property (nonatomic, assign) BOOL enableTips;//当列表为空时，是否显示tipsView(YES)
 
@@ -50,6 +51,7 @@ typedef void (^YSCIntegerBlock)(NSInteger pageIndex);
 @property (nonatomic, strong) NSString *prefixOfUrl;//接口地址前缀
 @property (nonatomic, assign) BOOL enableRefresh;   //是否启用下拉刷新(YES)
 @property (nonatomic, assign) BOOL enableLoadMore;  //是否启用上拉加载更多(YES)
+@property (nonatomic, strong) NSString *requestId;  //当前网络请求Id
 
 // blocks
 @property (nonatomic, copy) YSCIntegerSetBlock dictParamBlock;
@@ -74,6 +76,9 @@ typedef void (^YSCIntegerBlock)(NSInteger pageIndex);
 - (void)beginRefreshing;
 - (void)beginRefreshingByAnimation:(BOOL)animation;
 
+// 取消网络请求
+- (void)cancelRequesting;
+
 // 刷新列表
 - (void)refreshWithObjects:(NSObject *)objects;
 // 兼容第三方数据源
@@ -87,5 +92,6 @@ typedef void (^YSCIntegerBlock)(NSInteger pageIndex);
 - (BOOL)isLastSectionByIndexPath:(NSIndexPath *)indexPath;
 - (NSObject *)getObjectByIndexPath:(NSIndexPath *)indexPath;
 - (void)removeDataAtIndexPath:(NSIndexPath *)indexPath;
+- (NSIndexPath *)indexPathByObject:(NSObject *)object;
 @end
 

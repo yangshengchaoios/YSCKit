@@ -10,7 +10,8 @@
 
 @interface NSArray (YSCKit)
 
-+ (BOOL)isEquals:(NSArray *)array1 withArray:(NSArray *)array2;
-+ (NSArray *)commonArrayBetween:(NSArray *)array1 withArray:(NSArray *)array2;
++ (BOOL)isEquals:(NSArray *)array1 with:(NSArray *)array2;
++ (NSArray *)commonArrayBetween:(NSArray *)array1 and:(NSArray *)array2;
++ (NSArray *)reverseArray:(NSArray *)array;
 
 @end

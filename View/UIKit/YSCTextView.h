@@ -43,4 +43,6 @@
 - (NSInteger)textLength;    //返回去掉首位空格后的字符串的长度
 - (void)filterText:(NSString *)text;//TODO:输入text的时候过滤非法内容
 
+/** 处理self.text的变化是否需要触发通知 */
+- (void)setText:(NSString *)text notify:(BOOL)isNotify;
 @end

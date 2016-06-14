@@ -19,7 +19,7 @@
         [navigationBar setTranslucent:YES];
     }
     //1. 设置背景颜色/图片
-    UIImage *backImage = [UIImage imageNamed:YSCConfigDataInstance.defaultNaviBarBackImageName];
+    UIImage *backImage = [UIImage imageNamed:YSCConfigDataInstance.defaultNaviBackgroundImageName];
     if (backImage) {
         [navigationBar setBackgroundImage:backImage forBarMetrics:UIBarMetricsDefault];
     }

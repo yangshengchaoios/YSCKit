@@ -20,7 +20,7 @@
 @implementation YSCWebViewController
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.webViewTop.constant = (nil != self.customTitleView) ? 64 : 0;
+    self.webViewTop.constant = (self.customTitleView ? 64 : 0);
     [self showHUDOnSelfView];
     self.webUrl = [NSString stringWithFormat:@"%@", self.params[kParamUrl]];
     if ( ! [self.webUrl isContains:@"http"]) {//兼容没有输入http://的情况

@@ -298,8 +298,6 @@ forHeaderFooterViewReuseIdentifier:footerName];
             NSObject *object = [self.helper getObjectByIndexPath:indexPath];
             self.deleteCellBlock(object, indexPath);
         }
-        [self.helper removeDataAtIndexPath:indexPath];
-        [self deleteRowAtIndexPath:indexPath withRowAnimation:UITableViewRowAnimationAutomatic];
     }
 }
 //NOTE:系统自动返回支持多语言的"删除"

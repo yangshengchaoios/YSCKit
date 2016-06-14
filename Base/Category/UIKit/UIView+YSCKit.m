@@ -253,36 +253,53 @@
     [self resetConstraint];
 }
 - (void)resetFontSize {
+    [self resetFontSizeByXibWidth:YSCConfigDataInstance.xibWidth];
+}
+- (void)resetFontSizeByXibWidth:(CGFloat)xibWidth {
     for (UIView *subview in self.subviews) {
         if ([subview respondsToSelector:@selector(setCloseResetFontAndConstraint:)]) {
             continue;
         }
         if ([subview isMemberOfClass:[UILabel class]]) {
             UILabel *label = (UILabel *)subview;
-            label.font = AUTOLAYOUT_FONT(label.font.pointSize);
+            label.font = AUTOLAYOUT_FONT_W(label.font.pointSize, xibWidth);
         }
         else if ([subview isMemberOfClass:[UIButton class]]) {
             UIButton *button = (UIButton *)subview;
-            button.titleLabel.font = AUTOLAYOUT_FONT(button.titleLabel.font.pointSize);
-            button.contentEdgeInsets = AUTOLAYOUT_EDGEINSETS(button.contentEdgeInsets);
-            button.titleEdgeInsets = AUTOLAYOUT_EDGEINSETS(button.titleEdgeInsets);
-            button.imageEdgeInsets = AUTOLAYOUT_EDGEINSETS(button.imageEdgeInsets);
+            button.titleLabel.font = AUTOLAYOUT_FONT_W(button.titleLabel.font.pointSize, xibWidth);
+            button.contentEdgeInsets = UIEdgeInsetsMake(AUTOLAYOUT_LENGTH_W(button.contentEdgeInsets.top, xibWidth),
+                                                        AUTOLAYOUT_LENGTH_W(button.contentEdgeInsets.left, xibWidth),
+                                                        AUTOLAYOUT_LENGTH_W(button.contentEdgeInsets.bottom, xibWidth),
+                                                        AUTOLAYOUT_LENGTH_W(button.contentEdgeInsets.right, xibWidth));
+            
+            button.titleEdgeInsets = UIEdgeInsetsMake(AUTOLAYOUT_LENGTH_W(button.titleEdgeInsets.top, xibWidth),
+                                                      AUTOLAYOUT_LENGTH_W(button.titleEdgeInsets.left, xibWidth),
+                                                      AUTOLAYOUT_LENGTH_W(button.titleEdgeInsets.bottom, xibWidth),
+                                                      AUTOLAYOUT_LENGTH_W(button.titleEdgeInsets.right, xibWidth));
+            
+            button.imageEdgeInsets = UIEdgeInsetsMake(AUTOLAYOUT_LENGTH_W(button.imageEdgeInsets.top, xibWidth),
+                                                      AUTOLAYOUT_LENGTH_W(button.imageEdgeInsets.left, xibWidth),
+                                                      AUTOLAYOUT_LENGTH_W(button.imageEdgeInsets.bottom, xibWidth),
+                                                      AUTOLAYOUT_LENGTH_W(button.imageEdgeInsets.right, xibWidth));
         }
         else if ([subview isKindOfClass:[UITextField class]]) {
             UITextField *textField = (UITextField *)subview;
-            textField.font = AUTOLAYOUT_FONT(textField.font.pointSize);
+            textField.font = AUTOLAYOUT_FONT_W(textField.font.pointSize, xibWidth);
         }
         else if ([subview isKindOfClass:[UITextView class]]) {
             UITextView *textView = (UITextView *)subview;
-            textView.font = AUTOLAYOUT_FONT(textView.font.pointSize);
+            textView.font = AUTOLAYOUT_FONT_W(textView.font.pointSize, xibWidth);
         }
-        [subview resetFontSize];
+        [subview resetFontSizeByXibWidth:xibWidth];
     }
 }
 - (void)resetConstraint {
+    [self resetConstraintByXibWidth:YSCConfigDataInstance.xibWidth];
+}
+- (void)resetConstraintByXibWidth:(CGFloat)xibWidth {
     for (NSLayoutConstraint *constraint in self.constraints) {
         if (constraint.constant > 0) {
-            constraint.constant = AUTOLAYOUT_LENGTH(constraint.constant);
+            constraint.constant = AUTOLAYOUT_LENGTH_W((constraint.constant), xibWidth);
         }
     }
     if ([self respondsToSelector:@selector(setCloseResetFontAndConstraint:)]) {
@@ -291,7 +308,7 @@
     
     if ([self.subviews count] > 0) {
         for (UIView *subView in self.subviews) {
-            [subView resetConstraint];
+            [subView resetConstraintByXibWidth:xibWidth];
         }
     }
 }

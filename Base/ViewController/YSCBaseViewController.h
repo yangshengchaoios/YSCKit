@@ -14,9 +14,6 @@ typedef NS_ENUM(NSInteger, BackArrowType) {
     BackArrowTypeSystemWithoutText,  //用系统自带的返回箭头(去掉文字)
 };
 
-// 默认返回按钮图片名称
-static NSString * const kDefaultBackArrowImageName = @"arrow_left_default";
-
 /**
  *  作用：
  *      1. 统一设置返回按钮的箭头图片
@@ -47,9 +44,8 @@ static NSString * const kDefaultBackArrowImageName = @"arrow_left_default";
 - (void)hideTipsView:(BOOL)remove;
 
 /**
- *  自动判断hud的背景是否透明，以及HUD的edgeInsets
+ *  显示/隐藏HUD，自动判断hud的背景是否透明，以及HUD的edgeInsets
  */
-- (void)showHUDOnSelfViewWithMask:(BOOL)showsMask message:(NSString *)message;
 - (void)showHUDOnSelfViewWithMessage:(NSString *)message;
 - (void)showHUDOnSelfView;
 - (void)showHUDOnSelfViewThenHideWithMessage:(NSString *)message;
@@ -66,6 +62,7 @@ static NSString * const kDefaultBackArrowImageName = @"arrow_left_default";
  */
 - (void)addRequestId:(NSString *)requestId forKey:(NSString *)requestKey;
 - (void)removeRequestIdByKey:(NSString *)requestKey;
+- (void)cancelRequestIdByKey:(NSString *)requestKey;
 
 /**
  *  其它

@@ -28,14 +28,7 @@
 }
 + (instancetype)createYSCTipsViewOnView:(UIView *)contentView
                            buttonAction:(YSCBlock)buttonAction {
-    return [self createYSCTipsViewOnView:contentView withMessage:nil imageName:nil buttonTitle:nil buttonAction:buttonAction];
-}
-+ (instancetype)createYSCTipsViewOnView:(UIView *)contentView
-                            withMessage:(NSString *)message
-                              imageName:(NSString *)imageName
-                            buttonTitle:(NSString *)buttonTitle
-                           buttonAction:(YSCBlock)buttonAction {
-    return [self createYSCTipsViewOnView:contentView edgeInsets:UIEdgeInsetsZero withMessage:message imageName:imageName buttonTitle:buttonTitle buttonAction:buttonAction];
+    return [self createYSCTipsViewOnView:contentView edgeInsets:UIEdgeInsetsZero withMessage:nil imageName:nil buttonTitle:nil buttonAction:buttonAction];
 }
 + (instancetype)createYSCTipsViewOnView:(UIView *)contentView
                              edgeInsets:(UIEdgeInsets)edgeInsets
@@ -44,7 +37,7 @@
                             buttonTitle:(NSString *)buttonTitle
                            buttonAction:(YSCBlock)buttonAction {
     // 0. 设置默认提示信息
-    if (nil == contentView) {
+    if ( ! contentView) {
         return nil;
     }
     // 1. 创建tipsview
@@ -54,12 +47,19 @@
     [tipsView resetMessage:message];
     [tipsView resetActionWithButtonTitle:buttonTitle buttonAction:buttonAction];
     [tipsView resetFrameWithEdgeInsets:edgeInsets];
+    [tipsView _customSubviews];
     return tipsView;
+}
+
+// 可以重写该方法设置label 和 button
+- (void)_customSubviews {
+    
 }
 
 - (void)layoutSubviews {
     [super layoutSubviews];
     [self resetFrameWithEdgeInsets:self.edgeInsets];
+    [self layoutIfNeeded];
 }
 
 #pragma mark - reset
@@ -79,7 +79,7 @@
 }
 - (void)resetImageName:(NSString *)imageName {
     if (OBJECT_IS_EMPTY(TRIM_STRING(imageName))) {
-        imageName = YSCConfigDataInstance.defaultEmptyImageName;
+        imageName = YSCConfigDataInstance.defaultImageName;
     }
     @weakiy(self);
     [self.iconImageView ysc_setImageWithURLString:imageName completed:^(UIImage *image, NSError *error) {

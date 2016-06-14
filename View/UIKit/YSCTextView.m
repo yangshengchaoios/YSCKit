@@ -101,13 +101,19 @@
     self.remainingTextColor = YSCConfigDataInstance.defaultPlaceholderColor;
     self.maxLength = 400;
     
-    if (nil == self.backgroundColor) {
+    if ( ! self.backgroundColor) {
         self.backgroundColor = [UIColor whiteColor];
     }
     self.customDelegate = [YSCTextViewDelegate new];
     self.delegate = self.customDelegate;
     self.oldString = @"";
     ADD_OBSERVER_WITH_OBJECT(@selector(textViewChanged:), UITextViewTextDidChangeNotification, self);
+}
+- (void)setText:(NSString *)text notify:(BOOL)isNotify {
+    self.text = text;
+    if (isNotify) {
+        POST_NOTIFICATION_WITH_OBJECT(UITextViewTextDidChangeNotification, self);
+    }
 }
 - (void)setMaxLength:(NSInteger)maxLength {
     _maxLength = maxLength;
@@ -141,7 +147,7 @@
     }
     else {
         NSString *inputMode = [self.textInputMode primaryLanguage];
-        if (nil == inputMode) {//ios8 默认emoji键盘会返回nil 这是bug???
+        if ( ! inputMode) {//ios8 默认emoji键盘会返回nil 这是bug???
             inputMode = [[UITextInputMode currentInputMode] primaryLanguage];
         }
         if ([@"emoji" isEqualToString:inputMode] && ( ! self.allowsEmoji)) {//针对emoji键盘控制是否可以输入

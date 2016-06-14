@@ -10,7 +10,7 @@
 
 @implementation NSArray (YSCKit)
 
-+ (BOOL)isEquals:(NSArray *)array1 withArray:(NSArray *)array2 {
++ (BOOL)isEquals:(NSArray *)array1 with:(NSArray *)array2 {
     RETURN_NO_WHEN_OBJECT_IS_EMPTY(array1);
     RETURN_NO_WHEN_OBJECT_IS_EMPTY(array2);
     NSArray *tempArray1 = [array1 sortedArrayUsingComparator:^NSComparisonResult(id obj1, id obj2) {
@@ -28,7 +28,7 @@
     return [tempArray1 isEqualToArray:tempArray2];
 }
 
-+ (NSArray *)commonArrayBetween:(NSArray *)array1 withArray:(NSArray *)array2 {
++ (NSArray *)commonArrayBetween:(NSArray *)array1 and:(NSArray *)array2 {
     RETURN_NIL_WHEN_OBJECT_IS_EMPTY(array1);
     RETURN_NIL_WHEN_OBJECT_IS_EMPTY(array2);
     NSMutableArray *resultArray = [NSMutableArray array];
@@ -38,5 +38,21 @@
         }
     }
     return resultArray;
+}
+
+/**
+ * 测试结果：526条记录
+ * 方法一: for (id element in [array reverseObjectEnumerator])                 0.6ms 左右
+ * 方法二: [array enumerateObjectsWithOptions:NSEnumerationReverse usingBlock: 0.6ms 左右
+ * 方法三: NSArray *tempArray = [[array reverseObjectEnumerator] allObjects];  0.5-2.8ms
+ */
++ (NSArray *)reverseArray:(NSArray *)array {
+    RETURN_NIL_WHEN_OBJECT_IS_EMPTY(array);
+    NSMutableArray *retArray = [NSMutableArray arrayWithCapacity:[array count]];
+    [array enumerateObjectsWithOptions:NSEnumerationReverse
+                            usingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+                                [retArray addObject:obj];
+                            }];
+    return retArray;
 }
 @end

@@ -283,7 +283,7 @@
 #else
     if ([[UIDevice currentDevice] respondsToSelector:@selector(setOrientation:)]) {
         [[UIDevice currentDevice] performSelector:@selector(setOrientation:)
-                                       withObject:(id)UIInterfaceOrientationLandscapeRight];
+                                       withObject:@(orientation)];
     }
 #endif
 }

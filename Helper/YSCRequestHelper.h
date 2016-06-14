@@ -21,19 +21,6 @@ typedef NS_ENUM (NSInteger, YSCRequestType) {
     YSCRequestTypeCustomResponse       //数据来源不是YSCRequestHelper
 };
 
-// 网络错误类型
-static NSString * const YSCErrorTypeDisconnected        = @"网络未连接";//网络处于断开状态(访问网络之前)
-static NSString * const YSCErrorTypeConnectionFailed    = @"网络连接失败";//网络错误(网络访问过程中statusCode != 200)
-static NSString * const YSCErrorTypeServerFailed        = @"服务器连接失败";//服务器错误(statusCode == 200, 服务器不可访问)
-static NSString * const YSCErrorTypeInternalServer      = @"";//服务器内部错误(需要进一步解析dataModel.state 和 message)
-static NSString * const YSCErrorTypeRequesFailed        = @"创建网络请求失败";
-static NSString * const YSCErrorTypeCopyFileFailed      = @"拷贝文件失败";
-static NSString * const YSCErrorTypeURLInvalid          = @"网络请求的URL不合法";
-static NSString * const YSCErrorTypeReturnEmptyData     = @"返回数据为空";
-static NSString * const YSCErrorTypeDataMappingFailed   = @"数据映射本地模型失败";
-static NSString * const YSCErrorTypeLoginExpired        = @"登录过期";
-static NSString * const YSCErrorTypeRequesting          = @"数据获取中";
-
 typedef void (^YSCRequestSuccess)(id responseObject);
 typedef void (^YSCRequestFailed)(NSString *YSCErrorType, NSError *error);
 
@@ -54,9 +41,9 @@ typedef void (^YSCRequestFailed)(NSString *YSCErrorType, NSError *error);
 @property (nonatomic, strong) NSString *httpTokenSecretKey;
 
 + (instancetype)sharedInstance;
-// 移除网络请求
-- (void)removeRequestById:(NSString *)requestId;
-- (void)removeAllRequests;
+// 取消网络请求
+- (void)cancelRequestById:(NSString *)requestId;
+- (void)cancelAllRequests;
 // 解析错误信息
 - (NSString *)resolveYSCErrorType:(NSString *)errorType andError:(NSError *)error;
 

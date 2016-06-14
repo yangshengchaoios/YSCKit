@@ -112,7 +112,7 @@
 }
 // 写到文件的完成时执行
 - (void)image:(UIImage *)image didFinishSavingWithError:(NSError *)error contextInfo:(void *)contextInfo {
-    if (nil == error) {
+    if ( ! error) {
         [YSCHUDManager showHUDThenHideOnKeyWindowWithMessage:@"保存成功"];
     }
     else {

@@ -107,7 +107,7 @@
 }
 
 - (void)showPickerView:(id)initObject {
-    if (nil == self.superview) {
+    if ( ! self.superview) {
         [[UIApplication sharedApplication].keyWindow addSubview:self];
     }
     [[UIApplication sharedApplication].keyWindow bringSubviewToFront:self];

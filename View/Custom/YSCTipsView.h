@@ -17,11 +17,6 @@
 + (instancetype)createYSCTipsViewOnView:(UIView *)contentView
                            buttonAction:(YSCBlock)buttonAction;
 + (instancetype)createYSCTipsViewOnView:(UIView *)contentView
-                            withMessage:(NSString *)message
-                              imageName:(NSString *)imageName
-                            buttonTitle:(NSString *)buttonTitle
-                           buttonAction:(YSCBlock)buttonAction;
-+ (instancetype)createYSCTipsViewOnView:(UIView *)contentView
                              edgeInsets:(UIEdgeInsets)edgeInsets
                             withMessage:(NSString *)message
                               imageName:(NSString *)imageName
