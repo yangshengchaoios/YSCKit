@@ -1,15 +1,15 @@
 //
-//  PSShare.swift
-//  JiSha
+//  YSCShare.swift
+//  YSCKit
 //
 //  Created by 杨胜超 on 17/1/6.
-//  Copyright © 2017年 SMIT. All rights reserved.
+//  Copyright © 2017年 Builder. All rights reserved.
 //
 
 import UIKit
 
 /** suported apps */
-public enum PSSharePlatform {
+public enum YSCSharePlatform {
     case unSupported
     case weixin
     case qq
@@ -18,7 +18,7 @@ public enum PSSharePlatform {
 }
 
 /** define share types for each app */
-public enum PSShareType {
+public enum YSCShareType {
     case weixinSession      //微信会话（好友）
     case weixinTimeline     //微信朋友圈
     case weixinFavorite     //微信收藏
@@ -30,7 +30,7 @@ public enum PSShareType {
 }
 
 /** define share message types */
-public enum PSShareMessageType {
+public enum YSCShareMessageType {
     case autoDetect
     case news
     case audio
@@ -40,19 +40,19 @@ public enum PSShareMessageType {
 }
 
 /** define encoding type of pasteboard */
-public enum PSSharePasteboardEncoding {
+public enum YSCSharePasteboardEncoding {
     case keyedArchiver
     case listSerialization
 }
 
 /** define message model */
-public class PSShareMessage: NSObject {
+public class YSCShareMessage: NSObject {
     var title: String = ""
     var content: String = ""
     var link: String = ""
     var fullImage: UIImage?
     var thumbImage: UIImage?
-    var type: PSShareMessageType = .autoDetect
+    var type: YSCShareMessageType = .autoDetect
     var extraInfo: String = ""
     var mediaDataUrl: String = ""
     var fileData: Data?
@@ -85,18 +85,18 @@ public class PSShareMessage: NSObject {
 }
 
 /** define two callbacks */
-public typealias PSShareSuccess = (_ result: AnyObject) -> ()
-public typealias PSShareFailure = (_ errorCode: Int, _ errorMessage: String) -> ()
+public typealias YSCShareSuccess = (_ result: AnyObject) -> ()
+public typealias YSCShareFailure = (_ errorCode: Int, _ errorMessage: String) -> ()
 
-public class PSShare: NSObject {
+public class YSCShare: NSObject {
     
     //MARK: - Private vars
-    private static var registeredAppKeys = Dictionary<PSSharePlatform, Dictionary<String, String>>()
-    fileprivate static var successBlock: PSShareSuccess?
-    fileprivate static var failureBlock: PSShareFailure?
+    private static var registeredAppKeys = Dictionary<YSCSharePlatform, Dictionary<String, String>>()
+    fileprivate static var successBlock: YSCShareSuccess?
+    fileprivate static var failureBlock: YSCShareFailure?
     
     //MARK: - Public Methods
-    public static func register(platform: PSSharePlatform,
+    public static func register(platform: YSCSharePlatform,
                                 appKey: String,
                                 appSecret: String? = nil,
                                 redirectUrl: String? = nil) {
@@ -110,28 +110,28 @@ public class PSShare: NSObject {
         registeredAppKeys[platform] = dict
     }
     
-    public static func getAppKey(platform: PSSharePlatform) -> String? {
+    public static func getAppKey(platform: YSCSharePlatform) -> String? {
         if let dict = registeredAppKeys[platform] {
             return dict["AppKey"]
         }
         return nil
     }
     
-    public static func getAppSecret(platform: PSSharePlatform) -> String? {
+    public static func getAppSecret(platform: YSCSharePlatform) -> String? {
         if let dict = registeredAppKeys[platform] {
             return dict["AppSecret"]
         }
         return nil
     }
     
-    public static func getRedirectUrl(platform: PSSharePlatform) -> String? {
+    public static func getRedirectUrl(platform: YSCSharePlatform) -> String? {
         if let dict = registeredAppKeys[platform] {
             return dict["RedirectUrl"]
         }
         return nil
     }
     
-    public static func isInstalled(platform: PSSharePlatform) -> Bool {
+    public static func isInstalled(platform: YSCSharePlatform) -> Bool {
         if platform == .weixin {
             return UIApplication.shared.canOpenURL(URL(string: "weixin://")!)
         } else if platform == .qq {
@@ -150,9 +150,9 @@ public class PSShare: NSObject {
     ///   - platform: 第三方平台类型
     ///   - success: 登录成功的回调
     ///   - failure: 登录失败的回调
-    public static func authLogin(platform: PSSharePlatform,
-                                 success: PSShareSuccess?,
-                                 failure: PSShareFailure?) {
+    public static func authLogin(platform: YSCSharePlatform,
+                                 success: YSCShareSuccess?,
+                                 failure: YSCShareFailure?) {
         successBlock = success
         failureBlock = failure
         if checkPlatform(platform) {
@@ -180,10 +180,10 @@ public class PSShare: NSObject {
     ///   - type: 分享方式
     ///   - success: 分享成功的回调
     ///   - failure: 分享失败的回调
-    public static func share(message: PSShareMessage,
-                             type: PSShareType,
-                             success: PSShareSuccess?,
-                             failure: PSShareFailure?) {
+    public static func share(message: YSCShareMessage,
+                             type: YSCShareType,
+                             success: YSCShareSuccess?,
+                             failure: YSCShareFailure?) {
         successBlock = success
         failureBlock = failure
         let (platform_, isCheckPast) = checkShareType(type)
@@ -240,7 +240,7 @@ public class PSShare: NSObject {
     /// - parameter encoding: 编码方式
     ///
     /// - returns: 存储是否成功
-    public static func saveToPasteboard(value: Dictionary<String, AnyObject>, key: String, encoding: PSSharePasteboardEncoding) -> Bool {
+    public static func saveToPasteboard(value: Dictionary<String, AnyObject>, key: String, encoding: YSCSharePasteboardEncoding) -> Bool {
         var data: Data?
         if encoding == .keyedArchiver {
             data = NSKeyedArchiver.archivedData(withRootObject: value)
@@ -261,7 +261,7 @@ public class PSShare: NSObject {
     /// - parameter encoding: 编码方式
     ///
     /// - returns: 字典
-    public static func getFromPasteboard(key: String, encoding: PSSharePasteboardEncoding) -> Dictionary<String, AnyObject> {
+    public static func getFromPasteboard(key: String, encoding: YSCSharePasteboardEncoding) -> Dictionary<String, AnyObject> {
         var dict = Dictionary<String, AnyObject>()
         if let data = UIPasteboard.general.data(forPasteboardType: key) {
             if encoding == .keyedArchiver {
@@ -285,7 +285,7 @@ public class PSShare: NSObject {
         }
     }
     
-    fileprivate static func checkPlatform(_ platform: PSSharePlatform,
+    fileprivate static func checkPlatform(_ platform: YSCSharePlatform,
                                           _ checkAppKey: Bool = true,
                                           _ checkAppSecret: Bool = false,
                                           _ checkRedirectUrl: Bool = false) -> Bool {
@@ -318,7 +318,7 @@ public class PSShare: NSObject {
         return true
     }
     
-    fileprivate static func checkShareType(_ type: PSShareType) -> (PSSharePlatform?, Bool) {
+    fileprivate static func checkShareType(_ type: YSCShareType) -> (YSCSharePlatform?, Bool) {
         if type == .weixinSession || type == .weixinTimeline || type == .weixinFavorite {
             return (.weixin, checkPlatform(.weixin))
         } else if type == .qqFriends || type == .qqZone || type == .qqFavorite || type == .qqDataline {
@@ -378,7 +378,7 @@ public class PSShare: NSObject {
 }
 
 //处理微信分享、支付及回调
-extension PSShare {
+extension YSCShare {
     //MARK: - Public Methods
     
     /// 调用微信APP进行支付
@@ -400,8 +400,8 @@ extension PSShare {
                                    nonceStr: String,
                                    timeStamp: String,
                                    sign: String,
-                                   success: PSShareSuccess?,
-                                   failure: PSShareFailure?) {
+                                   success: YSCShareSuccess?,
+                                   failure: YSCShareFailure?) {
         successBlock = success
         failureBlock = failure
         if !checkPlatform(.weixin) {
@@ -433,7 +433,7 @@ extension PSShare {
         let appKey = getAppKey(platform: .weixin)!
         return "weixin://app/\(appKey)/auth/?scope=snsapi_userinfo&state=Weixinauth"
     }
-    fileprivate static func shareByWeixin(_ message: PSShareMessage, _ type: PSShareType) -> String? {
+    fileprivate static func shareByWeixin(_ message: YSCShareMessage, _ type: YSCShareType) -> String? {
         var dict = Dictionary<String, AnyObject>()
         dict = ["result": "1" as AnyObject,
                 "returnFromApp": "0" as AnyObject,
@@ -594,7 +594,7 @@ extension PSShare {
 }
 
 //处理QQ分享、支付及回调
-extension PSShare {
+extension YSCShare {
     //MARK: - Public Methods
     
     /// 与指定QQ号（非好友也行）聊天
@@ -645,7 +645,7 @@ extension PSShare {
             return nil
         }
     }
-    fileprivate static func shareByQQ(_ message: PSShareMessage, _ type: PSShareType) -> String? {
+    fileprivate static func shareByQQ(_ message: YSCShareMessage, _ type: YSCShareType) -> String? {
         var url = "mqqapi://share/to_fri?version=1&callback_type=scheme&generalpastboard=1&src_type=app&shareType=0"
         let fullImageData = message.fullImageData
         let thumbImageData = message.thumbImageData(size: CGSize(width: 36, height: 36))
@@ -772,11 +772,11 @@ extension PSShare {
 }
 
 //处理新浪微博分享、支付及回调
-extension PSShare {
+extension YSCShare {
     //MARK: - Private Methods
     fileprivate static func authBySinaWeibo() -> String? {
         guard let redirectUrl = getRedirectUrl(platform: .sinaWeibo) else {
-            callFailureBlock("The redirectUrl of platform: \(PSSharePlatform.sinaWeibo) is not registered!")
+            callFailureBlock("The redirectUrl of platform: \(YSCSharePlatform.sinaWeibo) is not registered!")
             return nil
         }
         
@@ -793,7 +793,7 @@ extension PSShare {
         UIPasteboard.general.items = [["transferObject" : transferData], ["userInfo": userInfoData], ["app": appData]]
         return "weibosdk://request?id=\(requestId)&sdkversion=003013000"
     }
-    fileprivate static func shareBySinaWeibo(_ message: PSShareMessage, _ type: PSShareType) -> String? {
+    fileprivate static func shareBySinaWeibo(_ message: YSCShareMessage, _ type: YSCShareType) -> String? {
         let fullImageData = message.fullImageData
         let thumbImageData = message.thumbImageData(size: CGSize(width: 36, height: 36))
         if type == .sinaTimeline {
@@ -883,7 +883,7 @@ extension PSShare {
 }
 
 //处理阿里支付及回调
-extension PSShare {
+extension YSCShare {
     //MARK: - Public Methods
     
     
@@ -909,8 +909,8 @@ extension PSShare {
                                    version: String,
                                    sign: String,
                                    appScheme: String,
-                                   success: PSShareSuccess?,
-                                   failure: PSShareFailure?) {
+                                   success: YSCShareSuccess?,
+                                   failure: YSCShareFailure?) {
         successBlock = success
         failureBlock = failure
         
@@ -940,7 +940,7 @@ extension PSShare {
     }
     
     //MARK: - Private Methods
-    fileprivate static func shareByAlipay(_ message: PSShareMessage, _ type: PSShareType) -> String? {
+    fileprivate static func shareByAlipay(_ message: YSCShareMessage, _ type: YSCShareType) -> String? {
         //TODO:
         return nil
     }
