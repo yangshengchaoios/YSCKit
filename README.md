@@ -185,3 +185,21 @@
 * YSCXxxAdapterManager负责创建Adapter;YSCXxxxAdapter负责调用第三方库的代码
 
 
+## 五、TODO
+
+* camera manager
+* photo browser
+* sqlite access
+* pop over
+* slide show
+* segmented control
+* location 
+* scanner
+* QR cde / Bar code
+* badge view
+* star rating
+* video player / audio player
+* downloader
+* HUD
+* data mapping
+* open web url
