@@ -1,0 +1,16 @@
+//
+//  YSCKit-Prefix.pch
+//  YSCKit
+//
+//  Created by Builder on 16/6/29.
+//  Copyright © 2016年 Builder. All rights reserved.
+//
+
+#ifndef YSCKitDemo_Prefix_pch
+#define YSCKitDemo_Prefix_pch
+
+#import "YSCKit.h"
+#import "AppMarcro.h"
+#import "AppModel.h"
+
+#endif /* YSCKitDemo_Prefix_pch */

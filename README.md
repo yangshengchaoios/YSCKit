@@ -1,48 +1,187 @@
-# YSCKit
-- 以控件的形式封装大量的"胶水代码"，减少业务层的处理逻辑，同时暴露足够多的配置点来保证控件的灵活性。如YSCTextField、YSCTableView
-- 推荐所有的UI都用XIB进行布局(不到万不得已不用代码创建UI控件)
-- 终极目标：让Control层的核心业务逻辑不被大量的“胶水代码”和其它各种小逻辑所淹没
+## 一、Why
+* <font color=black size=4>不重复造轮子</font>
 
-## Directory Structure
-&nbsp;YSCKit            根目录<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;|__Categories   分类目录，扩展常用的系统类<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;|__External     第三方库目录<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;|__Helper       单例类和公共方法类目录<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;|__Model        模型基类目录<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;|__Views        常用view控件<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|__BaseView    基类view<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|__YSCControls 扩展系统控件功能<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|__YSCCustomViews  自定义view<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;|__ViewControllers        常用ViewController控件<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|__Base  基类ViewController<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|__YSCPhotoBrowseViewController  可无限浏览图片的图片查看器<br/>
+> 项目之间可以共享代码，减少不必要的重复劳动，提高开发效率。
 
-## Summary
-- 封装了APP开发过程中常用的功能，包括：网络请求、模型映射、本地缓存策略、宏定义、枚举类型、emoji表情符号等。
-- 自定义了几个非常有用的view：
-  * YSCInfiniteLoopView: 无限循环浏览，如banner展示
-  * YSCTipsView：显示空列表/页面的提示信息
-  * YSCPickerView：时间、日期、多维数组选择器
-  * YSCTitleBarView：自定义导航条
-  * YSCZoomScrollView：可缩放的图片浏览页，用于图片浏览器
-  * YSCTextField：可在xib上设置数据的格式，自动检测键盘的类型、长度、以及合法性
-  * YSCTextView：除了基本功能和YSCTextField类似以外，还能动态显示剩余字符数
-  * YSCTableView：封装了列表的常用操作，支持<br/>
-    (1). 多section的上拉加载更多、下拉刷新<br/>
-    (2). GET、POST<br/>
-    (3). 列表为空的提示信息<br/>
-    (4). cell左右边界设置<br/>
-    (5). 对数据进行缓存<br/>
-    (6). 自定义任意单一确定的数据源<br/>
-    (7). 动态设置header、cell、footer的高度<br/>
-    (8). 支持多种header、cell、footer的注册<br/>
-    (9). 兼容外部数据源(前提是必须和列表数据源类型一致)<br/>
-    
-## How to install
-  git submodule add https://github.com/yangshengchaoios/YSCKit.git YOURPROJECT/YSCKit
+* <font color=black size=4>技术沉淀</font>
 
-## Demo
-见 [YSCKitDemo](https://github.com/yangshengchaoios/YSCKitDemo)
+> 让每一次的项目开发都有收获！养成经常思考、整理、优化代码的习惯，沉淀的不仅仅是代码量，更重要的是技术和经验！
 
-## TODO
+* <font color=black size=4>终极目标</font>
+
+> 让Control层的核心业务逻辑不被大量的“胶水代码”和其它各种小逻辑所淹没。
+	
+## 二、Structure
+
+* 目录结构
+
+		- YSCKit.h		存放YSCKit常用模块的引用
+		- YSCConstants.h	存放YSCKit中用到的常量、Block、枚举等的定义
+		- YSCMacros.h		存放YSCKit中常用的宏定义，最主要是代码段简写
+		+ YSCAdapter		统一管理第三方代码的适配器
+			- YSCAdapter.h      常用适配器的引用
+			+ YSCHUD            封装对MBProgressHUD调用的适配器
+			+ YSCModel          封装对MJExtension调用的适配器
+			+ YSCNetworking     封装对AFNetworking调用的适配器
+			+ YSCWebImage       封装对SDWebImage调用的适配器
+		+ YSCBase			对系统类的扩展
+			- YSCBase.h			常用系统类扩展的引用
+			+ Category          分类方式扩展系统库
+				+ Foundation         扩展Foundation.framework中的常用库
+				+ UIKit              扩展UIKit.framework中的常用库
+			+ Inherit           继承方式扩展系统库
+		+ YSCSingleton		单例类
+		+ YSCUtils			静态方法类
+		+ YSCView           自定义view
+		+ YSCViewController viewController基类
+
+		+ Demo              对基础库进行单元测试、功能演示的demo项目
+
+* 类名
+		
+		1. 自定义类命名规范：YSCXxxxx
+		2. category类命名规范：SYSTEM_CLASS (YSCKit)
+		3. 封装静态方法的类：YSCXxxxUtil、YSCXxxxHelper
+		4. 单例类：YSCXxxxManager
+
+* 方法名
+
+		1. 创建单例的标准代码：
+		+ (instancetype)sharedInstance {
+			static dispatch_once_t pred = 0;
+			__strong static id _sharedObject = nil;
+			dispatch_once(&pred, ^{
+				_sharedObject = [[self alloc] init];
+			});
+			return _sharedObject;
+		}
+		2. 私有方法前面加下划线’_’ 
+		3. category方法前必须有前缀’psk_’
+
+* 文件头注释
+
+		必不可少的要素：类名、包名、作者、创建日期、版权信息。如:
+		//
+		//  YSCXxxx.m
+		//  YSCKit
+		//
+		//  Created by AUTHOR on DATE.
+		//  Copyright © 2016年 Builder. All rights reserved.
+	
+## 三、Comment
+
+* 为了更好兼容工具appledoc或doxygen以自动生成文档，在书写注释时注意使用以下命令：
+
+		/**
+		 * @brief 带字符串参数的方法.
+		 *
+		 * 详细描述或其他.
+		 * 
+		 * @param  value1 值.
+		 * @param  value2 值.
+		 *
+		 * @return 返回value.
+		 *
+		 * @exception NSException 可能抛出的异常.
+		 * 
+		 * @see someMethod
+		 * @warning 警告: appledoc中显示为蓝色背景, Doxygen中显示为红色竖条.
+		 * @bug 缺陷: appledoc中显示为黄色背景, Doxygen中显示为绿色竖条.
+		 */ 
+		 
+* 注释中添加实例代码：
+
+		/**
+ 		 * 示例代码:
+		 *
+		 *		int sum = 0;
+		 * 		for(int i= 0; i < 10; i++) {
+		 *          sum += i;
+		 * 		}
+		 */
+		 
+* 带参数的宏注释：
+
+		/**
+		 * @brief	最小值 （参数宏, 仅Doxygen）.
+		 *			
+		 * 详细描述或其他.
+		 * 
+		 * @param     a     值a.
+		 * @param     b     值b.
+		 *
+		 * @return    返回两者中的最小值.
+		 */
+		#define min(a,b)    ( ((a)<(b)) ? (a) : (b) )
+		
+* 函数指针与块函数注释：
+
+		/**
+		 * @brief    动作块函数.
+		 *
+		 * 详细描述或其他.
+		 * 
+		 * @param     sender     发送者.
+		 * @param     userdata     自定义数据.
+		 */
+		typedef void (^ActionHandler)(id sender, id userdata);
+
+* 无序列表：
+
+		/**
+		 * 无序列表:
+		 *
+		 * - abc
+		 * - xyz
+		 * - rgb
+		 */
+
+* 有序列表：
+
+		/**
+		 * 有序列表:
+		 *
+		 * 1. first.
+		 * 2. second.
+		 * 3. third.
+		 */
+
+
+* 多级列表：
+
+		/**
+		 * 多级列表:
+		 *
+		 * - xyz
+		 *    - x
+		 *    - y
+		 *    - z
+		 * - rgb
+		 *    - red
+		 *        1. first.
+		 *            1. alpha.
+		 *            2. beta.
+		 *        2. second.
+		 *        3. third.
+		 *    - green
+		 *    - blue
+		 */
+
+* 添加链接：
+	
+		/**
+ 		 * [Doxygen](http://www.stack.nl/~dimitri/doxygen/)
+ 		 */
+	
+	
+## 四、How 3rd lib added into YSCKit?
+
+* 加入的第三方库随时可以替换但不能修改调用方的代码
+
+* 通过Adapter模式解耦第三方库的调用方式
+ 
+* 有两种适配方式：对象适配(封装实例化对象)、类适配(继承)
+ 
+* YSCXxxAdapterManager负责创建Adapter;YSCXxxxAdapter负责调用第三方库的代码
+
 

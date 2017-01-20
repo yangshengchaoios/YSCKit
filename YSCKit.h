@@ -1,28 +1,37 @@
 //
 //  YSCKit.h
 //  YSCKit
-// 
-//  Created by yangshengchao on 15/7/15.
-//  Copyright (c) 2015年 Builder. All rights reserved.
+//
+//  Created by Builder on 16/6/23.
+//  Copyright (c) 2016 Builder. All rights reserved.
 //
 
-#ifndef YSCKit_YSCKit_h
-#define YSCKit_YSCKit_h
+
+//==============================================================================
+//
+//  @Description:
+//      该文件引入了YSCKit框架中最常用的4个模块：
+//      YSCAdapter、YSCBase、YSCSingleton、YSCUtil
+//      其它模块（如：YSCView、YSCViewController）则根据需要手动引入
+//
+//==============================================================================
+
+#ifndef YSCKit_h
+#define YSCKit_h
 
 // system
-#import <UIKit/UIKit.h>
 #import <AVFoundation/AVFoundation.h>
-#import <CoreLocation/CoreLocation.h>
+#import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
+#import <CoreGraphics/CoreGraphics.h>
 
-// header
-#import "YSCEmoji.h"
+// constant
+#import "YSCMacros.h"
+#import "YSCConstants.h"
 
 // module
-#import "YSCKitBase.h"
-#import "YSCKitHelper.h"
-#import "YSCKitModel.h"
-#import "YSCKitView.h"
-#import "YSCKitViewController.h"
+#import "YSCBase.h"
+#import "YSCSingleton.h"
+#import "YSCUtil.h"
 
-#endif /* YSCKit_YSCKit_h */
-
+#endif /* YSCKit_h */
