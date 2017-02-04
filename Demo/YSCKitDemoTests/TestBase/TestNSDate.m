@@ -7,6 +7,7 @@
 //
 
 #import <XCTest/XCTest.h>
+#import "NSDate+YSCKit.h"
 
 @interface TestNSDate : XCTestCase
 

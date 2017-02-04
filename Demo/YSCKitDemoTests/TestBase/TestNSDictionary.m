@@ -7,6 +7,7 @@
 //
 
 #import <XCTest/XCTest.h>
+#import "NSDictionary+YSCKit.h"
 
 @interface TestNSDictionary : XCTestCase
 

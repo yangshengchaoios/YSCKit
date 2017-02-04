@@ -20,7 +20,7 @@ static NSInteger const kTagOfMaskView       = 234688;
 @implementation UIViewController (YSCKit)
 
 // 添加params属性
-YSC_DYNAMIC_PROPERTY_OBJECT(ysc_params, setPsk_params, RETAIN_NONATOMIC, NSMutableDictionary *)
+YSC_DYNAMIC_PROPERTY_OBJECT(ysc_params, setYsc_params, RETAIN_NONATOMIC, NSMutableDictionary *)
 
 + (void)load {
     [super load];

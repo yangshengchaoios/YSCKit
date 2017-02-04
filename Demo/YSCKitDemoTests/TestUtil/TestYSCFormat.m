@@ -1,5 +1,5 @@
 //
-//  TestPSKFormat.m
+//  TestYSCFormat.m
 //  YSCKitDemo
 //
 //  Created by Builder on 16/7/12.
@@ -8,11 +8,11 @@
 
 #import <XCTest/XCTest.h>
 
-@interface TestPSKFormatUtil : XCTestCase
+@interface TestYSCFormatUtil : XCTestCase
 
 @end
 
-@implementation TestPSKFormatUtil
+@implementation TestYSCFormatUtil
 
 - (void)setUp {
     [super setUp];

@@ -1,5 +1,5 @@
 //
-//  TestPSKStorage.m
+//  TestYSCStorage.m
 //  YSCKitDemo
 //
 //  Created by Builder on 16/7/12.
@@ -8,11 +8,11 @@
 
 #import <XCTest/XCTest.h>
 
-@interface TestPSKStorageUtil : XCTestCase
+@interface TestYSCStorageUtil : XCTestCase
 
 @end
 
-@implementation TestPSKStorageUtil
+@implementation TestYSCStorageUtil
 
 - (void)setUp {
     [super setUp];

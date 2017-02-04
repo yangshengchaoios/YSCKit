@@ -7,6 +7,7 @@
 //
 
 #import <XCTest/XCTest.h>
+#import "NSArray+YSCKit.h"
 
 #define TEST_PERFORMANCE_NSARRAY    0
 
@@ -80,15 +81,6 @@
     XCTAssert( ! [NSArray ysc_isEquals:self.array4 with:self.array5], @"");
     XCTAssert( ! [NSArray ysc_isEquals:self.array5 with:self.array6], @"");
     XCTAssert( ! [NSArray ysc_isEquals:self.array4 with:self.array6], @"");
-    
-    // 对象数据类型(不能判断)
-    CommonItemModel *temp_item1 = [CommonItemModel createItemBySectionTitle:@"123" title:@"321" viewController:nil];
-    CommonItemModel *temp_item2 = [CommonItemModel createItemBySectionTitle:@"123" title:@"321" viewController:nil];
-    CommonItemModel *temp_item3 = [temp_item1 copy];
-    CommonItemModel *temp_item4 = [temp_item2 copy];
-    NSArray *temp_array6 = @[temp_item1, temp_item2];
-    NSArray *temp_array7 = @[temp_item3, temp_item4];
-    XCTAssert( ! [NSArray ysc_isEquals:temp_array6 with:temp_array7], @"");
 }
 - (void)test_ysc_intersectionArrayBetween {
     XCTAssert( ! [NSArray ysc_intersectionArrayBetween:self.array1 and:nil], @"");

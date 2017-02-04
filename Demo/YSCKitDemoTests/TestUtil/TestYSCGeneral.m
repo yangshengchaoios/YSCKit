@@ -1,5 +1,5 @@
 //
-//  TestPSKGeneral.m
+//  TestYSCGeneral.m
 //  YSCKitDemo
 //
 //  Created by Builder on 16/7/12.
@@ -8,11 +8,11 @@
 
 #import <XCTest/XCTest.h>
 
-@interface TestPSKGeneralUtil : XCTestCase
+@interface TestYSCGeneralUtil : XCTestCase
 
 @end
 
-@implementation TestPSKGeneralUtil
+@implementation TestYSCGeneralUtil
 
 - (void)setUp {
     [super setUp];

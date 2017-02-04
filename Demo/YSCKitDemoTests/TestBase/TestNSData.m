@@ -7,6 +7,7 @@
 //
 
 #import <XCTest/XCTest.h>
+#import "NSData+YSCKit.h"
 
 @interface TestNSData : XCTestCase
 @property (nonatomic, strong) NSString *source1;

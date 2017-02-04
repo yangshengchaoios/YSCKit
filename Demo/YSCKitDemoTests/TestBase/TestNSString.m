@@ -7,32 +7,35 @@
 //
 
 #import <XCTest/XCTest.h>
+#import "NSString+YSCKit.h"
 
 @interface TestNSString : XCTestCase
-
+@property (nonatomic, strong) NSString *source;
+@property (nonatomic, strong) NSString *pattern1;
+@property (nonatomic, strong) NSString *pattern2;
 @end
 
 @implementation TestNSString
 
 - (void)setUp {
     [super setUp];
-    // Put setup code here. This method is called before the invocation of each test method in the class.
+    self.source = @"asfdafsdweabcABCadsf72q938whabd23498^%$";
+    self.pattern1 = @"abc";
+    self.pattern2 = @"acdasdfasdf";
 }
 
 - (void)tearDown {
     // Put teardown code here. This method is called after the invocation of each test method in the class.
+    self.source = nil;
+    self.pattern1 = nil;
+    self.pattern2 = nil;
     [super tearDown];
 }
 
-- (void)testExample {
-    // This is an example of a functional test case.
-    // Use XCTAssert and related functions to verify your tests produce the correct results.
-}
-
-- (void)testPerformanceExample {
-    // This is an example of a performance test case.
+- (void)test_ysc_matchesByRegex1 {
     [self measureBlock:^{
-        // Put the code you want to measure the time of here.
+        NSArray *array1 = [self.source ysc_matchesByRegex:self.pattern1 options:NSRegularExpressionCaseInsensitive];
+        NSArray *array2 = [self.source ysc_matchesByRegex:self.pattern2 options:NSRegularExpressionCaseInsensitive];
     }];
 }
 

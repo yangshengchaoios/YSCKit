@@ -19,7 +19,7 @@
 - (CGFloat)ysc_left {
     return self.frame.origin.x;
 }
-- (void)setPsk_left:(CGFloat)x {
+- (void)setYsc_left:(CGFloat)x {
     CGRect frame = self.frame;
     frame.origin.x = x;
     self.frame = frame;
@@ -27,7 +27,7 @@
 - (CGFloat)ysc_top {
     return self.frame.origin.y;
 }
-- (void)setPsk_top:(CGFloat)y {
+- (void)setYsc_top:(CGFloat)y {
     CGRect frame = self.frame;
     frame.origin.y = y;
     self.frame = frame;
@@ -35,7 +35,7 @@
 - (CGFloat)ysc_width {
     return self.frame.size.width;
 }
-- (void)setPsk_width:(CGFloat)width {
+- (void)setYsc_width:(CGFloat)width {
     CGRect frame = self.frame;
     frame.size.width = width;
     self.frame = frame;
@@ -43,7 +43,7 @@
 - (CGFloat)ysc_height {
     return self.frame.size.height;
 }
-- (void)setPsk_height:(CGFloat)height {
+- (void)setYsc_height:(CGFloat)height {
     CGRect frame = self.frame;
     frame.size.height = height;
     self.frame = frame;
@@ -51,19 +51,19 @@
 - (CGFloat)ysc_centerX {
     return self.center.x;
 }
-- (void)setPsk_centerX:(CGFloat)centerX {
+- (void)setYsc_centerX:(CGFloat)centerX {
     self.center = CGPointMake(centerX, self.center.y);
 }
 - (CGFloat)ysc_centerY {
     return self.center.y;
 }
-- (void)setPsk_centerY:(CGFloat)centerY {
+- (void)setYsc_centerY:(CGFloat)centerY {
     self.center = CGPointMake(self.center.x, centerY);
 }
 - (CGPoint)ysc_origin {
     return self.frame.origin;
 }
-- (void)setPsk_origin:(CGPoint)origin {
+- (void)setYsc_origin:(CGPoint)origin {
     CGRect frame = self.frame;
     frame.origin = origin;
     self.frame = frame;
