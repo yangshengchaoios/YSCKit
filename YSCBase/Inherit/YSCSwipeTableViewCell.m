@@ -83,31 +83,40 @@
     self.animateDuration = 0.3f;
     self.leftActions = @[];
     self.rightActions = @[];
+    if (nil == self.panRecognizer) {
+        self.panRecognizer = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(_panHandler:)];
+        [self addGestureRecognizer:self.panRecognizer];
+        self.panRecognizer.delegate = self;
+    }
     
-    self.panRecognizer = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(_panHandler:)];
-    [self addGestureRecognizer:self.panRecognizer];
-    self.panRecognizer.delegate = self;
+    if (nil == self.swipeContainerView) {
+        self.swipeContainerView = [[UIView alloc] initWithFrame:CGRectZero];
+        self.swipeContainerView.hidden = YES;
+        self.swipeContainerView.layer.zPosition = 100;// ensure on the top of contentView
+        [self.contentView addSubview:self.swipeContainerView];
+    }
     
-    self.swipeContainerView = [[UIView alloc] initWithFrame:CGRectZero];
-    self.swipeContainerView.hidden = YES;
-    self.swipeContainerView.layer.zPosition = 100;// ensure on the top of contentView
-    [self.contentView addSubview:self.swipeContainerView];
+    if (nil == self.leftContainerView) {
+        self.leftContainerView = [[UIView alloc] initWithFrame:CGRectZero];
+        self.leftContainerView.backgroundColor = [UIColor clearColor];
+        self.leftContainerView.clipsToBounds = YES;
+        [self.swipeContainerView addSubview:self.leftContainerView];
+    }
     
-    self.leftContainerView = [[UIView alloc] initWithFrame:CGRectZero];
-    self.leftContainerView.backgroundColor = [UIColor clearColor];
-    self.leftContainerView.clipsToBounds = YES;
-    [self.swipeContainerView addSubview:self.leftContainerView];
+    if (nil == self.rightContainerView) {
+        self.rightContainerView = [[UIView alloc] initWithFrame:CGRectZero];
+        self.rightContainerView.backgroundColor = [UIColor clearColor];
+        self.rightContainerView.clipsToBounds = YES;
+        [self.swipeContainerView addSubview:self.rightContainerView];
+    }
     
-    self.rightContainerView = [[UIView alloc] initWithFrame:CGRectZero];
-    self.rightContainerView.backgroundColor = [UIColor clearColor];
-    self.rightContainerView.clipsToBounds = YES;
-    [self.swipeContainerView addSubview:self.rightContainerView];
-    
-    self.cellImageView = [[UIImageView alloc] initWithFrame:CGRectZero];
-    self.cellImageView.contentMode = UIViewContentModeCenter;
-    self.cellImageView.clipsToBounds = YES;
-    self.cellImageView.backgroundColor = [UIColor clearColor];
-    [self.swipeContainerView addSubview:self.cellImageView];
+    if (nil == self.cellImageView) {
+        self.cellImageView = [[UIImageView alloc] initWithFrame:CGRectZero];
+        self.cellImageView.contentMode = UIViewContentModeCenter;
+        self.cellImageView.clipsToBounds = YES;
+        self.cellImageView.backgroundColor = [UIColor clearColor];
+        [self.swipeContainerView addSubview:self.cellImageView];
+    }
 }
 - (void)_createActionsIfNeeded {
     if (self.leftActions.count == 0 && self.actionsBlock) {
@@ -234,7 +243,7 @@
         self.swipeOffset = offset;
     }
     else {//ended
-        CGFloat minOffset = 10;// swipe min length at least
+        CGFloat minOffset = 0;
         YSCSwipeState state = YSCSwipeStateNone;
         if (YSCSwipeStateSwipingLeftToRight == self.swipeState) {
             state = YSCSwipeStateLeftShows;
@@ -244,7 +253,7 @@
             state = YSCSwipeStateRightShows;
             minOffset = self.rightContainerView.ysc_width / 3;
         }
-        
+        minOffset = MAX(10, minOffset); // swipe min length at least
         if (fabs(self.swipeOffset) < minOffset) {
             [self _hideActionsWithAnimated:fabs(self.swipeOffset) > 0 ? YES : NO
                                 completion:nil];
